@@ -2,12 +2,12 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class Stat
+public class Stat //StatModifier 패턴 적용
 {
     [SerializeField] private float baseValue;
 
-    private float additive = 0;
-    private float multiplier = 1f;
+    private float additive; //Serializable의 직렬화 대상이 아닌경우 0으로 세팅해버림
+    private float multiplier;
 
     public float FinalValue => (baseValue + additive) * multiplier;
 
