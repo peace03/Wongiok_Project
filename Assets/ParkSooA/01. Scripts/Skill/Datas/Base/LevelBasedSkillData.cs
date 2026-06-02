@@ -14,7 +14,7 @@ public abstract class LevelBasedSkillData<T> : BaseSkillData where T : BaseSkill
         // 범위에서 벗어난 레벨이라면
         if (level < 1 || level > MaxLevel)
         {
-            Debug.Log($"레벨({level})은 범위(1 ~ {MaxLevel})를 벗어났습니다.");
+            Debug.Log($"[Error] 해당 데이터 없음 => 입력 : 레벨({level}) | 레벨 정보(1 ~ {MaxLevel})");
             return null;
         }
 

@@ -17,6 +17,16 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
         return null;
     }
 
-    // 레벨별 데미지 반환 함수
-    public float GetDamageByLevel(int level, int stage = 0) => GetLevelData(level).GetDamage(stage);
+    // 레벨 데미지 반환 함수
+    public float GetDamageByLevel(int level, int stage = 0)
+    {
+        // 레벨에 맞는 데이터 가져오기
+        var data = GetLevelData(level);
+
+        // 데이터가 없다면
+        if (data == null)
+            return 0f;
+
+        return data.GetDamage(stage);
+    }
 }

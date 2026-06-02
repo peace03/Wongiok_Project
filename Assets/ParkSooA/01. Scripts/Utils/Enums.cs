@@ -41,3 +41,12 @@ public enum ACTIVE_SKILL_TYPE
     Projectile,     // 발사체
     Area            // 영역
 }
+
+// 스킬 상태
+public enum SKILL_STATE
+{
+    Ready,          // 사용 가능
+    CoolTime,       // [사용 후] 쿨타임 중
+    Executing,      // 실행 중(지속 사용 중)
+    Charging        // [사용 전] 충전 중
+}

@@ -68,4 +68,17 @@ public static class EnumExtensions
             _                               => ""
         };
     }
+
+    // 스킬 상태 한국어 반환 함수
+    public static string ToKoreanString(this SKILL_STATE state)
+    {
+        return state switch
+        {
+            SKILL_STATE.Ready               => "사용 가능",
+            SKILL_STATE.CoolTime            => "쿨타임 중",
+            SKILL_STATE.Executing           => "사용 중",
+            SKILL_STATE.Charging            => "차징 중",
+            _                               => ""
+        };
+    }
 }

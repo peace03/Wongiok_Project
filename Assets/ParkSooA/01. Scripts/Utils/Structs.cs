@@ -13,7 +13,7 @@ public readonly struct StatAdjustment
 // 영역 스킬 단계 정보
 public readonly struct AreaSkillStageData
 {
-    public readonly float damage;
-    public readonly float distance;
-    public readonly float angle;
+    public readonly float damage;               // 데미지
+    public readonly float distance;             // 사거리
+    public readonly float angle;                // 각도
 }
