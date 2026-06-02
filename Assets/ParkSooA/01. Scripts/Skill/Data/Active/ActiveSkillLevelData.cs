@@ -1,7 +1,9 @@
 using UnityEngine;
+using System;
 
+[Serializable]
 // 액티브 스킬 레벨 정보
-public abstract class ActiveSkillLevelData
+public abstract class ActiveSkillLevelData : BaseSkillLevelData
 {
     [SerializeField] private float maxCoolTime;     // 쿨타임
     [SerializeField] private float maxDuration;     // 지속시간
@@ -9,5 +11,9 @@ public abstract class ActiveSkillLevelData
     public float MaxCoolTime => maxCoolTime;
     public float MaxDuration => maxDuration;
 
-    //public abstract float 
+    // 액티브 스킬 종류 반환 프로퍼티
+    public abstract ACTIVE_SKILL_TYPE ActiveType { get; }
+
+    // 데미지 반환 함수
+    public abstract float GetDamage(int stage);
 }

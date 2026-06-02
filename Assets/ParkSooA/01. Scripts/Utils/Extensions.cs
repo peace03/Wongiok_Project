@@ -58,6 +58,7 @@ public static class EnumExtensions
         };
     }
 
+    // 액티브 스킬 종류 한국어 반환 함수
     public static string ToKoreanString(this ACTIVE_SKILL_TYPE type)
     {
         return type switch

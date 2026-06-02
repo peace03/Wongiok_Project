@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 기본 스킬 정보
+// 스킬 기본 정보
 public abstract class BaseSkillData : ScriptableObject
 {
     [SerializeField] private int id;                    // ID
