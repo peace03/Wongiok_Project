@@ -21,4 +21,13 @@ public abstract class BaseSkillData : ScriptableObject
 
     // 객체 생성 함수
     public abstract SkillInstance CreateInstance();
+
+    // 최대 쿨타임 반환 함수
+    public virtual float GetMaxCoolTime(int level) => 0f;
+
+    // 최대 지속 시간 반환 함수
+    public virtual float GetMaxDuration(int level) => 0f;
+
+    // 최대 차징 시간 반환 함수
+    public virtual float GetMaxChargingTime(int level) => 0f;
 }

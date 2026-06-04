@@ -11,6 +11,9 @@ public abstract class ActiveSkillLevelData : BaseSkillLevelData
     public float MaxCoolTime => maxCoolTime;
     public float MaxDuration => maxDuration;
 
+    // 최대 차징 시간 반환 프로퍼티
+    public virtual float MaxChargingTime => 0f;
+
     // 액티브 스킬 종류 반환 프로퍼티
     public abstract ACTIVE_SKILL_TYPE ActiveType { get; }
 

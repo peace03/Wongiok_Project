@@ -17,6 +17,15 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
         return null;
     }
 
+    // 최대 쿨타임 반환 함수
+    public override float GetMaxCoolTime(int level) => GetLevelData(level).MaxCoolTime;
+
+    // 최대 지속 시간 반환 함수
+    public override float GetMaxDuration(int level) => GetLevelData(level).MaxDuration;
+
+    // 최대 차징 시간 반환 함수
+    public override float GetMaxChargingTime(int level) => GetLevelData(level).MaxChargingTime;
+
     // 레벨 데미지 반환 함수
     public float GetDamageByLevel(int level, int stage = 0)
     {
