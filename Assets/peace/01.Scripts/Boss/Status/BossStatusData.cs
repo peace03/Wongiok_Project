@@ -6,7 +6,7 @@ public class BossStatusData
 {
     [SerializeField] private Stat maxHP;                    //최대 체력
     [SerializeField] private Stat damageTakenMultiplier;    //피격 데미지 배율
-    [SerializeField] private Stat moveSpeed;                //이동속도
+    //[SerializeField] private Stat moveSpeed;                //이동속도 (speed값이 많이서 필요없는듯?)
     [SerializeField] private Stat attackSpeed;              //공속 배율
     [SerializeField] private Stat telegraphSpeed;           //사전 신호 표시 시간 배율
     [SerializeField] private Stat attackAPower;             //패턴A 공격력
@@ -29,7 +29,7 @@ public class BossStatusData
     {
         maxHP.ResetModifiers();
         damageTakenMultiplier.ResetModifiers();
-        moveSpeed.ResetModifiers();
+        //moveSpeed.ResetModifiers();
         attackSpeed.ResetModifiers();
         telegraphSpeed.ResetModifiers();
         attackAPower.ResetModifiers();

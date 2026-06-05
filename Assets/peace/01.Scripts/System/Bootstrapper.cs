@@ -24,9 +24,9 @@ public class Bootstrapper : MonoBehaviour
         //Priority로 정렬된 managers순서대로 초기화 및 ServiceLocator 등록
         foreach(var manager in managers)
         {
-            manager.Init();
-            ServiceLocator.Register(manager.GetType(), manager);
             //GetType()은 IInitializable같은 껍데기 타입이 아닌 알맹이 진짜 타입을 반환함
+            ServiceLocator.Register(manager.GetType(), manager); //먼저 등록해줘야 Init()에서 사용 가능
+            manager.Init();
         }
     }
 }
