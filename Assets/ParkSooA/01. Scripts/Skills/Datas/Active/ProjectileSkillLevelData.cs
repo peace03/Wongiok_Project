@@ -10,7 +10,6 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
     [SerializeField] private int penetrationCount;      // 관통 횟수(-1 : 횟수 제한 없음)
     [SerializeField] private float maxChargingTime;     // 차징시간
 
-    public float Damage => damage;
     public int ProjectileCount => projectileCount;
     public int PenetrationCount => penetrationCount;
 
@@ -20,5 +19,11 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
     public override ACTIVE_SKILL_TYPE ActiveType => ACTIVE_SKILL_TYPE.Projectile;
 
     // 데미지 반환 함수
-    public override float GetDamage(int stage) => Damage;
+    public override float GetDamage(int stage) => damage;
+
+    // 스킬 효과 적용 함수
+    public override void ApplyEffect(GameObject target)
+    {
+        
+    }
 }

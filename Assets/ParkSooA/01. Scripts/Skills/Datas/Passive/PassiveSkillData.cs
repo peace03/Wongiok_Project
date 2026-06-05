@@ -5,8 +5,5 @@
 public class PassiveSkillData : LevelBasedSkillData<PassiveSkillLevelData>
 {
     // 객체 생성 함수
-    public override SkillInstance CreateInstance()
-    {
-        return null;
-    }
+    public override SkillInstance CreateInstance() => new(this);
 }

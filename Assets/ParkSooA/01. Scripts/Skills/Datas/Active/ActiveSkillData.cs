@@ -12,10 +12,7 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
     public IReadOnlyList<GameObject> Effects => effects;
 
     // 객체 생성 함수
-    public override SkillInstance CreateInstance()
-    {
-        return null;
-    }
+    public override SkillInstance CreateInstance() => new(this);
 
     // 최대 쿨타임 반환 함수
     public override float GetMaxCoolTime(int level) => GetLevelData(level).MaxCoolTime;
