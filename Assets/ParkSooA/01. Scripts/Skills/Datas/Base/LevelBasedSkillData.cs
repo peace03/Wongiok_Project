@@ -8,6 +8,12 @@ public abstract class LevelBasedSkillData<T> : BaseSkillData where T : BaseSkill
 
     public IReadOnlyList<T> LevelDatas => levelDatas;
 
+    // 스킬 사용 함수
+    public override void ExecuteSkill(GameObject target, int level) => GetLevelData(level)?.ApplyEffect(target);
+
+    // 스킬 취소 함수
+    public override void CancelSkill(GameObject target, int level) => GetLevelData(level)?.RemoveEffect(target);
+
     // 레벨 정보 반환 함수
     public T GetLevelData(int level)
     {

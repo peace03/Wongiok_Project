@@ -19,11 +19,16 @@ public class AreaSkillLevelData : ActiveSkillLevelData
         // 범위에서 벗어난 단계라면
         if(stage < 1 || stage > stages.Count)
         {
-            Debug.Log($"[Error] 해당 데이터 없음 => 입력 : 단계({stage}) | 스킬 단계(1 ~ {stages.Count})");
+            Debug.Log($"[Error | Skill] 해당 데이터 없음 => 입력 : 단계({stage}) | 스킬 단계(1 ~ {stages.Count})");
             return 0f;
         }
 
         // 단계에 해당하는 데미지 반환
         return stages[stage - 1].damage;
+    }
+
+    public override void ApplyEffect(GameObject target)
+    {
+        Debug.Log("[Skill] 영역 액티브 스킬 공격");
     }
 }

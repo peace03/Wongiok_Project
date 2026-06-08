@@ -24,6 +24,15 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
     // 스킬 효과 적용 함수
     public override void ApplyEffect(GameObject target)
     {
-        
+        Debug.Log("[Skill] 발사체 액티브 스킬 공격");
+
+        // 임시용 총알 생성 로직
+        GameObject[] projectiles = new GameObject[projectileCount];
+
+        for(int i = 0; i < projectiles.Length; i++)
+        {
+            projectiles[i] = MonoBehaviour.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
+                        target.transform.position + target.transform.forward, target.transform.rotation);
+        }
     }
 }

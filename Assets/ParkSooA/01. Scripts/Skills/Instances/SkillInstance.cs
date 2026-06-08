@@ -50,86 +50,34 @@ public class SkillInstance
     }
 
     // 스킬 레벨 상승 함수
-    public void LevelUp()
+    public void LevelUp(GameObject owner)
     {
+        // 강화 불가능이라면
+        if(!CanEnhance)
+        {
+            Debug.Log($"[Skill] {data.SkillName}(Lv.{curLevel}) - 강화 불가");
+            return;
+        }
+
+        //data.Cancel
+        // 레벨 증가
         curLevel = Math.Clamp(curLevel + 1, 1, Math.Max(1, data.MaxLevel));
 
         // 스킬 효과도 다시 적용 시켜줘야 되네...
         // 패시브라면 현재 레벨의 효과를 - 해주고, 다음 레벨 효과를 + 해줘야 될듯
     }
 
-    // 패시브 스킬 장착 함수
-    public void EquippedPassive()
+    // 스킬 사용 함수
+    public void UseSkill(GameObject owner)
     {
-        // 액티브 스킬이라면
-        if(IsActiveSkill)
-        {
-            Debug.Log($"[Skill] {data.SkillName} - 액티브 스킬");
-            return;
-        }
-
-        // 실행 상태로 변경
-        state = SKILL_STATE.Executing;
-        // 스킬 효과 적용
-        ApplySkillEffect();
-    }
-
-    // 스킬 효과 적용 함수
-    private void ApplySkillEffect()
-    {
-        Debug.Log("스킬 효과 적용");
-
-        // 패시브 스킬이라면
-        if (!IsActiveSkill)
-        {
-
-        }
-        // 액티브 스킬이라면
-        else
-        {
-
-        }
-    }
-
-    // 스킬 효과 미적용 함수
-    private void RemoveSkillEffect()
-    {
-        Debug.Log("스킬 효과 미적용");
-    }
-
-    // 패시브 스킬 장착 해제 함수
-    public void UnEquippedPassive()
-    {
-        // 액티브 스킬이라면
-        if (IsActiveSkill)
-        {
-            Debug.Log($"[Skill] {data.SkillName} - 액티브 스킬");
-            return;
-        }
-
-        // 사용 가능 상태로 변경
-        state = SKILL_STATE.Ready;
-        // 스킬 효과 미적용
-        RemoveSkillEffect();
-    }
-
-    // 액티브 스킬 실행 함수
-    public void ExecuteActive()
-    {
-        // 액티브 스킬이 아니라면
-        if(!IsActiveSkill)
-        {
-            Debug.Log($"[Skill] {data.SkillName} - 패시브 스킬");
-            return;
-        }
         // 사용 가능한 상태가 아니라면
-        else if (!IsReady)
+        if (!IsReady)
         {
             Debug.Log($"[Skill] {data.SkillName} - {state.ToKoreanString()}");
             return;
         }
 
-        Debug.Log($"[Skill] {data.SkillName} - 실행");
+        Debug.Log($"[Skill] {data.SkillName} - 사용");
 
         // 차징 시간이 없다면
         if (data.GetMaxChargingTime(curLevel) <= 0f)
@@ -142,7 +90,7 @@ public class SkillInstance
     }
 
     // 스킬 상태 변경 함수
-    private void SwitchState(SKILL_STATE change)
+    private void SwitchState(SKILL_STATE change, GameObject owner = null)
     {
         // 패시브 스킬이라면
         if (!IsActiveSkill)
@@ -160,19 +108,22 @@ public class SkillInstance
             Debug.Log("스킬 슬롯 UI에 반짝거리는 이펙트가 필요하다면 채우기");
         // 쿨타임 상태라면
         else if (IsOnCoolTime)
-        {
             // 현재 쿨타임 초기화
             curCoolTime = 0f;
-            // 스킬 효과 미적용
-            RemoveSkillEffect();
-        }
         // 실행 상태라면
         else if (IsExecuting)
         {
+            // 실행 주체가 비어있다면
+            if(owner == null)
+            {
+                Debug.Log($"[Error | Skill] {data.SkillName}(Lv.{curLevel}) - 스킬 실행 주체(Owner) 없음");
+                return;
+            }
+
             // 현재 지속 시간 초기화
             curDuration = 0f;
-            // 스킬 효과 적용
-            ApplySkillEffect();
+            // 스킬 실행(플레이어, 레벨)
+            data.ExecuteSkill(owner, curLevel);
         }
         // 차징 상태라면
         else if (IsCharging)
