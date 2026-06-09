@@ -30,7 +30,7 @@ public class BossController : MonoBehaviour, IInitializable
         bossState.Add(State.Groggy,     new GroggyState(this, logics));
         bossState.Add(State.Defeated,   new DefeatedState(this, logics));
 
-        curState = bossState[State.Spawn];
+        curState = bossState[State.Attack];
         curState?.Enter();
         //Debug.Log("BossController Init()실행 완료");
     }

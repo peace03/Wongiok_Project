@@ -14,6 +14,11 @@ public class BossStatus : MonoBehaviour, IInitializable
         TestPrint();
     }
 
+    public void TakeDamage(float amount)
+    {
+        status.SubCurrentHP(amount);
+    }
+
     public void TestPrint()
     {
         Debug.Log(status.CurrentHP);

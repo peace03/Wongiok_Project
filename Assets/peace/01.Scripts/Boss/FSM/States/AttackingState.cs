@@ -4,20 +4,25 @@ public class AttackingState : BossState
 {
     public AttackingState(BossController controller, IBossLogics logics)
         : base(controller, logics) { }
-
-    bool chance = false;
+    
+    private Node curBT;
 
     public override void Enter()
     {
         Debug.Log("Attack 상태 진입");
+        curBT = logics.GetAttackBT();
+    }
+    public override void FixedUpdate()
+    {
+        logics.ExcuteAttackMove();
     }
     public override void Update()
     {
-        if (!chance) { Debug.Log("Attack Update 실행"); chance = true; }
+        curBT.Evaluate();
     }
     public override void Exit()
     {
-        chance = false;
+        
         Debug.Log("Attack 상태 이탈");
     }
 }

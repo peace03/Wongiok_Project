@@ -37,5 +37,9 @@ public class BossStatusData
         attackCPower.ResetModifiers();
         attackDPower.ResetModifiers();
     }
-    
+
+    public void SubCurrentHP(float amount)
+    {
+        currentHP -= amount;
+    }
 }

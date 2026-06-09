@@ -3,6 +3,8 @@ using UnityEngine;
 
 public interface IBossLogics
 {
+    public Node GetAttackBT();
     public void Spawn();
     public void ExcuteIdleMove();
+    public void ExcuteAttackMove();
 }
