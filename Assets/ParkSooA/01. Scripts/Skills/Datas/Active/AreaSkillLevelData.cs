@@ -27,7 +27,7 @@ public class AreaSkillLevelData : ActiveSkillLevelData
         return stages[stage - 1].damage;
     }
 
-    public override void ApplyEffect(GameObject target)
+    public override void ApplyEffect(GameObject target, IReadOnlyList<StatAdjustment> prevStats)
     {
         Debug.Log("[Skill] 영역 액티브 스킬 공격");
     }

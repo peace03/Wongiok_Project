@@ -15,7 +15,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
     public override IReadOnlyList<StatAdjustment> GetAppliedStats() => appliedStats;
 
     // 스킬 효과 적용 함수
-    public override void ApplyEffect(GameObject target)
+    public override void ApplyEffect(GameObject target, IReadOnlyList<StatAdjustment> prevStats)
     {
         // 스탯이 없다면
         if (!target.TryGetComponent<PlayerStatus>(out var trgStat))
@@ -32,6 +32,22 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         {
             // 변화량 구하기
             amount = stat.modifyType == MODIFY_TYPE.Addition ? stat.amount : -stat.amount;
+
+            if(prevStats != null)
+            {
+                float prevAmount = 0;
+
+                for (int i = 0; i < prevStats.Count; i++)
+                    if (prevStats[i].statType == stat.statType)
+                    {
+                        prevAmount = prevStats[i].modifyType == MODIFY_TYPE.Addition ? prevStats[i].amount
+                                                                                        : -prevStats[i].amount;
+                        break;
+                    }
+
+                if (prevAmount != 0)
+                    amount -= prevAmount;
+            }
 
             // 스탯 종류에 따라서
             switch (stat.statType)

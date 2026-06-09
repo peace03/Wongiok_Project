@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 [Serializable]
 // 발사체 액티브 스킬 레벨 정보
@@ -22,7 +23,7 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
     public override float GetDamage(int stage) => damage;
 
     // 스킬 효과 적용 함수
-    public override void ApplyEffect(GameObject target)
+    public override void ApplyEffect(GameObject target, IReadOnlyList<StatAdjustment> prevStats)
     {
         Debug.Log("[Skill] 발사체 액티브 스킬 공격");
 

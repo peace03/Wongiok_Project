@@ -59,12 +59,13 @@ public class SkillInstance
             return;
         }
 
-        //data.Cancel
         // 레벨 증가
         curLevel = Math.Clamp(curLevel + 1, 1, Math.Max(1, data.MaxLevel));
 
-        // 스킬 효과도 다시 적용 시켜줘야 되네...
-        // 패시브라면 현재 레벨의 효과를 - 해주고, 다음 레벨 효과를 + 해줘야 될듯
+        // 패시브 스킬이라면
+        if(!IsActiveSkill)
+            // 스킬 사용
+            data.ExecuteSkill(owner, curLevel);
     }
 
     // 스킬 사용 함수
@@ -82,7 +83,7 @@ public class SkillInstance
         // 차징 시간이 없다면
         if (data.GetMaxChargingTime(curLevel) <= 0f)
             // 실행 상태로 변경
-            SwitchState(SKILL_STATE.Executing);
+            SwitchState(SKILL_STATE.Executing, owner);
         // 차징 시간이 있다면
         else
             // 차징 상태로 변경
