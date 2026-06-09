@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 3841034060840281779}
   - component: {fileID: 7376795056748142258}
   - component: {fileID: -8439078067589889534}
-  - component: {fileID: 5367993387972709741}
-  m_Layer: 7
+  - component: {fileID: -9084250434651854662}
+  m_Layer: 10
   m_Name: bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -141,7 +141,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &5367993387972709741
+--- !u!114 &-9084250434651854662
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -155,3 +155,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BulletProjectile
   speed: 25
   lifeTime: 3
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 256

@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 3841034060840281779}
   - component: {fileID: 7376795056748142258}
   - component: {fileID: -8439078067589889534}
-  - component: {fileID: 5367993387972709741}
-  m_Layer: 9
-  m_Name: PlayerBullet
+  - component: {fileID: -6531391070390987119}
+  m_Layer: 10
+  m_Name: TestBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -141,7 +141,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &5367993387972709741
+--- !u!114 &-6531391070390987119
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -150,11 +150,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5778001344916438767}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf80ba7af0555ab4faba06248dce558c, type: 3}
+  m_Script: {fileID: 11500000, guid: 3c5a74087f3544daa36bdb7836e51b8c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BulletProjectile
-  speed: 25
+  m_EditorClassIdentifier: Assembly-CSharp::TestMonsterProjectile
+  speed: 5
   lifeTime: 3
   hitMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 64
+  parryReadyColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

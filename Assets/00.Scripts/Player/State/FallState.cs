@@ -18,14 +18,14 @@ public class FallState : PlayerBaseState
 
         if (controller.DashTriggered && controller.Movement.CanDash())
         {
-            controller.TransitionTo(controller.DashState);
+            controller.TransitionTo(controller.DashState); 
             return;
         }
 
         if (controller.JumpTriggered && controller.Movement.CanJump())
         {
-            controller.TransitionTo(controller.JumpState);
-            return;
+            controller.TransitionTo(controller.JumpState); 
+            return;                        
         }
 
         if (controller.Movement.IsGrounded && controller.Movement.IsFalling)

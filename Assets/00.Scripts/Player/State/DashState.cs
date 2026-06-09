@@ -51,8 +51,7 @@ public class DashState : PlayerBaseState
         controller.Movement.MoveByVelocity(dashVelocity);
 
         // 아직 시간이 남아 있으면 상태 전환 없이 대쉬를 계속합니다.
-        if (dashTimer > 0f)
-            return;
+        if (dashTimer > 0f) return;
 
         // 대쉬가 끝난 뒤 지상에 있다면 입력 여부에 따라 이동/정지 상태로 돌아갑니다.
         if (controller.Movement.IsGrounded)
@@ -76,14 +75,12 @@ public class DashState : PlayerBaseState
     private Vector3 GetDashDirection()
     {
         // 현재 입력 방향이 있으면 입력을 우선해서 대쉬 방향을 정합니다.
-        if (controller.MoveInput.x > 0f)
-            return Vector3.back;
-
-        if (controller.MoveInput.x < 0f)
-            return Vector3.forward;
+        if (controller.MoveInput.x > 0f) return Vector3.left;
+         
+        if (controller.MoveInput.x < 0f) return Vector3.right;
 
         // 입력이 없다면 마지막으로 바라보던 방향으로 대쉬합니다.
-        return controller.IsFacingRight ? Vector3.back : Vector3.forward;
+        return controller.IsFacingRight ? Vector3.left : Vector3.right;
     }
 
     public override void ExitState()

@@ -7,7 +7,7 @@ public class MonsterStatusData : LivingStatus
 }
 
 // 몬스터의 HP와 기본 스탯을 관리하는 컴포넌트입니다.
-// 공격 판정이 발행한 DamageRequestEvent를 받아 자기 자신이 대상이면 실제 HP를 깎습니다.
+// 공격 판정이 직접 전달한 DamageInfo를 받아 실제 HP를 깎습니다.
 [RequireComponent(typeof(HitFlashFeedback))]
 public class MonsterStatus : MonoBehaviour
 {
@@ -43,17 +43,6 @@ public class MonsterStatus : MonoBehaviour
         Init();
     }
 
-    private void OnEnable()
-    {
-        // 공격 판정이 발행한 데미지 요청을 받습니다.
-        EventBus<DamageRequestEvent>.action += OnDamageRequested;
-    }
-
-    private void OnDisable()
-    {
-        EventBus<DamageRequestEvent>.action -= OnDamageRequested;
-    }
-
     private void SetupBaseStatus()
     {
         // 인스펙터에서 조절한 값을 LivingStatus의 공통 Stat에 복사합니다.
@@ -73,9 +62,9 @@ public class MonsterStatus : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        // 디버그나 테스트 코드에서 직접 데미지를 줄 수 있도록 남겨둔 진입점입니다.
-        ApplyDamage(
-            new DamageRequestEvent(
+        // 디버그나 테스트 코드에서 숫자만 넘겨도 같은 데미지 흐름을 타도록 감쌉니다.
+        TakeDamage(
+            new DamageInfo(
                 gameObject,
                 null,
                 null,
@@ -84,6 +73,31 @@ public class MonsterStatus : MonoBehaviour
                 damage
             )
         );
+    }
+
+    public void TakeDamage(DamageInfo damageInfo)
+    {
+        // 다른 대상용 DamageInfo가 잘못 전달된 경우에는 처리하지 않습니다.
+        if (!IsTargetSelf(damageInfo.TargetObject)) return;
+
+        // 이미 죽은 몬스터는 추가 피해를 무시합니다.
+        if (status.IsDead) return;
+
+        // 음수 데미지나 0 데미지는 적용하지 않습니다.
+        float damage = Mathf.Max(0f, damageInfo.Damage);
+        if (Mathf.Approximately(damage, 0f)) return;
+
+        status.CurrentHP -= damage;
+
+        if (status.CurrentHP < 0f)
+            status.CurrentHP = 0f;
+
+        PublishHealthChanged();
+        PublishDamaged(damageInfo, damage);
+
+        // HP가 0이 되면 사망 이벤트를 발행합니다.
+        if (status.IsDead)
+            EventBus<MonsterDeadEvent>.Publish(new MonsterDeadEvent(gameObject));
     }
 
     public float GetMaxHP()
@@ -106,41 +120,12 @@ public class MonsterStatus : MonoBehaviour
         return status.MoveSpeed.FinalValue;
     }
 
-    private void OnDamageRequested(DamageRequestEvent eventData)
-    {
-        // 이벤트가 전역으로 발행되므로, 자기 자신을 대상으로 한 요청만 처리합니다.
-        if (!IsTargetSelf(eventData.TargetObject)) return;
-
-        ApplyDamage(eventData);
-    }
-
-    private void ApplyDamage(DamageRequestEvent eventData)
-    {
-        // 이미 죽은 몬스터는 추가 피해를 무시합니다.
-        if (status.IsDead) return;
-
-        // 음수 데미지나 0 데미지는 적용하지 않습니다.
-        float damage = Mathf.Max(0f, eventData.Damage);
-        if (Mathf.Approximately(damage, 0f)) return;
-
-        status.CurrentHP -= damage;
-
-        if (status.CurrentHP < 0f)
-            status.CurrentHP = 0f;
-
-        PublishHealthChanged();
-        PublishDamageApplied(eventData, damage);
-
-        // HP가 0이 되면 사망 이벤트를 발행합니다.
-        if (status.IsDead)
-            EventBus<MonsterDeadEvent>.Publish(new MonsterDeadEvent(gameObject));
-    }
-
     private bool IsTargetSelf(GameObject targetObject)
     {
-        // 자식 콜라이더가 맞아도 부모 몬스터가 맞은 것으로 처리합니다.
-        if (targetObject == null) return false;
+        // 대상 정보가 비어 있으면 직접 호출로 보고 현재 몬스터에게 적용합니다.
+        if (targetObject == null) return true;
 
+        // 자식 콜라이더가 맞아도 부모 몬스터가 맞은 것으로 처리합니다.
         return targetObject == gameObject || targetObject.transform.IsChildOf(transform);
     }
 
@@ -156,17 +141,20 @@ public class MonsterStatus : MonoBehaviour
         );
     }
 
-    private void PublishDamageApplied(DamageRequestEvent eventData, float damage)
+    private void PublishDamaged(DamageInfo damageInfo, float appliedDamage)
     {
-        // 실제 HP가 감소한 뒤 피격 피드백용 이벤트를 발행합니다.
-        EventBus<DamageAppliedEvent>.Publish(
-            new DamageAppliedEvent(
+        // 후처리 시스템이 실제 적용된 데미지와 피격 정보를 함께 받을 수 있게 알립니다.
+        EventBus<MonsterDamagedEvent>.Publish(
+            new MonsterDamagedEvent(
                 gameObject,
-                eventData.HitCollider,
-                eventData.AttackerObject,
-                eventData.HitPoint,
-                eventData.AttackDirection,
-                damage,
+                new DamageInfo(
+                    gameObject,
+                    damageInfo.HitCollider,
+                    damageInfo.AttackerObject,
+                    damageInfo.HitPoint,
+                    damageInfo.HitDirection,
+                    appliedDamage
+                ),
                 status.CurrentHP,
                 status.MaxHP.FinalValue
             )

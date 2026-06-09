@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
     public JumpState JumpState { get; private set; }
     public FallState FallState { get; private set; }
     public DashState DashState { get; private set; }
+    public HitState HitState { get; private set; }
+    public DeathState DeathState { get; private set; }
 
     // 현재 프레임의 이동 입력입니다.
     public Vector2 MoveInput { get; private set; }
@@ -82,6 +84,8 @@ public class PlayerController : MonoBehaviour
         JumpState = new JumpState(this);
         FallState = new FallState(this);
         DashState = new DashState(this);
+        HitState = new HitState(this);
+        DeathState = new DeathState(this);
     }
 
     private void OnEnable()
@@ -137,6 +141,32 @@ public class PlayerController : MonoBehaviour
         _currentState?.ExitState();
         _currentState = newState;
         _currentState.EnterState();
+    }
+
+    public void EnterHitState(DamageInfo damageInfo)
+    {
+        // PlayerStatus에서 실제 데미지가 적용된 뒤 피격 상태로 진입할 때 사용합니다.
+        HitState.SetHit(damageInfo);
+        TransitionTo(HitState);
+    }
+
+    public void EnterDeathState(DeathInfo deathInfo)
+    {
+        // PlayerStatus에서 사망이 확정된 뒤 모든 조작을 잠그기 위해 사용합니다.
+        DeathState.SetDeath(deathInfo);
+        TransitionTo(DeathState);
+    }
+
+    public void ExitDeathStateAfterRevive()
+    {
+        // 부활 후 현재 위치의 지상 여부에 따라 자연스러운 기본 상태로 복귀합니다.
+        if (Movement != null && !Movement.IsGrounded)
+        {
+            TransitionTo(FallState);
+            return;
+        }
+
+        TransitionTo(IdleState);
     }
 
     private void PlayerInput()

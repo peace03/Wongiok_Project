@@ -1,5 +1,3 @@
-// 모든 플레이어 상태가 상속받는 기본 클래스입니다.
-// Idle, Move, Jump, Dash 같은 상태들이 같은 인터페이스로 동작하도록 묶어줍니다.
 public abstract class PlayerBaseState
 {
     // 상태에서 플레이어 입력, 이동, 공격 컴포넌트에 접근하기 위한 컨트롤러 참조입니다.

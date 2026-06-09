@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-// DamageAppliedEvent를 받아 피격된 오브젝트의 색을 짧게 붉게 바꾸는 시각 피드백입니다.
+// 전용 피격 이벤트를 받아 피격된 오브젝트의 색을 짧게 붉게 바꾸는 시각 피드백입니다.
 // 플레이어와 몬스터 모두 같은 컴포넌트를 사용하도록 분리했습니다.
 public class HitFlashFeedback : MonoBehaviour
 {
@@ -38,12 +38,14 @@ public class HitFlashFeedback : MonoBehaviour
             CacheRenderers();
 
         // 실제 데미지가 적용된 뒤에만 색을 바꿉니다.
-        EventBus<DamageAppliedEvent>.action += OnDamageApplied;
+        EventBus<PlayerDamagedEvent>.action += OnPlayerDamaged;
+        EventBus<MonsterDamagedEvent>.action += OnMonsterDamaged;
     }
 
     private void OnDisable()
     {
-        EventBus<DamageAppliedEvent>.action -= OnDamageApplied;
+        EventBus<PlayerDamagedEvent>.action -= OnPlayerDamaged;
+        EventBus<MonsterDamagedEvent>.action -= OnMonsterDamaged;
 
         // 비활성화될 때 피격 색이 남아 있지 않도록 정리합니다.
         if (flashRoutine != null)
@@ -55,10 +57,18 @@ public class HitFlashFeedback : MonoBehaviour
         RestoreOriginalColors();
     }
 
-    private void OnDamageApplied(DamageAppliedEvent eventData)
+    private void OnPlayerDamaged(PlayerDamagedEvent eventData)
     {
-        // 다른 오브젝트가 맞은 이벤트에는 반응하지 않습니다.
-        if (eventData.VictimObject != gameObject) return;
+        // 다른 플레이어 오브젝트가 맞은 이벤트에는 반응하지 않습니다.
+        if (eventData.PlayerObject != gameObject) return;
+
+        Flash();
+    }
+
+    private void OnMonsterDamaged(MonsterDamagedEvent eventData)
+    {
+        // 다른 몬스터 오브젝트가 맞은 이벤트에는 반응하지 않습니다.
+        if (eventData.MonsterObject != gameObject) return;
 
         Flash();
     }

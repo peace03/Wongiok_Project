@@ -15,9 +15,74 @@ public readonly struct PlayerHealthChangedEvent
 }
 
 // 플레이어 체력이 0이 되어 사망했을 때 발행되는 이벤트입니다.
-// 현재는 데이터가 필요 없으므로 비어 있는 이벤트 구조체로 선언되어 있습니다.
+// 사망 UI, 사운드, 화면 효과는 이 이벤트의 DeathInfo를 사용합니다.
 public readonly struct PlayerDeadEvent
 {
+    // 사망 순간의 위치, 원인, 마지막 데미지 정보입니다.
+    public readonly DeathInfo DeathInfo;
+
+    public PlayerDeadEvent(DeathInfo deathInfo)
+    {
+        DeathInfo = deathInfo;
+    }
+}
+
+// 플레이어가 사망 후 부활했을 때 발행되는 이벤트입니다.
+// 체크포인트 부활, 부활 이펙트, UI 복구 흐름에서 사용할 수 있습니다.
+public readonly struct PlayerRevivedEvent
+{
+    // 부활한 플레이어 오브젝트입니다.
+    public readonly GameObject PlayerObject;
+
+    // 부활이 완료된 위치입니다.
+    public readonly Vector3 RevivePosition;
+
+    // 부활 후 현재 체력입니다.
+    public readonly float CurrentHP;
+
+    // 플레이어의 최대 체력입니다.
+    public readonly float MaxHP;
+
+    public PlayerRevivedEvent(
+        GameObject playerObject,
+        Vector3 revivePosition,
+        float currentHP,
+        float maxHP)
+    {
+        PlayerObject = playerObject;
+        RevivePosition = revivePosition;
+        CurrentHP = currentHP;
+        MaxHP = maxHP;
+    }
+}
+
+// 플레이어가 실제 데미지를 받은 뒤 발행되는 이벤트입니다.
+// UI, 사운드, 피격 이펙트는 이 이벤트를 구독해서 후처리만 담당합니다.
+public readonly struct PlayerDamagedEvent
+{
+    // 실제로 데미지를 받은 플레이어 오브젝트입니다.
+    public readonly GameObject PlayerObject;
+
+    // 이번 피격에 사용된 데미지 정보입니다.
+    public readonly DamageInfo DamageInfo;
+
+    // 피해 적용 후 현재 체력입니다.
+    public readonly float CurrentHP;
+
+    // 플레이어의 최대 체력입니다.
+    public readonly float MaxHP;
+
+    public PlayerDamagedEvent(
+        GameObject playerObject,
+        DamageInfo damageInfo,
+        float currentHP,
+        float maxHP)
+    {
+        PlayerObject = playerObject;
+        DamageInfo = damageInfo;
+        CurrentHP = currentHP;
+        MaxHP = maxHP;
+    }
 }
 
 // 플레이어가 공격을 발사했을 때 발행되는 이벤트입니다.

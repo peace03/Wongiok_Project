@@ -137,12 +137,10 @@ public class PlayerMovement : MonoBehaviour
     public bool CanDash()
     {
         // 마지막 대쉬 이후 쿨타임이 지나지 않았다면 대쉬할 수 없습니다.
-        if (Time.time < lastDashTime + dashCooldown)
-            return false;
+        if (Time.time < lastDashTime + dashCooldown) return false;
 
         // 지상에서는 쿨타임만 만족하면 대쉬할 수 있습니다.
-        if (IsGrounded)
-            return true;
+        if (IsGrounded) return true;
 
         // 공중에서는 아직 공중 대쉬를 소비하지 않았을 때만 대쉬할 수 있습니다.
         return canAirDash;

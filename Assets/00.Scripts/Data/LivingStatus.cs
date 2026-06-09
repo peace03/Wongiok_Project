@@ -3,7 +3,7 @@ using System;
 [Serializable]
 public class LivingStatus
 {
-    // 생명체가 공통으로 가지는 스탯들입니다.
+    // 생명체가 공통으로 가지는 스탯들입니다. 
     // PlayerStatusData처럼 상속받는 클래스에서 추가 스탯을 확장할 수 있습니다.
     public Stat MaxHP = new Stat();
     public Stat AttackPower = new Stat();

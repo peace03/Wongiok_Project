@@ -58,13 +58,13 @@ public class PlayerAttack : MonoBehaviour
         // 바닥을 향해 바로 발사되는 어색한 상황을 막기 위한 예외 처리입니다.
         if (isGrounded && Mathf.Approximately(x, 0f) && y < 0f)
         {
-            return isFacingRight ? Vector3.back : Vector3.forward;
+            return isFacingRight ? Vector3.left : Vector3.right;
         }
 
         // 아무 방향 입력이 없다면 마지막으로 바라본 방향으로 공격합니다.
         if (Mathf.Approximately(x, 0f) && Mathf.Approximately(y, 0f))
         {
-            return isFacingRight ? Vector3.back : Vector3.forward;
+            return isFacingRight ? Vector3.left : Vector3.right;
         }
 
         // 수평 입력 없이 위/아래 입력만 있다면 수직 방향으로 공격합니다.
@@ -75,7 +75,8 @@ public class PlayerAttack : MonoBehaviour
 
         // 현재 게임 축 기준으로 입력 x는 z축 방향에 매핑합니다.
         // x가 양수일 때 Vector3.back 방향이 되도록 -x를 사용합니다.
-        Vector3 direction = new Vector3(0f, y, -x);
+        //Vector3 direction = new Vector3(0f, y, -x);
+        Vector3 direction = new Vector3(-x, y, 0f);
         return direction.normalized;
     }
 }

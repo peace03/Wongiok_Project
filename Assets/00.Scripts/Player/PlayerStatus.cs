@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 [Serializable]
@@ -25,6 +26,18 @@ public class PlayerStatusData : LivingStatus
 [RequireComponent(typeof(HitFlashFeedback))]
 public class PlayerStatus : MonoBehaviour
 {
+    // 피격 직후 입력을 막는 경직 시간입니다.
+    public const float HitStunDuration = 0.2f;
+
+    // 경직이 끝난 뒤 추가로 유지되는 무적 시간입니다.
+    public const float HitInvincibleDuration = 0.5f;
+
+    // 피격 경직 동안 뒤로 밀려나는 거리입니다.
+    public const float HitKnockbackDistance = 0.3f;
+
+    // 1차 구현에서 사용하는 사망 후 자동 부활 대기 시간입니다.
+    private const float ReviveDelay = 2f;
+
     [Header("Base Status")]
     // 인스펙터에서 조절하는 기본 체력입니다.
     [SerializeField] private float baseMaxHP = 100f;
@@ -57,6 +70,15 @@ public class PlayerStatus : MonoBehaviour
     // 현재 플레이어 상태가 피해를 받을 수 있는지 확인하기 위한 컨트롤러 참조입니다.
     private PlayerController playerController;
 
+    // 피격 후 무적이 끝나는 시각입니다.
+    private float invincibleEndTime;
+
+    // 사망 처리 중인지 확인해 회복, 추가 피격, 중복 부활을 막습니다.
+    private bool isDeathProcessing;
+
+    // 사망 후 부활을 기다리는 코루틴 핸들입니다.
+    private Coroutine reviveRoutine;
+
     private void Awake()
     {
         // 기존 씬 오브젝트에 PlayerStatus만 붙어 있는 경우도 피격 피드백을 보장합니다.
@@ -66,18 +88,6 @@ public class PlayerStatus : MonoBehaviour
         // 기본값을 스탯 객체에 반영한 뒤 현재 체력을 초기화합니다.
         SetupBaseStatus();
         Init();
-    }
-
-    private void OnEnable()
-    {
-        // 공격 판정 스크립트가 발행한 데미지 요청을 받습니다.
-        EventBus<DamageRequestEvent>.action += OnDamageRequested;
-    }
-
-    private void OnDisable()
-    {
-        // 비활성화될 때 구독을 해제해 중복 호출과 참조 누수를 막습니다.
-        EventBus<DamageRequestEvent>.action -= OnDamageRequested;
     }
 
     private void SetupBaseStatus()
@@ -96,12 +106,37 @@ public class PlayerStatus : MonoBehaviour
     {
         // 현재 체력을 최대 체력으로 채우고 UI 등에 변경 이벤트를 알립니다.
         status.Init();
+        isDeathProcessing = false;
+        invincibleEndTime = 0f;
         PublishHealthChanged();
     }
 
     public void TakeDamage(float damage)
     {
-        // 이미 죽은 상태라면 추가 피해를 무시합니다.
+        // 디버그나 테스트 코드에서 숫자만 넘겨도 같은 데미지 흐름을 타도록 감쌉니다.
+        TakeDamage(
+            new DamageInfo(
+                gameObject,
+                null,
+                null,
+                transform.position,
+                Vector3.zero,
+                damage
+            )
+        );
+    }
+    // 플레이 hp 100 -> 패시브 1레벨 -> hp 120 -> 패시브 2레벨 -> 패시브 1레벨 제거 -> hp 100 -> 패시브 2렙 추가
+    // hp 100/110
+
+    public void TakeDamage(DamageInfo damageInfo)
+    {
+        // 다른 대상용 DamageInfo가 잘못 전달된 경우에는 처리하지 않습니다.
+        if (!IsTargetSelf(damageInfo.TargetObject)) return;
+
+        // 사망 처리 중에는 추가 피해와 피격 상태 진입을 모두 무시합니다.
+        if (isDeathProcessing) return;
+
+        // 이미 죽은 플레이어는 추가 피해를 무시합니다.
         if (status.IsDead) return;
 
         // 현재 상태가 회피 무적 상태라면 HP 감소와 피격 피드백을 모두 막습니다.
@@ -111,31 +146,55 @@ public class PlayerStatus : MonoBehaviour
             return;
         }
 
+        // 피격 후 무적 시간 동안에는 추가 데미지와 넉백을 막습니다.
+        if (Time.time < invincibleEndTime)
+        {
+            Debug.Log("피격 무적: 데미지 무시");
+            return;
+        }
+
+        // 음수 데미지나 0 데미지는 적용하지 않습니다.
+        float damage = Mathf.Max(0f, damageInfo.Damage);
+        if (Mathf.Approximately(damage, 0f)) return;
+
         status.CurrentHP -= damage;
 
         if (status.CurrentHP < 0f)
+        {
             status.CurrentHP = 0f;
+        }
 
         PublishHealthChanged();
-
-        // 직접 TakeDamage가 호출된 경우에도 피격 피드백이 동작하도록 데미지 적용 이벤트를 발행합니다.
-        PublishDamageApplied(damage);
+        PublishDamaged(damageInfo, damage);
 
         // 피해 적용 후 사망 상태가 되었다면 사망 이벤트를 발행합니다.
         if (status.IsDead)
-            EventBus<PlayerDeadEvent>.Publish(new PlayerDeadEvent());
+        {
+            HandleDeath(damageInfo);
+            return;
+        }
+
+        StartHitInvincibility();
+
+        // 살아 있다면 피격 상태로 진입해 경직과 넉백을 처리합니다.
+        if (playerController != null)
+        {
+            playerController.EnterHitState(damageInfo);
+        }
     }
 
     public void Heal(float amount)
     {
-        // 죽은 상태에서는 회복을 적용하지 않습니다.
-        if (status.IsDead) return;
+        // 죽었거나 사망 처리 중일 때는 일반 회복을 적용하지 않습니다.
+        if (status.IsDead || isDeathProcessing) return;
 
         status.CurrentHP += amount;
 
         // 현재 체력이 최대 체력을 넘지 않도록 제한합니다.
         if (status.CurrentHP > status.MaxHP.FinalValue)
+        {
             status.CurrentHP = status.MaxHP.FinalValue;
+        }
 
         PublishHealthChanged();
     }
@@ -143,6 +202,9 @@ public class PlayerStatus : MonoBehaviour
     public void ResetStatus()
     {
         // 모든 임시 보정값을 제거하고 기본 스탯을 다시 적용합니다.
+        StopReviveRoutine();
+        isDeathProcessing = false;
+        invincibleEndTime = 0f;
         status.ResetAllModifiers();
         SetupBaseStatus();
         status.Init();
@@ -266,86 +328,121 @@ public class PlayerStatus : MonoBehaviour
     {
         // 최대 체력이 줄어든 상황에서 현재 체력이 새 최대값보다 높게 남지 않도록 합니다.
         if (status.CurrentHP > status.MaxHP.FinalValue)
-            status.CurrentHP = status.MaxHP.FinalValue;
-    }
-
-    private void OnDamageRequested(DamageRequestEvent eventData)
-    {
-        // 이벤트는 전역으로 발행되므로, 자기 자신을 대상으로 한 요청만 처리합니다.
-        if (!IsTargetSelf(eventData.TargetObject)) return;
-
-        ApplyDamage(eventData);
-    }
-
-    private void ApplyDamage(DamageRequestEvent eventData)
-    {
-        // 이미 죽은 플레이어는 추가 피해를 무시합니다.
-        if (status.IsDead) return;
-
-        // 음수 데미지나 0 데미지는 적용하지 않습니다.
-        // 현재 상태가 회피 무적 상태라면 HP 감소와 피격 피드백을 모두 막습니다.
-        if (playerController != null && !playerController.CanTakeDamage)
         {
-            Debug.Log("회피 성공: 데미지 무시");
-            return;
+            status.CurrentHP = status.MaxHP.FinalValue;
         }
-
-        float damage = Mathf.Max(0f, eventData.Damage);
-        if (Mathf.Approximately(damage, 0f)) return;
-
-        status.CurrentHP -= damage;
-
-        if (status.CurrentHP < 0f)
-            status.CurrentHP = 0f;
-
-        PublishHealthChanged();
-        PublishDamageApplied(eventData, damage);
-
-        // HP가 0이 되면 사망 이벤트를 발행합니다.
-        if (status.IsDead)
-            EventBus<PlayerDeadEvent>.Publish(new PlayerDeadEvent());
     }
 
     private bool IsTargetSelf(GameObject targetObject)
     {
-        // 자식 콜라이더가 맞아도 부모 플레이어가 맞은 것으로 처리합니다.
-        if (targetObject == null) return false;
+        // 대상 정보가 비어 있으면 직접 호출로 보고 현재 플레이어에게 적용합니다.
+        if (targetObject == null) return true;
 
+        // 자식 콜라이더가 맞아도 부모 플레이어가 맞은 것으로 처리합니다.
         return targetObject == gameObject || targetObject.transform.IsChildOf(transform);
     }
 
-    private void PublishDamageApplied(float damage)
+    private void PublishDamaged(DamageInfo damageInfo, float appliedDamage)
     {
-        // 외부에서 직접 TakeDamage를 호출한 경우를 위한 간단한 피격 완료 이벤트입니다.
-        EventBus<DamageAppliedEvent>.Publish(
-            new DamageAppliedEvent(
+        // 후처리 시스템이 실제 적용된 데미지와 피격 정보를 함께 받을 수 있게 알립니다.
+        EventBus<PlayerDamagedEvent>.Publish(
+            new PlayerDamagedEvent(
                 gameObject,
-                null,
-                null,
-                transform.position,
-                Vector3.zero,
-                damage,
+                new DamageInfo(
+                    gameObject,
+                    damageInfo.HitCollider,
+                    damageInfo.AttackerObject,
+                    damageInfo.HitPoint,
+                    damageInfo.HitDirection,
+                    appliedDamage
+                ),
                 status.CurrentHP,
                 status.MaxHP.FinalValue
             )
         );
     }
 
-    private void PublishDamageApplied(DamageRequestEvent eventData, float damage)
+    private void StartHitInvincibility()
     {
-        // DamageRequestEvent에서 받은 피격 정보를 유지한 채 피격 완료 이벤트를 발행합니다.
-        EventBus<DamageAppliedEvent>.Publish(
-            new DamageAppliedEvent(
+        // 경직 0.2초와 이후 무적 0.5초를 합산해 재피격을 막습니다.
+        invincibleEndTime = Time.time + HitStunDuration + HitInvincibleDuration;
+    }
+
+    private void HandleDeath(DamageInfo lastDamageInfo)
+    {
+        // 사망 이벤트와 상태 진입, 부활 대기를 한 번만 실행합니다.
+        if (isDeathProcessing) return;
+
+        isDeathProcessing = true;
+        invincibleEndTime = 0f;
+
+        DeathInfo deathInfo = CreateDeathInfo(lastDamageInfo);
+
+        EventBus<PlayerDeadEvent>.Publish(new PlayerDeadEvent(deathInfo));
+
+        if (playerController != null)
+            playerController.EnterDeathState(deathInfo);
+
+        StopReviveRoutine();
+        reviveRoutine = StartCoroutine(ReviveAfterDelay());
+    }
+
+    private DeathInfo CreateDeathInfo(DamageInfo lastDamageInfo)
+    {
+        // 현재는 데미지로 인한 사망만 연결되어 있으며, 낙하/함정은 추후 별도 진입점에서 Cause를 바꿉니다.
+        return new DeathInfo(
+            gameObject,
+            transform.position,
+            lastDamageInfo,
+            DeathCause.Damage,
+            status.CurrentHP,
+            status.MaxHP.FinalValue
+        );
+    }
+
+    private IEnumerator ReviveAfterDelay()
+    {
+        // 사망 연출과 UI가 반응할 시간을 확보한 뒤 같은 자리에서 부활합니다.
+        yield return new WaitForSeconds(ReviveDelay);
+
+        ReviveAtCurrentPosition();
+        reviveRoutine = null;
+    }
+
+    private void ReviveAtCurrentPosition()
+    {
+        // 1차 구현은 체크포인트가 없으므로 현재 위치에서 최대 체력으로 부활합니다.
+        status.CurrentHP = status.MaxHP.FinalValue;
+        isDeathProcessing = false;
+        invincibleEndTime = 0f;
+
+        PublishHealthChanged();
+        PublishRevived();
+
+        if (playerController != null)
+            playerController.ExitDeathStateAfterRevive();
+    }
+
+    private void PublishRevived()
+    {
+        // UI, 사운드, 이펙트가 부활 시점을 구독할 수 있게 알립니다.
+        EventBus<PlayerRevivedEvent>.Publish(
+            new PlayerRevivedEvent(
                 gameObject,
-                eventData.HitCollider,
-                eventData.AttackerObject,
-                eventData.HitPoint,
-                eventData.AttackDirection,
-                damage,
+                transform.position,
                 status.CurrentHP,
                 status.MaxHP.FinalValue
             )
         );
+    }
+
+    private void StopReviveRoutine()
+    {
+        // 상태 초기화나 재설정 시 기존 부활 대기가 남지 않도록 정리합니다.
+        if (reviveRoutine == null) return;
+
+        StopCoroutine(reviveRoutine);
+        reviveRoutine = null;
     }
 
     private void EnsureHitFlashFeedback()
