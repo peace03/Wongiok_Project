@@ -5,6 +5,7 @@ using System.Collections.Generic;
 [Serializable]
 public class SkillInstance
 {
+    [SerializeField] private GameObject owner;                          // 스킬 소유자
     [SerializeField] private BaseSkillData data;                        // 스킬 정보
     [SerializeField] private SKILL_STATE state = SKILL_STATE.Ready;     // 스킬 상태
     [SerializeField] private int curLevel = 1;                          // 현재 레벨
@@ -12,8 +13,8 @@ public class SkillInstance
     [SerializeField] private float curDuration = 0f;                    // 현재 지속 시간
     [SerializeField] private float curChargingTime = 0f;                // 현재 차징 시간
 
-    private List<SkillInstance> equippedActives;       // 장착된 액티브 스킬 목록
-    private List<SkillInstance> equippedPassives;      // 장착된 패시브 스킬 목록
+    private List<SkillInstance> equippedActives;                        // 장착된 액티브 스킬 목록
+    private List<SkillInstance> equippedPassives;                       // 장착된 패시브 스킬 목록
 
     // 액티브 스킬 여부
     public bool IsActiveSkill => data.Type == SKILL_TYPE.Active;
@@ -40,7 +41,11 @@ public class SkillInstance
         1f - data.GetMaxChargingTime(curLevel) <= 0f ? 0f : curChargingTime / data.GetMaxChargingTime(curLevel);
 
     // 생성자
-    public SkillInstance(BaseSkillData data) => this.data = data;
+    public SkillInstance(GameObject owner, BaseSkillData data)
+    {
+        this.owner = owner;
+        this.data = data;
+    }
 
     // 장착된 스킬 설정 함수
     public void SetEquippedSkills(List<SkillInstance> active, List<SkillInstance> passive)
@@ -50,7 +55,7 @@ public class SkillInstance
     }
 
     // 스킬 레벨 상승 함수
-    public void LevelUp(GameObject owner)
+    public void LevelUp()
     {
         // 강화 불가능이라면
         if(!CanEnhance)
@@ -69,7 +74,7 @@ public class SkillInstance
     }
 
     // 스킬 사용 함수
-    public void UseSkill(GameObject owner)
+    public void UseSkill()
     {
         // 사용 가능한 상태가 아니라면
         if (!IsReady)
@@ -83,7 +88,7 @@ public class SkillInstance
         // 차징 시간이 없다면
         if (data.GetMaxChargingTime(curLevel) <= 0f)
             // 실행 상태로 변경
-            SwitchState(SKILL_STATE.Executing, owner);
+            SwitchState(SKILL_STATE.Executing);
         // 차징 시간이 있다면
         else
             // 차징 상태로 변경
@@ -91,7 +96,7 @@ public class SkillInstance
     }
 
     // 스킬 상태 변경 함수
-    private void SwitchState(SKILL_STATE change, GameObject owner = null)
+    private void SwitchState(SKILL_STATE change)
     {
         // 패시브 스킬이라면
         if (!IsActiveSkill)
@@ -114,16 +119,16 @@ public class SkillInstance
         // 실행 상태라면
         else if (IsExecuting)
         {
-            // 실행 주체가 비어있다면
+            // 소유자가 없다면
             if(owner == null)
             {
-                Debug.Log($"[Error | Skill] {data.SkillName}(Lv.{curLevel}) - 스킬 실행 주체(Owner) 없음");
+                Debug.Log($"[Error | Skill] {data.SkillName}(Lv.{curLevel}) - 스킬 소유자(Owner) 없음");
                 return;
             }
 
             // 현재 지속 시간 초기화
             curDuration = 0f;
-            // 스킬 실행(플레이어, 레벨)
+            // 스킬 실행
             data.ExecuteSkill(owner, curLevel);
         }
         // 차징 상태라면

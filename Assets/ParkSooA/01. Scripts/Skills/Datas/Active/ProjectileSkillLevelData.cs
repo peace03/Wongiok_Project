@@ -23,7 +23,7 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
     public override float GetDamage(int stage) => damage;
 
     // 스킬 효과 적용 함수
-    public override void ApplyEffect(GameObject target, IReadOnlyList<StatAdjustment> prevStats)
+    public override void ApplyEffect(GameObject owner, IReadOnlyList<StatAdjustment> prevStats)
     {
         Debug.Log("[Skill] 발사체 액티브 스킬 공격");
 
@@ -33,7 +33,7 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
         for(int i = 0; i < projectiles.Length; i++)
         {
             projectiles[i] = MonoBehaviour.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
-                        target.transform.position + target.transform.forward, target.transform.rotation);
+                        owner.transform.position + owner.transform.forward, owner.transform.rotation);
         }
     }
 }

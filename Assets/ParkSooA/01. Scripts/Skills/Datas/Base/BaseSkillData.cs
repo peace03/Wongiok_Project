@@ -20,13 +20,13 @@ public abstract class BaseSkillData : ScriptableObject
     public string Desc => desc;
 
     // 객체 생성 함수
-    public abstract SkillInstance CreateInstance();
+    public abstract SkillInstance CreateInstance(GameObject owner);
 
     // 스킬 실행 함수
-    public abstract void ExecuteSkill(GameObject target, int level);
+    public abstract void ExecuteSkill(GameObject owner, int level);
 
     // 스킬 취소 함수
-    public abstract void CancelSkill(GameObject target, int level);
+    public abstract void CancelSkill(GameObject owner, int level);
 
     // 최대 쿨타임 반환 함수
     public virtual float GetMaxCoolTime(int level) => 0f;

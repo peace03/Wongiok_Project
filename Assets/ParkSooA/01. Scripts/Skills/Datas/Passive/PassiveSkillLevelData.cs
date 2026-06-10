@@ -15,12 +15,12 @@ public class PassiveSkillLevelData : BaseSkillLevelData
     public override IReadOnlyList<StatAdjustment> GetAppliedStats() => appliedStats;
 
     // 스킬 효과 적용 함수
-    public override void ApplyEffect(GameObject target, IReadOnlyList<StatAdjustment> prevStats)
+    public override void ApplyEffect(GameObject owner, IReadOnlyList<StatAdjustment> prevStats)
     {
         // 스탯이 없다면
-        if (!target.TryGetComponent<PlayerStatus>(out var trgStat))
+        if (!owner.TryGetComponent<PlayerStatus>(out var trgStat))
         {
-            Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 ⇒ 입력 - 대상 : {target.name}\n", target);
+            Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 ⇒ 입력 - 대상 : {owner.name}\n", owner);
             return;
         }
 
@@ -33,19 +33,25 @@ public class PassiveSkillLevelData : BaseSkillLevelData
             // 변화량 구하기
             amount = stat.modifyType == MODIFY_TYPE.Addition ? stat.amount : -stat.amount;
 
+            // 이전 레벨 스탯이 있다면
             if(prevStats != null)
             {
+                // 이전 변화량을 저장할 변수
                 float prevAmount = 0;
 
-                for (int i = 0; i < prevStats.Count; i++)
-                    if (prevStats[i].statType == stat.statType)
+                // 바꿨던 스탯의 수만큼
+                foreach(var prev in prevStats)
+                    // 같은 스탯을 찾았다면
+                    if (prev.statType == stat.statType)
                     {
-                        prevAmount = prevStats[i].modifyType == MODIFY_TYPE.Addition ? prevStats[i].amount
-                                                                                        : -prevStats[i].amount;
+                        // 변화량 구하기
+                        prevAmount = prev.modifyType == MODIFY_TYPE.Addition ? prev.amount : -prev.amount;
                         break;
                     }
 
+                // 이전 변화량이 있다면
                 if (prevAmount != 0)
+                    // 변화량에 반영
                     amount -= prevAmount;
             }
 
@@ -77,12 +83,12 @@ public class PassiveSkillLevelData : BaseSkillLevelData
     }
 
     // 스킬 효과 적용 해제 함수
-    public override void RemoveEffect(GameObject target)
+    public override void RemoveEffect(GameObject owner)
     {
         // 스탯이 없다면
-        if (!target.TryGetComponent<PlayerStatus>(out var trgStat))
+        if (!owner.TryGetComponent<PlayerStatus>(out var trgStat))
         {
-            Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 ⇒ 입력 - 대상 : {target.name}\n", target);
+            Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 ⇒ 입력 - 대상 : {owner.name}\n", owner);
             return;
         }
 
