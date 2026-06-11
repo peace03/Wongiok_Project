@@ -3,8 +3,11 @@ using UnityEngine;
 
 public interface IBossLogics
 {
-    public Node GetAttackBT();
+    public bool GetStateDone(); //상태의 종료 여부
+    public NodeState SetStateDone(bool set); //상태 여부 세팅
+    public Node GetAttackBT(); //BT 노드 가져오기
     public void Spawn();
-    public void ExcuteIdleMove();
-    public void ExcuteAttackMove();
+    public void IdleMove();
+    public void ExcuteMove(); //이동 실행(FixedUpdate 실행용)
+    public void AttackInit(); //공격 변수 초기화
 }

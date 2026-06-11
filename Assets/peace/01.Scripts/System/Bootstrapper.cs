@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Linq;
+using System;
 
 //각자 스크립트 초기화 순서 정해줄 때 사용
 public enum InitOrder
@@ -25,8 +26,15 @@ public class Bootstrapper : MonoBehaviour
         foreach(var manager in managers)
         {
             //GetType()은 IInitializable같은 껍데기 타입이 아닌 알맹이 진짜 타입을 반환함
-            ServiceLocator.Register(manager.GetType(), manager); //먼저 등록해줘야 Init()에서 사용 가능
+            Type concreteType = manager.GetType();
+            ServiceLocator.Register(concreteType, manager); //먼저 등록해줘야 Init()에서 사용 가능
             manager.Init();
+            //인터페이스로도 호출할 수 있도록 등록해주기
+            foreach(var _interface in concreteType.GetInterfaces())
+            {
+                if (_interface != typeof(IInitializable))
+                    ServiceLocator.Register(_interface, manager);
+            }
         }
     }
 }
