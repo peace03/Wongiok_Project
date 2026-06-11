@@ -50,3 +50,11 @@ public enum SKILL_STATE
     Executing,      // 실행 중(지속 사용 중)
     Charging        // [사용 전] 충전 중
 }
+
+// 액티브 스킬 슬롯 종류
+public enum ACTIVE_SKILL_SLOT_TYPE
+{
+    A,              // 첫번째
+    S,              // 두번째
+    D               // 세번째
+}
