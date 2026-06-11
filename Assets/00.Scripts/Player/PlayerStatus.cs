@@ -22,8 +22,9 @@ public class PlayerStatusData : LivingStatus
     }
 }
 
-// 플레이어는 실제 데미지를 받은 뒤 색상 피드백을 보여야 하므로 HitFlashFeedback을 요구합니다.
+// 플레이어는 피격 피드백과 체크포인트 부활 기록을 함께 사용합니다.
 [RequireComponent(typeof(HitFlashFeedback))]
+[RequireComponent(typeof(PlayerCheckpointTracker))]
 public class PlayerStatus : MonoBehaviour
 {
     // 피격 직후 입력을 막는 경직 시간입니다.
@@ -70,6 +71,9 @@ public class PlayerStatus : MonoBehaviour
     // 현재 플레이어 상태가 피해를 받을 수 있는지 확인하기 위한 컨트롤러 참조입니다.
     private PlayerController playerController;
 
+    // 사망 후 부활 위치를 가져오기 위한 체크포인트 기록 참조입니다.
+    private PlayerCheckpointTracker checkpointTracker;
+
     // 피격 후 무적이 끝나는 시각입니다.
     private float invincibleEndTime;
 
@@ -83,7 +87,10 @@ public class PlayerStatus : MonoBehaviour
     {
         // 기존 씬 오브젝트에 PlayerStatus만 붙어 있는 경우도 피격 피드백을 보장합니다.
         EnsureHitFlashFeedback();
+        EnsurePlayerCheckpointTracker();
+
         playerController = GetComponent<PlayerController>();
+        checkpointTracker = GetComponent<PlayerCheckpointTracker>();
 
         // 기본값을 스탯 객체에 반영한 뒤 현재 체력을 초기화합니다.
         SetupBaseStatus();
@@ -402,34 +409,57 @@ public class PlayerStatus : MonoBehaviour
 
     private IEnumerator ReviveAfterDelay()
     {
-        // 사망 연출과 UI가 반응할 시간을 확보한 뒤 같은 자리에서 부활합니다.
+        // 사망 연출과 UI가 반응할 시간을 확보한 뒤 체크포인트 위치에서 부활합니다.
         yield return new WaitForSeconds(ReviveDelay);
 
-        ReviveAtCurrentPosition();
+        ReviveAtCheckpoint();
         reviveRoutine = null;
     }
 
-    private void ReviveAtCurrentPosition()
+    private void ReviveAtCheckpoint()
     {
-        // 1차 구현은 체크포인트가 없으므로 현재 위치에서 최대 체력으로 부활합니다.
+        // 체크포인트를 밟지 않았다면 트래커가 시작 위치를 반환합니다.
+        Vector3 revivePosition = GetRevivePosition();
+
+        if (playerController != null)
+        {
+            playerController.TeleportTo(revivePosition);
+        }
+        else
+        {
+            transform.position = revivePosition;
+        }
+
+        // 부활 위치 이동 후 최대 체력으로 회복합니다.
         status.CurrentHP = status.MaxHP.FinalValue;
         isDeathProcessing = false;
         invincibleEndTime = 0f;
 
         PublishHealthChanged();
-        PublishRevived();
+        PublishRevived(revivePosition);
 
         if (playerController != null)
             playerController.ExitDeathStateAfterRevive();
     }
 
-    private void PublishRevived()
+    private Vector3 GetRevivePosition()
+    {
+        // 체크포인트 기록이 없으면 현재 위치를 안전한 대체값으로 사용합니다.
+        if (checkpointTracker == null)
+            checkpointTracker = GetComponent<PlayerCheckpointTracker>();
+
+        if (checkpointTracker == null) return transform.position;
+
+        return checkpointTracker.RespawnPosition;
+    }
+
+    private void PublishRevived(Vector3 revivePosition)
     {
         // UI, 사운드, 이펙트가 부활 시점을 구독할 수 있게 알립니다.
         EventBus<PlayerRevivedEvent>.Publish(
             new PlayerRevivedEvent(
                 gameObject,
-                transform.position,
+                revivePosition,
                 status.CurrentHP,
                 status.MaxHP.FinalValue
             )
@@ -451,6 +481,14 @@ public class PlayerStatus : MonoBehaviour
         if (GetComponent<HitFlashFeedback>() != null) return;
 
         gameObject.AddComponent<HitFlashFeedback>();
+    }
+
+    private void EnsurePlayerCheckpointTracker()
+    {
+        // 기존 플레이어 오브젝트도 체크포인트 부활 기록을 가질 수 있게 보강합니다.
+        if (GetComponent<PlayerCheckpointTracker>() != null) return;
+
+        gameObject.AddComponent<PlayerCheckpointTracker>();
     }
 
     private void PublishHealthChanged()

@@ -56,6 +56,35 @@ public readonly struct PlayerRevivedEvent
     }
 }
 
+// 플레이어가 더 높은 번호의 체크포인트를 활성화했을 때 발행되는 이벤트입니다.
+// UI, 사운드, 저장 연출은 이 이벤트를 구독해서 처리합니다.
+public readonly struct CheckpointActivatedEvent
+{
+    // 체크포인트를 활성화한 플레이어 오브젝트입니다.
+    public readonly GameObject PlayerObject;
+
+    // 활성화된 체크포인트 오브젝트입니다.
+    public readonly GameObject CheckpointObject;
+
+    // 활성화된 체크포인트 번호입니다.
+    public readonly int CheckpointNumber;
+
+    // 이 체크포인트가 제공하는 부활 위치입니다.
+    public readonly Vector3 RespawnPosition;
+
+    public CheckpointActivatedEvent(
+        GameObject playerObject,
+        GameObject checkpointObject,
+        int checkpointNumber,
+        Vector3 respawnPosition)
+    {
+        PlayerObject = playerObject;
+        CheckpointObject = checkpointObject;
+        CheckpointNumber = checkpointNumber;
+        RespawnPosition = respawnPosition;
+    }
+}
+
 // 플레이어가 실제 데미지를 받은 뒤 발행되는 이벤트입니다.
 // UI, 사운드, 피격 이펙트는 이 이벤트를 구독해서 후처리만 담당합니다.
 public readonly struct PlayerDamagedEvent

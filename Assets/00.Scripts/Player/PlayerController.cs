@@ -169,6 +169,25 @@ public class PlayerController : MonoBehaviour
         TransitionTo(IdleState);
     }
 
+    public void TeleportTo(Vector3 position)
+    {
+        // CharacterController가 켜진 상태에서 직접 위치를 바꾸면 충돌 보정이 끼어들 수 있어 잠시 끕니다.
+        if (_cc == null)
+        {
+            transform.position = position;
+            return;
+        }
+
+        bool wasEnabled = _cc.enabled;
+        if (wasEnabled)
+            _cc.enabled = false;
+
+        transform.position = position;
+
+        if (wasEnabled)
+            _cc.enabled = true;
+    }
+
     private void PlayerInput()
     {
         // Input System 액션에서 현재 프레임 입력 값을 읽어 상태들이 사용할 수 있게 저장합니다.
