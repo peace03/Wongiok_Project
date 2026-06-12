@@ -6,9 +6,9 @@ public static class EnumExtensions
     {
         return type switch
         {
-            SKILL_TYPE.Passive => "패시브",
-            SKILL_TYPE.Active => "액티브",
-            _ => ""                               // default
+            SKILL_TYPE.Passive              => "패시브",
+            SKILL_TYPE.Active               => "액티브",
+            _                               => ""             // default
         };
     }
 
@@ -17,9 +17,9 @@ public static class EnumExtensions
     {
         return type switch
         {
-            CHAPTER_TYPE.First  => "챕터 1",
-            CHAPTER_TYPE.Second => "챕터 2",
-            _                   => ""
+            CHAPTER_TYPE.First              => "챕터 1",
+            CHAPTER_TYPE.Second             => "챕터 2",
+            _                               => ""
         };
     }
 
@@ -39,11 +39,11 @@ public static class EnumExtensions
     {
         return type switch
         {
-            STAT_TYPE.Health    => "체력",
-            STAT_TYPE.AtkPower  => "공격력",
-            STAT_TYPE.MoveSpeed => "이동 속도",
-            STAT_TYPE.AtkSpeed  => "공격 속도",
-            _                   => ""
+            STAT_TYPE.Health                => "체력",
+            STAT_TYPE.AtkPower              => "공격력",
+            STAT_TYPE.MoveSpeed             => "이동 속도",
+            STAT_TYPE.AtkSpeed              => "공격 속도",
+            _                               => ""
         };
     }
 
@@ -52,9 +52,9 @@ public static class EnumExtensions
     {
         return type switch
         {
-            MODIFY_TYPE.Addition    => "+",
-            MODIFY_TYPE.Subtraction => "-",
-            _                       => ""
+            MODIFY_TYPE.Addition            => "+",
+            MODIFY_TYPE.Subtraction         => "-",
+            _                               => ""
         };
     }
 
@@ -78,6 +78,18 @@ public static class EnumExtensions
             SKILL_STATE.CoolTime            => "쿨타임 중",
             SKILL_STATE.Executing           => "사용 중",
             SKILL_STATE.Charging            => "차징 중",
+            _                               => ""
+        };
+    }
+
+    // 액티브 스킬 슬롯 종류 한국어 반환 함수
+    public static string ToKoreanString(this ACTIVE_SKILL_SLOT_TYPE type)
+    {
+        return type switch
+        {
+            ACTIVE_SKILL_SLOT_TYPE.A        => "슬롯 A",
+            ACTIVE_SKILL_SLOT_TYPE.S        => "슬롯 S",
+            ACTIVE_SKILL_SLOT_TYPE.D        => "슬롯 D",
             _                               => ""
         };
     }

@@ -16,6 +16,7 @@ public class SkillInstance
     private List<SkillInstance> equippedActives;                        // 장착된 액티브 스킬 목록
     private List<SkillInstance> equippedPassives;                       // 장착된 패시브 스킬 목록
 
+    public BaseSkillData Data => data;
     // 액티브 스킬 여부
     public bool IsActiveSkill => data.Type == SKILL_TYPE.Active;
     // 스킬 장착 여부
