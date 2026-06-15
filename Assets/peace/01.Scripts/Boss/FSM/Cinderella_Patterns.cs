@@ -1,13 +1,11 @@
 using UnityEngine;
+using Random = UnityEngine.Random;
 using System;
 using System.Collections.Generic;
 
-public enum AttackType { Kick, SpinShard, JumpSlam }
-public enum Animation { Idle, Attack }
-
 public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 {
-    public int Priority => (int)InitOrder.Boss +1;
+    public int Priority => (int)InitOrder.Boss + 1;
 
     [Header("Animator")]
     [SerializeField] private Animator anim;
@@ -15,35 +13,42 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [SerializeField] private Transform spawnPos;
     [SerializeField] private Transform playerPos;
     [Header("Idle 상태")]
-    [SerializeField] private float move_idleSpeed;
-    [SerializeField] private Vector3 move_idlePos;
+    [SerializeField] private float idleDurationTime;//idle 정지상태 지속시간
+    [Min(0)] [SerializeField] private float move_idleSpeed;
+    [Min(0)] [SerializeField] private float move_idleRange;  //이동가능 범위
+    [Min(3)] [SerializeField] private float move_idlePos;    //플레이어 기준 이동범위 중심
     [Header("Enranged 상태")]
     [SerializeField] private float move_enrangedSpeed;
     [SerializeField] private Vector3 move_enrangedPos;
     [Header("Attack 상태")]
     [SerializeField] private float kickChaseSpeed;
     [SerializeField] private Vector3 kickChasePos;
+    [SerializeField] private float postAtkDelay;
 
-    public float Move_idleSpeed => move_idleSpeed;
-    public Vector3 Move_idlePos => move_idlePos;
+
+    //공통 사용
     public float Distance => playerPos.position.x - transform.position.x;
     public bool StateDone { get; private set; } //공격 BT 종료 여부
 
     private Rigidbody rb;
     private AnimatorStateInfo animState;
-    private float curTime = 0f;
+    private float curTime_Anim = 0f;
+    private float curTime_Idle = 0f;
 
     private Node kickAttack;
     private Node spinShardAttack;
     private Node jumpSlamAttack;
     private AttackType attackType;  //현재 공격 타입
-    private AttackType beforeType = AttackType.JumpSlam;  //이전 공격 타입
+    private AttackType beforeType = AttackType.C;  //이전 공격 타입
+
+    //Idle
+    private Vector3 RandomPos;
 
     //kick 공격 타입
     private bool chaseDone = false;    //추격 실행 여부
     private bool telegraphExcuted = false;
     private bool attackDone = false;    //공격 실행 여부
-    
+
 
     private float x, y, z; //Move에 사용될 속도 저장
 
@@ -51,6 +56,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     {
         rb = GetComponent<Rigidbody>();
         Init_BT();
+        if (move_idleRange >= move_idlePos) move_idleRange = move_idlePos - 0.5f;
     }
 
     public void Init_BT()
@@ -79,25 +85,18 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() => PlayAnim_Speed((int)Animation.Attack, 1f)), //공격 애님 실행
                     new Leaf(() => {
                         attackDone = true;
-                        return NodeState.Success; 
+                        return NodeState.Success;
                     })
                 })
             }),
             //후딜 시퀀스
             new Sequence(new List<Node>
             {
-                new Leaf(() => PlayAnim_Time((int)Animation.Idle, 0.5f)), //Idle 애님 실행
+                new Leaf(() => PlayAnim_Time((int)Animation.Idle, postAtkDelay)), //Idle 애님 실행
                 new Leaf(() => SetStateDone(true))
             })
         });
     }
-
-
-    //private void Wait
-    //private IEnumerator Wait()
-    //{
-
-    //}
 
     #region CommonLogic
     private void Move(float x, float y, float z)
@@ -129,18 +128,18 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     //애니메이션 재생(일정시간이 지나면 다음으로 넘어감)
     public NodeState PlayAnim_Time(int num, float targetSeconds) 
     {
-        curTime += Time.deltaTime;
+        curTime_Anim += Time.deltaTime;
         //Debug.Log($"PlayAnim {num} 재생중");
         if (anim.GetInteger("Boss") != num) //애니메이션 전환
         {
-            curTime = 0f;
+            curTime_Anim = 0f;
             anim.SetInteger("Boss", num);
             return NodeState.Running; //방어코드(프레임 갱신)
         }
         if (anim.IsInTransition(0)) return NodeState.Running; //방어코드(애님 전환 중)
         //원하는 시간만큼 애님 재생
         animState = anim.GetCurrentAnimatorStateInfo(0);
-        if (curTime < targetSeconds) return NodeState.Running;
+        if (curTime_Anim < targetSeconds) return NodeState.Running;
         else { anim.speed = 1.0f; return NodeState.Success; }
     }
     public NodeState SetStateDone(bool set)
@@ -153,6 +152,10 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     {
         return StateDone;
     }
+    public AttackType GetAttackType()
+    {
+        return attackType;
+    }
     #endregion
 
     #region Spawn
@@ -163,13 +166,27 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #endregion
 
     #region Idle
-    public void IdleMove()
+    public void InitCurTime_Idle() { curTime_Idle = 0f; }  //시간 초기화
+    public void SetRandomPos() //플레이어 기준 좌우 좌표 지정
     {
-        if (Math.Abs(Distance) > move_idlePos.x + 0.5)
-            Move(Math.Sign(Distance) * move_idleSpeed, 0, 0);
-        else if (Math.Abs(Distance) < move_idlePos.x - 0.5)
-            Move(-Math.Sign(Distance) * move_idleSpeed, 0, 0);
-        else { Move(0, 0, 0); SetStateDone(true); }
+        float element = move_idlePos + Random.Range(-move_idleRange, move_idleRange);
+        if (Math.Sign(Distance) <= 0) //플레이어가 보스 오른쪽에 위치
+        {
+            RandomPos = new Vector3(playerPos.position.x + element, 0, 0);
+            Debug.Log($"플레이어 - 보스 = {Distance}");
+            Debug.Log($"{RandomPos.x}, {RandomPos.y}, {RandomPos.z}");
+        }
+        else    //플레이어가 보스 왼쪽에 위치
+            RandomPos = new Vector3(playerPos.position.x - element, 0, 0);
+    }
+    public void IdleMove() //보스 기준
+    {
+        if (transform.position.x < RandomPos.x -0.5)    //지정좌표 왼쪽에 있을 때
+            Move(move_idleSpeed, 0, 0);
+        else if (transform.position.x > RandomPos.x +0.5)   //지정좌표 오른쪽에 있을 때
+            Move(-move_idleSpeed, 0, 0);
+        else { Move(0, 0, 0); curTime_Idle += Time.deltaTime; }
+        if (curTime_Idle > idleDurationTime) SetStateDone(true); //지속시간 지나면 상태전이
     }
     #endregion
 
@@ -178,15 +195,15 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     {
         //while (attackType == beforeType) attackType = (AttackType)UnityEngine.Random.Range(0, 3);
         //beforeType = attackType;
-        attackType = AttackType.Kick;
+        attackType = AttackType.A;
         //Debug.Log($"{attackType} 공격 실행");
         switch (attackType)
         {
-            case AttackType.Kick:
+            case AttackType.A:
                 return kickAttack;
-            case AttackType.SpinShard:
+            case AttackType.B:
                 return spinShardAttack;
-            case AttackType.JumpSlam:
+            case AttackType.C:
                 return jumpSlamAttack;
         }
         return default;

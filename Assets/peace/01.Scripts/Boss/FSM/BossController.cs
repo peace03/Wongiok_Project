@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 public class BossController : MonoBehaviour, IInitializable
 {
-    public enum State
-    {
-        Spawn, Idle, Attack, Ultimate, Groggy, Defeated
-    }
     //초기화 순서
     public int Priority => (int)InitOrder.Boss +2;
 
@@ -34,6 +30,16 @@ public class BossController : MonoBehaviour, IInitializable
         curState?.Enter();
         //Debug.Log("BossController Init()실행 완료");
     }
+
+    private void OnEnable()
+    {
+        EventBus<UltimateInvoke>.action += SetUltimateState;
+    }
+    private void OnDisable()
+    {
+        EventBus<UltimateInvoke>.action -= SetUltimateState;
+    }
+
     private void FixedUpdate()
     {
         curState?.FixedUpdate();
@@ -41,6 +47,7 @@ public class BossController : MonoBehaviour, IInitializable
     private void Update()
     {
         curState?.Update();
+        if (Input.GetKeyDown(KeyCode.Space)) status.TakeDamage(20);
     }
 
     public void ChangeState(State state)
@@ -50,4 +57,6 @@ public class BossController : MonoBehaviour, IInitializable
         curState?.Enter();
         //Debug.Log($"BossController ChangeState({state})실행 완료");
     }
+    //궁극기 발동상태 전환
+    public void SetUltimateState(UltimateInvoke data) { ChangeState(State.Ultimate); }
 }

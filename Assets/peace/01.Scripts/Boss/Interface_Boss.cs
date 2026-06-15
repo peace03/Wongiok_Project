@@ -6,6 +6,9 @@ public interface IBossLogics
     public bool GetStateDone(); //상태의 종료 여부
     public NodeState SetStateDone(bool set); //상태 여부 세팅
     public Node GetAttackBT(); //BT 노드 가져오기
+    public AttackType GetAttackType();
+    public void SetRandomPos(); //Idle 이동 좌표 지정
+    public void InitCurTime_Idle(); //Idle 지속시간 초기화
     public void Spawn();
     public void IdleMove();
     public void ExcuteMove(); //이동 실행(FixedUpdate 실행용)

@@ -24,12 +24,12 @@ public class AttackingState : BossState
         //Debug.Log("Attack State Update 실행");
         if (logics.GetStateDone())
         {
-            controller.ChangeState(BossController.State.Idle);
+            controller.ChangeState(State.Idle);
         }
     }
     public override void Exit()
     {
-        
+        EventBus<AttackFinish>.Publish(default);
         //Debug.Log("Attack 상태 이탈");
     }
 }

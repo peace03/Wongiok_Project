@@ -129,13 +129,14 @@ GameObject:
   m_Component:
   - component: {fileID: 102180173}
   - component: {fileID: 102180174}
+  - component: {fileID: 102180175}
   m_Layer: 0
   m_Name: JumpSlamCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &102180173
 Transform:
   m_ObjectHideFlags: 0
@@ -166,12 +167,25 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 4}
   m_Center: {x: 0, y: -0.5, z: 0}
+--- !u!114 &102180175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102180172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9023e3275c04e314b8066121a31744de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossHitBox
+  AtkType: 2
 --- !u!1 &174314906
 GameObject:
   m_ObjectHideFlags: 0
@@ -589,13 +603,14 @@ GameObject:
   m_Component:
   - component: {fileID: 445290352}
   - component: {fileID: 445290353}
+  - component: {fileID: 445290354}
   m_Layer: 0
   m_Name: KickCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &445290352
 Transform:
   m_ObjectHideFlags: 0
@@ -626,12 +641,25 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 2, y: 1, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &445290354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445290351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9023e3275c04e314b8066121a31744de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossHitBox
+  AtkType: 0
 --- !u!1 &581796115
 GameObject:
   m_ObjectHideFlags: 0
@@ -644,9 +672,11 @@ GameObject:
   - component: {fileID: 581796118}
   - component: {fileID: 581796117}
   - component: {fileID: 581796116}
+  - component: {fileID: 581796120}
+  - component: {fileID: 581796121}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -740,12 +770,36 @@ Transform:
   m_GameObject: {fileID: 581796115}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.03, y: 0, z: 0}
+  m_LocalPosition: {x: -8.48, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &581796120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581796115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18824bbb5e388b41988f70ede9bc181, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Test_Y
+--- !u!114 &581796121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581796115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6bcae08499e6b043a9cdce377433944, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStatus_Y
 --- !u!95 &624802513 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
@@ -913,6 +967,7 @@ GameObject:
   - component: {fileID: 1650632855}
   - component: {fileID: 1650632860}
   - component: {fileID: 1650632861}
+  - component: {fileID: 1650632863}
   m_Layer: 0
   m_Name: BossObj
   m_TagString: Untagged
@@ -942,13 +997,18 @@ MonoBehaviour:
     telegraphSpeed:
       baseValue: 0
     attackAPower:
-      baseValue: 0
+      baseValue: 50
     attackBPower:
       baseValue: 0
     attackCPower:
       baseValue: 0
     attackDPower:
       baseValue: 0
+    hpThresholds:
+    - 0.7
+    - 0.5
+    - 0.1
+    - 0
 --- !u!136 &1650632856
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1018,12 +1078,15 @@ MonoBehaviour:
   anim: {fileID: 624802513}
   spawnPos: {fileID: 415502605}
   playerPos: {fileID: 581796119}
+  idleDurationTime: 1.5
   move_idleSpeed: 3
-  move_idlePos: {x: 10, y: 0, z: 0}
+  move_idleRange: 3
+  move_idlePos: 7
   move_enrangedSpeed: 0
   move_enrangedPos: {x: 0, y: 0, z: 0}
   kickChaseSpeed: 15
-  kickChasePos: {x: 3, y: 0, z: 0}
+  kickChasePos: {x: 1.5, y: 0, z: 0}
+  postAtkDelay: 0.6
 --- !u!54 &1650632862
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1051,6 +1114,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 120
   m_CollisionDetection: 0
+--- !u!114 &1650632863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1650632854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2556d015905a090468d926f1576ee6ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttackCollider
+  attackColliders:
+  - {fileID: 445290353}
+  - {fileID: 1756871976}
+  - {fileID: 102180174}
 --- !u!1 &1756871974
 GameObject:
   m_ObjectHideFlags: 0
@@ -1061,13 +1140,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1756871975}
   - component: {fileID: 1756871976}
+  - component: {fileID: 1756871977}
   m_Layer: 0
   m_Name: SpinShardCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1756871975
 Transform:
   m_ObjectHideFlags: 0
@@ -1098,12 +1178,25 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 4, y: 1.5, z: 4}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1756871977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756871974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9023e3275c04e314b8066121a31744de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossHitBox
+  AtkType: 1
 --- !u!1001 &1802285463
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ public class SpawningState : BossState
         Debug.Log("SpawningState 진입");
         logics.Spawn();
         Debug.Log("SpawningState 애니메이션, 효과음 재생");
-        controller.ChangeState(BossController.State.Idle);
+        controller.ChangeState(State.Idle);
     }
     public override void Update()
     {

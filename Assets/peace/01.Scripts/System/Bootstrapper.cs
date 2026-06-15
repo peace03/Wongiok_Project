@@ -2,16 +2,6 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-//각자 스크립트 초기화 순서 정해줄 때 사용
-public enum InitOrder
-{
-    Player = 0,
-    Skill = 100,
-    Mob = 200,
-    Boss = 300,
-    UI = 400
-}
-
 public class Bootstrapper : MonoBehaviour
 {
     private void Awake()
@@ -19,8 +9,7 @@ public class Bootstrapper : MonoBehaviour
         //인스펙터로 참조하지 말고 전체적으로 1회 찾아오기
         var managers = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
             .OfType<IInitializable>()
-            .OrderBy(m => m.Priority)
-            .ToArray();
+            .OrderBy(m => m.Priority);
 
         //Priority로 정렬된 managers순서대로 초기화 및 ServiceLocator 등록
         foreach(var manager in managers)
@@ -32,7 +21,7 @@ public class Bootstrapper : MonoBehaviour
             //인터페이스로도 호출할 수 있도록 등록해주기
             foreach(var _interface in concreteType.GetInterfaces())
             {
-                if (_interface != typeof(IInitializable))
+                if (_interface == typeof(IBossLogics))
                     ServiceLocator.Register(_interface, manager);
             }
         }
