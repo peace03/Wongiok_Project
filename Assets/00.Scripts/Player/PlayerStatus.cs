@@ -85,16 +85,8 @@ public class PlayerStatus : MonoBehaviour
 
     private void Awake()
     {
-        // 기존 씬 오브젝트에 PlayerStatus만 붙어 있는 경우도 피격 피드백을 보장합니다.
-        EnsureHitFlashFeedback();
-        EnsurePlayerCheckpointTracker();
-
-        playerController = GetComponent<PlayerController>();
-        checkpointTracker = GetComponent<PlayerCheckpointTracker>();
-
-        // 기본값을 스탯 객체에 반영한 뒤 현재 체력을 초기화합니다.
-        SetupBaseStatus();
-        Init();
+        // 실제 체력 초기화와 체력 이벤트 발행은 PlayerInitializer에서 순서를 보장해 처리합니다.
+        CacheRequiredReferences();
     }
 
     private void SetupBaseStatus()
@@ -112,9 +104,28 @@ public class PlayerStatus : MonoBehaviour
     public void Init()
     {
         // 현재 체력을 최대 체력으로 채우고 UI 등에 변경 이벤트를 알립니다.
+        Initialize(playerController, checkpointTracker);
+        PublishInitialHealth();
+    }
+
+    public void Initialize(PlayerController controller, PlayerCheckpointTracker tracker)
+    {
+        // PlayerInitializer가 넘겨준 참조를 우선 사용하고, 비어 있으면 같은 오브젝트에서 보강합니다.
+        EnsureHitFlashFeedback();
+        EnsurePlayerCheckpointTracker();
+        playerController = controller != null ? controller : GetComponent<PlayerController>();
+        checkpointTracker = tracker != null ? tracker : GetComponent<PlayerCheckpointTracker>();
+
+        // 인스펙터 기본값을 Stat에 반영한 뒤 현재 체력을 최대 체력으로 맞춥니다.
+        SetupBaseStatus();
         status.Init();
         isDeathProcessing = false;
         invincibleEndTime = 0f;
+    }
+
+    public void PublishInitialHealth()
+    {
+        // 모든 플레이어 초기화가 끝난 뒤 UI/사운드가 읽을 수 있도록 마지막에 체력 이벤트를 발행합니다.
         PublishHealthChanged();
     }
 
@@ -473,6 +484,15 @@ public class PlayerStatus : MonoBehaviour
 
         StopCoroutine(reviveRoutine);
         reviveRoutine = null;
+    }
+
+    private void CacheRequiredReferences()
+    {
+        // PlayerInitializer 호출 전에도 같은 오브젝트의 필수 참조만 미리 잡아둡니다.
+        EnsureHitFlashFeedback();
+        EnsurePlayerCheckpointTracker();
+        playerController = GetComponent<PlayerController>();
+        checkpointTracker = GetComponent<PlayerCheckpointTracker>();
     }
 
     private void EnsureHitFlashFeedback()

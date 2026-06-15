@@ -14,6 +14,7 @@ public class HitState : PlayerBaseState
     public override bool CanAttack => false;
     public override bool CanDash => false;
     public override bool CanParry => false;
+    public override bool CanUseHealItem => false;
     public override bool CanUpdateFacingDirection => false;
     public override bool CanTakeDamage => false;
 

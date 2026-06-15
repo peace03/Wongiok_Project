@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerMovement))]
 [RequireComponent(typeof(PlayerAttack))]
 [RequireComponent(typeof(PlayerParry))]
+[RequireComponent(typeof(PlayerHealItemInventory))]
 public class PlayerController : MonoBehaviour
 {
     // 현재 실행 중인 플레이어 상태입니다.
@@ -24,6 +25,12 @@ public class PlayerController : MonoBehaviour
     // 패링 범위 판정과 투사체 제거를 담당하는 컴포넌트입니다.
     private PlayerParry _parry;
 
+    // 회복 아이템 보유량과 사용 완료 처리를 담당하는 컴포넌트입니다.
+    private PlayerHealItemInventory _healItemInventory;
+
+    // Bootstrapper를 통한 PlayerInitializer 초기화가 끝났는지 확인합니다.
+    private bool isInitialized;
+
     // 플레이어가 마지막으로 바라본 방향입니다. true면 오른쪽, false면 왼쪽으로 취급합니다.
     private bool _isFacingRight = true;
 
@@ -35,6 +42,7 @@ public class PlayerController : MonoBehaviour
     public DashState DashState { get; private set; }
     public HitState HitState { get; private set; }
     public DeathState DeathState { get; private set; }
+    public HealItemUseState HealItemUseState { get; private set; }
 
     // 현재 프레임의 이동 입력입니다.
     public Vector2 MoveInput { get; private set; }
@@ -54,11 +62,15 @@ public class PlayerController : MonoBehaviour
     // 패링 버튼이 이번 프레임에 눌렸는지 여부입니다.
     public bool ParryTriggered { get; private set; }
 
+    // 회복 아이템 사용 버튼이 이번 프레임에 눌렸는지 저장합니다.
+    public bool UseHealItemTriggered { get; private set; }
+
     // 다른 상태와 컴포넌트에서 필요한 참조를 읽기 전용으로 제공합니다.
     public CharacterController Cc => _cc;
     public PlayerMovement Movement => _moveMent;
     public PlayerAttack Attack => _attack;
     public PlayerParry Parry => _parry;
+    public PlayerHealItemInventory HealItemInventory => _healItemInventory;
     public bool IsFacingRight => _isFacingRight;
 
     // 현재 상태가 피해를 받을 수 있는지 Status 컴포넌트에서 확인할 때 사용합니다.
@@ -67,18 +79,41 @@ public class PlayerController : MonoBehaviour
     // 현재 상태에서 패링 판정을 사용할 수 있는지 PlayerParry에서 확인할 때 사용합니다.
     public bool CanParry => _currentState == null || _currentState.CanParry;
 
+    // 현재 상태에서 회복 아이템 사용을 시작할 수 있는지 확인합니다.
+    public bool CanUseHealItem => _currentState == null || _currentState.CanUseHealItem;
+
     private void Awake()
     {
         // 입력 액션과 필수 컴포넌트들을 초기화합니다.
         EnsurePlayerParry();
 
-        _input = new PlayerInputAction();
-        _cc = GetComponent<CharacterController>();
-        _moveMent = GetComponent<PlayerMovement>();
-        _attack = GetComponent<PlayerAttack>();
-        _parry = GetComponent<PlayerParry>();
+        // 실제 참조 캐싱과 상태 생성은 PlayerInitializer에서 순서를 보장해 처리합니다.
 
         // 상태 객체를 미리 만들어두고, 이후에는 TransitionTo로 상태만 교체합니다.
+    }
+
+    private void OnEnable()
+    {
+        // 오브젝트가 활성화될 때 입력을 받을 수 있게 합니다.
+        _input?.Enable();
+    }
+
+    public void Initialize(
+        PlayerMovement movement,
+        PlayerAttack attack,
+        PlayerParry parry,
+        PlayerHealItemInventory healItemInventory)
+    {
+        // PlayerInitializer에서 넘긴 플레이어 하위 컴포넌트를 캐싱하고 상태 객체를 한 번만 생성합니다.
+        EnsurePlayerParry();
+
+        _input ??= new PlayerInputAction();
+        _cc = GetComponent<CharacterController>();
+        _moveMent = movement != null ? movement : GetComponent<PlayerMovement>();
+        _attack = attack != null ? attack : GetComponent<PlayerAttack>();
+        _parry = parry != null ? parry : GetComponent<PlayerParry>();
+        _healItemInventory = healItemInventory != null ? healItemInventory : GetComponent<PlayerHealItemInventory>();
+
         IdleState = new IdleState(this);
         MoveState = new MoveState(this);
         JumpState = new JumpState(this);
@@ -86,35 +121,50 @@ public class PlayerController : MonoBehaviour
         DashState = new DashState(this);
         HitState = new HitState(this);
         DeathState = new DeathState(this);
+        HealItemUseState = new HealItemUseState(this);
+
+        isInitialized = true;
+
+        if (isActiveAndEnabled)
+            _input.Enable();
     }
 
-    private void OnEnable()
+    public void EnterInitialState()
     {
-        // 오브젝트가 활성화될 때 입력을 받을 수 있게 합니다.
-        _input.Enable();
+        // 모든 플레이어 컴포넌트 초기화가 끝난 뒤 기본 상태로 진입합니다.
+        if (!isInitialized) return;
+
+        TransitionTo(IdleState);
     }
 
     private void OnDisable()
     {
         // 비활성화 시 입력도 함께 끄면 불필요한 입력 처리와 이벤트 누수를 막을 수 있습니다.
-        _input.Disable();
+        _input?.Disable();
     }
 
     private void Start()
     {
         // 게임 시작 시 기본 상태는 정지 상태입니다.
-        TransitionTo(IdleState);
+        // PlayerInitializer가 초기 상태 진입을 담당합니다.
     }
 
     private void Update()
     {
         // 매 프레임 입력을 먼저 읽고, 그 입력을 바탕으로 상태 로직을 실행합니다.
+        if (!isInitialized) return;
+
         PlayerInput();
         UpdateFacingDirection();
 
         if (_currentState != null && _currentState.CanParry)
         {
             HandleParryInput();
+        }
+
+        if (_currentState != null && _currentState.CanUseHealItem)
+        {
+            HandleHealItemInput();
         }
 
         _currentState?.UpdateState();
@@ -129,6 +179,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!isInitialized) return;
+
         _currentState?.FixedUpdateState();
     }
 
@@ -155,6 +207,17 @@ public class PlayerController : MonoBehaviour
         // PlayerStatus에서 사망이 확정된 뒤 모든 조작을 잠그기 위해 사용합니다.
         DeathState.SetDeath(deathInfo);
         TransitionTo(DeathState);
+    }
+
+    public void EnterHealItemUseState()
+    {
+        // 지상 상태에서만 회복 아이템 사용 상태로 들어갈 수 있습니다.
+        if (!CanUseHealItem) return;
+        if (_healItemInventory == null) return;
+        if (_moveMent == null || !_moveMent.IsGrounded) return;
+        if (!_healItemInventory.CanStartUse()) return;
+
+        TransitionTo(HealItemUseState);
     }
 
     public void ExitDeathStateAfterRevive()
@@ -197,6 +260,7 @@ public class PlayerController : MonoBehaviour
         AttackTriggered = _input.Player.Attack.WasPressedThisFrame();
         DashTriggered = _input.Player.Dash.WasPressedThisFrame();
         ParryTriggered = _input.Player.Parry.WasPressedThisFrame();
+        UseHealItemTriggered = _input.Player.UseHealItem.WasPressedThisFrame();
     }
 
     private void UpdateFacingDirection()
@@ -236,6 +300,14 @@ public class PlayerController : MonoBehaviour
         if (_parry == null) return;
 
         _parry.TryParry();
+    }
+
+    private void HandleHealItemInput()
+    {
+        // 회복 아이템 입력은 눌린 프레임에만 사용 상태 진입을 시도합니다.
+        if (!UseHealItemTriggered) return;
+
+        EnterHealItemUseState();
     }
 
     private void EnsurePlayerParry()

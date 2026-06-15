@@ -14,6 +14,9 @@ public class PlayerParry : MonoBehaviour
 
     private PlayerController playerController;
 
+    // PlayerInitializer를 통해 패링 참조가 준비되었는지 확인합니다.
+    private bool isInitialized;
+
     // 직전 프레임에 패리 가능 표시를 켜 둔 투사체 목록입니다.
     private readonly List<IParryableProjectile> parryReadyProjectiles = new List<IParryableProjectile>();
 
@@ -22,8 +25,15 @@ public class PlayerParry : MonoBehaviour
 
     private void Awake()
     {
-        playerController = GetComponent<PlayerController>();
+        // 실제 참조 캐싱은 PlayerInitializer에서 순서를 보장해 처리합니다.
+    }
+
+    public void Initialize(PlayerController controller)
+    {
+        // 패링 가능 상태를 확인할 컨트롤러 참조와 기본 레이어 마스크를 초기화합니다.
+        playerController = controller != null ? controller : GetComponent<PlayerController>();
         EnsureDefaultParryMask();
+        isInitialized = true;
     }
 
     private void OnValidate()
@@ -33,6 +43,8 @@ public class PlayerParry : MonoBehaviour
 
     private void Update()
     {
+        if (!isInitialized) return;
+
         RefreshParryReadyVisuals();
     }
 
@@ -43,6 +55,8 @@ public class PlayerParry : MonoBehaviour
 
     public bool TryParry()
     {
+        if (!isInitialized) return false;
+
         EnsureDefaultParryMask();
 
         // 범위 안의 투사체 중 가장 가까운 대상 하나만 패리합니다.

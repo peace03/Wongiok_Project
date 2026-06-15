@@ -15,7 +15,13 @@ public class PlayerAttack : MonoBehaviour
 
     private void Awake()
     {
-        playerStatus = GetComponent<PlayerStatus>();
+        // 실제 참조 캐싱은 PlayerInitializer에서 순서를 보장해 처리합니다.
+    }
+
+    public void Initialize(PlayerStatus status)
+    {
+        // 공격 데미지를 계산할 플레이어 스탯 참조를 초기화합니다.
+        playerStatus = status != null ? status : GetComponent<PlayerStatus>();
     }
 
     public void Attack(Vector2 aimInput, bool isFacingRight, bool isGrounded)

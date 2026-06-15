@@ -21,6 +21,9 @@ public class DashState : PlayerBaseState
     // 대쉬 중에는 패링을 막습니다.
     public override bool CanParry => false;
 
+    // 대쉬 중에는 회복 아이템 사용을 시작할 수 없습니다.
+    public override bool CanUseHealItem => false;
+
     // 대시 중에는 회피 판정으로 피해를 받지 않습니다.
     public override bool CanTakeDamage => false;
 

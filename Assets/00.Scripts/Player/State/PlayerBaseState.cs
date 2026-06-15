@@ -17,6 +17,9 @@ public abstract class PlayerBaseState
     // 패링 기능이 추가될 경우 상태별 패링 가능 여부를 제어하기 위한 속성입니다.
     public virtual bool CanParry => true;
 
+    // 현재 상태에서 회복 아이템 사용을 시작할 수 있는지 제어합니다.
+    public virtual bool CanUseHealItem => true;
+
     // 현재 상태에서 피해를 받을 수 있는지 나타냅니다.
     // DashState처럼 회피 무적이 필요한 상태에서 false로 재정의합니다.
     public virtual bool CanTakeDamage => true;

@@ -53,8 +53,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
+        // 실제 참조 캐싱은 PlayerInitializer에서 순서를 보장해 처리합니다.
+    }
+
+    public void Initialize(PlayerStatus status)
+    {
+        // 이동 계산에 필요한 컨트롤러와 스탯 참조를 초기화합니다.
         cc = GetComponent<CharacterController>();
-        playerStatus = GetComponent<PlayerStatus>();
+        playerStatus = status != null ? status : GetComponent<PlayerStatus>();
 
         // 시작 시점의 바닥 상태를 저장해 첫 중력 처리에서 착지 판정이 꼬이지 않게 합니다.
         wasGrounded = cc.isGrounded;

@@ -116,6 +116,27 @@ public readonly struct PlayerDamagedEvent
 
 // 플레이어가 공격을 발사했을 때 발행되는 이벤트입니다.
 // 사운드, 카메라 흔들림, 발사 이펙트 같은 부가 연출을 분리해서 처리할 수 있습니다.
+// 플레이어 회복 아이템 보유량이 바뀔 때 발행되는 이벤트입니다.
+// UI, 사운드, 획득 이펙트는 이 이벤트를 구독해서 후처리합니다.
+public readonly struct PlayerHealItemCountChangedEvent
+{
+    // 보유량이 변경된 플레이어 오브젝트입니다.
+    public readonly GameObject PlayerObject;
+
+    // 현재 회복 아이템 보유량입니다.
+    public readonly int CurrentCount;
+
+    // 회복 아이템 최대 보유량입니다.
+    public readonly int MaxCount;
+
+    public PlayerHealItemCountChangedEvent(GameObject playerObject, int currentCount, int maxCount)
+    {
+        PlayerObject = playerObject;
+        CurrentCount = currentCount;
+        MaxCount = maxCount;
+    }
+}
+
 public readonly struct PlayerAttackFiredEvent
 {
     // 총알이 생성된 위치입니다.
