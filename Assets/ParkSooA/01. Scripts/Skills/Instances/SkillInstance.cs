@@ -17,6 +17,7 @@ public class SkillInstance
     private List<SkillInstance> equippedPassives;                       // 장착된 패시브 스킬 목록
 
     public BaseSkillData Data => data;
+    public int CurLevel => curLevel;
     // 액티브 스킬 여부
     public bool IsActiveSkill => data.Type == SKILL_TYPE.Active;
     // 스킬 장착 여부
@@ -33,13 +34,13 @@ public class SkillInstance
     public bool IsCharging => state == SKILL_STATE.Charging;
     // 쿨타임 비율
     public float CoolTimeRatio =>
-        1f - data.GetMaxCoolTime(curLevel) <= 0f ? 0f : curCoolTime / data.GetMaxCoolTime(curLevel);
+        1f - (data.GetMaxCoolTime(curLevel) <= 0f ? 0f : curCoolTime / data.GetMaxCoolTime(curLevel));
     // 지속 시간 비율
     public float DurationRatio =>
-        1f - data.GetMaxDuration(curLevel) <= 0f ? 0f : curDuration / data.GetMaxDuration(curLevel);
+        1f - (data.GetMaxDuration(curLevel) <= 0f ? 0f : curDuration / data.GetMaxDuration(curLevel));
     // 차징 시간 비율
     public float ChargingTimeRatio =>
-        1f - data.GetMaxChargingTime(curLevel) <= 0f ? 0f : curChargingTime / data.GetMaxChargingTime(curLevel);
+        1f - (data.GetMaxChargingTime(curLevel) <= 0f ? 0f : curChargingTime / data.GetMaxChargingTime(curLevel));
 
     // 생성자
     public SkillInstance(GameObject owner, BaseSkillData data)
@@ -99,13 +100,6 @@ public class SkillInstance
     // 스킬 상태 변경 함수
     private void SwitchState(SKILL_STATE change)
     {
-        // 패시브 스킬이라면
-        if (!IsActiveSkill)
-        {
-            Debug.Log($"[Skill] {data.SkillName} - 패시브 스킬");
-            return;
-        }
-
         // 현재 상태 바꾸기
         state = change;
         Debug.Log($"[Skill] {data.SkillName} - {state.ToKoreanString()}");

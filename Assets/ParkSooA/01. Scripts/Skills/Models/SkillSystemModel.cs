@@ -5,7 +5,7 @@ using System.Collections.Generic;
 [Serializable]
 public class SkillSystemModel
 {
-    [Header("장착한 액티브 스킬")]
+    [Space(10)][Header("장착한 액티브 스킬")]
     [SerializeField] private int maxActiveCount = 3;                                // 액티브 스킬 최대 장착 개수
     [SerializeField] private List<SkillInstance> equippedActives = new();           // 장착한 액티브 스킬들
 
@@ -43,8 +43,100 @@ public class SkillSystemModel
             }
             // 해당 스킬이 있다면
             else
-                Debug.Log($"[Error | Skill] {data.SkillName} 스킬 존재 => 입력 - 대상 {owner.name}", owner);
+                Debug.Log($"[Error | Skill] {data.SkillName} 스킬 존재 => 입력 - 대상 {owner.name}\n", owner);
         }
+
+        // 스킬 장착
+        EquipSkills();
+    }
+
+    // 스킬 장착 함수
+    private void EquipSkills()
+    {
+        // 모든 스킬들의 수만큼
+        foreach(var skill in allSkillList)
+        {
+            // 챕터 1의 스킬이 아니거나, 장착할 액티브 슬롯이 없거나, 장착할 패시브 슬롯이 없다면
+            if (skill.Data.UnlockChapter != CHAPTER_TYPE.First ||
+                (skill.IsActiveSkill && equippedActives.Count >= maxActiveCount) ||
+                (!skill.IsActiveSkill && equippedPassives.Count >= maxPassiveCount))
+                continue;
+
+            // 장착할 액티브 슬롯이 있다면
+            if (skill.IsActiveSkill && equippedActives.Count < maxActiveCount)
+            {
+                // 액티브 스킬 장착
+                equippedActives.Add(skill);
+                Debug.Log($"[Active | Skill] {skill.Data.SkillName} 장착");
+            }
+            // 장착할 패시브 슬롯이 있다면
+            else if (!skill.IsActiveSkill && equippedPassives.Count < maxPassiveCount)
+            {
+                // 패시브 스킬 장착
+                equippedPassives.Add(skill);
+                Debug.Log($"[Passive | Skill] {skill.Data.SkillName} 장착");
+            }
+        }
+
+        // 장착할 액티브 슬롯이 남았다면
+        if (equippedActives.Count < maxActiveCount)
+        {
+            Debug.Log($"[Active | Skill] 빈 칸 {maxActiveCount - equippedActives.Count}개");
+
+            // 남은 액티브 슬롯 칸 수만큼
+            for (int i = equippedActives.Count; i < maxActiveCount; i++)
+                // 빈 칸 생성
+                equippedActives.Add(null);
+        }
+
+        // 장착할 패시브 슬롯이 남았다면
+        if (equippedPassives.Count < maxPassiveCount)
+        {
+            Debug.Log($"[Passive | Skill] 빈 칸 {maxPassiveCount - equippedPassives.Count}개");
+
+            // 남은 패시브 슬롯 칸 수만큼
+            for (int i = equippedPassives.Count; i < maxPassiveCount; i++)
+                // 빈 칸 생성
+                equippedPassives.Add(null);
+        }
+    }
+
+    // 장착한 액티브 스킬들 반환 함수
+    public void GetEquippedActiveSkills(List<SkillInstance> results)
+    {
+        // 결과를 담을 리스트가 없다면
+        if (results == null)
+        {
+            Debug.Log($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트(없음)");
+            return;
+        }
+
+        // 리스트 초기화
+        results.Clear();
+
+        // 장착한 액티브 스킬들의 수만큼
+        foreach (var skill in equippedActives)
+            // 결과 리스트에 추가
+            results.Add(skill);
+    }
+
+    // 장착한 패시브 스킬들 반환 함수
+    public void GetEquippedPassiveSkills(List<SkillInstance> results)
+    {
+        // 결과를 담을 리스트가 없다면
+        if (results == null)
+        {
+            Debug.Log($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트(없음)");
+            return;
+        }
+
+        // 리스트 초기화
+        results.Clear();
+
+        // 장착한 패시브 스킬들의 수만큼
+        foreach (var skill in equippedPassives)
+            // 결과 리스트에 추가
+            results.Add(skill);
     }
 
     // 액티브 스킬들 반환 함수
