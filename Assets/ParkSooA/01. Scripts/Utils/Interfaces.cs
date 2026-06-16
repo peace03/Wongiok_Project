@@ -1,8 +1,9 @@
-// 스킬 뷰 인터페이스
-public interface ISkillView
+﻿// 초기화가 필요한 스크립트에 붙이는 인터페이스
+public interface IInitializable
 {
-    // 스킬 슬롯들 갱신 함수
-    void RefreshSkillSlots(UIPlayerSkillSlotData[] skillSlots);
-    // 스킬 슬롯 갱신 함수
-    void RefreshSkillSlot(int index, bool hasData, UIPlayerSkillSlotData slotData);
+    // 중요도
+    public int Priority { get; }
+
+    // 초기화 함수
+    public void Init();
 }

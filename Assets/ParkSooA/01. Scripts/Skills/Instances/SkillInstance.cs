@@ -117,7 +117,7 @@ public class SkillInstance
             // 소유자가 없다면
             if(owner == null)
             {
-                Debug.Log($"[Error | Skill] {data.SkillName}(Lv.{curLevel}) - 스킬 소유자(Owner) 없음");
+                Debug.Log($"[Error | Skill] {data.SkillName}(Lv.{curLevel}) - 소유자(Owner) 없음");
                 return;
             }
 

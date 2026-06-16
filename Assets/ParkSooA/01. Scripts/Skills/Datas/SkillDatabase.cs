@@ -21,7 +21,7 @@ public static class SkillDatabase
         }
 
         // 스킬 정보들 가져오기
-        var datas = Resources.LoadAll<BaseSkillData>("Datas/Skill/");
+        var datas = Resources.LoadAll<BaseSkillData>("Datas/Skills/");
 
         // 가져온 스킬 정보들의 수만큼
         foreach(var data in datas)
@@ -90,7 +90,7 @@ public static class SkillDatabase
         // 결과를 담을 리스트가 없다면
         if(results == null)
         {
-            Debug.Log($"[Error | Skill] 필수 검색 조건 부족 => 입력 - {chapter.ToKoreanString()} | 리스트(없음)");
+            Debug.Log($"[Error | Skill] 필수 검색 조건 부족 => 입력 - {chapter.ToKoreanString()} | 리스트 없음");
             return;
         }
 

@@ -1,5 +1,12 @@
 using UnityEngine;
 
+public struct UISetPlayerSkillSlotsEvent
+{
+    public UIPlayerSkillSlotData[] SkillSlots { get; private set; }
+
+    public UISetPlayerSkillSlotsEvent(UIPlayerSkillSlotData[] skillSlots) => SkillSlots = skillSlots;
+}
+
 // UI용 플레이어 스킬 슬롯 데이터
 public struct UIPlayerSkillSlotData
 {
@@ -20,16 +27,16 @@ public struct UIPlayerSkillSlotData
     }
 }
 
-public class SkillSystemView : MonoBehaviour, ISkillView
+public class SkillSystemView : MonoBehaviour
 {
     // 스킬 슬롯들 갱신 함수
-    public void RefreshSkillSlots(UIPlayerSkillSlotData[] skillSlots)
+    private void RefreshSkillSlots(UIPlayerSkillSlotData[] skillSlots)
     {
         Debug.Log("스킬 슬롯들 갱신 함수");
     }
 
     // 스킬 슬롯 갱신 함수
-    public void RefreshSkillSlot(int index, bool hasData, UIPlayerSkillSlotData skillSlot)
+    private void RefreshSkillSlot(int index, bool hasData, UIPlayerSkillSlotData skillSlot)
     {
         Debug.Log("스킬 슬롯 갱신 함수");
     }
