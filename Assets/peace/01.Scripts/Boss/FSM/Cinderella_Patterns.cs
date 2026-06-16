@@ -24,22 +24,34 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [SerializeField] private float kickChaseSpeed;
     [SerializeField] private Vector3 kickChasePos;
     [SerializeField] private float postAtkDelay;
-
+    [Header("Ultimate 상태")]
+    [SerializeField] private float UltimateChaseSpeed;
+    [SerializeField] private Vector3 UltimateChasePos;
 
     //공통 사용
     public float Distance => playerPos.position.x - transform.position.x;
     public bool StateDone { get; private set; } //공격 BT 종료 여부
 
+    private Transform bossSkin;
     private Rigidbody rb;
     private AnimatorStateInfo animState;
     private float curTime_Anim = 0f;
     private float curTime_Idle = 0f;
+    private bool isParryed = false;     //패링 되었는지 여부
 
     private Node kickAttack;
     private Node spinShardAttack;
     private Node jumpSlamAttack;
+    private Node UltimateAttack;
     private AttackType attackType;  //현재 공격 타입
     private AttackType beforeType = AttackType.C;  //이전 공격 타입
+    public enum Facing { Left, Right }
+    private Facing curFacing = Facing.Left; //보스가 현재 바라보는 방향
+    private readonly float[] rotValue = //Animation Y축 각도 설정값
+    {
+        228, -228,
+        -45, 45
+    };
 
     //Idle
     private Vector3 RandomPos;
@@ -49,11 +61,15 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     private bool telegraphExcuted = false;
     private bool attackDone = false;    //공격 실행 여부
 
+    //Ultimate
+    private int parryCount = 0;
+
 
     private float x, y, z; //Move에 사용될 속도 저장
 
     public void Init()
     {
+        bossSkin = transform.GetChild(0).transform;
         rb = GetComponent<Rigidbody>();
         Init_BT();
         if (move_idleRange >= move_idlePos) move_idleRange = move_idlePos - 0.5f;
@@ -61,7 +77,6 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 
     public void Init_BT()
     {
-        //마지막에 bool변수들 초기화 해줘야함
         kickAttack = new Sequence(new List<Node>
         {
             //추격 실렉터
@@ -80,9 +95,10 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             new Selector(new List<Node>
             {
                 new ConditionLeaf(() => attackDone), //공격 애님 끝남?
-                new Sequence(new List<Node>
+                new StatefulSequence(new List<Node>
                 {
-                    new Leaf(() => PlayAnim_Speed((int)Animation.Attack, 1f)), //공격 애님 실행
+                    new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
+                    new Leaf(() => PlayAnim_Speed((int)Animation.AttackA_L, 1f)), //공격 애님 실행
                     new Leaf(() => {
                         attackDone = true;
                         return NodeState.Success;
@@ -92,9 +108,57 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             //후딜 시퀀스
             new Sequence(new List<Node>
             {
-                new Leaf(() => PlayAnim_Time((int)Animation.Idle, postAtkDelay)), //Idle 애님 실행
+                new Leaf(() =>
+                {
+                    UpdateFacing();
+                    return PlayAnim_Time((int)Animation.Idle_L, postAtkDelay); //Idle 애님 실행
+                }),
                 new Leaf(() => SetStateDone(true))
             })
+        });
+
+        UltimateAttack = new Sequence(new List<Node>
+        {
+            //주춤
+            new Sequence(new List<Node>
+            {
+                new ConditionLeaf(() => isParryed), //패링되었는지 검사
+                new Leaf(() => PlayAnim_Time((int)Animation.Idle_L, 0.6f)),
+                new Leaf(() => 
+                { 
+                    isParryed = false;
+                    parryCount++;
+                    return NodeState.Success; 
+                })
+            }),
+            //추격
+            new Selector(new List<Node>
+            {
+                new ConditionLeaf(() => chaseDone),
+                new Leaf(() => Chase(UltimateChasePos, UltimateChaseSpeed))
+            }),
+            //사전신호
+            new Sequence(new List<Node>
+            {
+
+            }),
+            //공격
+            new Selector(new List<Node>
+            {
+                new ConditionLeaf(() => attackDone),
+                new Sequence(new List<Node>
+                {
+                    new Leaf(() => PlayAnim_Speed((int)Animation.AttackA_L, 1f)), //나중에 애니메이션 변경
+                    new Leaf(() => PlayAnim_Speed((int)Animation.AttackB_L, 1f)), //나중에 애니메이션 변경
+                    new Leaf(() => PlayAnim_Speed((int)Animation.AttackB_L, 1f)), //나중에 애니메이션 변경
+                    new Leaf(() =>
+                    {
+                        attackDone = true;
+                        return NodeState.Success;
+                    })
+                })
+            })
+            //FSM 상태에서 Groggy로 전환
         });
     }
 
@@ -109,13 +173,29 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     {
         rb.linearVelocity = new Vector3(x, y, z);
     }
+    public void UpdateFacing() //보스가 플레이어 바라보는 방향 갱신
+    {
+        curFacing = (Distance < 0) ? Facing.Left : Facing.Right;
+        //Debug.Log($"UpdateFacing: {curFacing}");
+    }
+    public int GetAnimDirection(int baseAnimL) //방향에 맞춰 애니메이션 반환
+    {
+        return (curFacing == Facing.Left) ? baseAnimL : baseAnimL + 1;
+    }
+    public void SyncFacingWithAnim(int targetAnim)
+    {
+        Debug.Log($"SyncFacingWithAnim: {targetAnim}");
+        anim.SetInteger("Boss", targetAnim);
+        bossSkin.rotation = Quaternion.Euler(0f, rotValue[targetAnim], 0f);
+    }
     //애니메이션 재생(속도 조절해서 시간을 맞춤)
     public NodeState PlayAnim_Speed(int num, float targetSeconds) 
     {
+        int targetAnim = GetAnimDirection(num);
         //Debug.Log($"PlayAnim {num} 재생중");
-        if (anim.GetInteger("Boss") != num) //애니메이션 전환
+        if (anim.GetInteger("Boss") != targetAnim) //애니메이션 전환
         {
-            anim.SetInteger("Boss", num);
+            SyncFacingWithAnim(targetAnim);
             return NodeState.Running; //방어코드(프레임 갱신)
         }
         if (anim.IsInTransition(0)) return NodeState.Running; //방어코드(애님 전환 중)
@@ -128,12 +208,13 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     //애니메이션 재생(일정시간이 지나면 다음으로 넘어감)
     public NodeState PlayAnim_Time(int num, float targetSeconds) 
     {
+        int targetAnim = GetAnimDirection(num);
         curTime_Anim += Time.deltaTime;
         //Debug.Log($"PlayAnim {num} 재생중");
-        if (anim.GetInteger("Boss") != num) //애니메이션 전환
+        if (anim.GetInteger("Boss") != targetAnim) //애니메이션 전환
         {
             curTime_Anim = 0f;
-            anim.SetInteger("Boss", num);
+            SyncFacingWithAnim(targetAnim);
             return NodeState.Running; //방어코드(프레임 갱신)
         }
         if (anim.IsInTransition(0)) return NodeState.Running; //방어코드(애님 전환 중)
@@ -173,14 +254,16 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         if (Math.Sign(Distance) <= 0) //플레이어가 보스 오른쪽에 위치
         {
             RandomPos = new Vector3(playerPos.position.x + element, 0, 0);
-            Debug.Log($"플레이어 - 보스 = {Distance}");
-            Debug.Log($"{RandomPos.x}, {RandomPos.y}, {RandomPos.z}");
+            //Debug.Log($"플레이어 - 보스 = {Distance}");
+            //Debug.Log($"{RandomPos.x}, {RandomPos.y}, {RandomPos.z}");
         }
         else    //플레이어가 보스 왼쪽에 위치
             RandomPos = new Vector3(playerPos.position.x - element, 0, 0);
     }
     public void IdleMove() //보스 기준
     {
+        UpdateFacing();
+        PlayAnim_Time((int)Animation.Idle_L, 1f);
         if (transform.position.x < RandomPos.x -0.5)    //지정좌표 왼쪽에 있을 때
             Move(move_idleSpeed, 0, 0);
         else if (transform.position.x > RandomPos.x +0.5)   //지정좌표 오른쪽에 있을 때
@@ -226,11 +309,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         }
     }
 
-    public void AttackInit()
+    public void LogicInit()
     {
         chaseDone = false;
         telegraphExcuted = false;
         attackDone = false;
+        parryCount = 0;
     }
     #endregion
 
@@ -244,4 +328,10 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #region JumpSlamAttack
     #endregion
 
+    #region Ultimate
+    public bool CanTransitionToGroggy()
+    {
+        return parryCount >= 3;
+    }
+    #endregion
 }

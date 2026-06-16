@@ -12,7 +12,7 @@ public class AttackingState : BossState
         Debug.Log("Attack 상태 진입");
         curBT = logics.GetAttackBT();
         logics.SetStateDone(false);
-        logics.AttackInit();
+        logics.LogicInit();
     }
     public override void FixedUpdate()
     {

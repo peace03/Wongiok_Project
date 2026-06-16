@@ -12,5 +12,6 @@ public interface IBossLogics
     public void Spawn();
     public void IdleMove();
     public void ExcuteMove(); //이동 실행(FixedUpdate 실행용)
-    public void AttackInit(); //공격 변수 초기화
+    public void LogicInit(); //공격 변수 초기화
+    public bool CanTransitionToGroggy(); //패링 3회 성공시 그로기 전환
 }

@@ -16,11 +16,11 @@ public class Test_Y : MonoBehaviour
     public void SetCanParry(ParryEvent data)
     {
         canParry = data.CanParry;
-        Debug.Log(canParry);
+        //Debug.Log(canParry);
     }
     public void SetFalseParry(UltimateInvoke data) 
     { 
         canParry = false;
-        Debug.Log($"canParry: {canParry}");
+        //Debug.Log($"canParry: {canParry}");
     }
 }
