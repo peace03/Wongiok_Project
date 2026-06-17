@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &240197242743928305
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8820369979243843413}
+  m_Layer: 6
+  m_Name: FirePosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8820369979243843413
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 240197242743928305}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.07, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6823107894079953101}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3270525879389655030
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,7 +43,7 @@ GameObject:
   - component: {fileID: 3789659101440768516}
   - component: {fileID: 9181821032936425353}
   - component: {fileID: 822940817693250787}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -159,15 +190,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 72.79
+      value: 98.78
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.86
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 60.17
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalRotation.w
@@ -205,12 +236,19 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3473339947051621306}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8820369979243843413}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       insertIndex: -1
@@ -233,6 +271,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4072280436710111634}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2633535246944374968}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8121973273855103618}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6448603118492817629}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6964652310758986999}
   m_SourcePrefab: {fileID: 100100000, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
 --- !u!1 &6195647787250270839 stripped
 GameObject:
@@ -341,8 +391,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 191e3053ea2e09340a74e6560471e9a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
-  firePoint: {fileID: 0}
-  bulletPrefab: {fileID: 0}
+  firePoint: {fileID: 8820369979243843413}
+  bulletPrefab: {fileID: -9084250434651854662, guid: 335dd87a04a0e0747b6d7f22689ae5d5, type: 3}
 --- !u!114 &2325928613518686973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,6 +421,59 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dfa4c0509c7d51418edabea7e183f7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+--- !u!114 &2633535246944374968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d89f665a804a44f99a34252669ec5b36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCheckpointTracker
+--- !u!114 &8121973273855103618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d24d6fe3a8641c49b2a22e8bb1eb097, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealItemInventory
+  startCount: 1
+  maxCount: 3
+  healAmount: 30
+  useDuration: 1
+--- !u!114 &6448603118492817629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebc560a68d7a4d0aa50406a15cf63828, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLifeTracker
+  startLifeCount: 3
+--- !u!114 &6964652310758986999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61fe390158b94084a96f804ab5530f31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInitializer
 --- !u!4 &6823107894079953101 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
