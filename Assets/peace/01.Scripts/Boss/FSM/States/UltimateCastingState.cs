@@ -5,17 +5,25 @@ public class UltimateCastingState : BossState
     public UltimateCastingState(BossController controller, IBossLogics logics)
         : base(controller, logics) { }
 
-    private Node BT;
+    private Node curBT;
 
     public override void Enter()
     {
         Debug.Log("궁극기 상태 전환 완료");
+        curBT = logics.GetUltimateBT();
+        logics.SetStateDone(false);
         logics.LogicInit();
+    }
+    public override void FixedUpdate()
+    {
+        logics.ExcuteMove();
     }
     public override void Update()
     {
-        BT.Evaluate();
+        curBT.Evaluate();
         if (logics.CanTransitionToGroggy())
             controller.ChangeState(State.Groggy);
+        if (logics.GetStateDone())
+            controller.ChangeState(State.Idle);
     }
 }
