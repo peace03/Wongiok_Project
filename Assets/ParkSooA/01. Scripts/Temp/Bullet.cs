@@ -3,18 +3,20 @@ using System.Collections;
 
 public class Bullet : MonoBehaviour
 {
-    private float speed = 10f;
+    private readonly WaitForSeconds lifeTime = new(5f);
+
+    private readonly float speed = 10f;
 
     private void OnEnable()
     {
-        StartCoroutine(Fire());
+        StartCoroutine(LifeCycle());
     }
 
     private void FixedUpdate() => transform.position += speed * Time.fixedDeltaTime * transform.forward;
 
-    private IEnumerator Fire()
+    private IEnumerator LifeCycle()
     {
-        yield return new WaitForSeconds(10f);
+        yield return lifeTime;
         gameObject.SetActive(false);
     }
 }

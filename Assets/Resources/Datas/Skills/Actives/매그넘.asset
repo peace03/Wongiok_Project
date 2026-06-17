@@ -33,6 +33,7 @@ MonoBehaviour:
     - rid: 4582174391890870374
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
+        bullet: {fileID: 89748929391278128, guid: 1c0152f012197da4ebf1cd617831d240, type: 3}
         maxCoolTime: 3
         maxDuration: 0
         damage: 30
@@ -42,6 +43,7 @@ MonoBehaviour:
     - rid: 4582174391890870375
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
+        bullet: {fileID: 89748929391278128, guid: 1c0152f012197da4ebf1cd617831d240, type: 3}
         maxCoolTime: 2.5
         maxDuration: 0
         damage: 35
@@ -51,6 +53,7 @@ MonoBehaviour:
     - rid: 4582174391890870376
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
+        bullet: {fileID: 89748929391278128, guid: 1c0152f012197da4ebf1cd617831d240, type: 3}
         maxCoolTime: 2
         maxDuration: 0
         damage: 40

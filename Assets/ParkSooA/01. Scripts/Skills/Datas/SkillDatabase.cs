@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public static class SkillDatabase
 {
@@ -20,8 +21,8 @@ public static class SkillDatabase
             return;
         }
 
-        // 스킬 정보들 가져오기
-        var datas = Resources.LoadAll<BaseSkillData>("Datas/Skills/");
+        // ID 오름차순으로 스킬 정보들 가져오기
+        var datas = Resources.LoadAll<BaseSkillData>("Datas/Skills/").OrderBy(data => data.Id);
 
         // 가져온 스킬 정보들의 수만큼
         foreach(var data in datas)

@@ -5,9 +5,11 @@ using System;
 // 액티브 스킬 레벨 정보
 public abstract class ActiveSkillLevelData : BaseSkillLevelData
 {
+    [SerializeField] private GameObject bullet;     // (임시) 총알
     [SerializeField] private float maxCoolTime;     // 쿨타임
     [SerializeField] private float maxDuration;     // 지속시간
 
+    public GameObject Bullet => bullet;
     public float MaxCoolTime => maxCoolTime;
     public float MaxDuration => maxDuration;
 

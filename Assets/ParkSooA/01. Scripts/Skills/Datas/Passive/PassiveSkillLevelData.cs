@@ -24,6 +24,8 @@ public class PassiveSkillLevelData : BaseSkillLevelData
             return;
         }
 
+        // 나중에 밑에 계산하는 부분을 클래스로 분리하기!
+
         // 변화량을 저장할 변수
         float amount;
 
