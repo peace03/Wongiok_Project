@@ -13,6 +13,11 @@ public class Test_Y : MonoBehaviour
         EventBus<ParryEvent>.action -= SetCanParry;
         EventBus<UltimateInvoke>.action += SetFalseParry;
     }
+    private void Update()
+    {
+        if (canParry == true && Input.GetKeyDown(KeyCode.E))
+            EventBus<ParryKeyDown>.Publish(default);
+    }
     public void SetCanParry(ParryEvent data)
     {
         canParry = data.CanParry;

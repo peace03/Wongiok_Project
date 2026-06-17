@@ -20,6 +20,13 @@ public struct ColliderEvent
     }
 }
 
+//보스의 시점 방향에 따라 콜라이더 위치 변경
+public struct BossFacingChangeEvent
+{
+    public Facing dir { get; private set; }
+    public BossFacingChangeEvent(Facing dir) { this.dir = dir; }
+}
+
 //공격 종료 이벤트 (공격 콜라이더가 플레이어 1회만 공격하도록 기억)
 public struct AttackFinish { }
 
