@@ -1087,8 +1087,8 @@ MonoBehaviour:
   kickChaseSpeed: 15
   kickChasePos: {x: 1.5, y: 0, z: 0}
   postAtkDelay: 0.6
-  UltimateChaseSpeed: 0
-  UltimateChasePos: {x: 0, y: 0, z: 0}
+  UltimateChaseSpeed: 15
+  UltimateChasePos: {x: 1.5, y: 0, z: 0}
 --- !u!54 &1650632862
 Rigidbody:
   m_ObjectHideFlags: 0

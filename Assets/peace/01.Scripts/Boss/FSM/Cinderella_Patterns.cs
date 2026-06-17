@@ -95,7 +95,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             new StatefulSequence(new List<Node>
             {
                 new ConditionLeaf(() => isParryed),
-                new Leaf(() => PlayAnim_Speed((int)Animation.Parry_L, 0f)),
+                new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
                 new Leaf(() => 
                 { 
                     isParryed = false;
@@ -110,7 +110,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => chaseDone), //추격이 끝났는가? -> 다음 시퀀스
-                    new Leaf(() => Chase(kickChasePos, kickChaseSpeed, (int)Animation.Chase_L)) //해당 위치까지 이동
+                    new Leaf(() => Chase(kickChasePos, kickChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
                 }),
                 //사전신호
                 new Sequence(new List<Node>
@@ -125,7 +125,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new StatefulSequence(new List<Node>
                     {
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
-                        new Leaf(() => PlayAnim_Speed((int)Animation.AttackA_L, 0f)), //공격 애님 실행
+                        new Leaf(() => PlayAnim_Speed((int)Animation.AttackA, 0f)), //공격 애님 실행
                         new Leaf(() => {
                             attackDone = true;
                             return NodeState.Success;
@@ -138,7 +138,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() =>
                     {
                         UpdateFacing();
-                        return PlayAnim_Time((int)Animation.Idle_L, postAtkDelay); //Idle 애님 실행
+                        return PlayAnim_Time((int)Animation.Idle, postAtkDelay); //Idle 애님 실행
                     }),
                     new Leaf(() => SetStateDone(true))
                 })
@@ -151,7 +151,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             new StatefulSequence(new List<Node>
             {
                 new ConditionLeaf(() => isParryed),
-                new Leaf(() => PlayAnim_Speed((int)Animation.Parry_L, 0f)),
+                new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
                 new Leaf(() => 
                 { 
                     isParryed = false;
@@ -166,7 +166,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => chaseDone),
-                    new Leaf(() => Chase(UltimateChasePos, UltimateChaseSpeed, (int)Animation.Chase_L))
+                    new Leaf(() => Chase(UltimateChasePos, UltimateChaseSpeed, (int)Animation.Chase))
                 }),
                 //사전신호
                 new Sequence(new List<Node>
@@ -183,19 +183,19 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                         new Selector(new List<Node> //첫번째 공격
                         {
                             new ConditionLeaf(() => parryCount > 0),
-                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate1_L, 0f)), //나중에 애니메이션 변경
+                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate1, 0f)), //나중에 애니메이션 변경
                         }),
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
                         new Selector(new List<Node> //두번째 공격
                         {
                             new ConditionLeaf(() => parryCount > 1),
-                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate2_L, 0f)), //나중에 애니메이션 변경
+                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate2, 0f)), //나중에 애니메이션 변경
                         }),
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
                         new Selector(new List<Node> //세번째 공격
                         {
                             new ConditionLeaf(() => parryCount > 2),
-                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate3_L, 0f)), //나중에 애니메이션 변경
+                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate3, 0f)), //나중에 애니메이션 변경
                         }),
                         new Leaf(() =>
                         {
@@ -225,31 +225,46 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     }
     public void UpdateFacing() //보스가 플레이어 바라보는 방향 갱신
     {
-        curFacing = (Distance < 0) ? Facing.Left : Facing.Right;
+        Facing newFacing = (Distance < 0) ? Facing.Left : Facing.Right;
+        if (curFacing != newFacing) //방향이 바뀌었을 때 1회 발생
+        {
+            curFacing = newFacing;
+            EventBus<BossFacingChangeEvent>.Publish(new BossFacingChangeEvent(curFacing));
+        }
         //Debug.Log($"UpdateFacing: {curFacing}");
     }
-    public int GetAnimDirection(int baseAnimL) //방향에 맞춰 애니메이션 반환
-    {
-        //콜라이더 위치 이동
-        EventBus<BossFacingChangeEvent>.Publish(new BossFacingChangeEvent(curFacing));
-        return (curFacing == Facing.Left) ? baseAnimL : baseAnimL + 1;
-    }
+    //public int GetAnimDirection(int baseAnimL) //방향에 맞춰 애니메이션 반환
+    //{
+    //    //콜라이더 위치 이동
+    //    EventBus<BossFacingChangeEvent>.Publish(new BossFacingChangeEvent(curFacing));
+    //    return (curFacing == Facing.Left) ? baseAnimL : baseAnimL + 1;
+    //}
     public void SyncFacingWithAnim(int targetAnim)
     {
         //Debug.Log($"SyncFacingWithAnim: {targetAnim}");
+        bool shouldMirror = (curFacing == Facing.Right);
+        anim.SetBool("isMirrored", shouldMirror);
         anim.SetInteger("Boss", targetAnim);
-        bossSkin.rotation = Quaternion.Euler(0f, rotValue[targetAnim], 0f);
+        int angleIndex = (curFacing == Facing.Left) ? (targetAnim * 2) : (targetAnim * 2 + 1);
+        bossSkin.rotation = Quaternion.Euler(0f, rotValue[angleIndex], 0f);
     }
     //애니메이션 준비 단계
-    public bool IsAnimationReady(int baseAnimNum)
+    public bool IsAnimationReady(int targetAnim)
     {
-        int targetAnim = GetAnimDirection(baseAnimNum);
         int curAnim = anim.GetInteger("Boss");
-        if (curAnim != targetAnim) //애니메이션 전환
+        bool curMirror = anim.GetBool("isMirrored");
+        bool targetMirror = (curFacing == Facing.Right);
+        if (curAnim != targetAnim) //액션 자체 변화, 애니메이션 전환
         {
-            if (curAnim / 2 != targetAnim / 2) curTime_Anim = 0f;
+            //if (curAnim / 2 != targetAnim / 2) 
+            curTime_Anim = 0f;
             SyncFacingWithAnim(targetAnim);
             return false; //방어코드(프레임 갱신)
+        }
+        if(curMirror != targetMirror) //방향만 변화, 애니메이션 전환
+        {
+            SyncFacingWithAnim(targetAnim);
+            return false;
         }
         if (anim.IsInTransition(0)) return false; //방어코드(애님 전환 중)
         return true;
@@ -316,7 +331,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public void IdleMove() //보스 기준
     {
         UpdateFacing();
-        PlayAnim_Time((int)Animation.Idle_L, 1f);
+        PlayAnim_Time((int)Animation.Idle, 1f);
         if (Math.Sign(Distance) == Math.Sign(RandomPos.x - transform.position.x))
             { Move(0, 0, 0); curTime_Idle += Time.deltaTime; }
         else if (transform.position.x < RandomPos.x -0.5)    //지정좌표 왼쪽에 있을 때
