@@ -78,6 +78,15 @@ public class PlayerHealItemInventory : MonoBehaviour
         return true;
     }
 
+    public void RestoreCount(int count)
+    {
+        EnsureInitialized();
+
+        // 체크포인트에 저장된 회복 아이템 수량을 현재 최대 보유량 범위 안으로 복원합니다.
+        currentCount = Mathf.Clamp(count, 0, maxCount);
+        PublishCountChanged();
+    }
+
     private void EnsureInitialized()
     {
         if (isInitialized) return;

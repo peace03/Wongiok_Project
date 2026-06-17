@@ -58,6 +58,34 @@ public readonly struct PlayerRevivedEvent
 
 // 플레이어가 더 높은 번호의 체크포인트를 활성화했을 때 발행되는 이벤트입니다.
 // UI, 사운드, 저장 연출은 이 이벤트를 구독해서 처리합니다.
+// 플레이어 목숨 수가 변경될 때 발행되는 이벤트입니다.
+// UI는 이 이벤트를 구독해서 현재 남은 목숨을 표시합니다.
+public readonly struct PlayerLifeChangedEvent
+{
+    public readonly GameObject PlayerObject;
+    public readonly int CurrentLifeCount;
+    public readonly int MaxLifeCount;
+
+    public PlayerLifeChangedEvent(GameObject playerObject, int currentLifeCount, int maxLifeCount)
+    {
+        PlayerObject = playerObject;
+        CurrentLifeCount = currentLifeCount;
+        MaxLifeCount = maxLifeCount;
+    }
+}
+
+// 플레이어 목숨이 0이 되는 순간 발행되는 이벤트입니다.
+// 게임오버 UI와 연출은 이 이벤트를 구독해서 후처리합니다.
+public readonly struct PlayerLifeDepletedEvent
+{
+    public readonly GameObject PlayerObject;
+
+    public PlayerLifeDepletedEvent(GameObject playerObject)
+    {
+        PlayerObject = playerObject;
+    }
+}
+
 public readonly struct CheckpointActivatedEvent
 {
     // 체크포인트를 활성화한 플레이어 오브젝트입니다.

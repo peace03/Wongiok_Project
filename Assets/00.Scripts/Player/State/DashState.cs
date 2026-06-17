@@ -84,6 +84,7 @@ public class DashState : PlayerBaseState
 
         // 입력이 없다면 마지막으로 바라보던 방향으로 대쉬합니다.
         return controller.IsFacingRight ? Vector3.left : Vector3.right;
+
     }
 
     public override void ExitState()

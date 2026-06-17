@@ -25,6 +25,8 @@ public class PlayerStatusData : LivingStatus
 // 플레이어는 피격 피드백과 체크포인트 부활 기록을 함께 사용합니다.
 [RequireComponent(typeof(HitFlashFeedback))]
 [RequireComponent(typeof(PlayerCheckpointTracker))]
+[RequireComponent(typeof(PlayerHealItemInventory))]
+[RequireComponent(typeof(PlayerLifeTracker))]
 public class PlayerStatus : MonoBehaviour
 {
     // 피격 직후 입력을 막는 경직 시간입니다.
@@ -74,6 +76,12 @@ public class PlayerStatus : MonoBehaviour
     // 사망 후 부활 위치를 가져오기 위한 체크포인트 기록 참조입니다.
     private PlayerCheckpointTracker checkpointTracker;
 
+    // 체크포인트 부활 시 회복 아이템 수량을 복원하기 위한 참조입니다.
+    private PlayerHealItemInventory healItemInventory;
+
+    // 부활할 때마다 목숨을 차감하기 위한 참조입니다.
+    private PlayerLifeTracker lifeTracker;
+
     // 피격 후 무적이 끝나는 시각입니다.
     private float invincibleEndTime;
 
@@ -115,6 +123,8 @@ public class PlayerStatus : MonoBehaviour
         EnsurePlayerCheckpointTracker();
         playerController = controller != null ? controller : GetComponent<PlayerController>();
         checkpointTracker = tracker != null ? tracker : GetComponent<PlayerCheckpointTracker>();
+        healItemInventory = GetComponent<PlayerHealItemInventory>();
+        lifeTracker = GetComponent<PlayerLifeTracker>();
 
         // 인스펙터 기본값을 Stat에 반영한 뒤 현재 체력을 최대 체력으로 맞춥니다.
         SetupBaseStatus();
@@ -442,7 +452,10 @@ public class PlayerStatus : MonoBehaviour
         }
 
         // 부활 위치 이동 후 최대 체력으로 회복합니다.
-        status.CurrentHP = status.MaxHP.FinalValue;
+        // 체크포인트가 저장한 체력/회복 아이템 스냅샷으로 복원하고 목숨을 차감합니다.
+        status.CurrentHP = GetReviveHP();
+        RestoreHealItemCount();
+        ConsumeLifeOnRevive();
         isDeathProcessing = false;
         invincibleEndTime = 0f;
 
@@ -462,6 +475,41 @@ public class PlayerStatus : MonoBehaviour
         if (checkpointTracker == null) return transform.position;
 
         return checkpointTracker.RespawnPosition;
+    }
+
+    private float GetReviveHP()
+    {
+        // 체크포인트가 저장한 체력을 현재 최대 체력 범위 안으로 보정해 복원합니다.
+        if (checkpointTracker == null)
+            checkpointTracker = GetComponent<PlayerCheckpointTracker>();
+
+        float reviveHP = checkpointTracker != null ? checkpointTracker.SavedHP : status.MaxHP.FinalValue;
+        return Mathf.Clamp(reviveHP, 0f, status.MaxHP.FinalValue);
+    }
+
+    private void RestoreHealItemCount()
+    {
+        // 체크포인트가 저장한 회복 아이템 보유량을 인벤토리에 복원합니다.
+        if (healItemInventory == null)
+            healItemInventory = GetComponent<PlayerHealItemInventory>();
+
+        if (checkpointTracker == null)
+            checkpointTracker = GetComponent<PlayerCheckpointTracker>();
+
+        if (healItemInventory == null || checkpointTracker == null) return;
+
+        healItemInventory.RestoreCount(checkpointTracker.SavedHealItemCount);
+    }
+
+    private void ConsumeLifeOnRevive()
+    {
+        // 부활이 실제로 진행되는 시점에 목숨을 1 차감합니다.
+        if (lifeTracker == null)
+            lifeTracker = GetComponent<PlayerLifeTracker>();
+
+        if (lifeTracker == null) return;
+
+        lifeTracker.ConsumeLifeOnRevive();
     }
 
     private void PublishRevived(Vector3 revivePosition)
@@ -493,6 +541,8 @@ public class PlayerStatus : MonoBehaviour
         EnsurePlayerCheckpointTracker();
         playerController = GetComponent<PlayerController>();
         checkpointTracker = GetComponent<PlayerCheckpointTracker>();
+        healItemInventory = GetComponent<PlayerHealItemInventory>();
+        lifeTracker = GetComponent<PlayerLifeTracker>();
     }
 
     private void EnsureHitFlashFeedback()

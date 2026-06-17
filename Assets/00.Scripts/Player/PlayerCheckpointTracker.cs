@@ -10,6 +10,14 @@ public class PlayerCheckpointTracker : MonoBehaviour
 
     private Vector3 startPosition;
 
+    private float savedHP;
+
+    private int savedHealItemCount;
+
+    private PlayerStatus playerStatus;
+
+    private PlayerHealItemInventory healItemInventory;
+
     private bool isInitialized;
 
     public bool HasActiveCheckpoint
@@ -39,35 +47,63 @@ public class PlayerCheckpointTracker : MonoBehaviour
         }
     }
 
+    public float SavedHP
+    {
+        get
+        {
+            EnsureInitialized();
+            return savedHP;
+        }
+    }
+
+    public int SavedHealItemCount
+    {
+        get
+        {
+            EnsureInitialized();
+            return savedHealItemCount;
+        }
+    }
+
     private void Awake()
     {
-        // 시작 위치 저장은 PlayerInitializer에서 초기화 순서에 맞춰 처리합니다.
+        // 시작 스냅샷 저장은 PlayerInitializer에서 스탯/아이템 초기화 이후 처리합니다.
+    }
+
+    public void Initialize(PlayerStatus status, PlayerHealItemInventory inventory)
+    {
+        if (isInitialized) return;
+
+        playerStatus = status != null ? status : GetComponent<PlayerStatus>();
+        healItemInventory = inventory != null ? inventory : GetComponent<PlayerHealItemInventory>();
+
+        // 체크포인트를 밟기 전 사망에 대비해 시작 위치와 시작 상태를 기본 스냅샷으로 저장합니다.
+        startPosition = transform.position;
+        activeRespawnPosition = startPosition;
+        activeCheckpointNumber = -1;
+        SaveCurrentSnapshot(activeRespawnPosition);
+        isInitialized = true;
     }
 
     public void Initialize()
     {
-        if (isInitialized) return;
-
-        // 플레이어 배치 위치를 체크포인트가 없을 때의 기본 부활 위치로 저장합니다.
-        startPosition = transform.position;
-        activeCheckpointNumber = -1;
-        isInitialized = true;
+        Initialize(GetComponent<PlayerStatus>(), GetComponent<PlayerHealItemInventory>());
     }
 
     public bool TryActivateCheckpoint(Checkpoint checkpoint)
     {
-        // 잘못된 체크포인트 요청은 무시합니다.
         if (checkpoint == null) return false;
 
         EnsureInitialized();
 
-        // 더 높은 번호를 밟은 뒤에는 낮거나 같은 번호로 진행도를 되돌리지 않습니다.
+        // 같은 번호와 낮은 번호는 재접촉해도 위치/체력/회복 아이템 스냅샷을 갱신하지 않습니다.
         if (hasActiveCheckpoint && checkpoint.CheckpointNumber <= activeCheckpointNumber)
             return false;
 
         hasActiveCheckpoint = true;
         activeCheckpointNumber = checkpoint.CheckpointNumber;
         activeRespawnPosition = checkpoint.RespawnPosition;
+        SaveCurrentSnapshot(activeRespawnPosition);
 
         EventBus<CheckpointActivatedEvent>.Publish(
             new CheckpointActivatedEvent(
@@ -81,9 +117,16 @@ public class PlayerCheckpointTracker : MonoBehaviour
         return true;
     }
 
+    private void SaveCurrentSnapshot(Vector3 respawnPosition)
+    {
+        // 체크포인트 활성화 순간의 체력과 회복 아이템 보유량을 부활용 데이터로 고정합니다.
+        activeRespawnPosition = respawnPosition;
+        savedHP = playerStatus != null ? playerStatus.GetCurrentHP() : 0f;
+        savedHealItemCount = healItemInventory != null ? healItemInventory.CurrentCount : 0;
+    }
+
     private void EnsureInitialized()
     {
-        // 외부에서 초기화 전에 값을 읽는 예외 흐름도 안전하게 처리합니다.
         Initialize();
     }
 }
