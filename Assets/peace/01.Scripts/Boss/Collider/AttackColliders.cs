@@ -8,18 +8,25 @@ public class AttackColliders : MonoBehaviour
 
     private void OnEnable()
     {
-        EventBus<ColliderEvent>.action += ToggleCollider;
+        EventBus<ColliderToggleEvent>.action += ToggleCollider;
         EventBus<BossFacingChangeEvent>.action += ChangeColliderPos;
+        EventBus<ParryKeyDown>.action += OffCollider;
     }
     private void OnDisable()
     {
-        EventBus<ColliderEvent>.action -= ToggleCollider;
+        EventBus<ColliderToggleEvent>.action -= ToggleCollider;
         EventBus<BossFacingChangeEvent>.action -= ChangeColliderPos;
+        EventBus<ParryKeyDown>.action -= OffCollider;
     }
 
-    public void ToggleCollider(ColliderEvent data)
+    public void ToggleCollider(ColliderToggleEvent data)
     {
         attackColliders[(int)data.type].enabled = data.state;
+    }
+    public void OffCollider(ParryKeyDown data)
+    {
+        foreach(var collider in attackColliders)
+            collider.enabled = false;
     }
 
     public void ChangeColliderPos(BossFacingChangeEvent data)

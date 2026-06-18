@@ -7,9 +7,9 @@ public class SpawningState : BossState
 
     public override void Enter()
     {
-        Debug.Log("SpawningState 진입");
+        //Debug.Log("SpawningState 진입");
         logics.Spawn();
-        Debug.Log("SpawningState 애니메이션, 효과음 재생");
+        //Debug.Log("SpawningState 애니메이션, 효과음 재생");
         controller.ChangeState(State.Idle);
     }
     public override void Update()

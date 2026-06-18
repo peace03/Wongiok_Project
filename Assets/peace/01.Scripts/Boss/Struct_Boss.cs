@@ -1,19 +1,19 @@
 //패링 가능, 불가능 이벤트
-public struct ParryEvent 
+public struct CanParryEvent 
 {
     public bool CanParry { get; private set; }
-    public ParryEvent(bool canParry)
+    public CanParryEvent(bool canParry)
     {
         CanParry = canParry;
     }
 }
 
 //공격 콜라이더 토글 이벤트
-public struct ColliderEvent
+public struct ColliderToggleEvent
 {
     public AttackType type { get; private set; }
     public bool state { get; private set; }
-    public ColliderEvent(AttackType type, bool state)
+    public ColliderToggleEvent(AttackType type, bool state)
     {
         this.type = type;
         this.state = state;

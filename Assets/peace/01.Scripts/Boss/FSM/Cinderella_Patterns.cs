@@ -19,8 +19,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [Min(0)] [SerializeField] private float move_idleRange;  //이동가능 범위
     [Min(3)] [SerializeField] private float move_idlePos;    //플레이어 기준 이동범위 중심
     [Header("Enranged 상태")]
-    [SerializeField] private float move_enrangedSpeed;
-    [SerializeField] private Vector3 move_enrangedPos;
+    [SerializeField] private float durationEnranged; //지속시간
+    [SerializeField] private float enrangedAtkSpeed_Mul; //공격속도
     [Header("Attack 상태")]
     [SerializeField] private float kickChaseSpeed;
     [SerializeField] private Vector3 kickChasePos;
@@ -28,10 +28,14 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [Header("Ultimate 상태")]
     [SerializeField] private float UltimateChaseSpeed;
     [SerializeField] private Vector3 UltimateChasePos;
+    [Header("Groggy 상태")]
+    [SerializeField] private float groggyDuration; //그로기 지속시간
 
     //공통 사용
     public float Distance => playerPos.position.x - transform.position.x;
     public bool StateDone { get; private set; } //공격 BT 종료 여부
+    public bool IsParryed => isParryed;
+    public bool IsEnranged => isEnranged;
 
     private Transform bossSkin;
     private Rigidbody rb;
@@ -49,11 +53,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     private Facing curFacing = Facing.Left; //보스가 현재 바라보는 방향
     private readonly float[] rotValue = //Animation Y축 각도 설정값
     {
-        228, -228,
-        -90, 90, 0,0,0,0,
-        -90,90,-90,90,-45,45,
-        -90, 90,
-        228, -228
+        228, -228, //Idle
+        -90, 90, 0,0,0,0, //Attack
+        -90,90,-90,90,-90,90, //Ultimate
+        -90, 90, //Chase
+        228, -228, //Parry
+        -90, 90 //Groggy
     };
 
     //Idle
@@ -66,6 +71,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 
     //Ultimate
     private int parryCount = 0;
+    private int comboStep = 0;
+
+    //Enranged
+    private bool isEnranged = false;    //현재 격노 상태인지
+    private float curEnrangedTime = 0;  //현재 격노 타이머
+    private float curEnrangedAtkSpeed = 1; //현재 격노 속도
 
 
     private float x, y, z; //Move에 사용될 속도 저장
@@ -97,8 +108,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new ConditionLeaf(() => isParryed),
                 new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
                 new Leaf(() => 
-                { 
-                    isParryed = false;
+                {
+                    Parryed();
                     SetStateDone(true);
                     return NodeState.Success; 
                 })
@@ -153,9 +164,10 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new ConditionLeaf(() => isParryed),
                 new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
                 new Leaf(() => 
-                { 
-                    isParryed = false;
+                {
+                    Parryed();
                     parryCount++;
+                    comboStep++;
                     return NodeState.Success; 
                 })
             }),
@@ -182,20 +194,32 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
                         new Selector(new List<Node> //첫번째 공격
                         {
-                            new ConditionLeaf(() => parryCount > 0),
-                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate1, 0f)), //나중에 애니메이션 변경
+                            new ConditionLeaf(() => comboStep > 0),
+                            new Sequence(new List<Node>
+                            {
+                                new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate1, 0f)), //나중에 애니메이션 변경
+                                new Leaf(() => { comboStep++; return NodeState.Success; })
+                            }),
                         }),
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
                         new Selector(new List<Node> //두번째 공격
                         {
-                            new ConditionLeaf(() => parryCount > 1),
-                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate2, 0f)), //나중에 애니메이션 변경
+                            new ConditionLeaf(() => comboStep > 1),
+                            new Sequence(new List<Node>
+                            {
+                                new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate2, 0f)), //나중에 애니메이션 변경
+                                new Leaf(() => { comboStep++; return NodeState.Success; }),
+                            }),
                         }),
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
                         new Selector(new List<Node> //세번째 공격
                         {
-                            new ConditionLeaf(() => parryCount > 2),
-                            new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate3, 0f)), //나중에 애니메이션 변경
+                            new ConditionLeaf(() => comboStep > 2),
+                            new Sequence(new List<Node>
+                            {
+                                new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate3, 0f)), //나중에 애니메이션 변경
+                                new Leaf(() => { comboStep++; return NodeState.Success; }),
+                            }),
                         }),
                         new Leaf(() =>
                         {
@@ -213,6 +237,22 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 
     #region CommonLogic
     private void ParryKeyDown(ParryKeyDown data) { isParryed = true; } //패링 여부 확인
+    private void Parryed() //패링되었음(패링가능, 콜라이더 토글 끄기)
+    {
+        isParryed = false;
+        EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
+        EventBus<ColliderToggleEvent>.Publish(new ColliderToggleEvent(attackType, false));
+    }
+    public bool IsAttacking() //애니메이터 파라미터 읽어 현재 공격 상태인지 식별
+    {
+        int currentAnim = anim.GetInteger("Boss");
+        return currentAnim == (int)Animation.AttackA ||
+            currentAnim == (int)Animation.AttackB ||
+            currentAnim == (int)Animation.AttackC ||
+            currentAnim == (int)Animation.Ultimate1 ||
+            currentAnim == (int)Animation.Ultimate2 ||
+            currentAnim == (int)Animation.Ultimate3;
+    }
     private void Move(float x, float y, float z)
     {
         this.x = x;
@@ -222,6 +262,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public void ExcuteMove()
     {
         rb.linearVelocity = new Vector3(x, y, z);
+        //Debug.Log($"{isParryed}");
     }
     public void UpdateFacing() //보스가 플레이어 바라보는 방향 갱신
     {
@@ -233,13 +274,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         }
         //Debug.Log($"UpdateFacing: {curFacing}");
     }
-    //public int GetAnimDirection(int baseAnimL) //방향에 맞춰 애니메이션 반환
-    //{
-    //    //콜라이더 위치 이동
-    //    EventBus<BossFacingChangeEvent>.Publish(new BossFacingChangeEvent(curFacing));
-    //    return (curFacing == Facing.Left) ? baseAnimL : baseAnimL + 1;
-    //}
-    public void SyncFacingWithAnim(int targetAnim)
+    public void SyncFacingWithAnim(int targetAnim) //방향과 애님 동기화
     {
         //Debug.Log($"SyncFacingWithAnim: {targetAnim}");
         bool shouldMirror = (curFacing == Facing.Right);
@@ -276,8 +311,18 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         //Debug.Log($"PlayAnim {num} 재생중");
         //원하는 시간만큼 애님 재생
         animState = anim.GetCurrentAnimatorStateInfo(0);
-        anim.speed = (targetSeconds == 0) ? 
-            (animState.length / animState.length) : animState.length / targetSeconds;
+        //공격애니메이션만 속도 조절
+        if (isEnranged && (num == (int)Animation.AttackA || num == (int)Animation.AttackB || num == (int)Animation.AttackC))
+        {
+            anim.speed = (targetSeconds == 0) ?
+                (animState.length / animState.length * curEnrangedAtkSpeed)
+                : (animState.length / targetSeconds * curEnrangedAtkSpeed);
+        }
+        else
+        {
+            anim.speed = (targetSeconds == 0) ? 
+                (animState.length / animState.length) : animState.length / targetSeconds;
+        }
         if (animState.normalizedTime < 0.95f) return NodeState.Running;
         else { anim.speed = 1.0f; return NodeState.Success; }
     }
@@ -297,14 +342,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         //Debug.Log($"SetStateDone {set}");
         return NodeState.Success;
     }
-    public bool GetStateDone()
-    {
-        return StateDone;
-    }
-    public AttackType GetAttackType()
-    {
-        return attackType;
-    }
+    public bool GetStateDone() { return StateDone; } //상태 종료 확인
     #endregion
 
     #region Spawn
@@ -344,6 +382,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #endregion
 
     #region Attack
+    public AttackType GetAttackType() { return attackType; }
     public Node GetAttackBT()
     {
         //while (attackType == beforeType) attackType = (AttackType)UnityEngine.Random.Range(0, 3);
@@ -395,6 +434,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         telegraphExcuted = false;
         attackDone = false;
         parryCount = 0;
+        comboStep = 0;
     }
     #endregion
 
@@ -411,5 +451,31 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #region Ultimate
     public Node GetUltimateBT() { return UltimateAttack; }
     public bool CanTransitionToGroggy() { return parryCount >= 3; }
+    #endregion
+
+    #region Groggy
+    public NodeState PlayAnimGroggy_Time(int num)
+    {
+        NodeState state = PlayAnim_Time(num, groggyDuration);
+        if (state == NodeState.Success)
+        {
+            isEnranged = true;
+            curEnrangedAtkSpeed = enrangedAtkSpeed_Mul;
+            //Debug.Log("격노 시작");
+        }
+        return state;
+    }
+    //Enranged
+    public void EnrangedTimer()
+    {
+        curEnrangedTime += Time.deltaTime;
+        if(curEnrangedTime >= durationEnranged)
+        {
+            isEnranged = false;
+            curEnrangedTime = 0f;
+            curEnrangedAtkSpeed = 1f;
+            Debug.Log("격노 종료");
+        }
+    }
     #endregion
 }

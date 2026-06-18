@@ -9,7 +9,7 @@ public class UltimateCastingState : BossState
 
     public override void Enter()
     {
-        Debug.Log("궁극기 상태 전환 완료");
+        //Debug.Log("궁극기 상태 전환 완료");
         curBT = logics.GetUltimateBT();
         logics.SetStateDone(false);
         logics.LogicInit();
@@ -25,5 +25,9 @@ public class UltimateCastingState : BossState
             controller.ChangeState(State.Groggy);
         if (logics.GetStateDone())
             controller.ChangeState(State.Idle);
+    }
+    public override void Exit()
+    {
+
     }
 }

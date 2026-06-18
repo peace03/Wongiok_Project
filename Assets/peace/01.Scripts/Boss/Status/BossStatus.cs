@@ -17,7 +17,7 @@ public class BossStatus : MonoBehaviour, IInitializable
     public void TakeDamage(float amount)
     {
         status.SubCurrentHP(amount);
-        Debug.Log($"보스 현재 체력: {status.CurrentHP}");
+        //Debug.Log($"보스 현재 체력: {status.CurrentHP}");
     }
 
     public float GetAtkPower(AttackType type)

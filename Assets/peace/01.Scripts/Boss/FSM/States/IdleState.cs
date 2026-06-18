@@ -19,6 +19,7 @@ public class IdleState : BossState
     }
     public override void Update()
     {
+        if(logics.IsEnranged == true) logics.EnrangedTimer(); //격노 타이머
         if (logics.GetStateDone() == true)
             controller.ChangeState(State.Attack);
     }

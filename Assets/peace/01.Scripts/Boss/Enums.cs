@@ -10,7 +10,8 @@ public enum Animation
     AttackA, AttackB, AttackC,
     Ultimate1, Ultimate2, Ultimate3,
     Chase, 
-    Parry
+    Parry,
+    Groggy
 }
 //보스가 바라보는 방향
 public enum Facing { Left, Right }
