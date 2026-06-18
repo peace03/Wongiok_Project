@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "New PassiveSkillData", menuName = "Data/Skill/Passive", order = 2)]
 // 패시브 스킬 정보

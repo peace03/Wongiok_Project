@@ -62,7 +62,7 @@ public class SkillInstance
         // 강화 불가능이라면
         if(!CanEnhance)
         {
-            Debug.Log($"[Skill] {data.SkillName}(Lv.{curLevel}) - 강화 불가");
+            Debug.Log($"[Skill] 강화 불가 => {data.SkillName} : Lv.{curLevel}");
             return;
         }
 
@@ -81,11 +81,11 @@ public class SkillInstance
         // 사용 가능한 상태가 아니라면
         if (!IsReady)
         {
-            Debug.Log($"[Skill] {data.SkillName} - {state.ToKoreanString()}");
+            Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
             return;
         }
 
-        Debug.Log($"[Skill] {data.SkillName} - 사용");
+        Debug.Log($"[Skill] 사용 시작 => {data.SkillName}");
 
         // 차징 시간이 없다면
         if (data.GetMaxChargingTime(curLevel) <= 0f)
@@ -102,7 +102,7 @@ public class SkillInstance
     {
         // 현재 상태 바꾸기
         state = change;
-        Debug.Log($"[Skill] {data.SkillName} - {state.ToKoreanString()}");
+        Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
 
         // 사용 가능 상태라면
         if (IsReady)
@@ -117,7 +117,8 @@ public class SkillInstance
             // 소유자가 없다면
             if(owner == null)
             {
-                Debug.Log($"[Error | Skill] {data.SkillName}(Lv.{curLevel}) - 소유자(Owner) 없음");
+                Debug.LogError($"[Error | Skill] 사용 불가 => " +
+                                $"입력 - {data.SkillName} : Lv.{curLevel} / 소유자(Owner) : 없음");
                 return;
             }
 

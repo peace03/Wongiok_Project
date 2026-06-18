@@ -7,10 +7,7 @@ public class Bullet : MonoBehaviour
 
     private readonly float speed = 10f;
 
-    private void OnEnable()
-    {
-        StartCoroutine(LifeCycle());
-    }
+    private void OnEnable() => StartCoroutine(LifeCycle());
 
     private void FixedUpdate() => transform.position += speed * Time.fixedDeltaTime * transform.forward;
 

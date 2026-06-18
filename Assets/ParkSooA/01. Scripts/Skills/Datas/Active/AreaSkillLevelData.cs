@@ -19,7 +19,7 @@ public class AreaSkillLevelData : ActiveSkillLevelData
         // 범위에서 벗어난 단계라면
         if(stage < 1 || stage > stages.Count)
         {
-            Debug.Log($"[Error | Skill] 해당 데이터 없음 => 입력 : 단계({stage}) | 스킬 단계(1 ~ {stages.Count})");
+            Debug.LogError($"[Error | Skill] 해당 데이터 없음 => 입력 : 단계 :{stage} / 스킬 단계 : 1 ~ {stages.Count}");
             return 0f;
         }
 
@@ -27,6 +27,7 @@ public class AreaSkillLevelData : ActiveSkillLevelData
         return stages[stage - 1].damage;
     }
 
+    // 스킬 효과 적용 함수
     public override void ApplyEffect(GameObject owner, IReadOnlyList<StatAdjustment> prevStats)
     {
         Debug.Log("[Skill] 영역 액티브 스킬 공격");

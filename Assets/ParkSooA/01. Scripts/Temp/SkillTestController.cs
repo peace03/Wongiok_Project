@@ -19,9 +19,11 @@ public class SkillTestController : MonoBehaviour, IInitializable, IProjectileAct
     private Coroutine skillCoroutine;                               // 스킬 코루틴
     private WaitForSeconds fireDelayTime;                           // 사격 딜레이 시간
 
-    public int Priority => (int)INIT_PRIORITY_TYPE.Skill;           // 중요도
+    public int Priority => (int)INIT_PRIORITY_TYPE.Skill;           // (임시)중요도
+    //public int Priority => (int)InitOrder.Skill;                  // 중요도
     public GameObject Bullet => bullet;
 
+    // 임시 초기화
     void Start() => Init();
 
     private void Update()
@@ -59,7 +61,7 @@ public class SkillTestController : MonoBehaviour, IInitializable, IProjectileAct
         }
         // 소유자가 없다면
         else
-            Debug.Log($"[Error | Skill] 스킬 시스템 초기화 실패 => 입력 - 소유자(Owner) 없음");
+            Debug.LogError($"[Error | Skill] 스킬 시스템 초기화 실패 => 입력 - 소유자(Owner) : 없음");
     }
 
     // 발사체 액티브 스킬 실행 함수
@@ -68,19 +70,19 @@ public class SkillTestController : MonoBehaviour, IInitializable, IProjectileAct
         // 스킬 코루틴이 비어있지 않다면
         if (skillCoroutine != null)
         {
-            Debug.Log($"[Error | Skill] 발사체 액티브 스킬 실패 => 입력 - 스킬 진행 중");
+            Debug.Log($"[Skill] 발사체 액티브 스킬 실행 실패 => 스킬 진행 중");
             return;
         }
         // 소유자가 없다면
         else if (owner == null)
         {
-            Debug.Log($"[Error | Skill] 발사체 액티브 스킬 실패 => 입력 - 소유자 없음");
+            Debug.LogError($"[Error | Skill] 발사체 액티브 스킬 실패 => 입력 - 소유자 : 없음");
             return;
         }
         // 총알 프리팹이 없다면
         else if (bullet == null)
         {
-            Debug.Log($"[Error | Skill] 발사체 액티브 스킬 실패 => 입력 - (임시)총알 없음");
+            Debug.LogError($"[Error | Skill] 발사체 액티브 스킬 실패 => 입력 - (임시)총알 : 없음");
             return;
         }
 

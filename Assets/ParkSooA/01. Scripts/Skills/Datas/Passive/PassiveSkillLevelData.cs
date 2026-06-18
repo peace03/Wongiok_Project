@@ -20,7 +20,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         // 스탯이 없다면
         if (!owner.TryGetComponent<PlayerStatus>(out var trgStat))
         {
-            Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 ⇒ 입력 - 대상 : {owner.name}\n", owner);
+            Debug.LogError($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 ⇒ 입력 - 대상 : {owner.name}\n", owner);
             return;
         }
 
@@ -90,7 +90,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         // 스탯이 없다면
         if (!owner.TryGetComponent<PlayerStatus>(out var trgStat))
         {
-            Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 ⇒ 입력 - 대상 : {owner.name}\n", owner);
+            Debug.LogError($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 ⇒ 입력 - 대상 : {owner.name}\n", owner);
             return;
         }
 

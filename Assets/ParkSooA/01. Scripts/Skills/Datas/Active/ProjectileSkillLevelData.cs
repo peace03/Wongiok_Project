@@ -13,8 +13,7 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
 
     public int ProjectileCount => projectileCount;
     public int PenetrationCount => penetrationCount;
-
-    public override float MaxChargingTime => maxChargingTime;
+    public float MaxChargingTime => maxChargingTime;
 
     // 액티브 스킬 종류 반환 프로퍼티
     public override ACTIVE_SKILL_TYPE ActiveType => ACTIVE_SKILL_TYPE.Projectile;
@@ -28,13 +27,13 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
         // 소유자가 없다면
         if(owner == null)
         {
-            Debug.Log($"[Error | Skill] 발사체 액티브 스킬 실행 실패 => 소유자 없음");
+            Debug.LogError($"[Error | Skill] 발사체 액티브 스킬 실행 실패 => 소유자 : 없음");
             return;
         }
         // (임시)발사체 액티브 실행기가 없다면
         else if(owner.GetComponentInChildren<IProjectileActive>(true) is not IProjectileActive executer)
         {
-            Debug.Log($"[Error | Skill] 발사체 액티브 스킬 실행 실패 => (임시)발사체 액티브 실행기 없음");
+            Debug.LogError($"[Error | Skill] 발사체 액티브 스킬 실행 실패 => (임시)발사체 액티브 실행기 : 없음");
             return;
         }
         // (임시)발사체 액티브 실행기가 있다면

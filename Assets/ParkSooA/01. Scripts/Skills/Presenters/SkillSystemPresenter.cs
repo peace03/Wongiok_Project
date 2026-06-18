@@ -9,8 +9,8 @@ public class SkillSystemPresenter
     [SerializeField] private CHAPTER_TYPE curChapter = CHAPTER_TYPE.First;      // 현재 챕터
 
     [Space(10)][Header("스킬 모델")]
-    [SerializeField] private SkillSystemModel model;                   // 스킬 모델(인스펙터에서 보는 용도)
-    //[SerializeField] private readonly SkillSystemModel model;                   // 스킬 모델
+    [SerializeField] private SkillSystemModel model;                            // 스킬 모델(인스펙터에서 보는 용도)
+    //[SerializeField] private readonly SkillSystemModel model;                 // 스킬 모델
 
     private List<SkillInstance> modelResults = new();                           // 스킬 모델 결과들
     private List<UIPlayerSkillSlotData> uiEventDatas = new();                   // 스킬 뷰 이벤트 데이터들
@@ -32,7 +32,7 @@ public class SkillSystemPresenter
         }
         // 스킬 데이터가 없다면
         else
-            Debug.Log($"[Error | Skill] 스킬 모델 생성 실패 => 입력 - 대상 {owner.name} | 스킬 데이터 없음", owner);
+            Debug.LogError($"[Error | Skill] 스킬 모델 생성 실패 => 입력 - 대상 : {owner.name} / 스킬 데이터 : 없음", owner);
     }
 
     // 액티브 스킬들 새로고침 함수
@@ -41,7 +41,7 @@ public class SkillSystemPresenter
         // 모델이 없다면
         if (model == null)
         {
-            Debug.Log($"[Error | Skill] 액티브 스킬들 새로고침 실패 => 입력 - 스킬 모델 없음");
+            Debug.LogError($"[Error | Skill] 액티브 스킬들 새로고침 실패 => 입력 - 스킬 모델 : 없음");
             return;
         }
 
@@ -60,7 +60,7 @@ public class SkillSystemPresenter
                     uiEventDatas.Add(ChangeToUIData((ACTIVE_SKILL_SLOT_TYPE)i, modelResults[i]));
         // 스킬이 없다면
         else
-            Debug.Log($"[Skill] 장착한 액티브 스킬 없음");
+            Debug.Log($"[Skill] UI용 데이터 리스트 추가 실패 => 장착한 액티브 스킬 : 없음");
 
         // 장착한 액티브 스킬 이벤트 발행
         EventBus<UISetPlayerSkillSlotsEvent>.Publish(new UISetPlayerSkillSlotsEvent(uiEventDatas.ToArray()));
@@ -72,9 +72,9 @@ public class SkillSystemPresenter
         // 슬롯 범위가 액티브 스킬 최대 장착 개수를 넘어갔다면
         if ((int)slot >= model.MaxActiveCount)
         {
-            Debug.Log($"[Error | Skill] UI용 데이터 변환 실패 => " +
-                $"입력 - {slot.ToKoreanString()} | 최대 장착 개수({model.MaxActiveCount}) | " +
-                $"스킬({(skill == null ? "없음" : skill.Data.SkillName)})");
+            Debug.LogError($"[Error | Skill] UI용 데이터 변환 실패 => " +
+                            $"입력 - {slot.ToKoreanString()} / 최대 장착 개수 : {model.MaxActiveCount} / " +
+                            $"스킬 : {(skill == null ? "없음" : skill.Data.SkillName)}");
             return default;
         }
 
@@ -94,7 +94,7 @@ public class SkillSystemPresenter
         // 모델이 없다면
         if (model == null)
         {
-            Debug.Log($"[Error | Skill] 액티브 스킬 실행 실패 => 입력 - 스킬 모델 없음");
+            Debug.LogError($"[Error | Skill] 액티브 스킬 실행 실패 => 입력 - 스킬 모델 : 없음");
             return;
         }
 

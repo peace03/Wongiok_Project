@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
+[Serializable]
 // 스킬 레벨 기본 정보
 public abstract class BaseSkillLevelData
 {
