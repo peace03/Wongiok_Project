@@ -1,18 +1,23 @@
 ﻿using UnityEngine;
+using UnityEngine.Pool;
 
-// 초기화가 필요한 스크립트에 붙이는 인터페이스
-public interface IInitializable
+// 발사체 스킬 인터페이스
+public interface IProjectileSkill
 {
-    // 중요도
-    public int Priority { get; }
-
-    // 초기화 함수
-    public void Init();
+    // 스킬 실행 함수
+    public void ExecuteSkill(ProjectileSkillLevelData skillData);
 }
 
-public interface IProjectileActive
+// 영역 스킬 인터페이스
+public interface IAreaSkill
 {
-    public GameObject Bullet { get; }
+    // 스킬 실행 함수
+    public void ExecuteSkill(AreaSkillLevelData skillData);
+}
 
-    public void ExecuteProjectileActiveSkill(ProjectileSkillLevelData levelData);
+// 오브젝트 풀 인터페이스
+public interface IPoolable
+{
+    // 오브젝트 풀 주소 설정 함수
+    public void SetPoolRef(IObjectPool<GameObject> poolRef);
 }

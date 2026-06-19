@@ -30,6 +30,21 @@ public class AreaSkillLevelData : ActiveSkillLevelData
     // 스킬 효과 적용 함수
     public override void ApplyEffect(GameObject owner, IReadOnlyList<StatAdjustment> prevStats)
     {
-        Debug.Log("[Skill] 영역 액티브 스킬 공격");
+        // 소유자가 없다면
+        if (owner == null)
+        {
+            Debug.LogError($"[Error | Skill] 영역 스킬 실행 실패 => 소유자 : 없음");
+            return;
+        }
+        // 영역 스킬 인터페이스가 없다면
+        else if (owner.GetComponentInChildren<IAreaSkill>(true) is not IAreaSkill executer)
+        {
+            Debug.LogError($"[Error | Skill] 영역 스킬 실행 실패 => 영역 스킬 인터페이스 : 없음");
+            return;
+        }
+        // 영역 스킬 인터페이스가 있다면
+        else
+            // 스킬 실행
+            executer.ExecuteSkill(this);
     }
 }

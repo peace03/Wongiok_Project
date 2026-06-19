@@ -10,11 +10,9 @@ public class SkillSystemModel
     [SerializeField] private List<SkillInstance> equippedActives = new();           // 장착한 액티브 스킬들
     [Space(10)][Header("미장착한 액티브 스킬들")]
     [SerializeField] private List<SkillInstance> unequippedActives = new();         // 미장착한 액티브 스킬들
-
     [Space(10)][Header("장착한 패시브 스킬들")]
     [SerializeField] private int maxPassiveCount = 4;                               // 패시브 스킬 최대 장착 개수
     [SerializeField] private List<SkillInstance> equippedPassives = new();          // 장착한 패시브 스킬들
-
     [Space(10)][Header("모든 스킬들")]
     [SerializeField] private List<SkillInstance> allSkillList = new();              // 모든 스킬 리스트
 
