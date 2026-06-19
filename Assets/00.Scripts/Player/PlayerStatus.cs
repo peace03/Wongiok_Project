@@ -82,6 +82,9 @@ public class PlayerStatus : MonoBehaviour
     // 부활할 때마다 목숨을 차감하기 위한 참조입니다.
     private PlayerLifeTracker lifeTracker;
 
+    // 보스 근접 공격이 들어오는 순간 패링 성공 여부를 확인하기 위한 참조입니다.
+    private PlayerParry playerParry;
+
     // 피격 후 무적이 끝나는 시각입니다.
     private float invincibleEndTime;
 
@@ -125,6 +128,7 @@ public class PlayerStatus : MonoBehaviour
         checkpointTracker = tracker != null ? tracker : GetComponent<PlayerCheckpointTracker>();
         healItemInventory = GetComponent<PlayerHealItemInventory>();
         lifeTracker = GetComponent<PlayerLifeTracker>();
+        playerParry = GetComponent<PlayerParry>();
 
         // 인스펙터 기본값을 Stat에 반영한 뒤 현재 체력을 최대 체력으로 맞춥니다.
         SetupBaseStatus();
@@ -141,6 +145,9 @@ public class PlayerStatus : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        // 보스 히트박스가 float 데미지로 들어오는 순간 패링 성공 여부를 먼저 확인합니다.
+        if (TryConsumeBossParry()) return;
+
         // 디버그나 테스트 코드에서 숫자만 넘겨도 같은 데미지 흐름을 타도록 감쌉니다.
         TakeDamage(
             new DamageInfo(
@@ -543,6 +550,18 @@ public class PlayerStatus : MonoBehaviour
         checkpointTracker = GetComponent<PlayerCheckpointTracker>();
         healItemInventory = GetComponent<PlayerHealItemInventory>();
         lifeTracker = GetComponent<PlayerLifeTracker>();
+        playerParry = GetComponent<PlayerParry>();
+    }
+
+    private bool TryConsumeBossParry()
+    {
+        // 테스트 씬처럼 초기화 순서가 어긋난 경우에도 같은 오브젝트에서 한 번 더 보강합니다.
+        if (playerParry == null)
+        {
+            playerParry = GetComponent<PlayerParry>();
+        }
+
+        return playerParry != null && playerParry.TryConsumeBossParry();
     }
 
     private void EnsureHitFlashFeedback()

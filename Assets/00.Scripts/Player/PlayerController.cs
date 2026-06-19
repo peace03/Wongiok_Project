@@ -35,14 +35,14 @@ public class PlayerController : MonoBehaviour
     private bool _isFacingRight = true;
 
     // 상태 인스턴스들은 Awake에서 한 번 생성해 재사용합니다.
-    public IdleState IdleState { get; private set; }
-    public MoveState MoveState { get; private set; }
-    public JumpState JumpState { get; private set; }
-    public FallState FallState { get; private set; }
-    public DashState DashState { get; private set; }
-    public HitState HitState { get; private set; }
-    public DeathState DeathState { get; private set; }
-    public HealItemUseState HealItemUseState { get; private set; }
+    public PlayerIdleState PlayerIdleState { get; private set; }
+    public PlayerMoveState PlayerMoveState { get; private set; }
+    public PlayerJumpState PlayerJumpState { get; private set; }
+    public PlayerFallState PlayerFallState { get; private set; }
+    public PlayerDashState PlayerDashState { get; private set; }
+    public PlayerHitState PlayerHitState { get; private set; }
+    public PlayerDeathState PlayerDeathState { get; private set; }
+    public PlayerHealItemUseState PlayerHealItemUseState { get; private set; }
 
     // 현재 프레임의 이동 입력입니다.
     public Vector2 MoveInput { get; private set; }
@@ -114,14 +114,14 @@ public class PlayerController : MonoBehaviour
         _parry = parry != null ? parry : GetComponent<PlayerParry>();
         _healItemInventory = healItemInventory != null ? healItemInventory : GetComponent<PlayerHealItemInventory>();
 
-        IdleState = new IdleState(this);
-        MoveState = new MoveState(this);
-        JumpState = new JumpState(this);
-        FallState = new FallState(this);
-        DashState = new DashState(this);
-        HitState = new HitState(this);
-        DeathState = new DeathState(this);
-        HealItemUseState = new HealItemUseState(this);
+        PlayerIdleState = new PlayerIdleState(this);
+        PlayerMoveState = new PlayerMoveState(this);
+        PlayerJumpState = new PlayerJumpState(this);
+        PlayerFallState = new PlayerFallState(this);
+        PlayerDashState = new PlayerDashState(this);
+        PlayerHitState = new PlayerHitState(this);
+        PlayerDeathState = new PlayerDeathState(this);
+        PlayerHealItemUseState = new PlayerHealItemUseState(this);
 
         isInitialized = true;
 
@@ -134,7 +134,7 @@ public class PlayerController : MonoBehaviour
         // 모든 플레이어 컴포넌트 초기화가 끝난 뒤 기본 상태로 진입합니다.
         if (!isInitialized) return;
 
-        TransitionTo(IdleState);
+        TransitionTo(PlayerIdleState);
     }
 
     private void OnDisable()
@@ -198,15 +198,15 @@ public class PlayerController : MonoBehaviour
     public void EnterHitState(DamageInfo damageInfo)
     {
         // PlayerStatus에서 실제 데미지가 적용된 뒤 피격 상태로 진입할 때 사용합니다.
-        HitState.SetHit(damageInfo);
-        TransitionTo(HitState);
+        PlayerHitState.SetHit(damageInfo);
+        TransitionTo(PlayerHitState);
     }
 
     public void EnterDeathState(DeathInfo deathInfo)
     {
         // PlayerStatus에서 사망이 확정된 뒤 모든 조작을 잠그기 위해 사용합니다.
-        DeathState.SetDeath(deathInfo);
-        TransitionTo(DeathState);
+        PlayerDeathState.SetDeath(deathInfo);
+        TransitionTo(PlayerDeathState);
     }
 
     public void EnterHealItemUseState()
@@ -217,7 +217,7 @@ public class PlayerController : MonoBehaviour
         if (_moveMent == null || !_moveMent.IsGrounded) return;
         if (!_healItemInventory.CanStartUse()) return;
 
-        TransitionTo(HealItemUseState);
+        TransitionTo(PlayerHealItemUseState);
     }
 
     public void ExitDeathStateAfterRevive()
@@ -225,11 +225,11 @@ public class PlayerController : MonoBehaviour
         // 부활 후 현재 위치의 지상 여부에 따라 자연스러운 기본 상태로 복귀합니다.
         if (Movement != null && !Movement.IsGrounded)
         {
-            TransitionTo(FallState);
+            TransitionTo(PlayerFallState);
             return;
         }
 
-        TransitionTo(IdleState);
+        TransitionTo(PlayerIdleState);
     }
 
     public void TeleportTo(Vector3 position)
