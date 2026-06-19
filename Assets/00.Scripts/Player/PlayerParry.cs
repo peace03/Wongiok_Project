@@ -1,5 +1,6 @@
 using UnityEngine;
 
+<<<<<<< HEAD
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,6 +15,15 @@ public class PlayerParry : MonoBehaviour
     // 패링 입력 후 보스 근접 공격을 막을 수 있는 시간입니다.
     [SerializeField] private float parryWindowDuration = 0.2f;
 
+=======
+// 플레이어의 근접 패링 입력 시간을 관리합니다.
+public class PlayerParry : MonoBehaviour
+{
+    [Header("Melee Parry")]
+    // 패링 입력 후 근접 공격을 막을 수 있는 시간입니다.
+    [SerializeField] private float parryWindowDuration = 0.2f;
+
+>>>>>>> 600610e7e988249f490eb0ed610f0cf59cba5090
     // 이전 원거리 패링 인스펙터 데이터가 남아 있어도 Inspector가 깨지지 않도록 숨겨서 보존합니다.
 #pragma warning disable 0414
     [HideInInspector, SerializeField] private float parryRadius = 1.5f;
@@ -22,12 +32,21 @@ public class PlayerParry : MonoBehaviour
 
     private PlayerController playerController;
     private bool isInitialized;
+<<<<<<< HEAD
     private bool isPlayerParryWindowOpen;
     private bool isBossParryWindowOpen;
     private float playerParryWindowEndTime;
     private float parrySuccessDamageBlockEndTime;
 
     public bool LastParrySucceeded { get; private set; }
+=======
+    private bool isParryWindowOpen;
+    private bool isParryConsumed;
+    private float parryWindowEndTime;
+
+    // 다른 공격 판정 스크립트가 현재 패링 창이 열려 있는지 확인할 때 사용합니다.
+    public bool IsParryWindowOpen => IsValidParryWindow();
+>>>>>>> 600610e7e988249f490eb0ed610f0cf59cba5090
 
     private void Awake()
     {
@@ -36,12 +55,28 @@ public class PlayerParry : MonoBehaviour
 
     private void OnEnable()
     {
+<<<<<<< HEAD
         EventBus<CanParryEvent>.action += SetBossParryWindow;
         EventBus<UltimateInvoke>.action += CloseBossParryWindow;
+=======
+        // PlayerInitializer가 넘겨준 컨트롤러를 우선 사용하고, 없으면 같은 오브젝트에서 보강합니다.
+        playerController = controller != null ? controller : GetComponent<PlayerController>();
+        ResetParryWindow();
+        isInitialized = true;
+    }
+
+    private void Update()
+    {
+        if (!isParryWindowOpen) return;
+        if (Time.time <= parryWindowEndTime) return;
+
+        ResetParryWindow();
+>>>>>>> 600610e7e988249f490eb0ed610f0cf59cba5090
     }
 
     private void OnDisable()
     {
+<<<<<<< HEAD
         EventBus<CanParryEvent>.action -= SetBossParryWindow;
         EventBus<UltimateInvoke>.action -= CloseBossParryWindow;
         ResetPlayerParryWindow();
@@ -63,6 +98,9 @@ public class PlayerParry : MonoBehaviour
         playerController = controller != null ? controller : GetComponent<PlayerController>();
         ResetPlayerParryWindow();
         isInitialized = true;
+=======
+        ResetParryWindow();
+>>>>>>> 600610e7e988249f490eb0ed610f0cf59cba5090
     }
 
     public bool TryParry()
@@ -71,6 +109,7 @@ public class PlayerParry : MonoBehaviour
         if (!EnsureInitialized()) return false;
         if (!CanUseParry()) return false;
 
+<<<<<<< HEAD
         LastParrySucceeded = false;
         isPlayerParryWindowOpen = true;
         playerParryWindowEndTime = Time.time + Mathf.Max(0f, parryWindowDuration);
@@ -117,6 +156,36 @@ public class PlayerParry : MonoBehaviour
         // 테스트 씬에서 PlayerInitializer 순서가 빠졌더라도 최소 참조만 보강합니다.
         if (isInitialized) return true;
 
+=======
+        isParryWindowOpen = true;
+        isParryConsumed = false;
+        parryWindowEndTime = Time.time + Mathf.Max(0f, parryWindowDuration);
+
+        Debug.Log("근접 패링 준비");
+        return true;
+    }
+
+    public bool TryConsumeMeleeParry(DamageInfo damageInfo)
+    {
+        // 몬스터 근접 공격이 데미지를 넣기 직전에 호출해 피해 취소 여부를 확인합니다.
+        if (!EnsureInitialized()) return false;
+        if (!CanUseParry()) return false;
+        if (!IsValidParryWindow()) return false;
+        if (!IsTargetSelf(damageInfo.TargetObject)) return false;
+
+        isParryConsumed = true;
+        ResetParryWindow();
+
+        Debug.Log("근접 패링 성공");
+        return true;
+    }
+
+    private bool EnsureInitialized()
+    {
+        // 테스트 씬에서 PlayerInitializer 순서가 빠졌더라도 최소 참조만 보강합니다.
+        if (isInitialized) return true;
+
+>>>>>>> 600610e7e988249f490eb0ed610f0cf59cba5090
         Initialize(GetComponent<PlayerController>());
         return isInitialized;
     }
@@ -126,14 +195,23 @@ public class PlayerParry : MonoBehaviour
         return playerController == null || playerController.CanParry;
     }
 
+<<<<<<< HEAD
     private bool IsPlayerParryWindowValid()
     {
         if (!isPlayerParryWindowOpen) return false;
         if (Time.time > playerParryWindowEndTime) return false;
+=======
+    private bool IsValidParryWindow()
+    {
+        if (!isParryWindowOpen) return false;
+        if (isParryConsumed) return false;
+        if (Time.time > parryWindowEndTime) return false;
+>>>>>>> 600610e7e988249f490eb0ed610f0cf59cba5090
 
         return true;
     }
 
+<<<<<<< HEAD
     private void SetBossParryWindow(CanParryEvent data)
     {
         // 보스 애니메이션 이벤트가 알려주는 패링 가능 KeyFrame 상태를 저장합니다.
@@ -195,5 +273,20 @@ public class PlayerParry : MonoBehaviour
         Handles.color = color;
         Handles.Label(center + Vector3.up * (ParryGizmoRadius + 0.25f), label);
 #endif
+=======
+    private bool IsTargetSelf(GameObject targetObject)
+    {
+        // DamageInfo의 대상이 비어 있으면 현재 플레이어를 향한 직접 호출로 간주합니다.
+        if (targetObject == null) return true;
+
+        return targetObject == gameObject || targetObject.transform.IsChildOf(transform);
+    }
+
+    private void ResetParryWindow()
+    {
+        isParryWindowOpen = false;
+        isParryConsumed = false;
+        parryWindowEndTime = 0f;
+>>>>>>> 600610e7e988249f490eb0ed610f0cf59cba5090
     }
 }

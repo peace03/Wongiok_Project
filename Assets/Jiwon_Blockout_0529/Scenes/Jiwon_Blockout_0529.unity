@@ -135,7 +135,8 @@ GameObject:
   - component: {fileID: 189744351}
   - component: {fileID: 189744350}
   - component: {fileID: 189744349}
-  - component: {fileID: 189744348}
+  - component: {fileID: 189744358}
+  - component: {fileID: 189744357}
   m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
@@ -143,25 +144,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &189744348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 189744347}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f6f14794d0f47f4aa4f399991d5fd1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ParryTestMonster
-  target: {fileID: 0}
-  targetAimOffset: {x: 0, y: 1, z: 0}
-  bulletPrefab: {fileID: -6531391070390987119, guid: 79853dd3136f5de47bcfd4c35110b83e, type: 3}
-  firePoint: {fileID: 547033978}
-  firstRangedAttackDelay: 0.5
-  rangedAttackInterval: 1.5
-  rangedAttackDamage: 5
 --- !u!114 &189744349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -339,10 +321,60 @@ Transform:
   m_LocalPosition: {x: 75, y: 1, z: 60}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 547033978}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &189744357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189744347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d85c97f2b6f47cfa6b5d2c9c69b3e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestMonsterMeleeAI
+  target: {fileID: 0}
+  detectionRange: 6
+  verticalTolerance: 2
+  moveSpeed: 2.5
+  playerHitMask:
+    serializedVersion: 2
+    m_Bits: 64
+  attackRange: 1.3
+  attackDamage: 10
+  attackCooldown: 1.2
+  attackWindup: 0.25
+  attackRecovery: 0.35
+  attackBoxSize: {x: 1.2, y: 1.2, z: 1.2}
+  attackBoxOffset: {x: 0.8, y: 0, z: 0}
+--- !u!143 &189744358
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189744347}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &284517065 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2538481801490929255, guid: 53150636a1aa3bb4d9f377ad916f4137, type: 3}
@@ -748,37 +780,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &547033977
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 547033978}
-  m_Layer: 8
-  m_Name: FirePosition
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &547033978
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 547033977}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 189744356}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &794008271 stripped
 GameObject:
