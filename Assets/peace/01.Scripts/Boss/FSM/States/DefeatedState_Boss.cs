@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class DefeatedState : BossState
+public class DefeatedState_Boss : BossState
 {
-    public DefeatedState(BossController controller, IBossLogics logics)
+    public DefeatedState_Boss(BossController controller, IBossLogics logics)
         : base(controller, logics) { }
 
     bool chance = false;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 
 //각 스크립트 Init()에서 서로 참조가 필요할 경우 사용
-public static class ServiceLocator
+public static class ServiceLocator_Y
 {
     private static readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
 

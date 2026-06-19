@@ -8,7 +8,7 @@ public class BossAnimationKeyReceiver : MonoBehaviour, IInitializable
 
     public void Init()
     {
-        bossPatternLogic = ServiceLocator.Get<IBossLogics>();
+        bossPatternLogic = ServiceLocator_Y.Get<IBossLogics>();
     }
 
     //애니메이션 키로 이벤트 발생

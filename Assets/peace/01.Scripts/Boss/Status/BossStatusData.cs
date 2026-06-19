@@ -5,15 +5,15 @@ using System;
 public class BossStatusData
 {
     [Header("스탯")]
-    [SerializeField] private Stat maxHP;                    //최대 체력
-    [SerializeField] private Stat damageTakenMultiplier;    //피격 데미지 배율
+    [SerializeField] private Stat_Y maxHP;                    //최대 체력
+    [SerializeField] private Stat_Y damageTakenMultiplier;    //피격 데미지 배율
     //[SerializeField] private Stat moveSpeed;                //이동속도 (speed값이 많이서 필요없는듯?)
-    [SerializeField] private Stat attackSpeed;              //공속 배율
-    [SerializeField] private Stat telegraphSpeed;           //사전 신호 표시 시간 배율
-    [SerializeField] private Stat attackAPower;             //패턴A 공격력
-    [SerializeField] private Stat attackBPower;             //패턴B 공격력
-    [SerializeField] private Stat attackCPower;             //패턴C 공격력
-    [SerializeField] private Stat attackDPower;             //궁극기 공격력
+    [SerializeField] private Stat_Y attackSpeed;              //공속 배율
+    [SerializeField] private Stat_Y telegraphSpeed;           //사전 신호 표시 시간 배율
+    [SerializeField] private Stat_Y attackAPower;             //패턴A 공격력
+    [SerializeField] private Stat_Y attackBPower;             //패턴B 공격력
+    [SerializeField] private Stat_Y attackCPower;             //패턴C 공격력
+    [SerializeField] private Stat_Y attackDPower;             //궁극기 공격력
     [Header("궁극기 체력 임계치")]
     [SerializeField] private float[] hpThresholds;            //궁극기 체력 임계치
     int index = 0;                          //궁극기 임계치 인덱스(인덱스 마지막은 0으로)

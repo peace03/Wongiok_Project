@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class Bootstrapper : MonoBehaviour
+public class Bootstrapper_Y : MonoBehaviour
 {
     private void Awake()
     {
@@ -16,13 +16,13 @@ public class Bootstrapper : MonoBehaviour
         {
             //GetType()은 IInitializable같은 껍데기 타입이 아닌 알맹이 진짜 타입을 반환함
             Type concreteType = manager.GetType();
-            ServiceLocator.Register(concreteType, manager); //먼저 등록해줘야 Init()에서 사용 가능
+            ServiceLocator_Y.Register(concreteType, manager); //먼저 등록해줘야 Init()에서 사용 가능
             manager.Init();
             //인터페이스로도 호출할 수 있도록 등록해주기
             foreach(var _interface in concreteType.GetInterfaces())
             {
                 if (_interface == typeof(IBossLogics))
-                    ServiceLocator.Register(_interface, manager);
+                    ServiceLocator_Y.Register(_interface, manager);
             }
         }
     }

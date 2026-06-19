@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class IdleState : BossState
+public class IdleState_Boss : BossState
 {
-    public IdleState(BossController controller, IBossLogics logics)
+    public IdleState_Boss(BossController controller, IBossLogics logics)
         : base(controller, logics) { }
 
     public override void Enter()

@@ -16,15 +16,15 @@ public class BossController : MonoBehaviour, IInitializable
     public void Init()
     {
         //능력치
-        status = ServiceLocator.Get<BossStatus>();
+        status = ServiceLocator_Y.Get<BossStatus>();
         //FSM+BT
         logics = GetComponent<IBossLogics>();   //신데렐라 로직 참조
-        bossState.Add(State.Spawn,      new SpawningState(this, logics));
-        bossState.Add(State.Idle,       new IdleState(this, logics));
-        bossState.Add(State.Attack,     new AttackingState(this, logics));
-        bossState.Add(State.Ultimate,   new UltimateCastingState(this, logics));
-        bossState.Add(State.Groggy,     new GroggyState(this, logics));
-        bossState.Add(State.Defeated,   new DefeatedState(this, logics));
+        bossState.Add(State.Spawn,      new SpawningState_Boss(this, logics));
+        bossState.Add(State.Idle,       new IdleState_Boss(this, logics));
+        bossState.Add(State.Attack,     new AttackingState_Boss(this, logics));
+        bossState.Add(State.Ultimate,   new UltimateCastingState_Boss(this, logics));
+        bossState.Add(State.Groggy,     new GroggyState_Boss(this, logics));
+        bossState.Add(State.Defeated,   new DefeatedState_Boss(this, logics));
 
         curState = bossState[State.Spawn];
         curState?.Enter();

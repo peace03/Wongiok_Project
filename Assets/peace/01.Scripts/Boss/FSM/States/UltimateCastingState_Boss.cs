@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class UltimateCastingState : BossState
+public class UltimateCastingState_Boss : BossState
 {
-    public UltimateCastingState(BossController controller, IBossLogics logics)
+    public UltimateCastingState_Boss(BossController controller, IBossLogics logics)
         : base(controller, logics) { }
 
     private Node curBT;

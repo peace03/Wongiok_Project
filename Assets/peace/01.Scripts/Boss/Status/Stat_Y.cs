@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class Stat //StatModifier 패턴 적용
+public class Stat_Y //StatModifier 패턴 적용
 {
     [SerializeField] private float baseValue;
 
@@ -11,7 +11,7 @@ public class Stat //StatModifier 패턴 적용
 
     public float FinalValue => (baseValue + additive) * multiplier;
 
-    public Stat(float baseValue = 0f)
+    public Stat_Y(float baseValue = 0f)
     {
         this.baseValue = baseValue;
     }

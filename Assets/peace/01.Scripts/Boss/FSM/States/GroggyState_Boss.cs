@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class GroggyState : BossState
+public class GroggyState_Boss : BossState
 {
-    public GroggyState(BossController controller, IBossLogics logics)
+    public GroggyState_Boss(BossController controller, IBossLogics logics)
         : base(controller, logics) { }
 
     public override void Enter()

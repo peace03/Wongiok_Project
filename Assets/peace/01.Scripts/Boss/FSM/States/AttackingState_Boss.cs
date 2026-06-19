@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class AttackingState : BossState
+public class AttackingState_Boss : BossState
 {
-    public AttackingState(BossController controller, IBossLogics logics)
+    public AttackingState_Boss(BossController controller, IBossLogics logics)
         : base(controller, logics) { }
     
     private Node curBT;

@@ -11,7 +11,7 @@ public class BossHitBox : MonoBehaviour, IInitializable
 
     public void Init()
     {
-        AtkPower = ServiceLocator.Get<BossStatus>();
+        AtkPower = ServiceLocator_Y.Get<BossStatus>();
         box = GetComponent<BoxCollider>();
     }
 

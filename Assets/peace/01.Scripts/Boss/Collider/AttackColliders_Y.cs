@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class AttackColliders : MonoBehaviour
+public class AttackColliders_Y : MonoBehaviour
 {
     [SerializeField] private List<BoxCollider> attackColliders;
     [SerializeField] private List<Vector3> defaultPos; //왼쪽 바라보는 기준

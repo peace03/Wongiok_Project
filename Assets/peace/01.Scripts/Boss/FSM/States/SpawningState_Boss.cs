@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class SpawningState : BossState
+public class SpawningState_Boss : BossState
 {
-    public SpawningState(BossController controller, IBossLogics logics)
+    public SpawningState_Boss(BossController controller, IBossLogics logics)
         : base(controller, logics) { }
 
     public override void Enter()
