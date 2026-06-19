@@ -1,174 +1,89 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-// 플레이어 주변의 패리 가능 투사체를 찾고, 입력 시 가장 가까운 투사체를 패리합니다.
+// 플레이어의 근접 패링 입력 시간을 관리합니다.
 public class PlayerParry : MonoBehaviour
 {
-    // 인스펙터에서 별도 마스크가 없으면 몬스터 투사체 레이어만 검사합니다.
-    private const string DefaultParryLayerName = "MonsterProjectile";
+    [Header("Melee Parry")]
+    // 패링 입력 후 근접 공격을 막을 수 있는 시간입니다.
+    [SerializeField] private float parryWindowDuration = 0.2f;
 
-    [Header("Parry")]
-    // 플레이어 주변에서 패리 가능한 투사체를 찾는 반경입니다.
-    [SerializeField] private float parryRadius = 1.5f;
-    [SerializeField] private LayerMask parryMask;
+    // 이전 원거리 패링 인스펙터 데이터가 남아 있어도 Inspector가 깨지지 않도록 숨겨서 보존합니다.
+#pragma warning disable 0414
+    [HideInInspector, SerializeField] private float parryRadius = 1.5f;
+    [HideInInspector, SerializeField] private LayerMask parryMask;
+#pragma warning restore 0414
 
     private PlayerController playerController;
-
-    // PlayerInitializer를 통해 패링 참조가 준비되었는지 확인합니다.
     private bool isInitialized;
+    private bool isParryWindowOpen;
+    private bool isParryConsumed;
+    private float parryWindowEndTime;
 
-    // 직전 프레임에 패리 가능 표시를 켜 둔 투사체 목록입니다.
-    private readonly List<IParryableProjectile> parryReadyProjectiles = new List<IParryableProjectile>();
-
-    // 이번 프레임에 새로 감지한 투사체 목록입니다.
-    private readonly List<IParryableProjectile> detectedProjectiles = new List<IParryableProjectile>();
+    // 다른 공격 판정 스크립트가 현재 패링 창이 열려 있는지 확인할 때 사용합니다.
+    public bool IsParryWindowOpen => IsValidParryWindow();
 
     private void Awake()
     {
-        // 실제 참조 캐싱은 PlayerInitializer에서 순서를 보장해 처리합니다.
+        // 실제 참조 연결은 PlayerInitializer에서 순서를 보장해 처리합니다.
     }
 
     public void Initialize(PlayerController controller)
     {
-        // 패링 가능 상태를 확인할 컨트롤러 참조와 기본 레이어 마스크를 초기화합니다.
+        // PlayerInitializer가 넘겨준 컨트롤러를 우선 사용하고, 없으면 같은 오브젝트에서 보강합니다.
         playerController = controller != null ? controller : GetComponent<PlayerController>();
-        EnsureDefaultParryMask();
+        ResetParryWindow();
         isInitialized = true;
-    }
-
-    private void OnValidate()
-    {
-        EnsureDefaultParryMask();
     }
 
     private void Update()
     {
-        if (!isInitialized) return;
+        if (!isParryWindowOpen) return;
+        if (Time.time <= parryWindowEndTime) return;
 
-        RefreshParryReadyVisuals();
+        ResetParryWindow();
     }
 
     private void OnDisable()
     {
-        ClearParryReadyVisuals();
+        ResetParryWindow();
     }
 
     public bool TryParry()
     {
-        if (!isInitialized) return false;
+        // 현재 상태가 패링을 허용하지 않으면 패링 창을 열지 않습니다.
+        if (!EnsureInitialized()) return false;
+        if (!CanUseParry()) return false;
 
-        EnsureDefaultParryMask();
+        isParryWindowOpen = true;
+        isParryConsumed = false;
+        parryWindowEndTime = Time.time + Mathf.Max(0f, parryWindowDuration);
 
-        // 범위 안의 투사체 중 가장 가까운 대상 하나만 패리합니다.
-        IParryableProjectile closestProjectile = FindClosestParryProjectile();
-        if (IsMissing(closestProjectile)) return false;
-
-        if (!closestProjectile.TryParry(gameObject)) return false;
-
-        Debug.Log("패링 성공");
+        Debug.Log("근접 패링 준비");
         return true;
     }
 
-    private void RefreshParryReadyVisuals()
+    public bool TryConsumeMeleeParry(DamageInfo damageInfo)
     {
-        // 이번 프레임 감지 결과와 직전 표시 목록을 비교해 필요한 대상만 색을 갱신합니다.
-        detectedProjectiles.Clear();
+        // 몬스터 근접 공격이 데미지를 넣기 직전에 호출해 피해 취소 여부를 확인합니다.
+        if (!EnsureInitialized()) return false;
+        if (!CanUseParry()) return false;
+        if (!IsValidParryWindow()) return false;
+        if (!IsTargetSelf(damageInfo.TargetObject)) return false;
 
-        if (CanUseParry())
-            CollectParryProjectiles(detectedProjectiles);
+        isParryConsumed = true;
+        ResetParryWindow();
 
-        for (int i = 0; i < parryReadyProjectiles.Count; i++)
-        {
-            IParryableProjectile projectile = parryReadyProjectiles[i];
-            if (IsMissing(projectile)) continue;
-            if (detectedProjectiles.Contains(projectile)) continue;
-
-            projectile.SetParryReadyVisual(false);
-        }
-
-        for (int i = 0; i < detectedProjectiles.Count; i++)
-        {
-            IParryableProjectile projectile = detectedProjectiles[i];
-            if (IsMissing(projectile)) continue;
-
-            projectile.SetParryReadyVisual(true);
-        }
-
-        parryReadyProjectiles.Clear();
-        parryReadyProjectiles.AddRange(detectedProjectiles);
+        Debug.Log("근접 패링 성공");
+        return true;
     }
 
-    private void ClearParryReadyVisuals()
+    private bool EnsureInitialized()
     {
-        for (int i = 0; i < parryReadyProjectiles.Count; i++)
-        {
-            IParryableProjectile projectile = parryReadyProjectiles[i];
-            if (IsMissing(projectile)) continue;
+        // 테스트 씬에서 PlayerInitializer 순서가 빠졌더라도 최소 참조만 보강합니다.
+        if (isInitialized) return true;
 
-            projectile.SetParryReadyVisual(false);
-        }
-
-        parryReadyProjectiles.Clear();
-        detectedProjectiles.Clear();
-    }
-
-    private IParryableProjectile FindClosestParryProjectile()
-    {
-        IParryableProjectile closestProjectile = null;
-        float closestDistanceSqr = float.MaxValue;
-
-        detectedProjectiles.Clear();
-        CollectParryProjectiles(detectedProjectiles);
-
-        for (int i = 0; i < detectedProjectiles.Count; i++)
-        {
-            IParryableProjectile projectile = detectedProjectiles[i];
-            if (IsMissing(projectile)) continue;
-
-            float distanceSqr = (projectile.Position - transform.position).sqrMagnitude;
-            if (distanceSqr >= closestDistanceSqr) continue;
-
-            closestProjectile = projectile;
-            closestDistanceSqr = distanceSqr;
-        }
-
-        return closestProjectile;
-    }
-
-    private void CollectParryProjectiles(List<IParryableProjectile> results)
-    {
-        // 레이어로 1차 필터링한 뒤, IParryableProjectile 구현체만 패리 대상으로 수집합니다.
-        Collider[] hits = Physics.OverlapSphere(
-            GetParryCenter(),
-            parryRadius,
-            parryMask,
-            QueryTriggerInteraction.Collide
-        );
-
-        for (int i = 0; i < hits.Length; i++)
-        {
-            IParryableProjectile projectile = GetParryableProjectile(hits[i]);
-            if (IsMissing(projectile)) continue;
-            if (projectile.IsOwnedBy(gameObject)) continue;
-            if (results.Contains(projectile)) continue;
-
-            results.Add(projectile);
-        }
-    }
-
-    private IParryableProjectile GetParryableProjectile(Collider hit)
-    {
-        if (hit == null) return null;
-
-        // 인터페이스는 GetComponentInParent<T> 제네릭 제약에 걸릴 수 있어 MonoBehaviour를 순회합니다.
-        MonoBehaviour[] behaviours = hit.GetComponentsInParent<MonoBehaviour>();
-        for (int i = 0; i < behaviours.Length; i++)
-        {
-            if (behaviours[i] is IParryableProjectile projectile)
-                return projectile;
-        }
-
-        return null;
+        Initialize(GetComponent<PlayerController>());
+        return isInitialized;
     }
 
     private bool CanUseParry()
@@ -176,34 +91,27 @@ public class PlayerParry : MonoBehaviour
         return playerController == null || playerController.CanParry;
     }
 
-    private bool IsMissing(IParryableProjectile projectile)
+    private bool IsValidParryWindow()
     {
-        // Unity Object가 이미 Destroy된 경우 인터페이스 참조만 남을 수 있어 함께 검사합니다.
-        if (projectile == null) return true;
+        if (!isParryWindowOpen) return false;
+        if (isParryConsumed) return false;
+        if (Time.time > parryWindowEndTime) return false;
 
-        return projectile is Object unityObject && unityObject == null;
+        return true;
     }
 
-    private void EnsureDefaultParryMask()
+    private bool IsTargetSelf(GameObject targetObject)
     {
-        // 사용자가 직접 패리 마스크를 지정했다면 자동 보정하지 않습니다.
-        if (parryMask.value != 0 && parryMask.value != ~0) return;
+        // DamageInfo의 대상이 비어 있으면 현재 플레이어를 향한 직접 호출로 간주합니다.
+        if (targetObject == null) return true;
 
-        int monsterProjectileMask = LayerMask.GetMask(DefaultParryLayerName);
-        if (monsterProjectileMask == 0) return;
-
-        parryMask = monsterProjectileMask;
+        return targetObject == gameObject || targetObject.transform.IsChildOf(transform);
     }
 
-    private Vector3 GetParryCenter()
+    private void ResetParryWindow()
     {
-        // 발밑보다 몸통 주변을 검사하도록 반경의 절반만큼 위로 올립니다.
-        return transform.position + Vector3.up * (parryRadius * 0.5f);
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(GetParryCenter(), parryRadius);
+        isParryWindowOpen = false;
+        isParryConsumed = false;
+        parryWindowEndTime = 0f;
     }
 }
