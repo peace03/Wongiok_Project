@@ -481,6 +481,7 @@ GameObject:
   m_Component:
   - component: {fileID: 99279833}
   - component: {fileID: 99279834}
+  - component: {fileID: 99279835}
   m_Layer: 0
   m_Name: BootStrapper
   m_TagString: Untagged
@@ -515,6 +516,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2909951a6d37491fb70cf1a50213d562, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bootstrapper
+--- !u!114 &99279835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 99279831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca4da99d565445b8b0448f80871fc30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerUIEventBridge
 --- !u!1 &190136527
 GameObject:
   m_ObjectHideFlags: 0

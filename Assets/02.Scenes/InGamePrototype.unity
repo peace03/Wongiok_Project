@@ -963,6 +963,7 @@ GameObject:
   m_Component:
   - component: {fileID: 763320058}
   - component: {fileID: 763320059}
+  - component: {fileID: 763320060}
   m_Layer: 0
   m_Name: BootStrapper
   m_TagString: Untagged
@@ -997,6 +998,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2909951a6d37491fb70cf1a50213d562, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bootstrapper
+--- !u!114 &763320060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 763320056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca4da99d565445b8b0448f80871fc30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerUIEventBridge
 --- !u!1 &878935312
 GameObject:
   m_ObjectHideFlags: 0
@@ -1324,15 +1337,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11.23
+      value: 11.15
       objectReference: {fileID: 0}
     - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.92
+      value: 3.99
       objectReference: {fileID: 0}
     - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7082332
+      objectReference: {fileID: 0}
+    - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.022560243
+      objectReference: {fileID: 0}
+    - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.70526034
+      objectReference: {fileID: 0}
+    - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.022465544
+      objectReference: {fileID: 0}
+    - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 3.649
+      objectReference: {fileID: 0}
+    - target: {fileID: 3473339947051621306, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -89.759
       objectReference: {fileID: 0}
     - target: {fileID: 6195647787250270839, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Name
