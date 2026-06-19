@@ -1,3 +1,5 @@
+using UnityEngine;
+
 //패링 가능, 불가능 이벤트
 public struct CanParryEvent 
 {
@@ -32,3 +34,13 @@ public struct AttackFinish { }
 
 //궁극기 발동
 public struct UltimateInvoke { }
+
+//SpinShard 공격 장판 스폰
+public struct OnShardHitBox
+{
+    public Transform pos { get; private set; }
+    public OnShardHitBox(Transform pos)
+    {
+        this.pos = pos;
+    }
+}

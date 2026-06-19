@@ -21,10 +21,14 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [Header("Enranged 상태")]
     [SerializeField] private float durationEnranged; //지속시간
     [SerializeField] private float enrangedAtkSpeed_Mul; //공격속도
-    [Header("Attack 상태")]
-    [SerializeField] private float kickChaseSpeed;
-    [SerializeField] private Vector3 kickChasePos;
-    [SerializeField] private float postAtkDelay;
+    [Header("AttackA 상태")]
+    [SerializeField] private float A_ChaseSpeed;
+    [SerializeField] private Vector3 A_ChasePos;
+    [SerializeField] private float A_postAtkDelay;
+    [Header("AttackB 상태")]
+    [SerializeField] private float B_ChaseSpeed;
+    [SerializeField] private Vector3 B_ChasePos;
+    [SerializeField] private float B_postAtkDelay;
     [Header("Ultimate 상태")]
     [SerializeField] private float UltimateChaseSpeed;
     [SerializeField] private Vector3 UltimateChasePos;
@@ -64,10 +68,13 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     //Idle
     private Vector3 RandomPos;
 
-    //kick 공격 타입
+    //공격A 타입
     private bool chaseDone = false;    //추격 실행 여부
     private bool telegraphExcuted = false;
     private bool attackDone = false;    //공격 실행 여부
+
+    //공격B 타입
+    private bool isParryCanceled = false; //패링으로 캔슬된 공격인가?
 
     //Ultimate
     private int parryCount = 0;
@@ -121,7 +128,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => chaseDone), //추격이 끝났는가? -> 다음 시퀀스
-                    new Leaf(() => Chase(kickChasePos, kickChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
+                    new Leaf(() => Chase(A_ChasePos, A_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
                 }),
                 //사전신호
                 new Sequence(new List<Node>
@@ -149,68 +156,70 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() =>
                     {
                         UpdateFacing();
-                        return PlayAnim_Time((int)Animation.Idle, postAtkDelay); //Idle 애님 실행
+                        return PlayAnim_Time((int)Animation.Idle, A_postAtkDelay); //Idle 애님 실행
                     }),
                     new Leaf(() => SetStateDone(true))
                 })
             })
         });
 
-        //spinShardAttack = new Selector(new List<Node>
-        //{
-        //    //패링 시 주춤
-        //    new StatefulSequence(new List<Node>
-        //    {
-        //        new ConditionLeaf(() => isParryed),
-        //        new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
-        //        new Leaf(() =>
-        //        {
-        //            Parryed();
-        //            SetStateDone(true);
-        //            return NodeState.Success;
-        //        })
-        //    }),
-        //    //공격 로직
-        //    new Sequence(new List<Node>
-        //    {
-        //        //추격 실렉터
-        //        new Selector(new List<Node>
-        //        {
-        //            new ConditionLeaf(() => chaseDone), //추격이 끝났는가? -> 다음 시퀀스
-        //            new Leaf(() => Chase(kickChasePos, kickChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
-        //        }),
-        //        //사전신호
-        //        new Sequence(new List<Node>
-        //        {
-        //            //new ConditionLeaf(), //사전신호 발생했는가?
-        //            //new Leaf() //사전신호 발생
-        //        }),
-        //        //공격 실렉터
-        //        new Selector(new List<Node>
-        //        {
-        //            new ConditionLeaf(() => attackDone), //공격 애님 끝남?
-        //            new StatefulSequence(new List<Node>
-        //            {
-        //                new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
-        //                new Leaf(() => PlayAnim_Speed((int)Animation.AttackB, 0f)), //공격 애님 실행
-        //                new Leaf(() => {
-        //                    attackDone = true;
-        //                    return NodeState.Success;
-        //                })
-        //            })
-        //        }),
-        //        //후딜 시퀀스
-        //        new Sequence(new List<Node>
-        //        {
-        //            new Leaf(() =>
-        //            {
-        //                UpdateFacing();
-        //                return PlayAnim_Time((int)Animation.Idle, postAtkDelay); //Idle 애님 실행
-        //            }),
-        //            new Leaf(() => SetStateDone(true))
-        //        })
-        //    })
-        //});
+        spinShardAttack = new Selector(new List<Node>
+        {
+            //패링 시 주춤
+            new StatefulSequence(new List<Node>
+            {
+                new ConditionLeaf(() => isParryed),
+                new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
+                new Leaf(() =>
+                {
+                    Parryed();  
+                    SetStateDone(true);
+                    return NodeState.Success;
+                })
+            }),
+            //공격 로직
+            new Sequence(new List<Node>
+            {
+                //추격 실렉터
+                new Selector(new List<Node>
+                {
+                    new ConditionLeaf(() => chaseDone), //추격이 끝났는가? -> 다음 시퀀스
+                    new Leaf(() => Chase(A_ChasePos, A_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
+                }),
+                //사전신호
+                new Sequence(new List<Node>
+                {
+                    //new ConditionLeaf(), //사전신호 발생했는가?
+                    //new Leaf() //사전신호 발생
+                }),
+                //공격 실렉터
+                new Selector(new List<Node>
+                {
+                    new ConditionLeaf(() => attackDone), //공격 애님 끝남?
+                    new StatefulSequence(new List<Node>
+                    {
+                        new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
+                        new Leaf(() => PlayAnim_Speed((int)Animation.AttackB, 0f)), //공격 애님 실행
+                        new Leaf(() => {
+                            if(!isParryCanceled)
+                                EventBus<OnShardHitBox>.Publish(new OnShardHitBox(transform)); //장판 깔아주기
+                            attackDone = true;
+                            return NodeState.Success;
+                        })
+                    })
+                }),
+                //후딜 시퀀스
+                new Sequence(new List<Node>
+                {
+                    new Leaf(() =>
+                    {
+                        UpdateFacing();
+                        return PlayAnim_Time((int)Animation.Idle, A_postAtkDelay); //Idle 애님 실행
+                    }),
+                    new Leaf(() => SetStateDone(true))
+                })
+            })
+        });
 
         UltimateAttack = new Selector(new List<Node>
         {
@@ -296,6 +305,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     private void Parryed() //패링되었음(패링가능, 콜라이더 토글 끄기)
     {
         isParryed = false;
+        isParryCanceled = true;
         EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
         EventBus<ColliderToggleEvent>.Publish(new ColliderToggleEvent(attackType, false));
     }
@@ -441,10 +451,10 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public AttackType GetAttackType() { return attackType; }
     public Node GetAttackBT()
     {
-        //while (attackType == beforeType) attackType = (AttackType)UnityEngine.Random.Range(0, 3);
-        //beforeType = attackType;
-        attackType = AttackType.A;
-        //Debug.Log($"{attackType} 공격 실행");
+        while (attackType == beforeType) attackType = (AttackType)Random.Range(0, 2);
+        beforeType = attackType;
+        //attackType = AttackType.B;
+        Debug.Log($"{attackType} 공격 실행");
         switch (attackType)
         {
             case AttackType.A:
@@ -489,6 +499,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         chaseDone = false;
         telegraphExcuted = false;
         attackDone = false;
+        isParryCanceled = false;
         parryCount = 0;
         comboStep = 0;
     }
