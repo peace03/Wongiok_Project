@@ -87,7 +87,7 @@ public class SkillSystemPresenter
             return new(null, slot.ToKoreanString(), 0, 0f, false);
     }
 
-    // 액티브 스킬 실행
+    // 액티브 스킬 실행 함수
     public void ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
     {
         // 모델이 없다면
@@ -99,5 +99,19 @@ public class SkillSystemPresenter
 
         // 액티브 스킬 실행
         model.ExecuteActiveSkill(slot);
+    }
+
+    // 액티브 스킬 시간 진행 함수
+    public void TickActiveSkills(float time)
+    {
+        // 모델이 없다면
+        if (model == null)
+        {
+            Debug.LogError($"[Error | Skill] 액티브 스킬 실행 실패 => 입력 - 스킬 모델 : 없음");
+            return;
+        }
+
+        // 액티브 스킬 시간 진행
+        model.TickActiveSkills(time);
     }
 }

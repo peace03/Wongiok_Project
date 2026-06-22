@@ -22,29 +22,29 @@ public class BulletFactory : MonoBehaviour, IInitializable
     public void Init() => bullets = CustomObjectPool.CreatePool(bullet, maxCount, container);
 
     // 총알 가져오는 함수
-    public void GetBullet(LayerMask owner, float damage, int count = 1)
+    public Bullet GetBullet()
     {
-        // 총알 가져오기
+        // 총알 오브젝트 풀에서 받아오기
         var obj = bullets.Get();
 
-        // 반납 주소 설정자가 없다면
-        if (!obj.TryGetComponent<IPoolable>(out var setter))
+        // 총알 프리팹이 없다면
+        if(obj == null)
         {
-            Debug.LogError($"[Error | Bullet] 반납 주소 설정 실패 => 입력 - 오브젝트 풀 인터페이스 : 없음", obj);
-            return;
+            Debug.LogError($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 프리팹 : 없음", this);
+            return null;
         }
-
-        // 반납 주소 설정
-        setter.SetPoolRef(bullets);
-
         // 총알 스크립트가 없다면
-        if(!obj.TryGetComponent<Bullet>(out var bullet))
+        else if (!obj.TryGetComponent<Bullet>(out var bullet))
         {
-            Debug.LogError($"[Error | Bullet] 총알 정보 설정 실패 => 입력 - 총알 스크립트 : 없음", obj);
-            return;
+            Debug.LogError($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 스크립트 없음", obj);
+            return null;
         }
-
-        // 총알 정보 설정
-        bullet.SetInfo(owner, damage, count);
+        // 총알 스크립트가 있다면
+        else
+        {
+            // 반납 주소 설정
+            bullet.SetPoolRef(bullets);
+            return bullet;
+        }
     }
 }

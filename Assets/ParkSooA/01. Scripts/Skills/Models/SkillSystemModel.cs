@@ -80,7 +80,9 @@ public class SkillSystemModel
                 equippedActives.Add(skill);
                 // 미장착한 액티브 스킬 리스트에서 제거
                 unequippedActives.Remove(skill);
-                Debug.Log($"[Active | Skill] 스킬 장착 => 위치 : {equippedActives.Count} / {skill.Data.SkillName}");
+                Debug.Log($"[Active | Skill] 스킬 장착 => " +
+                            $"위치 : {(equippedActives.Count == 1 ? "A" : equippedActives.Count == 2 ? "S" : "D")}" +
+                            $" / {skill.Data.SkillName}");
             }
             // 장착할 패시브 슬롯이 있다면
             else if (!skill.IsActiveSkill && equippedPassives.Count < maxPassiveCount)
@@ -225,6 +227,22 @@ public class SkillSystemModel
 
         // 스킬 실행
         equippedActives[(int)slot].UseSkill();
+    }
+
+    // 액티브 스킬들 시간 진행 함수
+    public void TickActiveSkills(float time)
+    {
+        // 액티브 스킬 최대 장착 개수만큼
+        for(int i = 0; i < maxActiveCount; i++)
+        {
+            // 비어있는 칸이라면
+            if (equippedActives[i] == null)
+                Debug.Log($"[Skill] 시간 진행 실패 => 슬롯 : {i + 1}(비어있음)");
+            // 비어있지 않다면
+            else
+                // 시간 진행
+                equippedActives[i].Tick(time);
+        }
     }
 
     // 스킬 변경 함수
