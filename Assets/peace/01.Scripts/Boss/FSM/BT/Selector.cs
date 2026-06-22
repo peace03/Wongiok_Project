@@ -19,4 +19,12 @@ public class Selector : Node
         }
         return NodeState.Failure;
     }
+
+    public override void Reset()
+    {
+        foreach(var child in children)
+        {
+            child.Reset();
+        }
+    }
 }

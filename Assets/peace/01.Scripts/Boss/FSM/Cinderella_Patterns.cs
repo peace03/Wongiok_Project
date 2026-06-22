@@ -29,6 +29,10 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [SerializeField] private float B_ChaseSpeed;
     [SerializeField] private Vector3 B_ChasePos;
     [SerializeField] private float B_postAtkDelay;
+    [Header("AttackC 상태")]
+    [SerializeField] private float C_ChaseSpeed;
+    [SerializeField] private Vector3 C_ChasePos;
+    [SerializeField] private float C_postAtkDelay;
     [Header("Ultimate 상태")]
     [SerializeField] private float UltimateChaseSpeed;
     [SerializeField] private Vector3 UltimateChasePos;
@@ -185,6 +189,64 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 {
                     new ConditionLeaf(() => chaseDone), //추격이 끝났는가? -> 다음 시퀀스
                     new Leaf(() => Chase(A_ChasePos, A_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
+                }),
+                //사전신호
+                new Sequence(new List<Node>
+                {
+                    //new ConditionLeaf(), //사전신호 발생했는가?
+                    //new Leaf() //사전신호 발생
+                }),
+                //공격 실렉터
+                new Selector(new List<Node>
+                {
+                    new ConditionLeaf(() => attackDone), //공격 애님 끝남?
+                    new StatefulSequence(new List<Node>
+                    {
+                        new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
+                        new Leaf(() => PlayAnim_Speed((int)Animation.AttackB, 0f)), //공격 애님 실행
+                        new Leaf(() => {
+                            if(!isParryCanceled)
+                                EventBus<OnShardHitBox>.Publish(new OnShardHitBox(transform)); //장판 깔아주기
+                            attackDone = true;
+                            return NodeState.Success;
+                        })
+                    })
+                }),
+                //후딜 시퀀스
+                new Sequence(new List<Node>
+                {
+                    new Leaf(() =>
+                    {
+                        UpdateFacing();
+                        return PlayAnim_Time((int)Animation.Idle, A_postAtkDelay); //Idle 애님 실행
+                    }),
+                    new Leaf(() => SetStateDone(true))
+                })
+            })
+        });
+
+        jumpSlamAttack = new Selector(new List<Node>
+        {
+            //패링 시 주춤
+            new StatefulSequence(new List<Node>
+            {
+                new ConditionLeaf(() => isParryed),
+                new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
+                new Leaf(() =>
+                {
+                    Parryed();
+                    SetStateDone(true);
+                    return NodeState.Success;
+                })
+            }),
+            //공격 로직
+            new Sequence(new List<Node>
+            {
+                //추격 실렉터
+                new Selector(new List<Node>
+                {
+                    new ConditionLeaf(() => chaseDone || Math.Abs(Distance) < 10), //추격이 끝났는가? -> 다음 시퀀스
+                    new Leaf(() => Chase(C_ChasePos, C_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
                 }),
                 //사전신호
                 new Sequence(new List<Node>
@@ -502,6 +564,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         isParryCanceled = false;
         parryCount = 0;
         comboStep = 0;
+
+        UltimateAttack?.Reset();
     }
     #endregion
 
