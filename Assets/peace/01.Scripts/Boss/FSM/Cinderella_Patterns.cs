@@ -30,8 +30,6 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [SerializeField] private Vector3 B_ChasePos;
     [SerializeField] private float B_postAtkDelay;
     [Header("AttackC 상태")]
-    [SerializeField] private float C_ChaseSpeed;
-    [SerializeField] private Vector3 C_ChasePos;
     [SerializeField] private float C_postAtkDelay;
     [Header("Ultimate 상태")]
     [SerializeField] private float UltimateChaseSpeed;
@@ -62,7 +60,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     private readonly float[] rotValue = //Animation Y축 각도 설정값
     {
         228, -228, //Idle
-        -90, 90, 0,0,0,0, //Attack
+        -90, 90, 0,0, -90,90, //Attack
         -90,90,-90,90,-90,90, //Ultimate
         -90, 90, //Chase
         228, -228, //Parry
@@ -79,6 +77,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 
     //공격B 타입
     private bool isParryCanceled = false; //패링으로 캔슬된 공격인가?
+
+    //공격C 타입
+    private bool isJumping = false;
+    private Vector3 jumpStartPos;
+    private Vector3 jumpTargetPos;
+    private float currentJumpProgress = 0f; //OnAnimatorMove와 공유할 데이터 통로
 
     //Ultimate
     private int parryCount = 0;
@@ -227,27 +231,9 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 
         jumpSlamAttack = new Selector(new List<Node>
         {
-            //패링 시 주춤
-            new StatefulSequence(new List<Node>
-            {
-                new ConditionLeaf(() => isParryed),
-                new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
-                new Leaf(() =>
-                {
-                    Parryed();
-                    SetStateDone(true);
-                    return NodeState.Success;
-                })
-            }),
             //공격 로직
             new Sequence(new List<Node>
             {
-                //추격 실렉터
-                new Selector(new List<Node>
-                {
-                    new ConditionLeaf(() => chaseDone || Math.Abs(Distance) < 10), //추격이 끝났는가? -> 다음 시퀀스
-                    new Leaf(() => Chase(C_ChasePos, C_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
-                }),
                 //사전신호
                 new Sequence(new List<Node>
                 {
@@ -260,11 +246,9 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new ConditionLeaf(() => attackDone), //공격 애님 끝남?
                     new StatefulSequence(new List<Node>
                     {
-                        new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
-                        new Leaf(() => PlayAnim_Speed((int)Animation.AttackB, 0f)), //공격 애님 실행
-                        new Leaf(() => {
-                            if(!isParryCanceled)
-                                EventBus<OnShardHitBox>.Publish(new OnShardHitBox(transform)); //장판 깔아주기
+                        new Leaf(() => DynamicJumpSlam(playerPos.position, (int)Animation.AttackC)),
+                        new Leaf(() =>
+                        {
                             attackDone = true;
                             return NodeState.Success;
                         })
@@ -276,7 +260,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() =>
                     {
                         UpdateFacing();
-                        return PlayAnim_Time((int)Animation.Idle, A_postAtkDelay); //Idle 애님 실행
+                        return PlayAnim_Time((int)Animation.Idle, C_postAtkDelay); //Idle 애님 실행
                     }),
                     new Leaf(() => SetStateDone(true))
                 })
@@ -513,9 +497,9 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public AttackType GetAttackType() { return attackType; }
     public Node GetAttackBT()
     {
-        while (attackType == beforeType) attackType = (AttackType)Random.Range(0, 2);
-        beforeType = attackType;
-        //attackType = AttackType.B;
+        //while (attackType == beforeType) attackType = (AttackType)Random.Range(0, 2);
+        //beforeType = attackType;
+        attackType = AttackType.C;
         Debug.Log($"{attackType} 공격 실행");
         switch (attackType)
         {
@@ -577,6 +561,58 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #endregion
 
     #region JumpSlamAttack
+    private NodeState DynamicJumpSlam(Vector3 targetPos,  int animNum)
+    {
+        //단 1회 실행되는 스냅샷
+        if (!isJumping)
+        {
+            UpdateFacing();
+            SyncFacingWithAnim(animNum);
+
+            jumpStartPos = transform.position;  //도약지점 저장
+            jumpTargetPos = targetPos;          //타겟 지점(플레이어) 저장
+            isJumping = true;
+            currentJumpProgress = 0f;
+
+            return NodeState.Running;
+        }
+        //애니메이션 섞임 대기
+        if (anim.IsInTransition(0)) return NodeState.Running;
+        //종료 판정
+        animState = anim.GetCurrentAnimatorStateInfo(0);
+        //진행도 0.5일때 파동공격 콜라이더 실행
+        if (animState.normalizedTime >= 0.3f)
+            attackType = AttackType.C_2;
+        //진행도가 1.0에 근접했다면
+        if(animState.normalizedTime >= 0.95f)
+        {
+            isJumping = false;
+            return NodeState.Success;
+        }
+        return NodeState.Running; //아직 공중에 있음
+    }
+    //유니티 물리/애니메이션 렌더링 직전에 자동 호출되는 콜백(강력한 덥어쓰기 권한)
+    public void OnAnimatorMoveCallback()
+    {
+        if (anim == null || rb == null) return;
+        //평상시
+        if (!isJumping)
+        {
+            rb.MovePosition(rb.position);
+            return;
+        }
+        //현재 프레임 진행도 저장
+        currentJumpProgress = anim.GetFloat("JumpProgress");
+        //점프 공격 중
+        //x축(거리): 애니메이션의 x축 루트모션을 무시하고, 코드의 절대좌표로 덮어씌움
+        float newX = Mathf.Lerp(jumpStartPos.x, jumpTargetPos.x, currentJumpProgress);
+        //y축(높이): 애니메이션 클립이 제공하는 프레임당 높이 변화량만 선별적으로 가져와 더함
+        float newY = transform.position.y + anim.deltaPosition.y;
+        //z축(깊이): 현재 깊이 유지
+        float curZ = 0f;
+        //메모리 덮어쓰기
+        transform.position = new Vector3(newX, newY, curZ);
+    }
     #endregion
 
     #region Ultimate

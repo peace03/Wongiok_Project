@@ -21,7 +21,8 @@ public class AttackColliders_Y : MonoBehaviour
 
     public void ToggleCollider(ColliderToggleEvent data)
     {
-        attackColliders[(int)data.type].enabled = data.state;
+        if (data.state == true) attackColliders[(int)data.type].enabled = data.state;
+        else OffCollider(default);
     }
     public void OffCollider(ParryKeyDown data)
     {

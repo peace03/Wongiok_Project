@@ -59,7 +59,8 @@ public class BossStatusData
         {
             AttackType.A => attackAPower.FinalValue,
             AttackType.B => attackBPower.FinalValue,
-            AttackType.C => attackCPower.FinalValue
+            AttackType.C => attackCPower.FinalValue,
+            AttackType.C_2 => attackCPower.FinalValue
         };
     }
 }

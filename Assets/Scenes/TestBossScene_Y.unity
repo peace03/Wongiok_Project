@@ -1051,6 +1051,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 225394a211283584d98173d857198c72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: PeaceScripts::BossAnimationReceiver
+--- !u!114 &1635566597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635566595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8887d09623a2c284a817e9fca7c33098, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossAnimatorRelay
 --- !u!1 &1650632854
 GameObject:
   m_ObjectHideFlags: 0
@@ -1147,6 +1159,7 @@ Transform:
   - {fileID: 445290352}
   - {fileID: 1756871975}
   - {fileID: 102180173}
+  - {fileID: 2020555812}
   m_Father: {fileID: 769151241}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1650632860
@@ -1188,6 +1201,7 @@ MonoBehaviour:
   B_ChaseSpeed: 15
   B_ChasePos: {x: 1.5, y: 0, z: 0}
   B_postAtkDelay: 3
+  C_postAtkDelay: 3
   UltimateChaseSpeed: 15
   UltimateChasePos: {x: 1.5, y: 0, z: 0}
   groggyDuration: 2
@@ -1199,7 +1213,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1650632854}
   serializedVersion: 5
-  m_Mass: 0.0000001
+  m_Mass: 0.5
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1234,10 +1248,12 @@ MonoBehaviour:
   - {fileID: 445290353}
   - {fileID: 1756871976}
   - {fileID: 102180174}
+  - {fileID: 2020555814}
   defaultPos:
   - {x: -1, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: -0.5, z: 0}
+  - {x: 0, y: 0.5, z: 0}
+  - {x: 0, y: 0.5, z: 0}
 --- !u!1 &1756871974
 GameObject:
   m_ObjectHideFlags: 0
@@ -1376,7 +1392,77 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1635566596}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1635566597}
   m_SourcePrefab: {fileID: 100100000, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
+--- !u!1 &2020555811
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2020555812}
+  - component: {fileID: 2020555814}
+  - component: {fileID: 2020555813}
+  m_Layer: 0
+  m_Name: JumpSlamCollider (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2020555812
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020555811}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1650632859}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2020555813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020555811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9023e3275c04e314b8066121a31744de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossHitBox
+  AtkType: 3
+--- !u!65 &2020555814
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020555811}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 3, y: 1, z: 4}
+  m_Center: {x: 0, y: -0.5, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
