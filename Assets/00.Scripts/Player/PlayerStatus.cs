@@ -27,7 +27,7 @@ public class PlayerStatusData : LivingStatus
 [RequireComponent(typeof(PlayerCheckpointTracker))]
 [RequireComponent(typeof(PlayerHealItemInventory))]
 [RequireComponent(typeof(PlayerLifeTracker))]
-public class PlayerStatus : MonoBehaviour
+public class PlayerStatus : MonoBehaviour, IDamageable
 {
     // 피격 직후 입력을 막는 경직 시간입니다.
     public const float HitStunDuration = 0.2f;

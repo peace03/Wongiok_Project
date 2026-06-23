@@ -4,3 +4,9 @@ public interface IInitializable
     public int Priority { get; }    //초기화 순서
     public void Init();
 }
+
+// 데미지
+public interface IDamageable
+{
+    public void TakeDamage(float amount);
+}

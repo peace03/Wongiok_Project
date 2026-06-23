@@ -86,6 +86,44 @@ public readonly struct PlayerLifeDepletedEvent
     }
 }
 
+// 플레이어 경험치가 변경될 때 발행되는 이벤트입니다.
+// UI와 성장 연출은 이 이벤트를 구독해서 현재 경험치 진행도를 표시합니다.
+public readonly struct PlayerExperienceChangedEvent
+{
+    public readonly GameObject PlayerObject;
+    public readonly int CurrentLevel;
+    public readonly float CurrentExp;
+    public readonly float RequiredExp;
+
+    public PlayerExperienceChangedEvent(
+        GameObject playerObject,
+        int currentLevel,
+        float currentExp,
+        float requiredExp)
+    {
+        PlayerObject = playerObject;
+        CurrentLevel = currentLevel;
+        CurrentExp = currentExp;
+        RequiredExp = requiredExp;
+    }
+}
+
+// 플레이어가 레벨업했을 때 발행되는 이벤트입니다.
+// 스킬 선택 구조는 이 이벤트를 받아 다음 단계에서 진입합니다.
+public readonly struct PlayerLevelUpEvent
+{
+    public readonly GameObject PlayerObject;
+    public readonly int PreviousLevel;
+    public readonly int CurrentLevel;
+
+    public PlayerLevelUpEvent(GameObject playerObject, int previousLevel, int currentLevel)
+    {
+        PlayerObject = playerObject;
+        PreviousLevel = previousLevel;
+        CurrentLevel = currentLevel;
+    }
+}
+
 public readonly struct CheckpointActivatedEvent
 {
     // 체크포인트를 활성화한 플레이어 오브젝트입니다.

@@ -9,7 +9,7 @@ public class MonsterStatusData : LivingStatus
 // 몬스터의 HP와 기본 스탯을 관리하는 컴포넌트입니다.
 // 공격 판정이 직접 전달한 DamageInfo를 받아 실제 HP를 깎습니다.
 [RequireComponent(typeof(HitFlashFeedback))]
-public class MonsterStatus : MonoBehaviour
+public class MonsterStatus : MonoBehaviour, IDamageable
 {
     [Header("Base Status")]
     // 테스트 몬스터의 기본 체력입니다.

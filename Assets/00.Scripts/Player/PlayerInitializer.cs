@@ -9,6 +9,7 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerCheckpointTracker))]
 [RequireComponent(typeof(PlayerHealItemInventory))]
 [RequireComponent(typeof(PlayerLifeTracker))]
+[RequireComponent(typeof(PlayerExperienceTracker))]
 [RequireComponent(typeof(HitFlashFeedback))]
 public class PlayerInitializer : MonoBehaviour, IInitializable
 {
@@ -22,6 +23,7 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
     public PlayerCheckpointTracker CheckpointTracker { get; private set; }
     public PlayerHealItemInventory HealItemInventory { get; private set; }
     public PlayerLifeTracker LifeTracker { get; private set; }
+    public PlayerExperienceTracker ExperienceTracker { get; private set; }
     public HitFlashFeedback HitFeedback { get; private set; }
 
     public void Init()
@@ -35,6 +37,7 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         HealItemInventory.Initialize(Status);
         CheckpointTracker.Initialize(Status, HealItemInventory);
         LifeTracker.Initialize();
+        ExperienceTracker.Initialize();
         Movement.Initialize(Status);
         Attack.Initialize(Status);
         Parry.Initialize(Controller);
@@ -44,6 +47,7 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         Status.PublishInitialHealth();
         HealItemInventory.PublishInitialCount();
         LifeTracker.PublishInitialLife();
+        ExperienceTracker.PublishInitialExperience();
     }
 
     private void EnsureRequiredComponents()
@@ -57,6 +61,7 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         EnsureComponent<PlayerCheckpointTracker>();
         EnsureComponent<PlayerHealItemInventory>();
         EnsureComponent<PlayerLifeTracker>();
+        EnsureComponent<PlayerExperienceTracker>();
         EnsureComponent<HitFlashFeedback>();
     }
 
@@ -70,6 +75,7 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         CheckpointTracker = GetComponent<PlayerCheckpointTracker>();
         HealItemInventory = GetComponent<PlayerHealItemInventory>();
         LifeTracker = GetComponent<PlayerLifeTracker>();
+        ExperienceTracker = GetComponent<PlayerExperienceTracker>();
         HitFeedback = GetComponent<HitFlashFeedback>();
     }
 
@@ -84,6 +90,7 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         ServiceLocator.Register(typeof(PlayerCheckpointTracker), CheckpointTracker);
         ServiceLocator.Register(typeof(PlayerHealItemInventory), HealItemInventory);
         ServiceLocator.Register(typeof(PlayerLifeTracker), LifeTracker);
+        ServiceLocator.Register(typeof(PlayerExperienceTracker), ExperienceTracker);
         ServiceLocator.Register(typeof(HitFlashFeedback), HitFeedback);
     }
 
