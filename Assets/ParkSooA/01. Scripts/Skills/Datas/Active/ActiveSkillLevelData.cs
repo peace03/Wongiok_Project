@@ -5,8 +5,12 @@ using System;
 // 액티브 스킬 레벨 정보
 public abstract class ActiveSkillLevelData : BaseSkillLevelData
 {
-    [SerializeField] private float maxCoolTime;     // 쿨타임
-    [SerializeField] private float maxDuration;     // 지속시간
+    [Header("최대 쿨타임")]
+    [Tooltip("0으로 두면 쿨타임이 없는 스킬이 됨")]
+    [SerializeField] private float maxCoolTime;     // 최대 쿨타임
+    [Header("최대 지속 시간")]
+    [Tooltip("0으로 두면 즉시 효과가 끝나는 스킬이 됨")]
+    [SerializeField] private float maxDuration;     // 최대 지속 시간
 
     public float MaxCoolTime => maxCoolTime;
     public float MaxDuration => maxDuration;

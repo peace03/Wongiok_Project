@@ -36,7 +36,7 @@ MonoBehaviour:
         maxDuration: 1
         damage: 12
         projectileCount: 20
-        penetrationCount: 1
+        penetrationCount: 0
         maxChargingTime: 0
     - rid: 4582174391890870378
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
@@ -45,7 +45,7 @@ MonoBehaviour:
         maxDuration: 1
         damage: 14
         projectileCount: 30
-        penetrationCount: 1
+        penetrationCount: 0
         maxChargingTime: 0
     - rid: 4582174391890870379
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
@@ -54,5 +54,5 @@ MonoBehaviour:
         maxDuration: 1
         damage: 16
         projectileCount: 40
-        penetrationCount: 1
+        penetrationCount: 0
         maxChargingTime: 0

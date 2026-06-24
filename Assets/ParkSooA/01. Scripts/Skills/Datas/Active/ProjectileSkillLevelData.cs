@@ -6,10 +6,17 @@ using System.Collections.Generic;
 // 발사체 액티브 스킬 레벨 정보
 public class ProjectileSkillLevelData : ActiveSkillLevelData
 {
+    [Header("데미지")]
     [SerializeField] private float damage;              // 데미지
+    [Header("발사체 수")]
+    [Tooltip("0으로 둬도 최소 1개를 발사하는 스킬이 됨")]
     [SerializeField] private int projectileCount;       // 발사체 수
+    [Header("관통 횟수")]
+    [Tooltip("-1로 두면 무한 관통, 0으로 두면 관통 0회, 1로 두면 관통 1회 스킬이 됨")]
     [SerializeField] private int penetrationCount;      // 관통 횟수(-1 : 횟수 제한 없음)
-    [SerializeField] private float maxChargingTime;     // 차징시간
+    [Header("최대 차징 시간")]
+    [Tooltip("0으로 두면 즉시 발동하는 스킬이 됨")]
+    [SerializeField] private float maxChargingTime;     // 최대 차징 시간
 
     public int ProjectileCount => projectileCount;
     public int PenetrationCount => penetrationCount;

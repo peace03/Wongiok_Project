@@ -4,7 +4,8 @@ using UnityEngine.Pool;
 public static class CustomObjectPool
 {
     // 오브젝트 풀 생성 함수
-    public static IObjectPool<GameObject> CreatePool(GameObject prefab, int maxCount = 1000, Transform parent = null)
+    public static IObjectPool<GameObject> CreatePool(GameObject prefab, int maxCount = 1000,
+                                                                        Transform parent = null)
     {
         // 오브젝트 풀 반환
         return new ObjectPool<GameObject>(() => CreateObject(prefab, parent),

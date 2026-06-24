@@ -3,12 +3,19 @@ using UnityEngine;
 // 스킬 기본 정보
 public abstract class BaseSkillData : ScriptableObject
 {
+    [Header("스킬 ID")]
     [SerializeField] private int id;                            // ID
+    [Header("스킬 아이콘")]
     [SerializeField] private Sprite icon;                       // 아이콘
+    [Header("스킬 이름")]
     [SerializeField] private string skillName;                  // 이름
+    [Header("스킬 종류")]
     [SerializeField] private SKILL_TYPE type;                   // 스킬 종류
+    [Header("스킬 해금 챕터")]
     [SerializeField] private CHAPTER_TYPE unlockChapter;        // 해금 챕터 종류
+    [Header("스킬 최대 레벨")]
     [SerializeField] private int maxLevel;                      // 최대 레벨
+    [Header("스킬 설명")]
     [SerializeField] private string desc;                       // 설명
 
     public int Id => id;

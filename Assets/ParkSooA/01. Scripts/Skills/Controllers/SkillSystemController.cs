@@ -2,7 +2,10 @@ using UnityEngine;
 
 public class SkillSystemController : MonoBehaviour, IInitializable
 {
+    [Header("스킬 소유자")]
+    [Tooltip("플레이어, 몬스터, NPC 등등")]
     [SerializeField] private GameObject owner;                      // 소유자
+    [Header("스킬 시스템")]
     [SerializeField] private SkillSystemPresenter presenter;        // 프레젠터
 
     public int Priority => (int)InitOrder.Skill;                    // 중요도
@@ -11,10 +14,25 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     private void OnEnable() => EventBus<PressedSkillSlot>.action += ExecuteSkill;
 
     // 임시 초기화
-    private void Start() => Init();
+    private void Awake() => Init();
 
     private void Update()
     {
+        // A키를 눌렀다면
+        if (Input.GetKeyDown(KeyCode.A))
+            // A키 누름 이벤트 발행
+            EventBus<PressedSkillSlot>.Publish(new PressedSkillSlot(ACTIVE_SKILL_SLOT_TYPE.A));
+
+        // S키를 눌렀다면
+        if (Input.GetKeyDown(KeyCode.S))
+            // S키 누름 이벤트 발행
+            EventBus<PressedSkillSlot>.Publish(new PressedSkillSlot(ACTIVE_SKILL_SLOT_TYPE.S));
+
+        // D키를 눌렀다면
+        if (Input.GetKeyDown(KeyCode.D))
+            // D키 누름 이벤트 발행
+            EventBus<PressedSkillSlot>.Publish(new PressedSkillSlot(ACTIVE_SKILL_SLOT_TYPE.D));
+
         // 프레젠터가 없다면
         if (presenter == null)
             return;
@@ -71,7 +89,8 @@ public class SkillSystemController : MonoBehaviour, IInitializable
                 break;
             // 그 외라면
             default:
-                Debug.LogWarning($"[Skill] 스킬 실행 실패 => 입력 - 슬롯 : {type.slot.ToKoreanString()}", this);
+                Debug.LogWarning($"[Skill] 스킬 실행 실패 => " +
+                                    $"입력 - 슬롯 : {type.slot.ToKoreanString()}", this);
                 break;
         }
     }

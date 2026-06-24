@@ -22,4 +22,6 @@ public readonly struct AreaSkillStageData
 public readonly struct PressedSkillSlot
 {
     public readonly ACTIVE_SKILL_SLOT_TYPE slot;        // 슬롯 종류
+
+    public PressedSkillSlot(ACTIVE_SKILL_SLOT_TYPE slot) => this.slot = slot;
 }

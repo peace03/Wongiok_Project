@@ -6,8 +6,13 @@ using System.Collections.Generic;
 // 패시브 레벨 정보
 public class PassiveSkillLevelData : BaseSkillLevelData
 {
+    [Header("발동 조건")]
+    [Tooltip("현재는 상시 적용 패시브 밖에 없지만, 나중에 조건부 패시브를 대비하여 준비한 것이므로 신경쓰지 않으셔도 됨")]
     [SerializeField] private PASSIVE_TRIGGER_TYPE triggerType;      // 발동 조건
-    [SerializeField] private List<StatAdjustment> appliedStats;     // 바꿀 스탯 정보들
+    [Header("적용할 스탯")]
+    [Tooltip("적용할 스탯 종류(체력, 공격력, 이동 속도, 공격 속도) / 더할지(버프), 뺄지(디버프) / " +
+                "적용할 수치량(수치로 입력하기, 추후 퍼센트로 바꿀 확률 높음)")]
+    [SerializeField] private List<StatAdjustment> appliedStats;     // 적용할 스탯
 
     public PASSIVE_TRIGGER_TYPE TriggerType => triggerType;
 

@@ -5,23 +5,37 @@ using System.Collections.Generic;
 [Serializable]
 public class SkillInstance
 {
-    [SerializeField] private GameObject owner;                          // 스킬 소유자
+    [Header("스킬의 정보")]
+    [Tooltip("스킬에 대한 데이터")]
     [SerializeField] private BaseSkillData data;                        // 스킬 정보
+    [Header("스킬의 상태")]
+    [Tooltip("현재 스킬 상태\n[사용 가능 / 쿨타임 중 / 실행(지속) 중 / 시전(차징) 중]")]
     [SerializeField] private SKILL_STATE state = SKILL_STATE.Ready;     // 스킬 상태
+    [Header("스킬의 레벨")]
+    [Tooltip("스킬의 현재 레벨\n플레이어가 게임 플레이 중 올릴 수 있는 레벨")]
     [SerializeField] private int curLevel = 1;                          // 현재 레벨
+    [Header("스킬의 쿨타임")]
+    [Tooltip("스킬의 현재 쿨타임\n0에서부터 프레임 단위로 최대 쿨타임까지 올라감")]
     [SerializeField] private float curCoolTime = 0f;                    // 현재 쿨타임
+    [Header("스킬의 지속 시간")]
+    [Tooltip("스킬의 현재 지속 시간\n0에서부터 프레임 단위로 최대 지속 시간까지 올라감")]
     [SerializeField] private float curDuration = 0f;                    // 현재 지속 시간
+    [Header("스킬의 시전(차징) 시간")]
+    [Tooltip("스킬의 현재 시전(차징) 시간\n0에서부터 프레임 단위로 최대 시전(차징) 시간까지 올라감")]
     [SerializeField] private float curChargingTime = 0f;                // 현재 차징 시간
 
     private List<SkillInstance> equippedActives;                        // 장착된 액티브 스킬 목록
     private List<SkillInstance> equippedPassives;                       // 장착된 패시브 스킬 목록
+
+    private readonly GameObject owner;                                  // 스킬 소유자
 
     public BaseSkillData Data => data;
     public int CurLevel => curLevel;
     // 액티브 스킬 여부
     public bool IsActiveSkill => data.Type == SKILL_TYPE.Active;
     // 스킬 장착 여부
-    public bool IsEquipped => IsActiveSkill ? equippedActives.Contains(this) : equippedPassives.Contains(this);
+    public bool IsEquipped => IsActiveSkill ? equippedActives.Contains(this)
+                                                : equippedPassives.Contains(this);
     // 강화 가능 여부
     public bool CanEnhance => curLevel < data.MaxLevel;
     // 스킬 사용 가능 여부
@@ -40,7 +54,8 @@ public class SkillInstance
         1f - (data.GetMaxDuration(curLevel) <= 0f ? 0f : curDuration / data.GetMaxDuration(curLevel));
     // 차징 시간 비율
     public float ChargingTimeRatio =>
-        1f - (data.GetMaxChargingTime(curLevel) <= 0f ? 0f : curChargingTime / data.GetMaxChargingTime(curLevel));
+        1f - (data.GetMaxChargingTime(curLevel) <= 0f ?
+                                            0f : curChargingTime / data.GetMaxChargingTime(curLevel));
 
     // 생성자
     public SkillInstance(GameObject owner, BaseSkillData data)
@@ -144,7 +159,8 @@ public class SkillInstance
         if(IsCharging)
         {
             // 차징 시간 진행
-            curChargingTime = Math.Clamp(curChargingTime + time, 0f, Math.Max(0f, data.GetMaxChargingTime(curLevel)));
+            curChargingTime = Math.Clamp(curChargingTime + time, 0f,
+                                            Math.Max(0f, data.GetMaxChargingTime(curLevel)));
 
             // 차징이 끝났다면
             if (curChargingTime >= Math.Max(0f, data.GetMaxChargingTime(curLevel)))

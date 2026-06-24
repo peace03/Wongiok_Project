@@ -7,9 +7,8 @@ public class SkillSystemPresenter
 {
     [Header("(임시)현재 챕터")]
     [SerializeField] private CHAPTER_TYPE curChapter = CHAPTER_TYPE.First;      // 현재 챕터
-    [Space(10)][Header("스킬 모델")]
     [SerializeField] private SkillSystemModel model;                            // 스킬 모델(인스펙터에서 보는 용도)
-    //[SerializeField] private readonly SkillSystemModel model;                 // 스킬 모델
+    //private readonly SkillSystemModel model;                                    // 스킬 모델
 
     private List<SkillInstance> modelResults = new();                           // 스킬 모델 결과들
     private List<UIPlayerSkillSlotData> uiEventDatas = new();                   // 스킬 뷰 이벤트 데이터들

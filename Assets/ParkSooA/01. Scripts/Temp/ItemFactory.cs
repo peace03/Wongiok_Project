@@ -17,7 +17,7 @@ public class ItemFactory : MonoBehaviour, IInitializable
     public int Priority => (int)InitOrder.Skill;        // 오브젝트 풀링 생성을 위한 초기화가 필요함
 
     // 테스트를 위한 (임시) 초기화
-    private void Start() => Init();
+    private void Awake() => Init();
 
     public void Init()
     {

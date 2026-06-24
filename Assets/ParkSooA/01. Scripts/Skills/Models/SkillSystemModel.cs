@@ -5,21 +5,26 @@ using System.Collections.Generic;
 [Serializable]
 public class SkillSystemModel
 {
-    [Space(10)][Header("장착한 액티브 스킬들")]
-    [SerializeField] private int maxActiveCount = 3;                                // 액티브 스킬 최대 장착 개수
-    [SerializeField] private List<SkillInstance> equippedActives = new();           // 장착한 액티브 스킬들
-    [Space(10)][Header("미장착한 액티브 스킬들")]
-    [SerializeField] private List<SkillInstance> unequippedActives = new();         // 미장착한 액티브 스킬들
-    [Space(10)][Header("장착한 패시브 스킬들")]
-    [SerializeField] private int maxPassiveCount = 4;                               // 패시브 스킬 최대 장착 개수
-    [SerializeField] private List<SkillInstance> equippedPassives = new();          // 장착한 패시브 스킬들
-    [Space(10)][Header("모든 스킬들")]
-    [SerializeField] private List<SkillInstance> allSkillList = new();              // 모든 스킬 리스트
+    [Header("장착한 액티브 스킬들")]
+    [Tooltip("액티브 스킬의 장착 가능한 최대 개수")]
+    [SerializeField] private int maxActiveCount = 3;                            // 액티브 스킬 최대 장착 개수
+    [Tooltip("장착한 액티브 스킬들")]
+    [SerializeField] private List<SkillInstance> equippedActives = new();       // 장착한 액티브 스킬들
+    [Header("장착하지 않은 액티브 스킬들")]
+    [SerializeField] private List<SkillInstance> unequippedActives = new();     // 장착하지 않은 액티브 스킬들
+    [Header("장착한 패시브 스킬들")]
+    [Tooltip("패시브 스킬의 장착 가능한 최대 개수")]
+    [SerializeField] private int maxPassiveCount = 4;                           // 패시브 스킬 최대 장착 개수
+    [Tooltip("장착한 패시브 스킬들")]
+    [SerializeField] private List<SkillInstance> equippedPassives = new();      // 장착한 패시브 스킬들
+    [Header("모든 스킬들")]
+    [SerializeField] private List<SkillInstance> allSkillList = new();          // 모든 스킬 리스트
 
-    private readonly Dictionary<int, SkillInstance> allSkillDictionary = new();     // 모든 스킬 딕셔너리
+    private readonly Dictionary<int, SkillInstance> allSkillDictionary          // 모든 스킬 딕셔너리
+                                                                    = new();
 
-    public event Action OnActiveSkillsChanged;                                      // 액티브 스킬 변경 이벤트 변수
-    public event Action<SkillInstance> OnSkillEnhanced;                             // 스킬 강화 이벤트 변수
+    public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
+    public event Action<SkillInstance> OnSkillEnhanced;                         // 스킬 강화 이벤트 변수
 
     public int MaxActiveCount => maxActiveCount;
 
@@ -219,7 +224,7 @@ public class SkillSystemModel
     public void ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
     {
         // 해당 슬롯이 비어있다면
-        if (equippedActives[(int)slot] == null)
+        if (equippedActives[(int)slot] == null || equippedActives[(int)slot].Data == null)
         {
             Debug.Log($"[Skill] 실행할 액티브 스킬 없음 => 입력 - 슬롯 : {slot.ToKoreanString()}");
             return;
@@ -232,16 +237,15 @@ public class SkillSystemModel
     // 액티브 스킬들 시간 진행 함수
     public void TickActiveSkills(float time)
     {
-        // 액티브 스킬 최대 장착 개수만큼
-        for(int i = 0; i < maxActiveCount; i++)
+        // 장착된 액티브 스킬들의 수만큼
+        foreach(var skill in equippedActives)
         {
-            // 비어있는 칸이라면
-            if (equippedActives[i] == null)
-                Debug.Log($"[Skill] 시간 진행 실패 => 슬롯 : {i + 1}(비어있음)");
-            // 비어있지 않다면
-            else
-                // 시간 진행
-                equippedActives[i].Tick(time);
+            // 해당 슬롯이 비어있다면
+            if (skill == null || skill.Data == null)
+                continue;
+
+            // 시간 진행
+            skill.Tick(time);
         }
     }
 
@@ -274,7 +278,7 @@ public class SkillSystemModel
         else if (equippedActives[(int)slot]?.Data.Id == id)
             result = true;
         // 슬롯이 비어있다면
-        else if (equippedActives[(int)slot] == null)
+        else if (equippedActives[(int)slot] == null || equippedActives[(int)slot].Data == null)
         {
             // 해당 슬롯에 변경할 스킬 저장
             equippedActives[(int)slot] = skill;

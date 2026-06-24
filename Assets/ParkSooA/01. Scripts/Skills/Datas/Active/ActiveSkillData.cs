@@ -5,8 +5,10 @@ using System.Collections.Generic;
 // 액티브 스킬 정보
 public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
 {
-    [SerializeField] private GameObject weapon;                                     // 무기 프리팹
-    [SerializeField] private List<GameObject> effects;                              // 효과 프리팹들
+    [Header("무기 외형")]
+    [SerializeField] private GameObject weapon;                                     // 무기 외형
+    [Header("효과 외형들")]
+    [SerializeField] private List<GameObject> effects;                              // 효과 외형들
 
     public GameObject Weapon => weapon;
     public IReadOnlyList<GameObject> Effects => effects;

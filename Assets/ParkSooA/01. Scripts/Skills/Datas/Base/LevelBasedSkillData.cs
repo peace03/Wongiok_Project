@@ -4,7 +4,8 @@ using System.Collections.Generic;
 // 레벨이 있는 스킬 기본 정보
 public abstract class LevelBasedSkillData<T> : BaseSkillData where T : BaseSkillLevelData
 {
-    [SerializeReference, SubclassSelector] protected List<T> levelDatas;      // 레벨별 정보들
+    [Header("레벨별 스킬 정보들")]
+    [SerializeReference, SubclassSelector] protected List<T> levelDatas;      // 레벨별 스킬 정보들
 
     public IReadOnlyList<T> LevelDatas => levelDatas;
 
