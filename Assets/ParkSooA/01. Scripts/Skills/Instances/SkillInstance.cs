@@ -9,7 +9,7 @@ public class SkillInstance
     [Tooltip("스킬에 대한 데이터")]
     [SerializeField] private BaseSkillData data;                        // 스킬 정보
     [Header("스킬의 상태")]
-    [Tooltip("현재 스킬 상태\n[사용 가능 / 쿨타임 중 / 실행(지속) 중 / 시전(차징) 중]")]
+    [Tooltip("현재 스킬 상태\n[사용 가능 / 쿨타임 중 / 실행 중 / 차징 중]")]
     [SerializeField] private SKILL_STATE state = SKILL_STATE.Ready;     // 스킬 상태
     [Header("스킬의 레벨")]
     [Tooltip("스킬의 현재 레벨\n플레이어가 게임 플레이 중 올릴 수 있는 레벨")]
@@ -20,8 +20,8 @@ public class SkillInstance
     [Header("스킬의 지속 시간")]
     [Tooltip("스킬의 현재 지속 시간\n0에서부터 프레임 단위로 최대 지속 시간까지 올라감")]
     [SerializeField] private float curDuration = 0f;                    // 현재 지속 시간
-    [Header("스킬의 시전(차징) 시간")]
-    [Tooltip("스킬의 현재 시전(차징) 시간\n0에서부터 프레임 단위로 최대 시전(차징) 시간까지 올라감")]
+    [Header("스킬의 차징 시간")]
+    [Tooltip("스킬의 현재 차징 시간\n0에서부터 프레임 단위로 최대 차징 시간까지 올라감")]
     [SerializeField] private float curChargingTime = 0f;                // 현재 차징 시간
 
     private List<SkillInstance> equippedActives;                        // 장착된 액티브 스킬 목록

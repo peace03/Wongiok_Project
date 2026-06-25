@@ -1,4 +1,5 @@
-﻿public enum InitOrder
+﻿// 초기화 순서
+public enum InitOrder
 {
     Player = 0,
     Skill = 100,

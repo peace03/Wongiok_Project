@@ -70,7 +70,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
             return;
 
         // 슬롯 종류에 따라
-        switch (type.slot)
+        switch (type.slotType)
         {
             // A키라면
             case ACTIVE_SKILL_SLOT_TYPE.A:
@@ -90,7 +90,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
             // 그 외라면
             default:
                 Debug.LogWarning($"[Skill] 스킬 실행 실패 => " +
-                                    $"입력 - 슬롯 : {type.slot.ToKoreanString()}", this);
+                                    $"입력 - 슬롯 : {type.slotType.ToKoreanString()}", this);
                 break;
         }
     }

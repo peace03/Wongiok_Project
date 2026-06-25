@@ -7,7 +7,6 @@ using System.Collections.Generic;
 public class AreaSkillLevelData : ActiveSkillLevelData
 {
     [Header("스킬 단계")]
-    [Tooltip("데미지 / 사거리(데미지가 들어갈 스킬 최대 거리) / 각도(데미지가 들어갈 스킬 최대 각도, 최대 180도)")]
     [SerializeField] private List<AreaSkillStageData> stages;       // 스킬 단계
 
     public IReadOnlyList<AreaSkillStageData> Stages => stages;

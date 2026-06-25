@@ -5,13 +5,13 @@ using System.Collections.Generic;
 // 액티브 스킬 정보
 public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
 {
-    [Header("무기 외형")]
-    [SerializeField] private GameObject weapon;                                     // 무기 외형
-    [Header("효과 외형들")]
-    [SerializeField] private List<GameObject> effects;                              // 효과 외형들
+    [Header("무기 프리팹")]
+    [SerializeField] private GameObject weapon;                     // 무기 프리팹
+    [Header("스킬 효과들")]
+    [SerializeField] private List<ActiveSkillEffect> effects;       // 스킬 효과들
 
     public GameObject Weapon => weapon;
-    public IReadOnlyList<GameObject> Effects => effects;
+    public IReadOnlyList<ActiveSkillEffect> Effects => effects;
 
     // 객체 생성 함수
     public override SkillInstance CreateInstance(GameObject owner) => new(owner, this);

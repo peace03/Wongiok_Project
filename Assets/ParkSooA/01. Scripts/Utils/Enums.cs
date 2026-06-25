@@ -12,6 +12,17 @@ public enum CHAPTER_TYPE
     Second          // 두번째
 }
 
+// 액티브 스킬 이펙트 종류
+public enum ACTIVE_SKILL_EFFECT_TYPE
+{
+    ChargingEffect,     // 차징 이펙트
+    MuzzleEffect,       // 총구 이펙트
+    TrailEffect,        // 궤적 이펙트
+    MainEffect,         // 메인(발사체, 영역) 이펙트
+    TargetEffect,       // 타겟(과녁) 이펙트
+    HitEffect           // 타격/피격 이펙트
+}
+
 // 패시브 발동 조건 종류
 public enum PASSIVE_TRIGGER_TYPE
 {
@@ -47,8 +58,8 @@ public enum SKILL_STATE
 {
     Ready,          // 사용 가능
     CoolTime,       // [사용 후] 쿨타임 중
-    Executing,      // 실행 중(지속 사용 중)
-    Charging        // [사용 전] 충전 중
+    Executing,      // 실행 중
+    Charging        // [사용 전] 차징 중
 }
 
 // 액티브 스킬 슬롯 종류
