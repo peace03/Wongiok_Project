@@ -28,7 +28,7 @@ public class BulletFactory : MonoBehaviour, IInitializable
         var obj = bullets.Get();
 
         // 총알 프리팹이 없다면
-        if(obj == null)
+        if (obj == null)
         {
             Debug.LogError($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 프리팹 : 없음", this);
             return null;

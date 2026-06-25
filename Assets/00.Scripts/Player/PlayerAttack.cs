@@ -14,7 +14,7 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private LayerMask ownerLayer;
 
     // Bullet 원본에 넘길 관통 횟수입니다.
-    [SerializeField] private int penetrationCount = 1;
+    [SerializeField] private int penetrationCount = 0;
 
     // 공격력 계산을 위한 플레이어 스탯 컴포넌트입니다.
     private PlayerStatus playerStatus;
