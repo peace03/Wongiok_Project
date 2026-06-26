@@ -29,7 +29,7 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
     public override float GetDamage(int stage = 1) => damage;
 
     // 스킬 효과 적용 함수
-    public override void ApplyEffect(GameObject owner, IReadOnlyList<StatAdjustment> prevStats)
+    public override void ApplyEffect(GameObject owner, int id, IReadOnlyList<StatAdjustment> prevStats)
     {
         // 소유자가 없다면
         if(owner == null)
@@ -46,6 +46,6 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
         // 발사체 스킬 인터페이스가 있다면
         else
             // 스킬 실행
-            executer.ExecuteSkill(this);
+            executer.ExecuteSkill(id, this);
     }
 }

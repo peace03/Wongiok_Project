@@ -4,7 +4,7 @@ using UnityEngine.Pool;
 public class Item : MonoBehaviour, IPoolable
 {
     private int id;
-    private string name;
+    private string itemName;
     private string desc;
     private IObjectPool<GameObject> returnRef;      // 반납할 오브젝트 풀링 주소
 
@@ -15,7 +15,7 @@ public class Item : MonoBehaviour, IPoolable
     public void Init(int id, string name, string desc)
     {
         this.id = id;
-        this.name = name;
+        itemName = name;
         this.desc = desc;
     }
 

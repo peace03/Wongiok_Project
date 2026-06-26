@@ -7,8 +7,8 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
 {
     [Header("무기 프리팹")]
     [SerializeField] private GameObject weapon;                     // 무기 프리팹
-    [Header("스킬 효과들")]
-    [SerializeField] private List<ActiveSkillEffect> effects;       // 스킬 효과들
+    [Header("스킬 이펙트들")]
+    [SerializeField] private List<ActiveSkillEffect> effects;       // 스킬 이펙트들
 
     public GameObject Weapon => weapon;
     public IReadOnlyList<ActiveSkillEffect> Effects => effects;

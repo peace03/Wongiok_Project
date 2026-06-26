@@ -24,10 +24,10 @@ public class SkillInstance
     [Tooltip("스킬의 현재 차징 시간\n0에서부터 프레임 단위로 최대 차징 시간까지 올라감")]
     [SerializeField] private float curChargingTime = 0f;                // 현재 차징 시간
 
-    private List<SkillInstance> equippedActives;                        // 장착된 액티브 스킬 목록
-    private List<SkillInstance> equippedPassives;                       // 장착된 패시브 스킬 목록
+    [NonSerialized] private List<SkillInstance> equippedActives;        // 장착된 액티브 스킬 목록
+    [NonSerialized] private List<SkillInstance> equippedPassives;       // 장착된 패시브 스킬 목록
 
-    private readonly GameObject owner;                                  // 스킬 소유자
+    [NonSerialized] private readonly GameObject owner;                  // 스킬 소유자
 
     public BaseSkillData Data => data;
     public int CurLevel => curLevel;
@@ -144,8 +144,13 @@ public class SkillInstance
         }
         // 차징 상태라면
         else if (IsCharging)
+        {
             // 현재 차징 시간 초기화
             curChargingTime = 0f;
+            // 차징 이펙트 실행 이벤트 발행
+            EventBus<ExecuteActiveSkillEffect>.Publish(
+                new ExecuteActiveSkillEffect(data.Id, ACTIVE_SKILL_EFFECT_TYPE.Charging));
+        }
     }
 
     // 스킬 시간 진행 함수

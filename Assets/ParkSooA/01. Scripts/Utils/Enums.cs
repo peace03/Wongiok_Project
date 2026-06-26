@@ -15,12 +15,12 @@ public enum CHAPTER_TYPE
 // 액티브 스킬 이펙트 종류
 public enum ACTIVE_SKILL_EFFECT_TYPE
 {
-    ChargingEffect,     // 차징 이펙트
-    MuzzleEffect,       // 총구 이펙트
-    TrailEffect,        // 궤적 이펙트
-    MainEffect,         // 메인(발사체, 영역) 이펙트
-    TargetEffect,       // 타겟(과녁) 이펙트
-    HitEffect           // 타격/피격 이펙트
+    Charging,       // 차징 이펙트
+    Muzzle,         // 총구 이펙트
+    Trail,          // 궤적 이펙트
+    Main,           // 메인(발사체, 영역) 이펙트
+    Target,         // 타겟(과녁) 이펙트
+    Hit             // 타격/피격 이펙트
 }
 
 // 패시브 발동 조건 종류

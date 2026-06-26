@@ -18,7 +18,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
     public override IReadOnlyList<StatAdjustment> GetAppliedStats() => appliedStats;
 
     // 스킬 효과 적용 함수
-    public override void ApplyEffect(GameObject owner, IReadOnlyList<StatAdjustment> prevStats)
+    public override void ApplyEffect(GameObject owner, int id, IReadOnlyList<StatAdjustment> prevStats)
     {
         // 스탯이 없다면
         if (!owner.TryGetComponent<PlayerStatus>(out var trgStat))
@@ -36,7 +36,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         foreach (var stat in appliedStats)
         {
             // 변화량 구하기
-            amount = stat.modifyType == MODIFY_TYPE.Addition ? stat.amount : -stat.amount;
+            amount = stat.modify == MODIFY_TYPE.Addition ? stat.amount : -stat.amount;
 
             // 이전 레벨 스탯이 있다면
             if(prevStats != null)
@@ -47,10 +47,10 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 // 바꿨던 스탯의 수만큼
                 foreach(var prev in prevStats)
                     // 같은 스탯을 찾았다면
-                    if (prev.statType == stat.statType)
+                    if (prev.stat == stat.stat)
                     {
                         // 변화량 구하기
-                        prevAmount = prev.modifyType == MODIFY_TYPE.Addition ? prev.amount : -prev.amount;
+                        prevAmount = prev.modify == MODIFY_TYPE.Addition ? prev.amount : -prev.amount;
                         break;
                     }
 
@@ -61,7 +61,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
             }
 
             // 스탯 종류에 따라서
-            switch (stat.statType)
+            switch (stat.stat)
             {
                 // 체력이라면
                 case STAT_TYPE.Health:
@@ -104,10 +104,10 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         foreach (var stat in appliedStats)
         {
             // 변화량 구하기
-            amount = stat.modifyType == MODIFY_TYPE.Addition ? -stat.amount : stat.amount;
+            amount = stat.modify == MODIFY_TYPE.Addition ? -stat.amount : stat.amount;
 
             // 스탯 종류에 따라서
-            switch (stat.statType)
+            switch (stat.stat)
             {
                 // 체력이라면
                 case STAT_TYPE.Health:

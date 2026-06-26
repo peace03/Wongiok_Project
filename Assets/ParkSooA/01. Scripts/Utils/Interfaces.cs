@@ -1,23 +1,35 @@
 ﻿using UnityEngine;
 using UnityEngine.Pool;
 
-// 발사체 스킬 인터페이스
+/// <summary>
+/// 발사체 액티브 스킬 인터페이스
+/// </summary>
 public interface IProjectileSkill
 {
-    // 스킬 실행 함수
-    public void ExecuteSkill(ProjectileSkillLevelData skillData);
+    /// <summary>
+    /// 발사체 액티브 스킬 실행 함수
+    /// </summary>
+    public void ExecuteSkill(int id, ProjectileSkillLevelData skillData);
 }
 
-// 영역 스킬 인터페이스
+/// <summary>
+/// 영역 액티브 스킬 인터페이스
+/// </summary>
 public interface IAreaSkill
 {
-    // 스킬 실행 함수
-    public void ExecuteSkill(AreaSkillLevelData skillData);
+    /// <summary>
+    /// 영역 액티브 스킬 실행 함수
+    /// </summary>
+    public void ExecuteSkill(int id, AreaSkillLevelData skillData);
 }
 
-// 오브젝트 풀 인터페이스
+/// <summary>
+/// 오브젝트 풀 인터페이스
+/// </summary>
 public interface IPoolable
 {
-    // 오브젝트 풀 주소 설정 함수
+    /// <summary>
+    /// 오브젝트 풀 주소 설정 함수
+    /// </summary>
     public void SetPoolRef(IObjectPool<GameObject> poolRef);
 }

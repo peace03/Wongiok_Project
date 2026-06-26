@@ -11,7 +11,7 @@ public abstract class LevelBasedSkillData<T> : BaseSkillData where T : BaseSkill
 
     // 스킬 사용 함수
     public override void ExecuteSkill(GameObject owner, int level)
-        => GetLevelData(level)?.ApplyEffect(owner, level > 1 ? GetLevelData(level - 1)?.GetAppliedStats() : null);
+        => GetLevelData(level)?.ApplyEffect(owner, Id, level > 1 ? GetLevelData(level - 1)?.GetAppliedStats() : null);
 
     // 스킬 취소 함수
     public override void CancelSkill(GameObject owner, int level) => GetLevelData(level)?.RemoveEffect(owner);
