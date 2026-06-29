@@ -2,7 +2,7 @@ public enum State
 {
     Spawn, Idle, Attack, Ultimate, Groggy, Defeated
 }
-public enum AttackType { A, B, C, C_2 }
+public enum AttackType { A, B, C, C_2, D }
 //애니메이션 transition 번호
 public enum Animation 
 { 

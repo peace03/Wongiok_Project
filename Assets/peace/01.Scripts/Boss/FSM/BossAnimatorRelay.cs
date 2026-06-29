@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//SpinShard용이었음
 //OnAnimatorMove()는 Animator가 붙어있는 오브젝트 내에서 실행을 해줘야하기 때문에
 //해당 메서드에서 돌려야하는 메서드를 대신 호출해준다.
 public class BossAnimatorRelay : MonoBehaviour, IInitializable

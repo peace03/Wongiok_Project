@@ -10,10 +10,11 @@ public class BossStatusData
     //[SerializeField] private Stat moveSpeed;                //이동속도 (speed값이 많이서 필요없는듯?)
     [SerializeField] private Stat_Y attackSpeed;              //공속 배율
     [SerializeField] private Stat_Y telegraphSpeed;           //사전 신호 표시 시간 배율
-    [SerializeField] private Stat_Y attackAPower;             //패턴A 공격력
-    [SerializeField] private Stat_Y attackBPower;             //패턴B 공격력
-    [SerializeField] private Stat_Y attackCPower;             //패턴C 공격력
-    [SerializeField] private Stat_Y attackDPower;             //궁극기 공격력
+    [Tooltip("공격력 퍼센티지")][SerializeField] private Stat_Y attackAPower;      //패턴A 공격력
+    [Tooltip("공격력 퍼센티지")][SerializeField] private Stat_Y attackBPower;      //패턴B 공격력
+    [Tooltip("공격력 퍼센티지")][SerializeField] private Stat_Y attackCPower;      //패턴C 공격력
+    [Tooltip("공격력 퍼센티지")][SerializeField] private Stat_Y attackC_2Power;    //패턴C 공격력
+    [Tooltip("공격력 퍼센티지")][SerializeField] private Stat_Y attackDPower;      //궁극기 공격력
     [Header("궁극기 체력 임계치")]
     [SerializeField] private float[] hpThresholds;            //궁극기 체력 임계치
     int index = 0;                          //궁극기 임계치 인덱스(인덱스 마지막은 0으로)
@@ -45,6 +46,7 @@ public class BossStatusData
     public void SubCurrentHP(float amount)
     {
         currentHP -= amount;
+        //Debug.Log(currentHP);
         if (currentHP < 0) currentHP = 0f;  //사망 검사
         if(currentHP < maxHP.FinalValue * hpThresholds[index])  //궁극기 체력 임계치 검사
         {
@@ -53,14 +55,15 @@ public class BossStatusData
         }
     }
 
-    public float GetAtkPower(AttackType type)
+    public float GetAtkPower(AttackType type, float playerMaxHP)
     {
         return type switch
         {
-            AttackType.A => attackAPower.FinalValue,
-            AttackType.B => attackBPower.FinalValue,
-            AttackType.C => attackCPower.FinalValue,
-            AttackType.C_2 => attackCPower.FinalValue
+            AttackType.A => attackAPower.FinalValue / 100 * playerMaxHP,
+            AttackType.B => attackBPower.FinalValue / 100 * playerMaxHP,
+            AttackType.C => attackCPower.FinalValue / 100 * playerMaxHP,
+            AttackType.C_2 => attackC_2Power.FinalValue / 100 * playerMaxHP,
+            AttackType.D => attackDPower.FinalValue / 100 * playerMaxHP
         };
     }
 }

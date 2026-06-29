@@ -2,13 +2,17 @@ using UnityEngine;
 
 public class BossStatus : MonoBehaviour, IInitializable
 {
+    public int Priority => (int)InitOrder.Boss;
+
     [SerializeField] private BossStatusData status;
 
-    public int Priority => (int)InitOrder.Boss;
+    private float playerMaxHP; //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
 
     public void Init()
     {
         Debug.Log($"{Priority}번 BossStatus의 Init()호출");
+        //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
+        playerMaxHP = 120;
         status.ResetAllModifiers(); //계산식 먼저 초기화
         status.Init();
         TestPrint();
@@ -22,7 +26,7 @@ public class BossStatus : MonoBehaviour, IInitializable
 
     public float GetAtkPower(AttackType type)
     {
-        return status.GetAtkPower(type);
+        return status.GetAtkPower(type, playerMaxHP);
     }
 
     public void TestPrint()

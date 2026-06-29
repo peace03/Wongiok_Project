@@ -870,6 +870,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6bcae08499e6b043a9cdce377433944, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatus_Y
+  maxHP:
+    baseValue: 0
 --- !u!54 &581796122
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -878,7 +880,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 581796115}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 0.1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -897,6 +899,73 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 120
   m_CollisionDetection: 0
+--- !u!1 &594183190
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 594183191}
+  - component: {fileID: 594183193}
+  - component: {fileID: 594183192}
+  m_Layer: 0
+  m_Name: UltimateCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &594183191
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 594183190}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1650632859}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &594183192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 594183190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9023e3275c04e314b8066121a31744de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossHitBox
+  AtkType: 4
+--- !u!65 &594183193
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 594183190}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 2, y: 1, z: 3}
+  m_Center: {x: -1, y: 0, z: 0}
 --- !u!95 &624802513 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
@@ -1000,8 +1069,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1034156362}
   - component: {fileID: 1034156361}
+  - component: {fileID: 1034156363}
+  - component: {fileID: 1034156365}
+  - component: {fileID: 1034156364}
   m_Layer: 0
-  m_Name: Bootstrapper_Boss
+  m_Name: System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1034,6 +1106,83 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1034156363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034156360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 949915f3fba805b4fa8bc28d0c8b6575, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitStopManager
+--- !u!114 &1034156364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034156360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a66c1841ba29db4eaf34781858b5534, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraShakeManager
+--- !u!114 &1034156365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034156360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseSource
+  ImpulseDefinition:
+    ImpulseChannel: 1
+    ImpulseShape: 2
+    CustomImpulseShape:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ImpulseDuration: 0.2
+    ImpulseType: 0
+    DissipationRate: 0.25
+    RawSignal: {fileID: 0}
+    AmplitudeGain: 1
+    FrequencyGain: 1
+    RepeatMode: 0
+    Randomize: 1
+    TimeEnvelope:
+      AttackShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      DecayShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      AttackTime: 0
+      SustainTime: 0.2
+      DecayTime: 0.7
+      ScaleWithImpact: 1
+      HoldForever: 0
+    ImpactRadius: 100
+    DirectionMode: 0
+    DissipationMode: 2
+    DissipationDistance: 100
+    PropagationSpeed: 343
+  DefaultVelocity: {x: 0, y: -1, z: 0}
 --- !u!1 &1635566595 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
@@ -1107,13 +1256,15 @@ MonoBehaviour:
     telegraphSpeed:
       baseValue: 0
     attackAPower:
-      baseValue: 10
-    attackBPower:
       baseValue: 15
+    attackBPower:
+      baseValue: 25
     attackCPower:
-      baseValue: 0
+      baseValue: 30
+    attackC_2Power:
+      baseValue: 15
     attackDPower:
-      baseValue: 0
+      baseValue: 30
     hpThresholds:
     - 0.7
     - 0.5
@@ -1160,6 +1311,7 @@ Transform:
   - {fileID: 1756871975}
   - {fileID: 102180173}
   - {fileID: 2020555812}
+  - {fileID: 594183191}
   m_Father: {fileID: 769151241}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1650632860
@@ -1189,6 +1341,7 @@ MonoBehaviour:
   anim: {fileID: 624802513}
   spawnPos: {fileID: 415502605}
   playerPos: {fileID: 581796119}
+  HitStopFrame: 30
   idleDurationTime: 1.5
   move_idleSpeed: 3
   move_idleRange: 3
@@ -1197,10 +1350,14 @@ MonoBehaviour:
   enrangedAtkSpeed_Mul: 1.5
   A_ChaseSpeed: 15
   A_ChasePos: {x: 1.5, y: 0, z: 0}
+  A_attackDuration: 1
   A_postAtkDelay: 3
+  A_parryStunDuration: 0.5
   B_ChaseSpeed: 15
   B_ChasePos: {x: 1.5, y: 0, z: 0}
   B_postAtkDelay: 3
+  C_ChaseSpeed: 15
+  C_ChasePos: {x: 6, y: 0, z: 0}
   C_postAtkDelay: 3
   UltimateChaseSpeed: 15
   UltimateChasePos: {x: 1.5, y: 0, z: 0}
@@ -1249,11 +1406,13 @@ MonoBehaviour:
   - {fileID: 1756871976}
   - {fileID: 102180174}
   - {fileID: 2020555814}
+  - {fileID: 594183193}
   defaultPos:
   - {x: -1, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0.5, z: 0}
   - {x: 0, y: 0.5, z: 0}
+  - {x: -1, y: 0, z: 0}
 --- !u!1 &1756871974
 GameObject:
   m_ObjectHideFlags: 0

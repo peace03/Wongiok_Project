@@ -10,30 +10,45 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 
     [Header("Animator")]
     [SerializeField] private Animator anim;
+    
     [Header("위치")]
-    [SerializeField] private Transform spawnPos;
-    [SerializeField] private Transform playerPos;
+    [Tooltip("보스 스폰 위치")][SerializeField] private Transform spawnPos;
+    [Tooltip("플레이어 위치")][SerializeField] private Transform playerPos;
+
+    [Header("공통")]
+    [SerializeField] private int HitStopFrame;
+    
     [Header("Idle 상태")]
     [SerializeField] private float idleDurationTime;//idle 정지상태 지속시간
-    [Min(0)] [SerializeField] private float move_idleSpeed;
-    [Min(0)] [SerializeField] private float move_idleRange;  //이동가능 범위
+    [Tooltip("이동속도")][Min(0)] [SerializeField] private float move_idleSpeed;
+    [Tooltip("목표 좌표 근처 이동 가능한 범위")][Min(0)] [SerializeField] private float move_idleRange;  //이동가능 범위
     [Min(3)] [SerializeField] private float move_idlePos;    //플레이어 기준 이동범위 중심
+    
     [Header("Enranged 상태")]
     [SerializeField] private float durationEnranged; //지속시간
     [SerializeField] private float enrangedAtkSpeed_Mul; //공격속도
+    
     [Header("AttackA 상태")]
     [SerializeField] private float A_ChaseSpeed;
     [SerializeField] private Vector3 A_ChasePos;
-    [SerializeField] private float A_postAtkDelay;
+    [Tooltip("공격 발동 시간")][SerializeField] private float A_attackDuration;
+    [Tooltip("후딜 시간")][SerializeField] private float A_postAtkDelay;
+    [Tooltip("패링 시 보스 경직 시간")][SerializeField] private float A_parryStunDuration;
+    
     [Header("AttackB 상태")]
     [SerializeField] private float B_ChaseSpeed;
     [SerializeField] private Vector3 B_ChasePos;
     [SerializeField] private float B_postAtkDelay;
+    
     [Header("AttackC 상태")]
-    [SerializeField] private float C_postAtkDelay;
+    [SerializeField] private float C_ChaseSpeed;
+    [SerializeField] private Vector3 C_ChasePos;
+    [Tooltip("후딜 시간")][SerializeField] private float C_postAtkDelay;
+    
     [Header("Ultimate 상태")]
     [SerializeField] private float UltimateChaseSpeed;
     [SerializeField] private Vector3 UltimateChasePos;
+    
     [Header("Groggy 상태")]
     [SerializeField] private float groggyDuration; //그로기 지속시간
 
@@ -43,6 +58,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public bool IsParryed => isParryed;
     public bool IsEnranged => isEnranged;
 
+    private BossStatus bossStatus;
     private Transform bossSkin;
     private Rigidbody rb;
     private AnimatorStateInfo animState;
@@ -98,6 +114,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 
     public void Init()
     {
+        bossStatus = ServiceLocator_Y.Get<BossStatus>();
         bossSkin = transform.GetChild(0).transform;
         rb = GetComponent<Rigidbody>();
         Init_BT();
@@ -121,7 +138,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             new StatefulSequence(new List<Node>
             {
                 new ConditionLeaf(() => isParryed),
-                new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
+                new Leaf(() =>
+                {
+                    EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
+                    return NodeState.Success;
+                }),
+                new Leaf(() => PlayAnim_Speed((int)Animation.Parry, A_parryStunDuration)),
                 new Leaf(() => 
                 {
                     Parryed();
@@ -151,7 +173,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new StatefulSequence(new List<Node>
                     {
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
-                        new Leaf(() => PlayAnim_Speed((int)Animation.AttackA, 0f)), //공격 애님 실행
+                        new Leaf(() => PlayAnim_Speed((int)Animation.AttackA, A_attackDuration)), //공격 애님 실행
                         new Leaf(() => {
                             attackDone = true;
                             return NodeState.Success;
@@ -177,10 +199,17 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             new StatefulSequence(new List<Node>
             {
                 new ConditionLeaf(() => isParryed),
+                new Leaf(() => 
+                {
+                    EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
+                    return NodeState.Success;
+                }),
                 new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
                 new Leaf(() =>
                 {
-                    Parryed();  
+                    Parryed();
+                    
+                    bossStatus.TakeDamage(30); //패링시 파편반사로 인한 데미지
                     SetStateDone(true);
                     return NodeState.Success;
                 })
@@ -192,7 +221,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => chaseDone), //추격이 끝났는가? -> 다음 시퀀스
-                    new Leaf(() => Chase(A_ChasePos, A_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
+                    new Leaf(() => Chase(B_ChasePos, B_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
                 }),
                 //사전신호
                 new Sequence(new List<Node>
@@ -222,7 +251,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() =>
                     {
                         UpdateFacing();
-                        return PlayAnim_Time((int)Animation.Idle, A_postAtkDelay); //Idle 애님 실행
+                        return PlayAnim_Time((int)Animation.Idle, B_postAtkDelay); //Idle 애님 실행
                     }),
                     new Leaf(() => SetStateDone(true))
                 })
@@ -234,6 +263,17 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             //공격 로직
             new Sequence(new List<Node>
             {
+                //추격 실렉터
+                new Selector(new List<Node>
+                {
+                    new ConditionLeaf(() => chaseDone), //추격이 끝났는가? -> 다음 시퀀스
+                    new Leaf(() => //사정거리 안에 있으면 추격안함
+                    {
+                        if(Math.Abs(Distance) > C_ChasePos.x) return NodeState.Failure;
+                        else { chaseDone = true; return NodeState.Success; }
+                    }),
+                    new Leaf(() => Chase(C_ChasePos, C_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
+                }),
                 //사전신호
                 new Sequence(new List<Node>
                 {
@@ -285,6 +325,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             //공격 로직
             new Sequence(new List<Node>
             {
+                //공격 타입 설정
+                new Leaf(() => {attackType = AttackType.D; return NodeState.Success; }),
                 //추격
                 new Selector(new List<Node>
                 {
@@ -309,6 +351,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             new Sequence(new List<Node>
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate1, 0f)), //나중에 애니메이션 변경
+                                new Leaf(() => { EventBus<AttackFinish>.Publish(default); return NodeState.Success; }), //중복공격 초기화
                                 new Leaf(() => { comboStep++; return NodeState.Success; })
                             }),
                         }),
@@ -319,6 +362,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             new Sequence(new List<Node>
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate2, 0f)), //나중에 애니메이션 변경
+                                new Leaf(() => { EventBus<AttackFinish>.Publish(default); return NodeState.Success; }), //중복공격 초기화
                                 new Leaf(() => { comboStep++; return NodeState.Success; }),
                             }),
                         }),
@@ -329,6 +373,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             new Sequence(new List<Node>
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate3, 0f)), //나중에 애니메이션 변경
+                                new Leaf(() => { EventBus<AttackFinish>.Publish(default); return NodeState.Success; }), //중복공격 초기화
                                 new Leaf(() => { comboStep++; return NodeState.Success; }),
                             }),
                         }),
@@ -497,9 +542,13 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public AttackType GetAttackType() { return attackType; }
     public Node GetAttackBT()
     {
-        //while (attackType == beforeType) attackType = (AttackType)Random.Range(0, 2);
-        //beforeType = attackType;
-        attackType = AttackType.C;
+        do
+        {
+            attackType = (AttackType)Random.Range(0, 3);
+        }
+        while (attackType == beforeType);
+        beforeType = attackType;
+        //attackType = AttackType.C;
         Debug.Log($"{attackType} 공격 실행");
         switch (attackType)
         {
@@ -587,6 +636,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         if(animState.normalizedTime >= 0.95f)
         {
             isJumping = false;
+            attackType = AttackType.C;
             return NodeState.Success;
         }
         return NodeState.Running; //아직 공중에 있음

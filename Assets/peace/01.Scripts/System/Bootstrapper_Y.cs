@@ -5,11 +5,12 @@ using System;
 //각자 스크립트 초기화 순서 정해줄 때 사용
 public enum InitOrder
 {
-    Player = 0,
-    Skill = 100,
-    Mob = 200,
-    Boss = 300,
-    UI = 400
+    System = 0,
+    Player = 100,
+    Skill = 200,
+    Mob = 300,
+    Boss = 400,
+    UI = 500,
 }
 
 public class Bootstrapper_Y : MonoBehaviour

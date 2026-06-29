@@ -11,7 +11,7 @@ public class Test_Y : MonoBehaviour
     private void OnDisable()
     {
         EventBus<CanParryEvent>.action -= SetCanParry;
-        EventBus<UltimateInvoke>.action += SetFalseParry;
+        EventBus<UltimateInvoke>.action -= SetFalseParry;
     }
     private void Update()
     {
