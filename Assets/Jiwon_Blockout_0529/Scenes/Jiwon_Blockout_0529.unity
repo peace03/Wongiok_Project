@@ -1586,14 +1586,6 @@ PrefabInstance:
       propertyPath: bulletFactory
       value: 
       objectReference: {fileID: 1670155723}
-    - target: {fileID: 3986897394805655502, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
-      propertyPath: penetrationCount
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3986897394805655502, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
-      propertyPath: ownerLayer.m_Bits
-      value: 64
-      objectReference: {fileID: 0}
     - target: {fileID: 6195647787250270839, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Name
       value: Player

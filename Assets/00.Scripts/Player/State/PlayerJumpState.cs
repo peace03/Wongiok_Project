@@ -1,10 +1,15 @@
 using UnityEngine;
 
-// 점프 입력으로 실제 점프 힘을 적용하는 짧은 상태입니다.
-// 점프를 시작한 직후 공중 이동 처리는 FallState로 넘깁니다.
+// 점프 입력으로 실제 점프 힘을 적용하는 즉시 상태입니다.
 public class PlayerJumpState : PlayerBaseState
 {
+    #region 생성자
+
     public PlayerJumpState(PlayerController controller) : base(controller) { }
+
+    #endregion
+
+    #region 상태 생명주기
 
     public override void EnterState()
     {
@@ -18,12 +23,14 @@ public class PlayerJumpState : PlayerBaseState
     {
     }
 
+    public override void FixedUpdateState()
+    {
+    }
+
     public override void ExitState()
     {
         Debug.Log("Jump Exit");
     }
 
-    public override void FixedUpdateState()
-    {
-    }
+    #endregion
 }

@@ -1,7 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(PlayerStatus))]
 public class PlayerMovement : MonoBehaviour
 {
     // 실제 이동을 수행하는 Unity CharacterController입니다.

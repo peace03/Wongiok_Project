@@ -1,5 +1,5 @@
 using UnityEngine;
-
+#region 플레이어가 가져야할 필수 스크립트
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerController))]
 [RequireComponent(typeof(PlayerStatus))]
@@ -11,10 +11,11 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerLifeTracker))]
 [RequireComponent(typeof(PlayerExperienceTracker))]
 [RequireComponent(typeof(HitFlashFeedback))]
+#endregion
 public class PlayerInitializer : MonoBehaviour, IInitializable
 {
+    #region 플레이어 초기화 참조 값
     public int Priority => (int)InitOrder.Player;
-
     public PlayerController Controller { get; private set; }
     public PlayerStatus Status { get; private set; }
     public PlayerMovement Movement { get; private set; }
@@ -25,10 +26,11 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
     public PlayerLifeTracker LifeTracker { get; private set; }
     public PlayerExperienceTracker ExperienceTracker { get; private set; }
     public HitFlashFeedback HitFeedback { get; private set; }
+    #endregion
 
+    #region 플레이어 초기화 순서
     public void Init()
     {
-        // 플레이어 루트 초기화는 필수 컴포넌트 보강에서 시작합니다.
         EnsureRequiredComponents();
         CacheReferences();
         RegisterServices();
@@ -49,7 +51,9 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         LifeTracker.PublishInitialLife();
         ExperienceTracker.PublishInitialExperience();
     }
+    #endregion
 
+    #region 플레이어 컴포넌트 확인
     private void EnsureRequiredComponents()
     {
         EnsureComponent<CharacterController>();
@@ -64,7 +68,9 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         EnsureComponent<PlayerExperienceTracker>();
         EnsureComponent<HitFlashFeedback>();
     }
+    #endregion
 
+    #region 플레이어 컴포넌트를 변수에 저장
     private void CacheReferences()
     {
         Controller = GetComponent<PlayerController>();
@@ -78,7 +84,9 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         ExperienceTracker = GetComponent<PlayerExperienceTracker>();
         HitFeedback = GetComponent<HitFlashFeedback>();
     }
+    #endregion
 
+    #region 초기화가 끝난 컴포넌트를 다른곳에서 사용할 수 있게 ServiceLocator에 등록
     private void RegisterServices()
     {
         ServiceLocator.Register(typeof(PlayerInitializer), this);
@@ -93,7 +101,9 @@ public class PlayerInitializer : MonoBehaviour, IInitializable
         ServiceLocator.Register(typeof(PlayerExperienceTracker), ExperienceTracker);
         ServiceLocator.Register(typeof(HitFlashFeedback), HitFeedback);
     }
+    #endregion
 
+    // 해당 컴포넌트가 플레이어 오브젝트에 존재하는지 확인용
     private T EnsureComponent<T>() where T : Component
     {
         T component = GetComponent<T>();

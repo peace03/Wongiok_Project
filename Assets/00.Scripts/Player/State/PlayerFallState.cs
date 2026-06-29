@@ -1,10 +1,15 @@
 using UnityEngine;
 
-// 플레이어가 공중에 떠 있거나 낙하 중일 때의 상태입니다.
-// JumpState는 점프 시작만 맡고, FallState는 중력, 공중 이동, 추가 점프, 공중 대쉬, 착지를 처리합니다.
+// 플레이어가 공중에 있거나 낙하 중일 때의 상태입니다.
 public class PlayerFallState : PlayerBaseState
 {
+    #region 생성자
+
     public PlayerFallState(PlayerController controller) : base(controller) { }
+
+    #endregion
+
+    #region 상태 생명주기
 
     public override void EnterState()
     {
@@ -16,29 +21,13 @@ public class PlayerFallState : PlayerBaseState
         controller.Movement.ApplyGravity();
         controller.Movement.Move(controller.MoveInput);
 
-        if (controller.DashTriggered && controller.Movement.CanDash())
-        {
-            controller.TransitionTo(controller.PlayerDashState); 
-            return;
-        }
+        if (CheckDashTransition()) return;
+        if (CheckJumpTransition()) return;
+        if (CheckGroundTransition()) return;
+    }
 
-        if (controller.JumpTriggered && controller.Movement.CanJump())
-        {
-            controller.TransitionTo(controller.PlayerJumpState); 
-            return;                        
-        }
-
-        if (controller.Movement.IsGrounded && controller.Movement.IsFalling)
-        {
-            if (controller.MoveInput != Vector2.zero)
-            {
-                controller.TransitionTo(controller.PlayerMoveState);
-            }
-            else
-            {
-                controller.TransitionTo(controller.PlayerIdleState);
-            }
-        }
+    public override void FixedUpdateState()
+    {
     }
 
     public override void ExitState()
@@ -46,7 +35,45 @@ public class PlayerFallState : PlayerBaseState
         Debug.Log("Fall Exit");
     }
 
-    public override void FixedUpdateState()
+    #endregion
+
+    #region 상태 전환 체크
+
+    private bool CheckDashTransition()
     {
+        if (controller.DashTriggered && controller.Movement.CanDash())
+        {
+            controller.TransitionTo(controller.PlayerDashState);
+            return true;
+        }
+
+        return false;
     }
+
+    private bool CheckJumpTransition()
+    {
+        if (controller.JumpTriggered && controller.Movement.CanJump())
+        {
+            controller.TransitionTo(controller.PlayerJumpState);
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool CheckGroundTransition()
+    {
+        if (!controller.Movement.IsGrounded || !controller.Movement.IsFalling) return false;
+
+        if (controller.MoveInput != Vector2.zero)
+        {
+            controller.TransitionTo(controller.PlayerMoveState);
+            return true;
+        }
+
+        controller.TransitionTo(controller.PlayerIdleState);
+        return true;
+    }
+
+    #endregion
 }

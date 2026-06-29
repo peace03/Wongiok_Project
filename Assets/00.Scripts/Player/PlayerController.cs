@@ -1,12 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(PlayerMovement))]
-[RequireComponent(typeof(PlayerAttack))]
-[RequireComponent(typeof(PlayerParry))]
-[RequireComponent(typeof(PlayerHealItemInventory))]
 public class PlayerController : MonoBehaviour
 {
+    #region 플레이어 관련 변수, 상태, 참조등
     // 현재 실행 중인 플레이어 상태입니다.
     private PlayerBaseState _currentState;
 
@@ -81,7 +78,7 @@ public class PlayerController : MonoBehaviour
 
     // 현재 상태에서 회복 아이템 사용을 시작할 수 있는지 확인합니다.
     public bool CanUseHealItem => _currentState == null || _currentState.CanUseHealItem;
-
+    #endregion
     private void Awake()
     {
         // 입력 액션과 필수 컴포넌트들을 초기화합니다.

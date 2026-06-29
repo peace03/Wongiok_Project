@@ -1,13 +1,17 @@
 using UnityEngine;
 
-// 플레이어가 사망한 뒤 부활 전까지 모든 조작과 피격을 잠그는 상태입니다.
-// 사망 연출과 UI는 PlayerDeadEvent를 구독한 별도 시스템이 처리합니다.
+// 플레이어가 사망한 뒤 부활하기 전까지 모든 조작과 피격을 막는 상태입니다.
 public class PlayerDeathState : PlayerBaseState
 {
-    // 마지막 사망 정보를 보관해 이후 연출 확장에서 참조할 수 있게 합니다.
+    #region 필드
+
+    // 마지막 사망 정보를 저장해 이후 연출 확장에서 참조할 수 있게 합니다.
     private DeathInfo deathInfo;
 
-    // 사망 상태에서는 모든 플레이어 행동과 추가 피격을 막습니다.
+    #endregion
+
+    #region 상태 권한
+
     public override bool CanAttack => false;
     public override bool CanDash => false;
     public override bool CanParry => false;
@@ -15,11 +19,18 @@ public class PlayerDeathState : PlayerBaseState
     public override bool CanUpdateFacingDirection => false;
     public override bool CanTakeDamage => false;
 
+    #endregion
+
+    #region 생성자
+
     public PlayerDeathState(PlayerController controller) : base(controller) { }
+
+    #endregion
+
+    #region 상태 생명주기
 
     public void SetDeath(DeathInfo info)
     {
-        // 상태 진입 전에 사망 정보를 확정해 둡니다.
         deathInfo = info;
     }
 
@@ -27,13 +38,11 @@ public class PlayerDeathState : PlayerBaseState
     {
         Debug.Log($"Death Enter: {deathInfo.Cause}");
 
-        // 사망 순간에는 기존 점프, 낙하, 넉백 속도를 멈춰 현재 위치에 고정합니다.
         controller.Movement.ResetVerticalVelocity();
     }
 
     public override void UpdateState()
     {
-        // 부활 코루틴이 끝날 때까지 현재 위치에서 멈춰 있습니다.
     }
 
     public override void FixedUpdateState()
@@ -44,4 +53,6 @@ public class PlayerDeathState : PlayerBaseState
     {
         Debug.Log("Death Exit");
     }
+
+    #endregion
 }

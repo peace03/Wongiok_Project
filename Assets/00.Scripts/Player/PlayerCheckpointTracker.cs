@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerCheckpointTracker : MonoBehaviour
 {
+    #region 체크포인트에 사용될 정보들 ( 저장될 스텟, 위치정보등 )
     private bool hasActiveCheckpoint;
 
     private int activeCheckpointNumber;
@@ -19,6 +20,7 @@ public class PlayerCheckpointTracker : MonoBehaviour
     private PlayerHealItemInventory healItemInventory;
 
     private bool isInitialized;
+    #endregion
 
     public bool HasActiveCheckpoint
     {
@@ -63,11 +65,6 @@ public class PlayerCheckpointTracker : MonoBehaviour
             EnsureInitialized();
             return savedHealItemCount;
         }
-    }
-
-    private void Awake()
-    {
-        // 시작 스냅샷 저장은 PlayerInitializer에서 스탯/아이템 초기화 이후 처리합니다.
     }
 
     public void Initialize(PlayerStatus status, PlayerHealItemInventory inventory)

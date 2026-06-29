@@ -23,10 +23,6 @@ public class PlayerStatusData : LivingStatus
 }
 
 // 플레이어는 피격 피드백과 체크포인트 부활 기록을 함께 사용합니다.
-[RequireComponent(typeof(HitFlashFeedback))]
-[RequireComponent(typeof(PlayerCheckpointTracker))]
-[RequireComponent(typeof(PlayerHealItemInventory))]
-[RequireComponent(typeof(PlayerLifeTracker))]
 public class PlayerStatus : MonoBehaviour, IDamageable
 {
     // 피격 직후 입력을 막는 경직 시간입니다.
