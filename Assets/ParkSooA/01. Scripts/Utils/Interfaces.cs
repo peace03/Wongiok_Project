@@ -33,3 +33,14 @@ public interface IPoolable
     /// </summary>
     public void SetPoolRef(IObjectPool<GameObject> poolRef);
 }
+
+/// <summary>
+/// 이펙트 실행자 인터페이스
+/// </summary>
+public interface IEffectExecuter
+{
+    /// <summary>
+    /// 실행 함수
+    /// </summary>
+    public void Execute(float time);
+}

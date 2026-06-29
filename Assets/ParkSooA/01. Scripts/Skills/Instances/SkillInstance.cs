@@ -29,7 +29,9 @@ public class SkillInstance
 
     [NonSerialized] private readonly GameObject owner;                  // 스킬 소유자
 
-    public BaseSkillData Data => data;
+    public BaseSkillData BaseData => data;
+    public ActiveSkillData ActiveData => IsActiveSkill ? data as ActiveSkillData : null;
+    public PassiveSkillData PassiveData => !IsActiveSkill ? data as PassiveSkillData : null;
     public int CurLevel => curLevel;
     // 액티브 스킬 여부
     public bool IsActiveSkill => data.Type == SKILL_TYPE.Active;
@@ -148,8 +150,8 @@ public class SkillInstance
             // 현재 차징 시간 초기화
             curChargingTime = 0f;
             // 차징 이펙트 실행 이벤트 발행
-            EventBus<ExecuteActiveSkillEffect>.Publish(
-                new ExecuteActiveSkillEffect(data.Id, ACTIVE_SKILL_EFFECT_TYPE.Charging));
+            EventBus<ExecuteActiveSkillEffect>.Publish(new ExecuteActiveSkillEffect(data.Id,
+                                                                ACTIVE_SKILL_EFFECT_TYPE.Charging, 1f));
         }
     }
 

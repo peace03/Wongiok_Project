@@ -72,14 +72,14 @@ public class SkillSystemPresenter
         {
             Debug.LogError($"[Error | Skill] UI용 데이터 변환 실패 => " +
                             $"입력 - {slot.ToKoreanString()} / 최대 장착 개수 : {model.MaxActiveCount} / " +
-                            $"스킬 : {(skill == null ? "없음" : skill.Data.SkillName)}");
+                            $"스킬 : {(skill == null ? "없음" : skill.BaseData.SkillName)}");
             return default;
         }
 
         // 스킬이 있다면
         if (skill == null)
             // UI용 데이터로 변환해서 반환하기
-            return new(skill.Data.Icon, slot.ToKoreanString(), skill.CurLevel, skill.CoolTimeRatio, skill.IsReady);
+            return new(skill.BaseData.Icon, slot.ToKoreanString(), skill.CurLevel, skill.CoolTimeRatio, skill.IsReady);
         // 스킬이 없다면
         else
             // 스킬 입력 키만 넣어서 반환하기

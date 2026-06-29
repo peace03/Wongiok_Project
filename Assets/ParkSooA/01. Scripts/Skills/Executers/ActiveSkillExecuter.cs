@@ -36,9 +36,9 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         Debug.Log($"[Skill] 발사체 액티브 스킬 실행 => 총 {skillData.ProjectileCount}개");
         // 타겟(과녁) 이펙트 실행 이벤트 발행
-        EventBus<ExecuteActiveSkillEffect>.Publish(new ExecuteActiveSkillEffect(
-                                                    id,  ACTIVE_SKILL_EFFECT_TYPE.Target,
-                                                    GetLastTargetPosition(executePosition, maxDistance)));
+        EventBus<ExecuteActiveSkillEffect>.Publish(new ExecuteActiveSkillEffect(id,
+                                                        ACTIVE_SKILL_EFFECT_TYPE.Target, 1f,
+                                        GetLastTargetPosition(executePosition, maxDistance)));
         // 사격 딜레이 시간 구하기
         fireDelayTime = new WaitForSeconds(skillData.MaxDuration /
             (skillData.ProjectileCount == 0 ? 1 : skillData.ProjectileCount));
@@ -77,7 +77,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             // 제일 마지막 물체가 데미지를 입을 수 있다면
             if (hits[^1].transform.TryGetComponent<IDamageable>(out _))
                 // 콜라이더의 위치 반환
-                return hits[^1].point;
+                return hits[^1].transform.position;
             // 데미지를 입을 수 없다면
             else
                 return null;
@@ -86,7 +86,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 인덱스가 범위 안에 있고 데미지를 입을 수 있는 물체라면
         if (index - 1 >= 0 && hits[index - 1].transform.TryGetComponent<IDamageable>(out _))
             // 콜라이더의 위치 반환
-            return hits[index - 1].point;
+            return hits[index - 1].transform.position;
 
         return null;
     }

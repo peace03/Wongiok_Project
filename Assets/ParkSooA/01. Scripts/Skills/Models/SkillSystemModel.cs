@@ -73,7 +73,7 @@ public class SkillSystemModel
         foreach(var skill in allSkillList)
         {
             // 챕터 1의 스킬이 아니거나, 장착할 액티브 슬롯이 없거나, 장착할 패시브 슬롯이 없다면
-            if (skill.Data.UnlockChapter != CHAPTER_TYPE.First ||
+            if (skill.BaseData.UnlockChapter != CHAPTER_TYPE.First ||
                 (skill.IsActiveSkill && equippedActives.Count >= maxActiveCount) ||
                 (!skill.IsActiveSkill && equippedPassives.Count >= maxPassiveCount))
                 continue;
@@ -83,18 +83,21 @@ public class SkillSystemModel
             {
                 // 액티브 스킬 장착
                 equippedActives.Add(skill);
+                // 액티브 스킬 장착 이벤트 발행
+                EventBus<EquippedActiveSkill>.Publish(new EquippedActiveSkill(skill.ActiveData.Id,
+                                                    skill.ActiveData.Weapon, skill.ActiveData.Effects));
                 // 미장착한 액티브 스킬 리스트에서 제거
                 unequippedActives.Remove(skill);
                 Debug.Log($"[Active | Skill] 스킬 장착 => " +
                             $"위치 : {(equippedActives.Count == 1 ? "A" : equippedActives.Count == 2 ? "S" : "D")}" +
-                            $" / {skill.Data.SkillName}");
+                            $" / {skill.BaseData.SkillName}");
             }
             // 장착할 패시브 슬롯이 있다면
             else if (!skill.IsActiveSkill && equippedPassives.Count < maxPassiveCount)
             {
                 // 패시브 스킬 장착
                 equippedPassives.Add(skill);
-                Debug.Log($"[Passive | Skill] 스킬 장착 => 위치 : {equippedPassives.Count} / {skill.Data.SkillName}");
+                Debug.Log($"[Passive | Skill] 스킬 장착 => 위치 : {equippedPassives.Count} / {skill.BaseData.SkillName}");
             }
         }
 
@@ -224,7 +227,7 @@ public class SkillSystemModel
     public void ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
     {
         // 해당 슬롯이 비어있다면
-        if (equippedActives[(int)slot] == null || equippedActives[(int)slot].Data == null)
+        if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
         {
             Debug.Log($"[Skill] 실행할 액티브 스킬 없음 => 입력 - 슬롯 : {slot.ToKoreanString()}");
             return;
@@ -241,7 +244,7 @@ public class SkillSystemModel
         foreach(var skill in equippedActives)
         {
             // 해당 슬롯이 비어있다면
-            if (skill == null || skill.Data == null)
+            if (skill == null || skill.BaseData == null)
                 continue;
 
             // 시간 진행
@@ -273,15 +276,18 @@ public class SkillSystemModel
                             $"입력 - {slot.ToKoreanString()} / 최대 장착 개수 :{maxActiveCount}");
         // 패시브 스킬이라면
         else if (!skill.IsActiveSkill)
-            Debug.LogError($"[Error | Skill] 패시브 스킬 => 입력 - ID :{id} / {skill.Data.SkillName}");
+            Debug.LogError($"[Error | Skill] 패시브 스킬 => 입력 - ID :{id} / {skill.BaseData.SkillName}");
         // 해당 슬롯에 장착된 스킬이라면
-        else if (equippedActives[(int)slot]?.Data.Id == id)
+        else if (equippedActives[(int)slot]?.BaseData.Id == id)
             result = true;
         // 슬롯이 비어있다면
-        else if (equippedActives[(int)slot] == null || equippedActives[(int)slot].Data == null)
+        else if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
         {
             // 해당 슬롯에 변경할 스킬 저장
             equippedActives[(int)slot] = skill;
+            // 액티브 스킬 장착 이벤트 발행
+            EventBus<EquippedActiveSkill>.Publish(new EquippedActiveSkill(skill.ActiveData.Id,
+                                                skill.ActiveData.Weapon, skill.ActiveData.Effects));
             // 미장착한 액티브 스킬 리스트에서 제거
             unequippedActives.Remove(skill);
             result = true;
@@ -306,6 +312,9 @@ public class SkillSystemModel
             unequippedActives.Add(equippedActives[(int)slot]);
             // 해당 슬롯에 변경할 스킬 저장
             equippedActives[(int)slot] = skill;
+            // 액티브 스킬 장착 이벤트 발행
+            EventBus<EquippedActiveSkill>.Publish(new EquippedActiveSkill(skill.ActiveData.Id,
+                                                skill.ActiveData.Weapon, skill.ActiveData.Effects));
             // 미장착한 액티브 스킬 리스트에서 제거
             unequippedActives.Remove(skill);
             result = true;
@@ -331,7 +340,7 @@ public class SkillSystemModel
             Debug.LogError($"[Error | Skill] 해당 스킬 없음 => 입력 - ID : {id}");
         // 강화가 가능하지 않다면
         else if (!skill.CanEnhance)
-            Debug.LogError($"[Error | Skill] 강화 불가능(최대 레벨) => 입력 - ID :{id} / {skill.Data.SkillName}");
+            Debug.LogError($"[Error | Skill] 강화 불가능(최대 레벨) => 입력 - ID :{id} / {skill.BaseData.SkillName}");
         else
         {
             // 스킬 강화
