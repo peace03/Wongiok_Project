@@ -23,18 +23,18 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private IObjectPool<GameObject> returnRef;              // 반납 오브젝트 풀 주소
 
-    private Coroutine returnCoroutine;                      // 반납 코루틴
-    private WaitForSeconds waitTime;                        // 대기 시간
+    private Coroutine timerCoroutine;                       // 타이머 코루틴
+    private WaitForSeconds returnTime;                      // 반납 시간
 
     private bool startFire = false;                         // 사격 시작 여부
 
-    // 총알 발사
     private void Update()
     {
         // 사격이 시작되지 않았다면
         if (!startFire)
             return;
 
+        // 전방으로 총알 발사
         transform.position += speed * Time.deltaTime * transform.forward;
     }
 
@@ -68,13 +68,13 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void OnDisable()
     {
-        // 반납 코루틴이 비어있지 않다면
-        if(returnCoroutine != null)
+        // 타이머 코루틴이 비어있지 않다면
+        if(timerCoroutine != null)
         {
-            // 반납 중지
-            StopCoroutine(returnCoroutine);
-            // 반납 코루틴 초기화
-            returnCoroutine = null;
+            // 타이머 중지
+            StopCoroutine(timerCoroutine);
+            // 타이머 코루틴 초기화
+            timerCoroutine = null;
         }
     }
 
@@ -89,10 +89,10 @@ public class Bullet : MonoBehaviour, IPoolable
     public void StartFire(Transform origin, LayerMask ownerLayer, float damage,
                                                             int penetrationCount = 0)
     {
-        // 반납 코루틴이 비어있지 않다면
-        if (returnCoroutine != null)
-            // 반납 중지
-            StopCoroutine(returnCoroutine);
+        // 타이머 코루틴이 비어있지 않다면
+        if (timerCoroutine != null)
+            // 타이머 중지
+            StopCoroutine(timerCoroutine);
 
         // 위치, 각도 설정
         transform.SetPositionAndRotation(origin.position, origin.rotation);
@@ -100,10 +100,10 @@ public class Bullet : MonoBehaviour, IPoolable
         SetInfo(ownerLayer, damage, penetrationCount);
         // 사격 시작
         startFire = true;
-        // 대기 시간 구하기
-        waitTime = new WaitForSeconds(duration);
-        // 반납 시작
-        returnCoroutine = StartCoroutine(ReturnRoutine());
+        // 반납 시간 초기화
+        returnTime = new WaitForSeconds(duration);
+        // 타이머 시작
+        timerCoroutine = StartCoroutine(ReturnRoutine());
     }
 
     /// <summary>
@@ -120,16 +120,16 @@ public class Bullet : MonoBehaviour, IPoolable
     }
 
     /// <summary>
-    /// 반납 코루틴 함수
+    /// 타이머 코루틴 함수
     /// </summary>
     private IEnumerator ReturnRoutine()
     {
-        // 대기 시간 기다리기
-        yield return waitTime;
+        // 반납 시간 기다리기
+        yield return returnTime;
         // 사격 종료
         startFire = false;
-        // 반납 코루틴 초기화
-        returnCoroutine = null;
+        // 타이머 코루틴 초기화
+        timerCoroutine = null;
         // 총알 반납
         returnRef.Release(gameObject);
     }

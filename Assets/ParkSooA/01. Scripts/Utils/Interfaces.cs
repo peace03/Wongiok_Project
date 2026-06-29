@@ -40,7 +40,22 @@ public interface IPoolable
 public interface IEffectExecuter
 {
     /// <summary>
-    /// 실행 함수
+    /// 이펙트 실행 함수
     /// </summary>
-    public void Execute(float time);
+    public void ExecuteEffect();
+
+    /// <summary>
+    /// 이펙트 실행 함수(time 초 이후 종료)
+    /// </summary>
+    public void ExecuteEffect(float time);
+
+    /// <summary>
+    /// 이펙트 종료 함수
+    /// </summary>
+    public void StopEffect();
+
+    /// <summary>
+    /// 이펙트 초기화 함수
+    /// </summary>
+    public void ResetEffect();
 }

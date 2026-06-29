@@ -139,6 +139,9 @@ public class SkillInstance
                 return;
             }
 
+            // 차징 이펙트 종료 이벤트 발행
+            EventBus<StopActiveSkillEffect>.Publish(new StopActiveSkillEffect(data.Id,
+                                                                ACTIVE_SKILL_EFFECT_TYPE.Charging));
             // 현재 지속 시간 초기화
             curDuration = 0f;
             // 스킬 실행
@@ -151,7 +154,7 @@ public class SkillInstance
             curChargingTime = 0f;
             // 차징 이펙트 실행 이벤트 발행
             EventBus<ExecuteActiveSkillEffect>.Publish(new ExecuteActiveSkillEffect(data.Id,
-                                                                ACTIVE_SKILL_EFFECT_TYPE.Charging, 1f));
+                                                                ACTIVE_SKILL_EFFECT_TYPE.Charging));
         }
     }
 

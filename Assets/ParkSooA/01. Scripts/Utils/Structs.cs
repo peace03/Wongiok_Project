@@ -72,18 +72,55 @@ public readonly struct ExecuteActiveSkillEffect
 {
     public readonly int id;                                         // 스킬 ID
     public readonly ACTIVE_SKILL_EFFECT_TYPE type;                  // 이펙트 종류
-    public readonly float duration;                                 // 지속 시간
+    public readonly float? duration;                                // 지속 시간
     public readonly Vector3? pos;                                   // 실행 위치
 
     /// <summary>
     /// 실행할 액티브 스킬 이펙트 정보 생성자
     /// </summary>
-    public ExecuteActiveSkillEffect(int id, ACTIVE_SKILL_EFFECT_TYPE type, float duration, Vector3? pos = null)
+    public ExecuteActiveSkillEffect(int id, ACTIVE_SKILL_EFFECT_TYPE type,
+                                    float? duration = null, Vector3? pos = null)
     {
         this.id = id;
         this.type = type;
         this.duration = duration;
         this.pos = pos;
+    }
+}
+
+/// <summary>
+/// 종료할 액티브 스킬 이펙트 정보
+/// </summary>
+public readonly struct StopActiveSkillEffect
+{
+    public readonly int id;                                         // 스킬 ID
+    public readonly ACTIVE_SKILL_EFFECT_TYPE type;                  // 이펙트 종류
+
+    /// <summary>
+    /// 종료할 액티브 스킬 이펙트 정보 생성자
+    /// </summary>
+    public StopActiveSkillEffect(int id, ACTIVE_SKILL_EFFECT_TYPE type)
+    {
+        this.id = id;
+        this.type = type;
+    }
+}
+
+/// <summary>
+/// 초기화할 액티브 스킬 이펙트 정보
+/// </summary>
+public readonly struct ResetActiveSkillEffect
+{
+    public readonly int id;                                         // 스킬 ID
+    public readonly ACTIVE_SKILL_EFFECT_TYPE type;                  // 이펙트 종류
+
+    /// <summary>
+    /// 초기화할 액티브 스킬 이펙트 정보 생성자
+    /// </summary>
+    public ResetActiveSkillEffect(int id, ACTIVE_SKILL_EFFECT_TYPE type)
+    {
+        this.id = id;
+        this.type = type;
     }
 }
 
