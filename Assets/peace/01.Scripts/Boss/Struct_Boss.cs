@@ -30,17 +30,29 @@ public struct BossFacingChangeEvent
 }
 
 //공격 종료 이벤트 (공격 콜라이더가 플레이어 1회만 공격하도록 기억)
-public struct AttackFinish { }
+public struct AttackFinishEvent { }
 
 //궁극기 발동
-public struct UltimateInvoke { }
+public struct UltimateInvokeEvent { }
 
 //SpinShard 공격 장판 스폰
-public struct OnShardHitBox
+public struct OnShardHitBoxEvent
 {
     public Transform pos { get; private set; }
-    public OnShardHitBox(Transform pos)
+    public OnShardHitBoxEvent(Transform pos)
     {
         this.pos = pos;
     }
 }
+
+//보스 체력 변화 이벤트(UI 소통용)
+public struct BossHPChangedEvent
+{
+    public float curHP { get; private set; }
+    public BossHPChangedEvent(float curHP)
+    {
+        this.curHP = curHP;
+    }
+}
+//보스 죽음 이벤트(UI 연출 시작용)
+public struct BossDeadEvent { }

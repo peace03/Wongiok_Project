@@ -18,15 +18,15 @@ public class ShardAreaHitBox : MonoBehaviour
     private void OnEnable()
     {
         box = GetComponent<BoxCollider>();
-        EventBus<OnShardHitBox>.action += SpawnShardbox;
+        EventBus<OnShardHitBoxEvent>.action += SpawnShardbox;
     }
     private void OnDisable()
     {
-        EventBus<OnShardHitBox>.action -= SpawnShardbox;
+        EventBus<OnShardHitBoxEvent>.action -= SpawnShardbox;
     }
 
     //파편 지속데미지 박스 소환
-    public void SpawnShardbox(OnShardHitBox data)
+    public void SpawnShardbox(OnShardHitBoxEvent data)
     {
         curTime = 0f;
         damageTime = 0f;

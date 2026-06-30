@@ -8,15 +8,18 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 {
     public int Priority => (int)InitOrder.Boss + 1;
 
+    #region 인스펙터
     [Header("Animator")]
     [SerializeField] private Animator anim;
     
     [Header("위치")]
     [Tooltip("보스 스폰 위치")][SerializeField] private Transform spawnPos;
     [Tooltip("플레이어 위치")][SerializeField] private Transform playerPos;
+    [Tooltip("이동 가능한 바닥 감지")][SerializeField] private BoxCollider ground;
 
-    [Header("공통")]
-    [SerializeField] private int HitStopFrame;
+    [Header("히트스탑")]
+    [Tooltip("패링시 히트스탑 프레임")][SerializeField] private int HitStopFrame;
+    [Tooltip("히트스탑시 카메라 흔들림 강도")][SerializeField] private float cameraShakeIntensity;
     
     [Header("Idle 상태")]
     [SerializeField] private float idleDurationTime;//idle 정지상태 지속시간
@@ -51,14 +54,16 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     
     [Header("Groggy 상태")]
     [SerializeField] private float groggyDuration; //그로기 지속시간
+    #endregion
 
+    #region 변수
     //공통 사용
     public float Distance => playerPos.position.x - transform.position.x;
     public bool StateDone { get; private set; } //공격 BT 종료 여부
     public bool IsParryed => isParryed;
     public bool IsEnranged => isEnranged;
 
-    private BossStatus bossStatus;
+    public BossStatus bossStatus { get; private set; }
     private Transform bossSkin;
     private Rigidbody rb;
     private AnimatorStateInfo animState;
@@ -104,13 +109,19 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     private int parryCount = 0;
     private int comboStep = 0;
 
+    //Groggy
+    private bool isGroggyAnimDone = false;
+
     //Enranged
     private bool isEnranged = false;    //현재 격노 상태인지
     private float curEnrangedTime = 0;  //현재 격노 타이머
     private float curEnrangedAtkSpeed = 1; //현재 격노 속도
 
-
+    //Move
     private float x, y, z; //Move에 사용될 속도 저장
+    private float groundXMin; //이동 가능지역 최솟값 x
+    private float groundXMax; //이동 가능지역 최대값 x
+    #endregion
 
     public void Init()
     {
@@ -118,6 +129,10 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         bossSkin = transform.GetChild(0).transform;
         rb = GetComponent<Rigidbody>();
         Init_BT();
+
+        //이동가능 x좌표
+        groundXMin = ground.bounds.min.x;
+        groundXMax = ground.bounds.max.x;
         if (move_idleRange >= move_idlePos) move_idleRange = move_idlePos - 0.5f;
     }
 
@@ -140,6 +155,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new ConditionLeaf(() => isParryed),
                 new Leaf(() =>
                 {
+                    EventBus<CameraShakeEvent>.Publish(new CameraShakeEvent(cameraShakeIntensity));
                     EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
                     return NodeState.Success;
                 }),
@@ -201,6 +217,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new ConditionLeaf(() => isParryed),
                 new Leaf(() => 
                 {
+                    EventBus<CameraShakeEvent>.Publish(new CameraShakeEvent(cameraShakeIntensity));
                     EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
                     return NodeState.Success;
                 }),
@@ -239,7 +256,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                         new Leaf(() => PlayAnim_Speed((int)Animation.AttackB, 0f)), //공격 애님 실행
                         new Leaf(() => {
                             if(!isParryCanceled)
-                                EventBus<OnShardHitBox>.Publish(new OnShardHitBox(transform)); //장판 깔아주기
+                                EventBus<OnShardHitBoxEvent>.Publish(new OnShardHitBoxEvent(transform)); //장판 깔아주기
                             attackDone = true;
                             return NodeState.Success;
                         })
@@ -267,11 +284,6 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => chaseDone), //추격이 끝났는가? -> 다음 시퀀스
-                    new Leaf(() => //사정거리 안에 있으면 추격안함
-                    {
-                        if(Math.Abs(Distance) > C_ChasePos.x) return NodeState.Failure;
-                        else { chaseDone = true; return NodeState.Success; }
-                    }),
                     new Leaf(() => Chase(C_ChasePos, C_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
                 }),
                 //사전신호
@@ -313,6 +325,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             new StatefulSequence(new List<Node>
             {
                 new ConditionLeaf(() => isParryed),
+                new Leaf(() =>
+                {
+                    EventBus<CameraShakeEvent>.Publish(new CameraShakeEvent(cameraShakeIntensity));
+                    EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
+                    return NodeState.Success;
+                }),
                 new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
                 new Leaf(() => 
                 {
@@ -351,7 +369,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             new Sequence(new List<Node>
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate1, 0f)), //나중에 애니메이션 변경
-                                new Leaf(() => { EventBus<AttackFinish>.Publish(default); return NodeState.Success; }), //중복공격 초기화
+                                new Leaf(() => { EventBus<AttackFinishEvent>.Publish(default); return NodeState.Success; }), //중복공격 초기화
                                 new Leaf(() => { comboStep++; return NodeState.Success; })
                             }),
                         }),
@@ -362,7 +380,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             new Sequence(new List<Node>
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate2, 0f)), //나중에 애니메이션 변경
-                                new Leaf(() => { EventBus<AttackFinish>.Publish(default); return NodeState.Success; }), //중복공격 초기화
+                                new Leaf(() => { EventBus<AttackFinishEvent>.Publish(default); return NodeState.Success; }), //중복공격 초기화
                                 new Leaf(() => { comboStep++; return NodeState.Success; }),
                             }),
                         }),
@@ -373,7 +391,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             new Sequence(new List<Node>
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate3, 0f)), //나중에 애니메이션 변경
-                                new Leaf(() => { EventBus<AttackFinish>.Publish(default); return NodeState.Success; }), //중복공격 초기화
+                                new Leaf(() => { EventBus<AttackFinishEvent>.Publish(default); return NodeState.Success; }), //중복공격 초기화
                                 new Leaf(() => { comboStep++; return NodeState.Success; }),
                             }),
                         }),
@@ -522,6 +540,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         }
         else    //플레이어가 보스 왼쪽에 위치
             RandomPos = new Vector3(playerPos.position.x - element, 0, 0);
+        RandomPos.x = Mathf.Clamp(RandomPos.x, groundXMin, groundXMax); //이동가능 범위 밖으로 벗어나지 않도록 클램핑
     }
     public void IdleMove() //보스 기준
     {
@@ -574,7 +593,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         }
 
         //물리 이동 및 거리 계산
-        if (Math.Abs(Distance) > pos.x + 0.5)
+        if (Math.Abs(Distance) > pos.x)
         {
             //Debug.Log("오른쪽 호출");
             Move(Math.Sign(Distance) * speed, 0, 0);
@@ -673,14 +692,24 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #region Groggy
     public NodeState PlayAnimGroggy_Time(int num)
     {
-        NodeState state = PlayAnim_Time(num, groggyDuration);
-        if (state == NodeState.Success)
+        if (!isGroggyAnimDone)
         {
+            Debug.Log("그로기 애님 진행중");
+            if (PlayAnim_Time(num, groggyDuration) == NodeState.Success)
+            {
+                isGroggyAnimDone = true;
+                return NodeState.Running;
+            }
+        }
+        //그로기 끝나고 바로 공격해서 이상하다는 피드백 수용
+        else if (PlayAnim_Time((int)Animation.Idle, 1) == NodeState.Success)
+        {
+            Debug.Log("Idle 애님 success");
             isEnranged = true;
             curEnrangedAtkSpeed = enrangedAtkSpeed_Mul;
-            //Debug.Log("격노 시작");
+            return NodeState.Success;
         }
-        return state;
+        return NodeState.Running;
     }
     //Enranged
     public void EnrangedTimer()

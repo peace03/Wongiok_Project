@@ -33,11 +33,11 @@ public class BossController : MonoBehaviour, IInitializable
 
     private void OnEnable()
     {
-        EventBus<UltimateInvoke>.action += SetUltimateState;
+        EventBus<UltimateInvokeEvent>.action += SetUltimateState;
     }
     private void OnDisable()
     {
-        EventBus<UltimateInvoke>.action -= SetUltimateState;
+        EventBus<UltimateInvokeEvent>.action -= SetUltimateState;
     }
 
     private void FixedUpdate()
@@ -58,5 +58,5 @@ public class BossController : MonoBehaviour, IInitializable
         //Debug.Log($"BossController ChangeState({state})실행 완료");
     }
     //궁극기 발동상태 전환
-    public void SetUltimateState(UltimateInvoke data) { ChangeState(State.Ultimate); }
+    public void SetUltimateState(UltimateInvokeEvent data) { ChangeState(State.Ultimate); }
 }

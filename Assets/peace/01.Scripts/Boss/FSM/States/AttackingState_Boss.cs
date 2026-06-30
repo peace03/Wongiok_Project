@@ -35,7 +35,7 @@ public class AttackingState_Boss : BossState
     }
     public override void Exit()
     {
-        EventBus<AttackFinish>.Publish(default);
+        EventBus<AttackFinishEvent>.Publish(default);
         if(!logics.IsEnranged) enrangedCount = 0;
         //Debug.Log("Attack 상태 이탈");
     }

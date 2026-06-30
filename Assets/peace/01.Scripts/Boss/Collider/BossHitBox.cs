@@ -17,15 +17,15 @@ public class BossHitBox : MonoBehaviour, IInitializable
 
     private void OnEnable()
     {
-        EventBus<AttackFinish>.action += SetIsTriggered;
+        EventBus<AttackFinishEvent>.action += SetIsTriggered;
     }
 
     private void OnDisable()
     {
-        EventBus<AttackFinish>.action -= SetIsTriggered;
+        EventBus<AttackFinishEvent>.action -= SetIsTriggered;
     }
 
-    private void SetIsTriggered(AttackFinish data) { isTriggered = false; }
+    private void SetIsTriggered(AttackFinishEvent data) { isTriggered = false; }
 
     private void OnTriggerEnter(Collider other) //공격력 플레이어에게 넘겨주기
     {

@@ -16,4 +16,8 @@ public class GroggyState_Boss : BossState
         if (logics.PlayAnimGroggy_Time((int)Animation.Groggy) == NodeState.Success)
             controller.ChangeState(State.Attack);
     }
+    public override void Exit()
+    {
+
+    }
 }

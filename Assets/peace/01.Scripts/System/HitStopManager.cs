@@ -32,7 +32,7 @@ public class HitStopManager : MonoBehaviour, IInitializable
 
     public void TriggerHitStop(HitStopEvent data)
     {
-        Debug.Log(data.frames);
+        //Debug.Log(data.frames);
         //안전장치: 연속 패링으로 인해 또 이벤트가 들어올 경우 방지
         if (hitStopCoroutine != null)
         {

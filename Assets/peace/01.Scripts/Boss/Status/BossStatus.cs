@@ -4,9 +4,11 @@ public class BossStatus : MonoBehaviour, IInitializable
 {
     public int Priority => (int)InitOrder.Boss;
 
-    [SerializeField] private BossStatusData status;
+    [SerializeField] public BossStatusData status;
 
     private float playerMaxHP; //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
+
+    public Stat_Y BossMaxHP => status.MaxHP;
 
     public void Init()
     {

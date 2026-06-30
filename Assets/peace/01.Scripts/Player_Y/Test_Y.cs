@@ -6,12 +6,12 @@ public class Test_Y : MonoBehaviour
     private void OnEnable()
     {
         EventBus<CanParryEvent>.action += SetCanParry;
-        EventBus<UltimateInvoke>.action += SetFalseParry;
+        EventBus<UltimateInvokeEvent>.action += SetFalseParry;
     }
     private void OnDisable()
     {
         EventBus<CanParryEvent>.action -= SetCanParry;
-        EventBus<UltimateInvoke>.action -= SetFalseParry;
+        EventBus<UltimateInvokeEvent>.action -= SetFalseParry;
     }
     private void Update()
     {
@@ -23,7 +23,7 @@ public class Test_Y : MonoBehaviour
         canParry = data.CanParry;
         //Debug.Log(canParry);
     }
-    public void SetFalseParry(UltimateInvoke data) 
+    public void SetFalseParry(UltimateInvokeEvent data) 
     { 
         canParry = false;
         //Debug.Log($"canParry: {canParry}");

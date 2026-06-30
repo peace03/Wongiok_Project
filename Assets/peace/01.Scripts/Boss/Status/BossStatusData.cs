@@ -6,8 +6,7 @@ public class BossStatusData
 {
     [Header("스탯")]
     [SerializeField] private Stat_Y maxHP;                    //최대 체력
-    [SerializeField] private Stat_Y damageTakenMultiplier;    //피격 데미지 배율
-    //[SerializeField] private Stat moveSpeed;                //이동속도 (speed값이 많이서 필요없는듯?)
+    [Tooltip("피격 데미지 배율")][SerializeField] private Stat_Y damageTakenMultiplier;
     [SerializeField] private Stat_Y attackSpeed;              //공속 배율
     [SerializeField] private Stat_Y telegraphSpeed;           //사전 신호 표시 시간 배율
     [Tooltip("공격력 퍼센티지")][SerializeField] private Stat_Y attackAPower;      //패턴A 공격력
@@ -17,7 +16,10 @@ public class BossStatusData
     [Tooltip("공격력 퍼센티지")][SerializeField] private Stat_Y attackDPower;      //궁극기 공격력
     [Header("궁극기 체력 임계치")]
     [SerializeField] private float[] hpThresholds;            //궁극기 체력 임계치
+
     int index = 0;                          //궁극기 임계치 인덱스(인덱스 마지막은 0으로)
+
+    public Stat_Y MaxHP => maxHP;
 
     private float currentHP;
     public float CurrentHP => currentHP;
@@ -40,17 +42,22 @@ public class BossStatusData
         attackAPower.ResetModifiers();
         attackBPower.ResetModifiers();
         attackCPower.ResetModifiers();
+        attackC_2Power.ResetModifiers();
         attackDPower.ResetModifiers();
     }
 
     public void SubCurrentHP(float amount)
     {
         currentHP -= amount;
+        EventBus<BossHPChangedEvent>.Publish(new BossHPChangedEvent(currentHP)); //UI bridge
         //Debug.Log(currentHP);
-        if (currentHP < 0) currentHP = 0f;  //사망 검사
+        if (currentHP < 0)
+        {
+            currentHP = 0f;  //사망 검사
+        }
         if(currentHP < maxHP.FinalValue * hpThresholds[index])  //궁극기 체력 임계치 검사
         {
-            EventBus<UltimateInvoke>.Publish(default);
+            EventBus<UltimateInvokeEvent>.Publish(default); //UI bridge
             index++;
         }
     }
