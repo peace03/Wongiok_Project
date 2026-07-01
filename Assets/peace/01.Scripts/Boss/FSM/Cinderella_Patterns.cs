@@ -11,6 +11,10 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #region 인스펙터
     [Header("Animator")]
     [SerializeField] private Animator anim;
+
+    [Header("VFX")]
+    [SerializeField] private GameObject telegraph;
+    private RingDrawer telegraphDrawer;
     
     [Header("위치")]
     [Tooltip("보스 스폰 위치")][SerializeField] private Transform spawnPos;
@@ -34,6 +38,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [Header("AttackA 상태")]
     [SerializeField] private float A_ChaseSpeed;
     [SerializeField] private Vector3 A_ChasePos;
+    [SerializeField] private float A_telegraphTime;
     [Tooltip("공격 발동 시간")][SerializeField] private float A_attackDuration;
     [Tooltip("후딜 시간")][SerializeField] private float A_postAtkDelay;
     [Tooltip("패링 시 보스 경직 시간")][SerializeField] private float A_parryStunDuration;
@@ -41,7 +46,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [Header("AttackB 상태")]
     [SerializeField] private float B_ChaseSpeed;
     [SerializeField] private Vector3 B_ChasePos;
-    [SerializeField] private float B_postAtkDelay;
+    [SerializeField] private float B_telegraphTime;
+    [Tooltip("후딜 시간")][SerializeField] private float B_postAtkDelay;
     
     [Header("AttackC 상태")]
     [SerializeField] private float C_ChaseSpeed;
@@ -51,6 +57,9 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [Header("Ultimate 상태")]
     [SerializeField] private float UltimateChaseSpeed;
     [SerializeField] private Vector3 UltimateChasePos;
+    [SerializeField] private float ULTI_telegraphTime1;
+    [SerializeField] private float ULTI_telegraphTime2;
+    [SerializeField] private float ULTI_telegraphTime3;
     
     [Header("Groggy 상태")]
     [SerializeField] private float groggyDuration; //그로기 지속시간
@@ -91,9 +100,11 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     //Idle
     private Vector3 RandomPos;
 
+    //사전신호
+    private bool telegraphExcuted = false;
+
     //공격A 타입
     private bool chaseDone = false;    //추격 실행 여부
-    private bool telegraphExcuted = false;
     private bool attackDone = false;    //공격 실행 여부
 
     //공격B 타입
@@ -128,6 +139,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         bossStatus = ServiceLocator_Y.Get<BossStatus>();
         bossSkin = transform.GetChild(0).transform;
         rb = GetComponent<Rigidbody>();
+        telegraphDrawer = telegraph.GetComponent<RingDrawer>(); //사전신호
+        telegraphDrawer.Init();
         Init_BT();
 
         //이동가능 x좌표
@@ -177,10 +190,16 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() => Chase(A_ChasePos, A_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
                 }),
                 //사전신호
-                new Sequence(new List<Node>
+                new Selector(new List<Node>
                 {
-                    //new ConditionLeaf(), //사전신호 발생했는가?
-                    //new Leaf() //사전신호 발생
+                    new ConditionLeaf(() => telegraphExcuted), //사전신호 발생했는가?
+                    new Leaf(() =>
+                    {
+                        telegraph.SetActive(true);
+                        telegraphDrawer.PlaySignal(A_telegraphTime);
+                        telegraphExcuted = true;
+                        return NodeState.Success;
+                    }) //사전신호 발생
                 }),
                 //공격 실렉터
                 new Selector(new List<Node>
@@ -191,6 +210,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
                         new Leaf(() => PlayAnim_Speed((int)Animation.AttackA, A_attackDuration)), //공격 애님 실행
                         new Leaf(() => {
+                            //Debug.Log("여기서 오류남!");
                             attackDone = true;
                             return NodeState.Success;
                         })
@@ -561,14 +581,14 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public AttackType GetAttackType() { return attackType; }
     public Node GetAttackBT()
     {
-        do
-        {
-            attackType = (AttackType)Random.Range(0, 3);
-        }
-        while (attackType == beforeType);
+        //do
+        //{
+        //    attackType = (AttackType)Random.Range(0, 3);
+        //}
+        //while (attackType == beforeType);
         beforeType = attackType;
-        //attackType = AttackType.C;
-        Debug.Log($"{attackType} 공격 실행");
+        attackType = AttackType.A;
+        //Debug.Log($"{attackType} 공격 실행");
         switch (attackType)
         {
             case AttackType.A:
@@ -618,6 +638,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         comboStep = 0;
 
         UltimateAttack?.Reset();
+        isGroggyAnimDone = false; //다음 궁극기에서 사용할 수 있도록 다시 초기화
     }
     #endregion
 
@@ -698,13 +719,14 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
             if (PlayAnim_Time(num, groggyDuration) == NodeState.Success)
             {
                 isGroggyAnimDone = true;
+                bossStatus.SetGroggyDamageMultiplierActive(false); //그로기 피격 배율 복귀
                 return NodeState.Running;
             }
         }
         //그로기 끝나고 바로 공격해서 이상하다는 피드백 수용
         else if (PlayAnim_Time((int)Animation.Idle, 1) == NodeState.Success)
         {
-            Debug.Log("Idle 애님 success");
+            //Debug.Log("Idle 애님 success");
             isEnranged = true;
             curEnrangedAtkSpeed = enrangedAtkSpeed_Mul;
             return NodeState.Success;

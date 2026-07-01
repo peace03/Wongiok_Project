@@ -8,6 +8,6 @@ public class PlayerStatus_Y : MonoBehaviour
     public void TakeDamage(float amount)
     {
         curHP -= amount;
-        Debug.Log($"Player 현재 체력: {curHP}");
+        //Debug.Log($"Player 현재 체력: {curHP}");
     }
 }

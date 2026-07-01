@@ -23,7 +23,7 @@ public class BossController : MonoBehaviour, IInitializable
         bossState.Add(State.Idle,       new IdleState_Boss(this, logics));
         bossState.Add(State.Attack,     new AttackingState_Boss(this, logics));
         bossState.Add(State.Ultimate,   new UltimateCastingState_Boss(this, logics));
-        bossState.Add(State.Groggy,     new GroggyState_Boss(this, logics));
+        bossState.Add(State.Groggy,     new GroggyState_Boss(this, logics, status));
         bossState.Add(State.Defeated,   new DefeatedState_Boss(this, logics));
 
         curState = bossState[State.Spawn];

@@ -255,6 +255,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossHitBox
   AtkType: 2
+--- !u!4 &131016153 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 608321761475470972, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
+  m_PrefabInstance: {fileID: 1802285463}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &174314906
 GameObject:
   m_ObjectHideFlags: 0
@@ -537,6 +542,16 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!1 &335364873 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8686533583375575210, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+  m_PrefabInstance: {fileID: 447258351}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &335364876 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+  m_PrefabInstance: {fileID: 447258351}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -762,6 +777,71 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossHitBox
   AtkType: 0
+--- !u!1001 &447258351
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 131016153}
+    m_Modifications:
+    - target: {fileID: 3228647102662647802, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686533583375575210, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_Name
+      value: ParryRing
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686533583375575210, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5a02c05741024334a83245e867b18e74, type: 3}
 --- !u!1 &581796115
 GameObject:
   m_ObjectHideFlags: 0
@@ -1331,8 +1411,6 @@ MonoBehaviour:
   status:
     maxHP:
       baseValue: 2000
-    damageTakenMultiplier:
-      baseValue: 1.5
     attackSpeed:
       baseValue: 0
     telegraphSpeed:
@@ -1352,6 +1430,7 @@ MonoBehaviour:
     - 0.5
     - 0.1
     - 0
+    groggyDamageMultiplier: 1.5
 --- !u!136 &1650632856
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1384,7 +1463,7 @@ Transform:
   m_GameObject: {fileID: 1650632854}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.77, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1421,6 +1500,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: PeaceScripts::Cinderella_Patterns
   anim: {fileID: 624802513}
+  telegraph: {fileID: 335364873}
   spawnPos: {fileID: 415502605}
   playerPos: {fileID: 581796119}
   ground: {fileID: 174314907}
@@ -1434,17 +1514,22 @@ MonoBehaviour:
   enrangedAtkSpeed_Mul: 1.5
   A_ChaseSpeed: 15
   A_ChasePos: {x: 1.5, y: 0, z: 0}
+  A_telegraphTime: 0.5
   A_attackDuration: 1
   A_postAtkDelay: 3
   A_parryStunDuration: 0.5
   B_ChaseSpeed: 15
   B_ChasePos: {x: 1.5, y: 0, z: 0}
+  B_telegraphTime: 0.5
   B_postAtkDelay: 3
   C_ChaseSpeed: 15
   C_ChasePos: {x: 6, y: 0, z: 0}
   C_postAtkDelay: 3
   UltimateChaseSpeed: 15
   UltimateChasePos: {x: 1.5, y: 0, z: 0}
+  ULTI_telegraphTime1: 0.5
+  ULTI_telegraphTime2: 0.5
+  ULTI_telegraphTime3: 0.5
   groggyDuration: 2
 --- !u!54 &1650632862
 Rigidbody:
@@ -1630,7 +1715,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 608321761475470972, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 335364876}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       insertIndex: -1

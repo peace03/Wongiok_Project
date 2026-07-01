@@ -34,7 +34,7 @@ public class ShardAreaHitBox : MonoBehaviour
 
         transform.position = new Vector3(data.pos.position.x, 0, 0);
         box.enabled = true;
-        Debug.Log("콜라이더 켜짐!");
+        //Debug.Log("콜라이더 켜짐!");
     }
 
     private void Update()
@@ -47,7 +47,7 @@ public class ShardAreaHitBox : MonoBehaviour
             {
                 box.enabled = false;
                 curTime = 0f;
-                Debug.Log("콜라이더 꺼짐!");
+                //Debug.Log("콜라이더 꺼짐!");
                 return; //아래 계산 생략
             }
             //데미지 쿨타임 체크

@@ -2,14 +2,17 @@ using UnityEngine;
 
 public class GroggyState_Boss : BossState
 {
-    public GroggyState_Boss(BossController controller, IBossLogics logics)
-        : base(controller, logics) { }
+    private readonly BossStatus bossStatus;
+
+    public GroggyState_Boss(BossController controller, IBossLogics logics, BossStatus bossStatus)
+        : base(controller, logics) { this.bossStatus = bossStatus; }
 
     public override void Enter()
     {
         //Debug.Log("그로기 상태 진입");
         logics.SetStateDone(false);
         logics.LogicInit();
+        bossStatus.SetGroggyDamageMultiplierActive(true); //그로기 피격 배율 증가
     }
     public override void Update()
     {
@@ -18,6 +21,6 @@ public class GroggyState_Boss : BossState
     }
     public override void Exit()
     {
-
+        bossStatus.SetGroggyDamageMultiplierActive(false); //그로기 피격 배율 증가
     }
 }

@@ -20,6 +20,8 @@ public class BossStatus : MonoBehaviour, IInitializable
         TestPrint();
     }
 
+    //그로기시 데미지 배율 설정
+    public void SetGroggyDamageMultiplierActive(bool state) { status.SetGroggyDamageMultiplierActive(state); }
     public void TakeDamage(float amount)
     {
         status.SubCurrentHP(amount);
