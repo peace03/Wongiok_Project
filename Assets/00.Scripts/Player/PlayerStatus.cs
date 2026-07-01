@@ -25,6 +25,7 @@ public class PlayerStatusData : LivingStatus
 // 플레이어는 피격 피드백과 체크포인트 부활 기록을 함께 사용합니다.
 public class PlayerStatus : MonoBehaviour, IDamageable
 {
+    #region 플레이어가 가지는 스텟, 정보, 참조값
     // 피격 직후 입력을 막는 경직 시간입니다.
     public const float HitStunDuration = 0.2f;
 
@@ -89,7 +90,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
 
     // 사망 후 부활을 기다리는 코루틴 핸들입니다.
     private Coroutine reviveRoutine;
-
+    #endregion
     private void Awake()
     {
         // 실제 체력 초기화와 체력 이벤트 발행은 PlayerInitializer에서 순서를 보장해 처리합니다.
@@ -142,7 +143,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         // 보스 히트박스가 float 데미지로 들어오는 순간 패링 성공 여부를 먼저 확인합니다.
-        if (TryConsumeBossParry()) return;
+        //if (TryConsumeBossParry()) return;
 
         // 디버그나 테스트 코드에서 숫자만 넘겨도 같은 데미지 흐름을 타도록 감쌉니다.
         TakeDamage(
@@ -161,6 +162,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
 
     public void TakeDamage(DamageInfo damageInfo)
     {
+        #region 데미지 처리
         // 다른 대상용 DamageInfo가 잘못 전달된 경우에는 처리하지 않습니다.
         if (!IsTargetSelf(damageInfo.TargetObject)) return;
 
@@ -183,7 +185,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
             Debug.Log("피격 무적: 데미지 무시");
             return;
         }
-
+        #endregion
         // 음수 데미지나 0 데미지는 적용하지 않습니다.
         float damage = Mathf.Max(0f, damageInfo.Damage);
         if (Mathf.Approximately(damage, 0f)) return;
