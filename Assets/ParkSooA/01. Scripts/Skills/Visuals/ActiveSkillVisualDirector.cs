@@ -18,6 +18,8 @@ public class ActiveSkillVisualDirector : MonoBehaviour
     {
         // 액티브 스킬 장착 이벤트 구독
         EventBus<EquippedActiveSkill>.action += AddWeaponAndEffect;
+        // 액티브 스킬 무기 외형 상태 변경 이벤트 구독
+        EventBus<ChangeWeaponState>.action += ChangeWeapon;
         // 액티브 스킬 이펙트 실행 이벤트 구독
         EventBus<ExecuteActiveSkillEffect>.action += ExecuteEffect;
         // 액티브 스킬 이펙트 종료 이벤트 구독
@@ -30,6 +32,8 @@ public class ActiveSkillVisualDirector : MonoBehaviour
     {
         // 액티브 스킬 장착 이벤트 구독 해제
         EventBus<EquippedActiveSkill>.action -= AddWeaponAndEffect;
+        // 무기 외형 상태 변경 이벤트 구독 해제
+        EventBus<ChangeWeaponState>.action -= ChangeWeapon;
         // 액티브 스킬 이펙트 실행 이벤트 구독 해제
         EventBus<ExecuteActiveSkillEffect>.action -= ExecuteEffect;
         // 액티브 스킬 이펙트 종료 이벤트 구독 해제
@@ -94,17 +98,32 @@ public class ActiveSkillVisualDirector : MonoBehaviour
     }
 
     /// <summary>
+    /// 무기 외형 변경 함수
+    /// </summary>
+    public void ChangeWeapon(ChangeWeaponState change)
+    {
+        // 변경할 무기가 없다면
+        if (!weapons.TryGetValue(change.id, out var weaponVisual))
+            return;
+
+        // 무기 외형 상태 변경
+        weaponVisual.SetActive(change.isActiveWeapon);
+
+        // 활성화 상태이고 무기 외형에 무기 인터페이스가 있다면
+        if(change.isActiveWeapon && weaponVisual.TryGetComponent<IWeapon>(out var weapon))
+            // 액티브 스킬 실행 위치들 변경 이벤트 발행
+            EventBus<ChangeActiveSkillExecutePositions>
+                .Publish(new ChangeActiveSkillExecutePositions(weapon.FirePoints));
+    }
+
+    /// <summary>
     /// 이펙트 실행 함수
     /// </summary>
     public void ExecuteEffect(ExecuteActiveSkillEffect execute)
     {
         // 실행할 이펙트가 없다면
         if (!effects.TryGetValue(execute.id, out var skillEffect))
-        {
-            Debug.Log($"[Effect] 이펙트 실행 실패 => 입력 - 스킬 ID : {execute.id} / " +
-                        $"이펙트 종류 : {execute.type.ToKoreanString()} / 실행할 이펙트 : 없음");
             return;
-        }
 
         // 스킬 이펙트들의 수만큼
         foreach (var effect in skillEffect)
@@ -135,10 +154,15 @@ public class ActiveSkillVisualDirector : MonoBehaviour
                 case ACTIVE_SKILL_EFFECT_TYPE.Trail:
                 // 메인(총알, 영역) 이펙트 라면
                 case ACTIVE_SKILL_EFFECT_TYPE.Main:
-                // 타겟(과녁) 이펙트라면
-                case ACTIVE_SKILL_EFFECT_TYPE.Target:
                     // 이펙트 실행
                     executer.ExecuteEffect();
+                    break;
+                // 타겟(과녁) 이펙트라면
+                case ACTIVE_SKILL_EFFECT_TYPE.Target:
+                    // 이펙트 실행 위치가 비어있지 않다면
+                    if(execute.pos != null)
+                        // 이펙트 실행
+                        executer.ExecuteEffect();
                     break;
                 // 총구 이펙트라면
                 case ACTIVE_SKILL_EFFECT_TYPE.Muzzle:
@@ -159,11 +183,7 @@ public class ActiveSkillVisualDirector : MonoBehaviour
     {
         // 종료할 이펙트가 없다면
         if (!effects.TryGetValue(stop.id, out var skillEffect))
-        {
-            Debug.Log($"[Effect] 이펙트 종료 실패 => 입력 - 스킬 ID : {stop.id} / " +
-                        $"이펙트 종류 : {stop.type.ToKoreanString()} / 종료할 이펙트 : 없음");
             return;
-        }
 
         // 스킬 이펙트들의 수만큼
         foreach (var effect in skillEffect)

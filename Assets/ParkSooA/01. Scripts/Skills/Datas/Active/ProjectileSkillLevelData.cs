@@ -34,13 +34,13 @@ public class ProjectileSkillLevelData : ActiveSkillLevelData
         // 소유자가 없다면
         if(owner == null)
         {
-            Debug.LogError($"[Error | Skill] 발사체 스킬 실행 실패 => 소유자 : 없음");
+            Debug.Log($"[Error | Skill] 발사체 스킬 실행 실패 => 소유자 : 없음");
             return;
         }
         // 발사체 스킬 인터페이스가 없다면
         else if(owner.GetComponentInChildren<IProjectileSkill>(true) is not IProjectileSkill executer)
         {
-            Debug.LogError($"[Error | Skill] 발사체 스킬 실행 실패 => 발사체 스킬 인터페이스 : 없음");
+            Debug.Log($"[Error | Skill] 발사체 스킬 실행 실패 => 발사체 스킬 인터페이스 : 없음");
             return;
         }
         // 발사체 스킬 인터페이스가 있다면

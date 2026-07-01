@@ -22,14 +22,14 @@ public abstract class LevelBasedSkillData<T> : BaseSkillData where T : BaseSkill
         // 리스트가 없다면
         if (levelDatas == null) 
         {
-            Debug.LogError($"[Error | Skill] 레벨별 정보(리스트) 없음");
+            Debug.Log($"[Error | Skill] 레벨별 정보(리스트) 없음");
             return null;
         }
         // 범위에서 벗어난 레벨이라면
         else if (level < 1 || level > MaxLevel)
         {
-            Debug.LogError($"[Error | Skill] 해당하는 {typeof(T)} 없음 => " +
-                            $"입력 - 레벨 : {level} / 범위 : 1 ~ {MaxLevel} / 리스트 크기 : {levelDatas.Count}");
+            Debug.Log($"[Error | Skill] 해당하는 {typeof(T)} 없음 => " +
+                        $"입력 - 레벨 : {level} / 범위 : 1 ~ {MaxLevel} / 리스트 크기 : {levelDatas.Count}");
             return null;
         }
 

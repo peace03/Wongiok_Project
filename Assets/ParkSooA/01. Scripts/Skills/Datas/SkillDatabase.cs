@@ -36,8 +36,9 @@ public static class SkillDatabase
             }
             // ID에 해당하는 스킬 정보가 있다면
             else
-                Debug.LogError($"[Error | Skill] 해당 데이터 있음 => " +
-                                $"입력 - {data.SkillName} : ID({data.Id}) / {existData.SkillName} : ID({existData.Id})");
+                Debug.Log($"[Error | Skill] 해당 데이터 있음 => " +
+                            $"입력 - {data.SkillName} : ID({data.Id}) / " +
+                            $"{existData.SkillName} : ID({existData.Id})");
         }
 
         // 초기화됨
@@ -52,7 +53,7 @@ public static class SkillDatabase
         if(!skillDataDictionary.TryGetValue(id, out var data))
         {
             if(viewLog)
-                Debug.LogError($"[Error | Skill] 해당 데이터 없음 => 입력 - ID : {id}");
+                Debug.Log($"[Error | Skill] 해당 데이터 없음 => 입력 - ID : {id}");
 
             return null;
         }
@@ -66,9 +67,9 @@ public static class SkillDatabase
         // ID들이 없거나, 찾는 ID가 없거나, 결과를 담을 리스트가 없다면
         if(ids == null || ids.Length == 0 || results == null)
         {
-            Debug.LogError($"[Error | Skill] 필수 검색 조건 부족 => " +
-                            $"입력 - ID : {(ids == null ? "없음" : $"있음({ids.Length})")} / " +
-                            $"리스트 : {(results == null ? "없음" : "있음")}");
+            Debug.Log($"[Error | Skill] 필수 검색 조건 부족 => " +
+                        $"입력 - ID : {(ids == null ? "없음" : $"있음({ids.Length})")} / " +
+                        $"리스트 : {(results == null ? "없음" : "있음")}");
             return;
         }
 
@@ -91,7 +92,8 @@ public static class SkillDatabase
         // 결과를 담을 리스트가 없다면
         if(results == null)
         {
-            Debug.LogError($"[Error | Skill] 필수 검색 조건 부족 => 입력 - {chapter.ToKoreanString()} / 리스트 : 없음");
+            Debug.Log($"[Error | Skill] 필수 검색 조건 부족 => " +
+                        $"입력 - {chapter.ToKoreanString()} / 리스트 : 없음");
             return;
         }
 

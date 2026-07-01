@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Pool;
 
 /// <summary>
@@ -58,4 +59,15 @@ public interface IEffectExecuter
     /// 이펙트 초기화 함수
     /// </summary>
     public void ResetEffect();
+}
+
+/// <summary>
+/// 무기 인터페이스
+/// </summary>
+public interface IWeapon
+{
+    /// <summary>
+    /// 총구 위치들
+    /// </summary>
+    public List<Transform> FirePoints { get; }
 }

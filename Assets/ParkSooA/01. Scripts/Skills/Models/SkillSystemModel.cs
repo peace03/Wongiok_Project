@@ -28,13 +28,15 @@ public class SkillSystemModel
 
     public int MaxActiveCount => maxActiveCount;
 
-    // 생성자
+    /// <summary>
+    /// 생성자
+    /// </summary>
     public SkillSystemModel(GameObject owner, List<BaseSkillData> skillDatas)
     {
         // 스킬 데이터가 없다면
         if(skillDatas == null)
         {
-            Debug.LogError($"[Error | Skill] 스킬 객체 생성 실패 => 데이터 : 없음");
+            Debug.Log($"[Error | Skill] 스킬 객체 생성 실패 => 데이터 : 없음");
             return;
         }
 
@@ -66,7 +68,9 @@ public class SkillSystemModel
         EquipSkills();
     }
 
-    // 스킬 장착 함수
+    /// <summary>
+    /// 스킬 장착 함수
+    /// </summary>
     private void EquipSkills()
     {
         // 모든 스킬들의 수만큼
@@ -124,13 +128,15 @@ public class SkillSystemModel
         }
     }
 
-    // 장착한 액티브 스킬들 반환 함수
+    /// <summary>
+    /// 장착한 액티브 스킬들 반환 함수
+    /// </summary>
     public void GetEquippedActiveSkills(List<SkillInstance> results)
     {
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.LogError($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            Debug.Log($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -143,13 +149,15 @@ public class SkillSystemModel
             results.Add(skill);
     }
 
-    // 장착한 패시브 스킬들 반환 함수
+    /// <summary>
+    /// 장착한 패시브 스킬들 반환 함수
+    /// </summary>
     public void GetEquippedPassiveSkills(List<SkillInstance> results)
     {
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.LogError($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            Debug.Log($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -162,13 +170,15 @@ public class SkillSystemModel
             results.Add(skill);
     }
 
-    // 미장착한 액티브 스킬들 반환 함수
+    /// <summary>
+    /// 미장착한 액티브 스킬들 반환 함수
+    /// </summary>
     public void GetUnequippedActiveSkills(List<SkillInstance> results)
     {
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.LogError($"[Error | Skill] 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            Debug.Log($"[Error | Skill] 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -181,13 +191,15 @@ public class SkillSystemModel
             results.Add(skill);
     }
 
-    // 액티브 스킬들 반환 함수
+    /// <summary>
+    /// 액티브 스킬들 반환 함수
+    /// </summary>
     public void GetActiveSkills(List<SkillInstance> results)
     {
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.LogError($"[Error | Skill] 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            Debug.Log($"[Error | Skill] 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -202,13 +214,15 @@ public class SkillSystemModel
                 results.Add(skill);
     }
 
-    // 강화 가능한 스킬들 반환 함수
+    /// <summary>
+    /// 강화 가능한 스킬들 반환 함수
+    /// </summary>
     public void GetCanEnhanceSkills(List<SkillInstance> results)
     {
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.LogError($"[Error | Skill] 강화 가능한 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            Debug.Log($"[Error | Skill] 강화 가능한 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -223,7 +237,9 @@ public class SkillSystemModel
                 results.Add(skill);
     }
 
-    // 액티브 스킬 실행 함수
+    /// <summary>
+    /// 액티브 스킬 실행 함수
+    /// </summary>
     public void ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
     {
         // 해당 슬롯이 비어있다면
@@ -233,11 +249,32 @@ public class SkillSystemModel
             return;
         }
 
+        // 무기 외형 착용 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(
+                                                                equippedActives[(int)slot].BaseData.Id));
         // 스킬 실행
         equippedActives[(int)slot].UseSkill();
     }
 
-    // 액티브 스킬들 시간 진행 함수
+    /// <summary>
+    /// 액티브 스킬 취소 함수
+    /// </summary>
+    public void CancelActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
+    {
+        // 해당 슬롯이 비어있다면
+        if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
+        {
+            Debug.Log($"[Skill] 취소할 액티브 스킬 없음 => 입력 - 슬롯 : {slot.ToKoreanString()}");
+            return;
+        }
+
+        // 스킬 취소
+        equippedActives[(int)slot].CancelSkill();
+    }
+
+    /// <summary>
+    /// 액티브 스킬들 시간 진행 함수
+    /// </summary>
     public void TickActiveSkills(float time)
     {
         // 장착된 액티브 스킬들의 수만큼
@@ -252,7 +289,9 @@ public class SkillSystemModel
         }
     }
 
-    // 스킬 변경 함수
+    /// <summary>
+    /// 스킬 변경 함수
+    /// </summary>
     public bool SwapSkill(ACTIVE_SKILL_SLOT_TYPE slot, int? id = null)
     {
         // 스킬 변경 성공 여부
@@ -269,14 +308,14 @@ public class SkillSystemModel
         }
         // ID에 해당하는 스킬이 없다면
         else if (!allSkillDictionary.TryGetValue((int)id, out var skill))
-            Debug.LogError($"[Error | Skill] 해당 스킬 없음 => 입력 - ID : {id}");
+            Debug.Log($"[Error | Skill] 해당 스킬 없음 => 입력 - ID : {id}");
         // 슬롯 종류가 액티브 스킬 최대 장착 개수를 넘어간다면
         else if ((int)slot >= maxActiveCount)
-            Debug.LogError($"[Error | Skill] 액티브 최대 장착 개수 오버 => " +
-                            $"입력 - {slot.ToKoreanString()} / 최대 장착 개수 :{maxActiveCount}");
+            Debug.Log($"[Error | Skill] 액티브 최대 장착 개수 오버 => " +
+                        $"입력 - {slot.ToKoreanString()} / 최대 장착 개수 :{maxActiveCount}");
         // 패시브 스킬이라면
         else if (!skill.IsActiveSkill)
-            Debug.LogError($"[Error | Skill] 패시브 스킬 => 입력 - ID :{id} / {skill.BaseData.SkillName}");
+            Debug.Log($"[Error | Skill] 패시브 스킬 => 입력 - ID :{id} / {skill.BaseData.SkillName}");
         // 해당 슬롯에 장착된 스킬이라면
         else if (equippedActives[(int)slot]?.BaseData.Id == id)
             result = true;
@@ -329,7 +368,9 @@ public class SkillSystemModel
         return result;
     }
 
-    // 스킬 강화 함수
+    /// <summary>
+    /// 스킬 강화 함수
+    /// </summary>
     public bool EnhanceSkill(int id)
     {
         // 스킬 강화 성공 여부
@@ -337,10 +378,11 @@ public class SkillSystemModel
 
         // ID에 해당하는 스킬이 없다면
         if (!allSkillDictionary.TryGetValue(id, out var skill))
-            Debug.LogError($"[Error | Skill] 해당 스킬 없음 => 입력 - ID : {id}");
+            Debug.Log($"[Error | Skill] 해당 스킬 없음 => 입력 - ID : {id}");
         // 강화가 가능하지 않다면
         else if (!skill.CanEnhance)
-            Debug.LogError($"[Error | Skill] 강화 불가능(최대 레벨) => 입력 - ID :{id} / {skill.BaseData.SkillName}");
+            Debug.Log($"[Error | Skill] 강화 불가능(최대 레벨) => " +
+                        $"입력 - ID :{id} / {skill.BaseData.SkillName}");
         else
         {
             // 스킬 강화

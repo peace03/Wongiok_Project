@@ -1,18 +1,24 @@
-// 스킬 종류
+/// <summary>
+/// 스킬 종류
+/// </summary>
 public enum SKILL_TYPE
 {
     Passive,        // 패시브
     Active          // 액티브
 }
 
-// 챕터 종류
+/// <summary>
+/// 챕터 종류
+/// </summary>
 public enum CHAPTER_TYPE
 {
     First,          // 첫번째
     Second          // 두번째
 }
 
-// 액티브 스킬 이펙트 종류
+/// <summary>
+/// 액티브 스킬 이펙트 종류
+/// </summary>
 public enum ACTIVE_SKILL_EFFECT_TYPE
 {
     Charging,       // 차징 이펙트
@@ -23,14 +29,18 @@ public enum ACTIVE_SKILL_EFFECT_TYPE
     Hit             // 타격/피격 이펙트
 }
 
-// 패시브 발동 조건 종류
+/// <summary>
+/// 패시브 발동 조건 종류
+/// </summary>
 public enum PASSIVE_TRIGGER_TYPE
 {
     None,           // 상시
     Triggered       // 조건
 }
 
-// 스탯 종류
+/// <summary>
+/// 스탯 종류
+/// </summary>
 public enum STAT_TYPE
 {
     Health,         // 체력
@@ -39,21 +49,27 @@ public enum STAT_TYPE
     AtkSpeed        // 공격 속도
 }
 
-// 수식 종류
+/// <summary>
+/// 수식 종류
+/// </summary>
 public enum MODIFY_TYPE
 {
     Addition,       // 더하기
     Subtraction     // 빼기
 }
 
-// 액티브 스킬 종류
+/// <summary>
+/// 액티브 스킬 종류
+/// </summary>
 public enum ACTIVE_SKILL_TYPE
 {
     Projectile,     // 발사체
     Area            // 영역
 }
 
-// 스킬 상태
+/// <summary>
+/// 스킬 상태
+/// </summary>
 public enum SKILL_STATE
 {
     Ready,          // 사용 가능
@@ -62,7 +78,9 @@ public enum SKILL_STATE
     Charging        // [사용 전] 차징 중
 }
 
-// 액티브 스킬 슬롯 종류
+/// <summary>
+/// 액티브 스킬 슬롯 종류
+/// </summary>
 public enum ACTIVE_SKILL_SLOT_TYPE
 {
     A,              // 첫번째

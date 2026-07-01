@@ -20,7 +20,8 @@ public class AreaSkillLevelData : ActiveSkillLevelData
         // 범위에서 벗어난 단계라면
         if(stage < 1 || stage > stages.Count)
         {
-            Debug.LogError($"[Error | Skill] 해당 데이터 없음 => 입력 : 단계 :{stage} / 스킬 단계 : 1 ~ {stages.Count}");
+            Debug.Log($"[Error | Skill] 해당 데이터 없음 => " +
+                        $"입력 : 단계 :{stage} / 스킬 단계 : 1 ~ {stages.Count}");
             return 0f;
         }
 
@@ -34,13 +35,13 @@ public class AreaSkillLevelData : ActiveSkillLevelData
         // 소유자가 없다면
         if (owner == null)
         {
-            Debug.LogError($"[Error | Skill] 영역 스킬 실행 실패 => 소유자 : 없음");
+            Debug.Log($"[Error | Skill] 영역 스킬 실행 실패 => 소유자 : 없음");
             return;
         }
         // 영역 스킬 인터페이스가 없다면
         else if (owner.GetComponentInChildren<IAreaSkill>(true) is not IAreaSkill executer)
         {
-            Debug.LogError($"[Error | Skill] 영역 스킬 실행 실패 => 영역 스킬 인터페이스 : 없음");
+            Debug.Log($"[Error | Skill] 영역 스킬 실행 실패 => 영역 스킬 인터페이스 : 없음");
             return;
         }
         // 영역 스킬 인터페이스가 있다면

@@ -66,6 +66,38 @@ public readonly struct EquippedActiveSkill
 }
 
 /// <summary>
+/// 변경할 액티브 스킬 무기 외형 정보
+/// </summary>
+public readonly struct ChangeWeaponState
+{
+    public readonly int id;                                         // 스킬 ID
+    public readonly bool isActiveWeapon;                            // 외형 활성화 여부
+
+    /// <summary>
+    /// 변경할 액티브 스킬 무기 외형 정보 생성자
+    /// </summary>
+    public ChangeWeaponState(int id, bool isActiveWeapon = true)
+    {
+        this.id = id;
+        this.isActiveWeapon = isActiveWeapon;
+    }
+}
+
+/// <summary>
+/// 변경할 액티브 스킬 실행 위치들 정보
+/// </summary>
+public readonly struct ChangeActiveSkillExecutePositions
+{
+    public readonly List<Transform> positions;               // 실행 위치들
+
+    /// <summary>
+    /// 변경할 액티브 스킬 실행 위치들 정보 생성자
+    /// </summary>
+    public ChangeActiveSkillExecutePositions(List<Transform> positions)
+        => this.positions = positions;
+}
+
+/// <summary>
 /// 실행할 액티브 스킬 이펙트 정보
 /// </summary>
 public readonly struct ExecuteActiveSkillEffect
@@ -127,12 +159,25 @@ public readonly struct ResetActiveSkillEffect
 /// <summary>
 /// 누른 스킬 슬롯 정보
 /// </summary>
-public readonly struct PressedSkillSlot
+public readonly struct StartedPressSkillSlot
 {
     public readonly ACTIVE_SKILL_SLOT_TYPE type;                    // 슬롯 종류
 
     /// <summary>
     /// 누른 스킬 슬롯 정보 생성자
     /// </summary>
-    public PressedSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
+    public StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
+}
+
+/// <summary>
+/// 눌렀던 스킬 슬롯 정보
+/// </summary>
+public readonly struct CanceledPressSkillSlot
+{
+    public readonly ACTIVE_SKILL_SLOT_TYPE type;                    // 슬롯 종류
+
+    /// <summary>
+    /// 눌렀던 스킬 슬롯 정보 생성자
+    /// </summary>
+    public CanceledPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
 }

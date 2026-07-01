@@ -27,7 +27,7 @@ public class BulletFactory : MonoBehaviour, IInitializable
         // 총알 프리팹이 없다면
         if(bullet == null)
         {
-            Debug.LogError($"[Error | Bullet] 총알 공장 생성 실패 => 입력 - 총알 프리팹 : 없음", this);
+            Debug.Log($"[Error | Bullet] 총알 공장 생성 실패 => 입력 - 총알 프리팹 : 없음", this);
             return;
         }
 
@@ -46,13 +46,13 @@ public class BulletFactory : MonoBehaviour, IInitializable
         // 총알 프리팹이 없다면
         if(obj == null)
         {
-            Debug.LogError($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 프리팹 : 없음", this);
+            Debug.Log($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 프리팹 : 없음", this);
             return null;
         }
         // 총알 스크립트가 없다면
         else if (!obj.TryGetComponent<Bullet>(out var bullet))
         {
-            Debug.LogError($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 스크립트 없음", obj);
+            Debug.Log($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 스크립트 없음", obj);
             return null;
         }
         // 총알 스크립트가 있다면

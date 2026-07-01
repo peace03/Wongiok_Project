@@ -25,7 +25,7 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
         // 정보가 없다면
         if (data == null)
         {
-            Debug.LogError($"[Error | Skill] 스킬 쿨타임 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 없음");
+            Debug.Log($"[Error | Skill] 스킬 쿨타임 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 없음");
             return base.GetMaxCoolTime(level);
         }
 
@@ -42,7 +42,8 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
         // 정보가 없다면
         if (data == null)
         {
-            Debug.LogError($"[Error | Skill] 스킬 지속 시간 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 없음");
+            Debug.Log($"[Error | Skill] 스킬 지속 시간 받아오기 실패 => " +
+                        $"입력 - 레벨 : {level} / 정보 : 없음");
             return base.GetMaxDuration(level);
         }
 
@@ -59,15 +60,12 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
         // 정보가 없다면
         if (data == null)
         {
-            Debug.LogError($"[Error | Skill] 스킬 차징 시간 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 없음");
+            Debug.Log($"[Error | Skill] 스킬 차징 시간 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 없음");
             return base.GetMaxChargingTime(level);
         }
         // 발사체 정보가 아니라면
         else if (data is not ProjectileSkillLevelData levelData)
-        {
-            Debug.LogError($"[Error | Skill] 스킬 차징 시간 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 발사체 정보 아님");
             return base.GetMaxChargingTime(level);
-        }
         // 발사체 정보라면
         else
             // 최대 지속 시간 반환
@@ -83,7 +81,7 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
         // 정보가 없다면
         if (data == null)
         {
-            Debug.LogError($"[Error | Skill] 데미지 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 없음");
+            Debug.Log($"[Error | Skill] 데미지 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 없음");
             return 0f;
         }
 
