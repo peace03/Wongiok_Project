@@ -20,9 +20,6 @@ public readonly struct DeathInfo
     // 사망이 발생한 위치입니다.
     public readonly Vector3 DeathPosition;
 
-    // 마지막으로 적용된 데미지 정보입니다.
-    public readonly DamageInfo LastDamageInfo;
-
     // 사망 원인입니다.
     public readonly DeathCause Cause;
 
@@ -35,14 +32,12 @@ public readonly struct DeathInfo
     public DeathInfo(
         GameObject playerObject,
         Vector3 deathPosition,
-        DamageInfo lastDamageInfo,
         DeathCause cause,
         float currentHP,
         float maxHP)
     {
         PlayerObject = playerObject;
         DeathPosition = deathPosition;
-        LastDamageInfo = lastDamageInfo;
         Cause = cause;
         CurrentHP = currentHP;
         MaxHP = maxHP;

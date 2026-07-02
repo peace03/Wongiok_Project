@@ -32,10 +32,10 @@ public class PlayerHitState : PlayerBaseState
 
     #region 상태 생명주기
 
-    public void SetHit(DamageInfo damageInfo)
+    public void SetHit()
     {
         stunTimer = PlayerStatus.HitStunDuration;
-        knockbackVelocity = GetKnockbackDirection(damageInfo) *
+        knockbackVelocity = GetKnockbackDirection() *
             (PlayerStatus.HitKnockbackDistance / PlayerStatus.HitStunDuration);
     }
 
@@ -95,20 +95,8 @@ public class PlayerHitState : PlayerBaseState
 
     #region 내부 계산
 
-    private Vector3 GetKnockbackDirection(DamageInfo damageInfo)
+    private Vector3 GetKnockbackDirection()
     {
-        Vector3 direction = new Vector3(damageInfo.HitDirection.x, 0f, 0f);
-        if (direction.sqrMagnitude > Mathf.Epsilon)
-            return direction.normalized;
-
-        if (damageInfo.AttackerObject != null)
-        {
-            Vector3 fromAttacker = controller.transform.position - damageInfo.AttackerObject.transform.position;
-            fromAttacker.y = 0f;
-
-            if (fromAttacker.sqrMagnitude > Mathf.Epsilon) return fromAttacker.normalized;
-        }
-
         return controller.IsFacingRight ? Vector3.right : Vector3.left;
     }
 

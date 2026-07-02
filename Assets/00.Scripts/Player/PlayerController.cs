@@ -192,10 +192,10 @@ public class PlayerController : MonoBehaviour
         _currentState.EnterState();
     }
 
-    public void EnterHitState(DamageInfo damageInfo)
+    public void EnterHitState()
     {
         // PlayerStatus에서 실제 데미지가 적용된 뒤 피격 상태로 진입할 때 사용합니다.
-        PlayerHitState.SetHit(damageInfo);
+        PlayerHitState.SetHit();
         TransitionTo(PlayerHitState);
     }
 

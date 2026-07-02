@@ -158,9 +158,6 @@ public readonly struct PlayerDamagedEvent
     // 실제로 데미지를 받은 플레이어 오브젝트입니다.
     public readonly GameObject PlayerObject;
 
-    // 이번 피격에 사용된 데미지 정보입니다.
-    public readonly DamageInfo DamageInfo;
-
     // 피해 적용 후 현재 체력입니다.
     public readonly float CurrentHP;
 
@@ -169,12 +166,10 @@ public readonly struct PlayerDamagedEvent
 
     public PlayerDamagedEvent(
         GameObject playerObject,
-        DamageInfo damageInfo,
         float currentHP,
         float maxHP)
     {
         PlayerObject = playerObject;
-        DamageInfo = damageInfo;
         CurrentHP = currentHP;
         MaxHP = maxHP;
     }

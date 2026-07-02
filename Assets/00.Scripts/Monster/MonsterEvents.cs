@@ -7,9 +7,6 @@ public readonly struct MonsterDamagedEvent
     // 실제로 데미지를 받은 몬스터 오브젝트입니다.
     public readonly GameObject MonsterObject;
 
-    // 이번 피격에 사용된 데미지 정보입니다.
-    public readonly DamageInfo DamageInfo;
-
     // 피해 적용 후 현재 체력입니다.
     public readonly float CurrentHP;
 
@@ -18,12 +15,10 @@ public readonly struct MonsterDamagedEvent
 
     public MonsterDamagedEvent(
         GameObject monsterObject,
-        DamageInfo damageInfo,
         float currentHP,
         float maxHP)
     {
         MonsterObject = monsterObject;
-        DamageInfo = damageInfo;
         CurrentHP = currentHP;
         MaxHP = maxHP;
     }

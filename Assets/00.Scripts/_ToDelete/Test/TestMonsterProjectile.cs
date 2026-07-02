@@ -117,7 +117,7 @@ public class TestMonsterProjectile : MonoBehaviour, IParryableProjectile
 
     private void OnTriggerEnter(Collider other)
     {
-        HandleHit(other, transform.position);
+        HandleHit(other);
     }
 
     private bool TryHitAlongMovement(Vector3 movement)
@@ -158,11 +158,11 @@ public class TestMonsterProjectile : MonoBehaviour, IParryableProjectile
         );
 
         transform.position = hitPoint;
-        HandleHit(hit.collider, hitPoint);
+        HandleHit(hit.collider);
         return true;
     }
 
-    private void HandleHit(Collider other, Vector3 hitPoint)
+    private void HandleHit(Collider other)
     {
         if (isHit) return;
         if (ShouldIgnoreCollider(other)) return;
@@ -174,16 +174,7 @@ public class TestMonsterProjectile : MonoBehaviour, IParryableProjectile
         PlayerStatus playerStatus = other.GetComponentInParent<PlayerStatus>();
         if (playerStatus != null)
         {
-            playerStatus.TakeDamage(
-                new DamageInfo(
-                    playerStatus.gameObject,
-                    other,
-                    owner,
-                    hitPoint,
-                    moveDirection,
-                    damage
-                )
-            );
+            playerStatus.TakeDamage(damage);
         }
         else
         {

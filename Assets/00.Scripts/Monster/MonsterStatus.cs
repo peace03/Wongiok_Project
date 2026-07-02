@@ -7,7 +7,7 @@ public class MonsterStatusData : LivingStatus
 }
 
 // 몬스터의 HP와 기본 스탯을 관리하는 컴포넌트입니다.
-// 공격 판정이 직접 전달한 DamageInfo를 받아 실제 HP를 깎습니다.
+// 공격 판정이 전달한 float 데미지로 실제 HP를 깎습니다.
 [RequireComponent(typeof(HitFlashFeedback))]
 public class MonsterStatus : MonoBehaviour, IDamageable
 {
@@ -62,38 +62,20 @@ public class MonsterStatus : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
-        // 디버그나 테스트 코드에서 숫자만 넘겨도 같은 데미지 흐름을 타도록 감쌉니다.
-        TakeDamage(
-            new DamageInfo(
-                gameObject,
-                null,
-                null,
-                transform.position,
-                Vector3.zero,
-                damage
-            )
-        );
-    }
-
-    public void TakeDamage(DamageInfo damageInfo)
-    {
-        // 다른 대상용 DamageInfo가 잘못 전달된 경우에는 처리하지 않습니다.
-        if (!IsTargetSelf(damageInfo.TargetObject)) return;
-
         // 이미 죽은 몬스터는 추가 피해를 무시합니다.
         if (status.IsDead) return;
 
         // 음수 데미지나 0 데미지는 적용하지 않습니다.
-        float damage = Mathf.Max(0f, damageInfo.Damage);
-        if (Mathf.Approximately(damage, 0f)) return;
+        float appliedDamage = Mathf.Max(0f, damage);
+        if (Mathf.Approximately(appliedDamage, 0f)) return;
 
-        status.CurrentHP -= damage;
+        status.CurrentHP -= appliedDamage;
 
         if (status.CurrentHP < 0f)
             status.CurrentHP = 0f;
 
         PublishHealthChanged();
-        PublishDamaged(damageInfo, damage);
+        PublishDamaged();
 
         // HP가 0이 되면 사망 이벤트를 발행합니다.
         if (status.IsDead)
@@ -120,15 +102,6 @@ public class MonsterStatus : MonoBehaviour, IDamageable
         return status.MoveSpeed.FinalValue;
     }
 
-    private bool IsTargetSelf(GameObject targetObject)
-    {
-        // 대상 정보가 비어 있으면 직접 호출로 보고 현재 몬스터에게 적용합니다.
-        if (targetObject == null) return true;
-
-        // 자식 콜라이더가 맞아도 부모 몬스터가 맞은 것으로 처리합니다.
-        return targetObject == gameObject || targetObject.transform.IsChildOf(transform);
-    }
-
     private void PublishHealthChanged()
     {
         // UI나 디버그 표시가 몬스터 체력을 구독할 수 있게 알립니다.
@@ -141,20 +114,12 @@ public class MonsterStatus : MonoBehaviour, IDamageable
         );
     }
 
-    private void PublishDamaged(DamageInfo damageInfo, float appliedDamage)
+    private void PublishDamaged()
     {
-        // 후처리 시스템이 실제 적용된 데미지와 피격 정보를 함께 받을 수 있게 알립니다.
+        // 후처리 시스템이 실제 데미지가 적용된 시점을 받을 수 있게 알립니다.
         EventBus<MonsterDamagedEvent>.Publish(
             new MonsterDamagedEvent(
                 gameObject,
-                new DamageInfo(
-                    gameObject,
-                    damageInfo.HitCollider,
-                    damageInfo.AttackerObject,
-                    damageInfo.HitPoint,
-                    damageInfo.HitDirection,
-                    appliedDamage
-                ),
                 status.CurrentHP,
                 status.MaxHP.FinalValue
             )

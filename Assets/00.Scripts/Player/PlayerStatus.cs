@@ -142,30 +142,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
-        // 보스 히트박스가 float 데미지로 들어오는 순간 패링 성공 여부를 먼저 확인합니다.
-        //if (TryConsumeBossParry()) return;
-
-        // 디버그나 테스트 코드에서 숫자만 넘겨도 같은 데미지 흐름을 타도록 감쌉니다.
-        TakeDamage(
-            new DamageInfo(
-                gameObject,
-                null,
-                null,
-                transform.position,
-                Vector3.zero,
-                damage
-            )
-        );
-    }
-    // 플레이 hp 100 -> 패시브 1레벨 -> hp 120 -> 패시브 2레벨 -> 패시브 1레벨 제거 -> hp 100 -> 패시브 2렙 추가
-    // hp 100/110
-
-    public void TakeDamage(DamageInfo damageInfo)
-    {
         #region 데미지 처리
-        // 다른 대상용 DamageInfo가 잘못 전달된 경우에는 처리하지 않습니다.
-        if (!IsTargetSelf(damageInfo.TargetObject)) return;
-
         // 사망 처리 중에는 추가 피해와 피격 상태 진입을 모두 무시합니다.
         if (isDeathProcessing) return;
 
@@ -187,10 +164,10 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         }
         #endregion
         // 음수 데미지나 0 데미지는 적용하지 않습니다.
-        float damage = Mathf.Max(0f, damageInfo.Damage);
-        if (Mathf.Approximately(damage, 0f)) return;
+        float appliedDamage = Mathf.Max(0f, damage);
+        if (Mathf.Approximately(appliedDamage, 0f)) return;
 
-        status.CurrentHP -= damage;
+        status.CurrentHP -= appliedDamage;
 
         if (status.CurrentHP < 0f)
         {
@@ -198,12 +175,12 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         }
 
         PublishHealthChanged();
-        PublishDamaged(damageInfo, damage);
+        PublishDamaged();
 
         // 피해 적용 후 사망 상태가 되었다면 사망 이벤트를 발행합니다.
         if (status.IsDead)
         {
-            HandleDeath(damageInfo);
+            HandleDeath();
             return;
         }
 
@@ -212,9 +189,11 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         // 살아 있다면 피격 상태로 진입해 경직과 넉백을 처리합니다.
         if (playerController != null)
         {
-            playerController.EnterHitState(damageInfo);
+            playerController.EnterHitState();
         }
     }
+    // 플레이 hp 100 -> 패시브 1레벨 -> hp 120 -> 패시브 2레벨 -> 패시브 1레벨 제거 -> hp 100 -> 패시브 2렙 추가
+    // hp 100/110
 
     public void Heal(float amount)
     {
@@ -366,29 +345,12 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         }
     }
 
-    private bool IsTargetSelf(GameObject targetObject)
+    private void PublishDamaged()
     {
-        // 대상 정보가 비어 있으면 직접 호출로 보고 현재 플레이어에게 적용합니다.
-        if (targetObject == null) return true;
-
-        // 자식 콜라이더가 맞아도 부모 플레이어가 맞은 것으로 처리합니다.
-        return targetObject == gameObject || targetObject.transform.IsChildOf(transform);
-    }
-
-    private void PublishDamaged(DamageInfo damageInfo, float appliedDamage)
-    {
-        // 후처리 시스템이 실제 적용된 데미지와 피격 정보를 함께 받을 수 있게 알립니다.
+        // 후처리 시스템이 실제 데미지가 적용된 시점을 받을 수 있게 알립니다.
         EventBus<PlayerDamagedEvent>.Publish(
             new PlayerDamagedEvent(
                 gameObject,
-                new DamageInfo(
-                    gameObject,
-                    damageInfo.HitCollider,
-                    damageInfo.AttackerObject,
-                    damageInfo.HitPoint,
-                    damageInfo.HitDirection,
-                    appliedDamage
-                ),
                 status.CurrentHP,
                 status.MaxHP.FinalValue
             )
@@ -401,7 +363,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         invincibleEndTime = Time.time + HitStunDuration + HitInvincibleDuration;
     }
 
-    private void HandleDeath(DamageInfo lastDamageInfo)
+    private void HandleDeath()
     {
         // 사망 이벤트와 상태 진입, 부활 대기를 한 번만 실행합니다.
         if (isDeathProcessing) return;
@@ -409,7 +371,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         isDeathProcessing = true;
         invincibleEndTime = 0f;
 
-        DeathInfo deathInfo = CreateDeathInfo(lastDamageInfo);
+        DeathInfo deathInfo = CreateDeathInfo();
 
         EventBus<PlayerDeadEvent>.Publish(new PlayerDeadEvent(deathInfo));
 
@@ -420,13 +382,12 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         reviveRoutine = StartCoroutine(ReviveAfterDelay());
     }
 
-    private DeathInfo CreateDeathInfo(DamageInfo lastDamageInfo)
+    private DeathInfo CreateDeathInfo()
     {
         // 현재는 데미지로 인한 사망만 연결되어 있으며, 낙하/함정은 추후 별도 진입점에서 Cause를 바꿉니다.
         return new DeathInfo(
             gameObject,
             transform.position,
-            lastDamageInfo,
             DeathCause.Damage,
             status.CurrentHP,
             status.MaxHP.FinalValue

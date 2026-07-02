@@ -104,30 +104,18 @@ public class TestMonsterMeleeAI : MonoBehaviour
             if (damagedTargets.Contains(playerStatus)) continue;
 
             damagedTargets.Add(playerStatus);
-            ApplyDamageToPlayer(playerStatus, hits[i]);
+            ApplyDamageToPlayer(playerStatus);
         }
     }
 
-    private void ApplyDamageToPlayer(PlayerStatus playerStatus, Collider hitCollider)
+    private void ApplyDamageToPlayer(PlayerStatus playerStatus)
     {
-        Vector3 hitPoint = hitCollider.ClosestPoint(transform.position);
-        Vector3 hitDirection = GetFacingDirectionVector();
-
-        DamageInfo damageInfo = new DamageInfo(
-            playerStatus.gameObject,
-            hitCollider,
-            gameObject,
-            hitPoint,
-            hitDirection,
-            attackDamage
-        );
-
         // 근접 패링 창이 열려 있으면 데미지를 넣지 않고 이번 공격을 취소합니다.
         PlayerParry playerParry = playerStatus.GetComponent<PlayerParry>();
-        if (playerParry != null && playerParry.TryConsumeMeleeParry(damageInfo))
+        if (playerParry != null && playerParry.TryConsumeMeleeParry())
             return;
 
-        playerStatus.TakeDamage(damageInfo);
+        playerStatus.TakeDamage(attackDamage);
     }
 
     private void ChaseTarget()
@@ -180,11 +168,6 @@ public class TestMonsterMeleeAI : MonoBehaviour
     {
         float direction = isFacingRight ? 1f : -1f;
         return new Vector3(offset.x * direction, offset.y, offset.z);
-    }
-
-    private Vector3 GetFacingDirectionVector()
-    {
-        return isFacingRight ? Vector3.right : Vector3.left;
     }
 
     private void EnsureDefaultPlayerHitMask()

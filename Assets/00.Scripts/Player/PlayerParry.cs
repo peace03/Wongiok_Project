@@ -105,13 +105,12 @@ public class PlayerParry : MonoBehaviour
         return CompleteBossParry();
     }
 
-    public bool TryConsumeMeleeParry(DamageInfo damageInfo)
+    public bool TryConsumeMeleeParry()
     {
         // 테스트 근접 몬스터처럼 일반 근접 공격이 데미지 직전에 호출하는 패링 판정입니다.
         if (!EnsureInitialized()) return false;
         if (!CanUseParry()) return false;
         if (!IsPlayerParryWindowValid()) return false;
-        if (!IsTargetSelf(damageInfo.TargetObject)) return false;
 
         isParryConsumed = true;
         ResetPlayerParryWindow();
@@ -156,12 +155,6 @@ public class PlayerParry : MonoBehaviour
         if (Time.time > playerParryWindowEndTime) return false;
 
         return true;
-    }
-
-    private bool IsTargetSelf(GameObject targetObject)
-    {
-        // TargetObject가 비어 있는 테스트 공격은 플레이어에게 들어온 공격으로 간주합니다.
-        return targetObject == null || targetObject == gameObject;
     }
 
     private void SetBossParryWindow(CanParryEvent data)
