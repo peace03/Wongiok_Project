@@ -5,6 +5,7 @@ public interface IBossLogics
 {
     public bool IsParryed { get; } //이번 프레임에 패링 당했는가?
     public bool IsEnranged { get; } //격노 상태인가?
+    public bool IsPhysicsOverridden { get; }
     public bool IsAttacking(); //현재 애니메이터 상태가 공격중인가?
     public bool GetStateDone(); //상태의 종료 여부
     public NodeState SetStateDone(bool set); //상태 여부 세팅

@@ -93,10 +93,13 @@ public class RingDrawer : MonoBehaviour
 
         if (useSlowMo)
         {
-            Time.timeScale = slowMoScale;
-            yield return new WaitForSecondsRealtime(slowMoDuration);
-            Time.timeScale = 1f;       // ★ 무조건 1로 복구
+            EventBus<SlowMoEvent>.Publish(new SlowMoEvent(slowMoScale, slowMoDuration));
+            //Time.timeScale = slowMoScale;
+            //yield return new WaitForSecondsRealtime(slowMoDuration);
+            //Time.timeScale = 1f;       // ★ 무조건 1로 복구
         }
+
+        yield return new WaitForSecondsRealtime(slowMoDuration);
 
         isPlaying = false;
         gameObject.SetActive(false);

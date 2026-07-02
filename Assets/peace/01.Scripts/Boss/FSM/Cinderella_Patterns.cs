@@ -71,6 +71,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public bool StateDone { get; private set; } //공격 BT 종료 여부
     public bool IsParryed => isParryed;
     public bool IsEnranged => isEnranged;
+    public bool IsPhysicsOverridden => isJumping;
 
     public BossStatus bossStatus { get; private set; }
     private Transform bossSkin;
@@ -196,7 +197,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() =>
                     {
                         telegraph.SetActive(true);
-                        telegraphDrawer.PlaySignal(A_telegraphTime);
+                        telegraphDrawer.PlaySignal(GetAdjustedTelegraphTime(A_telegraphTime));
                         telegraphExcuted = true;
                         return NodeState.Success;
                     }) //사전신호 발생
@@ -261,10 +262,16 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() => Chase(B_ChasePos, B_ChaseSpeed, (int)Animation.Chase)) //해당 위치까지 이동
                 }),
                 //사전신호
-                new Sequence(new List<Node>
+                new Selector(new List<Node>
                 {
-                    //new ConditionLeaf(), //사전신호 발생했는가?
-                    //new Leaf() //사전신호 발생
+                    new ConditionLeaf(() => telegraphExcuted), //사전신호 발생했는가?
+                    new Leaf(() =>
+                    {
+                        telegraph.SetActive(true);
+                        telegraphDrawer.PlaySignal(GetAdjustedTelegraphTime(B_telegraphTime));
+                        telegraphExcuted = true;
+                        return NodeState.Success;
+                    }) //사전신호 발생
                 }),
                 //공격 실렉터
                 new Selector(new List<Node>
@@ -372,9 +379,20 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                     new Leaf(() => Chase(UltimateChasePos, UltimateChaseSpeed, (int)Animation.Chase))
                 }),
                 //사전신호
-                new Sequence(new List<Node>
+                new Selector(new List<Node>
                 {
-
+                    new ConditionLeaf(() => telegraphExcuted), //사전신호 발생했는가?
+                    new Leaf(() =>
+                    {
+                        telegraph.SetActive(true);
+                        float time;
+                        if(comboStep == 0) time = ULTI_telegraphTime1;
+                        else if(comboStep == 1) time = ULTI_telegraphTime2;
+                        else time = ULTI_telegraphTime3;
+                        telegraphDrawer.PlaySignal(GetAdjustedTelegraphTime(time));
+                        telegraphExcuted = true;
+                        return NodeState.Success;
+                    }) //사전신호 발생
                 }),
                 //공격
                 new Selector(new List<Node>
@@ -390,7 +408,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate1, 0f)), //나중에 애니메이션 변경
                                 new Leaf(() => { EventBus<AttackFinishEvent>.Publish(default); return NodeState.Success; }), //중복공격 초기화
-                                new Leaf(() => { comboStep++; return NodeState.Success; })
+                                new Leaf(() => 
+                                { 
+                                    comboStep++;
+                                    telegraphExcuted = false;
+                                    return NodeState.Success; 
+                                })
                             }),
                         }),
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
@@ -401,7 +424,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate2, 0f)), //나중에 애니메이션 변경
                                 new Leaf(() => { EventBus<AttackFinishEvent>.Publish(default); return NodeState.Success; }), //중복공격 초기화
-                                new Leaf(() => { comboStep++; return NodeState.Success; }),
+                                new Leaf(() =>
+                                {
+                                    comboStep++;
+                                    telegraphExcuted = false;
+                                    return NodeState.Success;
+                                })
                             }),
                         }),
                         new Leaf(() => { UpdateFacing(); return NodeState.Success; }),
@@ -412,7 +440,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                             {
                                 new Leaf(() => PlayAnim_Speed((int)Animation.Ultimate3, 0f)), //나중에 애니메이션 변경
                                 new Leaf(() => { EventBus<AttackFinishEvent>.Publish(default); return NodeState.Success; }), //중복공격 초기화
-                                new Leaf(() => { comboStep++; return NodeState.Success; }),
+                                new Leaf(() =>
+                                {
+                                    comboStep++;
+                                    telegraphExcuted = false;
+                                    return NodeState.Success;
+                                })
                             }),
                         }),
                         new Leaf(() =>
@@ -433,6 +466,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     private void ParryKeyDown(ParryKeyDown data) { isParryed = true; } //패링 여부 확인
     private void Parryed() //패링되었음(패링가능, 콜라이더 토글 끄기)
     {
+        telegraphExcuted = false; //사전신호 초기화
         isParryed = false;
         isParryCanceled = true;
         EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
@@ -581,13 +615,13 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public AttackType GetAttackType() { return attackType; }
     public Node GetAttackBT()
     {
-        //do
-        //{
-        //    attackType = (AttackType)Random.Range(0, 3);
-        //}
-        //while (attackType == beforeType);
+        do
+        {
+            attackType = (AttackType)Random.Range(0, 3);
+        }
+        while (attackType == beforeType);
         beforeType = attackType;
-        attackType = AttackType.A;
+        //attackType = AttackType.B;
         //Debug.Log($"{attackType} 공격 실행");
         switch (attackType)
         {
@@ -639,6 +673,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
 
         UltimateAttack?.Reset();
         isGroggyAnimDone = false; //다음 궁극기에서 사용할 수 있도록 다시 초기화
+        isJumping = false;
     }
     #endregion
 
@@ -734,6 +769,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         return NodeState.Running;
     }
     //Enranged
+    //격노 상태에서 공속 배율에 맞추어 사전신호 시간 계산
+    private float GetAdjustedTelegraphTime(float baseTime) { return baseTime / curEnrangedAtkSpeed; }
     public void EnrangedTimer()
     {
         curEnrangedTime += Time.deltaTime;

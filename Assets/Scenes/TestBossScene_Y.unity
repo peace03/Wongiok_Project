@@ -255,11 +255,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossHitBox
   AtkType: 2
---- !u!4 &131016153 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 608321761475470972, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
-  m_PrefabInstance: {fileID: 1802285463}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &174314906
 GameObject:
   m_ObjectHideFlags: 0
@@ -783,11 +778,19 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 131016153}
+    m_TransformParent: {fileID: 1650632859}
     m_Modifications:
     - target: {fileID: 3228647102662647802, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3503361922145606439, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: useSlowMo
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3503361922145606439, guid: 5a02c05741024334a83245e867b18e74, type: 3}
+      propertyPath: slowMoDuration
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_LocalPosition.x
@@ -799,7 +802,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.65
       objectReference: {fileID: 0}
     - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_LocalRotation.w
@@ -807,15 +810,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1410,7 +1413,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossStatus
   status:
     maxHP:
-      baseValue: 2000
+      baseValue: 100
     attackSpeed:
       baseValue: 0
     telegraphSpeed:
@@ -1473,6 +1476,7 @@ Transform:
   - {fileID: 102180173}
   - {fileID: 2020555812}
   - {fileID: 594183191}
+  - {fileID: 335364876}
   m_Father: {fileID: 769151241}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1650632860
@@ -1520,16 +1524,16 @@ MonoBehaviour:
   A_parryStunDuration: 0.5
   B_ChaseSpeed: 15
   B_ChasePos: {x: 1.5, y: 0, z: 0}
-  B_telegraphTime: 0.5
+  B_telegraphTime: 0.2
   B_postAtkDelay: 3
   C_ChaseSpeed: 15
   C_ChasePos: {x: 6, y: 0, z: 0}
   C_postAtkDelay: 3
   UltimateChaseSpeed: 15
   UltimateChasePos: {x: 1.5, y: 0, z: 0}
-  ULTI_telegraphTime1: 0.5
-  ULTI_telegraphTime2: 0.5
-  ULTI_telegraphTime3: 0.5
+  ULTI_telegraphTime1: 1.2
+  ULTI_telegraphTime2: 0.08
+  ULTI_telegraphTime3: 0.43
   groggyDuration: 2
 --- !u!54 &1650632862
 Rigidbody:
@@ -1539,7 +1543,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1650632854}
   serializedVersion: 5
-  m_Mass: 0.5
+  m_Mass: 50
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1715,10 +1719,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 608321761475470972, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 335364876}
+    m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       insertIndex: -1
