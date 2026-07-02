@@ -43,6 +43,9 @@ public struct AreaSkillStageData
     [Header("각도")]
     [Tooltip("데미지가 들어갈 스킬의 최대 각도, 최대 180도")]
     public float angle;                                             // 각도
+    [Header("타격 주기")]
+    [Tooltip("데미지가 들어가는 주기(간격)\n총 타격 주기의 합이 최대 지속 시간과 같아야 함")]
+    public float tickInterval;                                      // 타격 주기
 }
 
 /// <summary>
@@ -104,19 +107,19 @@ public readonly struct ExecuteActiveSkillEffect
 {
     public readonly int id;                                         // 스킬 ID
     public readonly ACTIVE_SKILL_EFFECT_TYPE type;                  // 이펙트 종류
-    public readonly float? duration;                                // 지속 시간
     public readonly Vector3? pos;                                   // 실행 위치
+    public readonly float? duration;                                // 지속 시간
 
     /// <summary>
     /// 실행할 액티브 스킬 이펙트 정보 생성자
     /// </summary>
     public ExecuteActiveSkillEffect(int id, ACTIVE_SKILL_EFFECT_TYPE type,
-                                    float? duration = null, Vector3? pos = null)
+                                    Vector3? pos = null, float? duration = null)
     {
         this.id = id;
         this.type = type;
-        this.duration = duration;
         this.pos = pos;
+        this.duration = duration;
     }
 }
 

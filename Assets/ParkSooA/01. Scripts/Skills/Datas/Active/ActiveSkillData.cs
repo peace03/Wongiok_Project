@@ -42,8 +42,7 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
         // 정보가 없다면
         if (data == null)
         {
-            Debug.Log($"[Error | Skill] 스킬 지속 시간 받아오기 실패 => " +
-                        $"입력 - 레벨 : {level} / 정보 : 없음");
+            Debug.Log($"[Error | Skill] 스킬 지속 시간 받아오기 실패 => 입력 - 레벨 : {level} / 정보 : 없음");
             return base.GetMaxDuration(level);
         }
 

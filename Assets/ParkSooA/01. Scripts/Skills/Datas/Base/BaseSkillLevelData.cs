@@ -11,7 +11,7 @@ public abstract class BaseSkillLevelData
 
     // 스킬 효과 적용 함수
     public abstract void ApplyEffect(GameObject owner, int id = 0,
-                    IReadOnlyList<StatAdjustment> prevStats = null);
+                        IReadOnlyList<StatAdjustment> prevStats = null);
 
     // 스킬 효과 적용 해제 함수
     public virtual void RemoveEffect(GameObject owner) { }

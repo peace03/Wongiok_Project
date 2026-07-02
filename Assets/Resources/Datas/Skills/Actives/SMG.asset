@@ -21,7 +21,7 @@ MonoBehaviour:
   desc: 
   levelDatas:
   - rid: 4582174707458244765
-  weapon: {fileID: 0}
+  weapon: {fileID: 4942464512446496594, guid: 2eacda384154cde4fbdacd87f246c657, type: 3}
   effects: []
   references:
     version: 2
@@ -30,8 +30,9 @@ MonoBehaviour:
       type: {class: AreaSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
         maxCoolTime: 8
-        maxDuration: 5
+        maxDuration: 2
         stages:
         - damage: 5
           distance: 5
           angle: 25
+          tickInterval: 0.1

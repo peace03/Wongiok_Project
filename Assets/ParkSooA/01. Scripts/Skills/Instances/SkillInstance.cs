@@ -144,6 +144,8 @@ public class SkillInstance
         }
 
         Debug.Log($"[Skill] 사용 시작 => {data.SkillName}");
+        // 무기 외형 착용 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id));
 
         // 차징 시간이 없다면
         if (data.GetMaxChargingTime(curLevel) <= 0f)
@@ -160,14 +162,9 @@ public class SkillInstance
     /// </summary>
     private void SwitchState(SKILL_STATE change)
     {
-        // 현재 상태 바꾸기
-        state = change;
-        Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
-
-        // 사용 가능 상태라면
-        if (IsReady)
+        // 현재 상태가 차징이였다면
+        if(IsCharging)
         {
-            Debug.Log("스킬 슬롯 UI에 반짝거리는 이펙트가 필요하다면 채우기");
             // 차징 이펙트 종료 이벤트 발행
             EventBus<StopActiveSkillEffect>.Publish(new StopActiveSkillEffect(data.Id,
                                                                 ACTIVE_SKILL_EFFECT_TYPE.Charging));
@@ -175,11 +172,23 @@ public class SkillInstance
             EventBus<StopActiveSkillEffect>.Publish(new StopActiveSkillEffect(data.Id,
                                                                 ACTIVE_SKILL_EFFECT_TYPE.Target));
         }
-        // 쿨타임 상태라면
+
+        // 현재 상태 바꾸기
+        state = change;
+        Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
+
+        // 바꾼 상태가 사용 가능이라면
+        if (IsReady)
+            Debug.Log("스킬 슬롯 UI에 반짝거리는 이펙트가 필요하다면 이벤트 보내기");
+        // 바꾼 상태가 쿨타임이라면
         else if (IsOnCoolTime)
+        {
+            // 무기 외형 착용 해제 이벤트 발행
+            EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
             // 현재 쿨타임 초기화
             curCoolTime = 0f;
-        // 실행 상태라면
+        }
+        // 바꾼 상태가 실행이라면
         else if (IsExecuting)
         {
             // 소유자가 없다면
@@ -190,29 +199,23 @@ public class SkillInstance
                 return;
             }
 
-            // 차징 이펙트 종료 이벤트 발행
-            EventBus<StopActiveSkillEffect>.Publish(new StopActiveSkillEffect(data.Id,
-                                                                ACTIVE_SKILL_EFFECT_TYPE.Charging));
-            // 타겟(과녁) 이펙트 종료 이벤트 발행
-            EventBus<StopActiveSkillEffect>.Publish(new StopActiveSkillEffect(data.Id,
-                                                                ACTIVE_SKILL_EFFECT_TYPE.Target));
             // 현재 지속 시간 초기화
             curDuration = 0f;
             // 스킬 실행
             data.ExecuteSkill(owner, curLevel);
         }
-        // 차징 상태라면
+        // 바꾼 상태가 차징 상태라면
         else if (IsCharging)
         {
-            // 현재 차징 시간 초기화
-            curChargingTime = 0f;
             // 차징 이펙트 실행 이벤트 발행
             EventBus<ExecuteActiveSkillEffect>.Publish(new ExecuteActiveSkillEffect(data.Id,
                                                                 ACTIVE_SKILL_EFFECT_TYPE.Charging));
             // 타겟(과녁) 이펙트 실행 이벤트 발행
             EventBus<ExecuteActiveSkillEffect>.Publish(new ExecuteActiveSkillEffect(data.Id,
-                                                            ACTIVE_SKILL_EFFECT_TYPE.Target,
-                                                pos: GetLastTargetPosition(owner.transform, 25f)));
+                                                                ACTIVE_SKILL_EFFECT_TYPE.Target,
+                                                        GetLastTargetPosition(owner.transform, 25f)));
+            // 현재 차징 시간 초기화
+            curChargingTime = 0f;
         }
     }
 
@@ -242,7 +245,7 @@ public class SkillInstance
             {
                 // 데미지를 입을 수 있고 소유자와 같은 레이어를 가지고 있지 않다면
                 if (hit.transform.TryGetComponent<IDamageable>(out _)
-                    && hit.transform.gameObject.layer != owner.layer)
+                        && hit.transform.gameObject.layer != owner.layer)
                     // 위치 반환
                     return hit.transform.position;
             }
@@ -255,7 +258,7 @@ public class SkillInstance
         {
             // 데미지를 입을 수 있고 소유자와 같은 레이어를 가지고 있지 않다면
             if (hits[i].transform.TryGetComponent<IDamageable>(out _)
-                && hits[i].transform.gameObject.layer != owner.layer)
+                    && hits[i].transform.gameObject.layer != owner.layer)
                 // 위치 반환
                 return hits[i].transform.position;
         }
@@ -280,6 +283,8 @@ public class SkillInstance
         else
         {
             Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
+            // 무기 외형 착용 해제 이벤트 발행
+            EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
             // 사용 가능 상태로 변경
             SwitchState(SKILL_STATE.Ready);
         }

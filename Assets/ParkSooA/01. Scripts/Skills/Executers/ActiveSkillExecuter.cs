@@ -1,6 +1,8 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 {
@@ -13,29 +15,35 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
     private readonly List<Transform> executePositions = new();                      // 실행 위치들
 
-    private Coroutine skillCoroutine;                                               // 스킬 코루틴
-    private WaitForSeconds fireDelayTime;                                           // 사격 딜레이 시간
+    private WaitForSeconds projectileDelayTime;                                     // 발사체 스킬 딜레이 시간
+    private WaitForSeconds areaDelayTime;                                           // 영역 스킬 딜레이 시간
 
     private LayerMask skillLayer;                                                   // 스킬 레이어
+
+    // 액티브 스킬 실행 위치들 변경 이벤트 구독
+    private void OnEnable() => EventBus<ChangeActiveSkillExecutePositions>.action += SetExecutePositions;
 
     private void Awake()
     {
         // 스킬 레이어 초기화(실행 위치의 레이어로 설정)
         skillLayer = 1 << defaultExecutePos.gameObject.layer;
-        // 실행 위치들 초기화 함수
+        // 실행 위치들 초기화
         ResetExecutePositions();
     }
+
+    // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
+    private void OnDisable() => EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
 
     /// <summary>
     /// 실행 위치들 설정 함수
     /// </summary>
-    public void SetExecutePositions(List<Transform> positions)
+    public void SetExecutePositions(ChangeActiveSkillExecutePositions change)
     {
         // 실행 위치들 초기화
         executePositions.Clear();
 
         // 위치들의 수만큼
-        foreach (var pos in positions)
+        foreach (var pos in change.positions)
             // 위치가 비어있지 않다면
             if (pos != null)
                 // 실행 위치 추가
@@ -63,26 +71,19 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// </summary>
     public void ExecuteSkill(int id, ProjectileSkillLevelData skillData)
     {
-        // 스킬 코루틴이 비어있지 않다면
-        if (skillCoroutine != null)
-        {
-            Debug.Log($"[Skill] 발사체 액티브 스킬 실행 실패 => 스킬 진행 중");
-            return;
-        }
-
         Debug.Log($"[Skill] 발사체 액티브 스킬 실행 => 총 {skillData.ProjectileCount}개");
-        // 사격 딜레이 시간 구하기
-        fireDelayTime = new WaitForSeconds(skillData.MaxDuration /
+        // 발사체 스킬 딜레이 시간 구하기
+        projectileDelayTime = new WaitForSeconds(skillData.MaxDuration /
                             (skillData.ProjectileCount == 0 ? 1 : skillData.ProjectileCount));
         // 발사체 스킬 실행
-        skillCoroutine = StartCoroutine(BulletFireRoutine(skillData.ProjectileCount,
-                                        skillData.GetDamage(), skillData.PenetrationCount));
+        StartCoroutine(ProjectileRoutine(skillData.ProjectileCount, skillData.GetDamage(),
+                                                                        skillData.PenetrationCount));
     }
 
     /// <summary>
-    /// 총알 발사 코루틴 함수
+    /// 발사체 스킬 코루틴 함수
     /// </summary>
-    private IEnumerator BulletFireRoutine(int bulletCount, float damage, int penetrationCount)
+    private IEnumerator ProjectileRoutine(int bulletCount, float damage, int penetrationCount)
     {
         // 발사체 수만큼
         for (int i = 0; i < bulletCount; i += executePositions.Count)
@@ -95,12 +96,12 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 Debug.Log($"[Skill] 발사체 {i + 1} 번째 발사");
             }
 
-            // 사격 딜레이 시간만큼 대기
-            yield return fireDelayTime;
+            // 발사체 스킬 딜레이 시간만큼 대기
+            yield return projectileDelayTime;
         }
 
-        // 스킬 코루틴 초기화
-        skillCoroutine = null;
+        // 실행 위치들 초기화
+        ResetExecutePositions();
     }
 
     /// <summary>
@@ -108,22 +109,76 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// </summary>
     public void ExecuteSkill(int id, AreaSkillLevelData skillData)
     {
-        List<IDamageable> targets = new();
-
-        for(int i = 0; i < skillData.Stages.Count; i++)
+        // 실행할 스킬 단계가 없다면
+        if (skillData.Stages.Count == 0)
         {
-            foreach(var pos in executePositions)
-            {
-                targets = GetTargetsInArea(pos, skillData.Stages[i].distance,
-                                                    skillData.Stages[i].angle * 0.5f);
-
-                foreach (var target in targets)
-                    target.TakeDamage(skillData.Stages[i].damage);
-            }
+            Debug.Log($"[Skill] 영역 액티브 스킬 실행 실패 => 입력 - 스킬 ID : {id} / 스킬 단계 : 없음");
+            return;
         }
+
+        // 영역 스킬 실행
+        StartCoroutine(AreaRoutine(skillData));
     }
 
-    // 범위 안에 있는 타겟들 반환 함수
+    /// <summary>
+    /// 영역 스킬 코루틴 함수
+    /// </summary>
+    private IEnumerator AreaRoutine(AreaSkillLevelData skillData)
+    {
+        // 최대 지속 시간 받아오기
+        float duration = skillData.MaxDuration;
+        // 타겟들을 저장할 리스트
+        List<IDamageable> targets = new();
+        // 스킬 단계 인덱스
+        int stageIndex = 0;
+        // 영역 스킬 딜레이 시간 구하기
+        areaDelayTime = new WaitForSeconds(skillData.Stages[stageIndex].tickInterval);
+
+        // 최대 지속 시간만큼
+        while (duration >= 0f)
+        {
+            // 실행 위치들의 수만큼
+            foreach (var pos in executePositions)
+            {
+                // 실행 위치에서 범위 안에 있는 타겟들 받아오기
+                targets = GetTargetsInArea(pos, skillData.Stages[stageIndex].distance,
+                                                    skillData.Stages[stageIndex].angle * 0.5f);
+
+                // 타겟들이 없다면
+                if (targets == null)
+                    continue;
+
+                // 타겟들의 수만큼
+                foreach (var target in targets)
+                    // 데미지 전달
+                    target.TakeDamage(skillData.Stages[stageIndex].damage);
+            }
+
+            // 영역 스킬 딜레이 시간만큼 대기
+            yield return areaDelayTime;
+            // 지속 시간 감소
+            duration = Mathf.Max(0f, duration - skillData.Stages[stageIndex].tickInterval);
+
+            // 스킬 단계가 남아있다면
+            if (skillData.Stages.Count > stageIndex + 1)
+            {
+                // 다음 스킬 단계로
+                stageIndex++;
+                // 다음 영역 스킬 딜레이 시간 구하기
+                areaDelayTime = new WaitForSeconds(skillData.Stages[stageIndex].tickInterval);
+            }
+            // 지속 시간이 끝났다면
+            else if (duration == 0f)
+                yield break;
+        }
+
+        // 실행 위치들 초기화
+        ResetExecutePositions();
+    }
+
+    /// <summary>
+    /// 범위 안의 타겟들 반환 함수
+    /// </summary>
     private List<IDamageable> GetTargetsInArea(Transform origin, float distance, float angle)
     {
         // 원하는 위치에서 사거리의 반지름의 구의 범위에서 스킬 소유자를 제외한 나머지 대상 받아오기

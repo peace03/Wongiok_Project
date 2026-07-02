@@ -249,9 +249,6 @@ public class SkillSystemModel
             return;
         }
 
-        // 무기 외형 착용 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(
-                                                                equippedActives[(int)slot].BaseData.Id));
         // 스킬 실행
         equippedActives[(int)slot].UseSkill();
     }

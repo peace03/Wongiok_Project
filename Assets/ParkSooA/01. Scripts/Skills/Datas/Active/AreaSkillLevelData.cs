@@ -20,8 +20,8 @@ public class AreaSkillLevelData : ActiveSkillLevelData
         // 범위에서 벗어난 단계라면
         if(stage < 1 || stage > stages.Count)
         {
-            Debug.Log($"[Error | Skill] 해당 데이터 없음 => " +
-                        $"입력 : 단계 :{stage} / 스킬 단계 : 1 ~ {stages.Count}");
+            Debug.Log($"[Error | Skill] 해당 데이터 없음 => 입력 : 단계 :{stage} / " +
+                        $"스킬 단계 : 1 ~ {stages.Count}");
             return 0f;
         }
 
