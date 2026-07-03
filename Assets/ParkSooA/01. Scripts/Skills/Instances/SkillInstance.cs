@@ -208,10 +208,10 @@ public class SkillInstance
         else if (IsCharging)
         {
             // 차징 이펙트 실행 이벤트 발행
-            EventBus<ExecuteActiveSkillEffect>.Publish(new ExecuteActiveSkillEffect(data.Id,
+            EventBus<EffectPlayData>.Publish(new EffectPlayData(data.Id,
                                                                 ACTIVE_SKILL_EFFECT_TYPE.Charging));
             // 타겟(과녁) 이펙트 실행 이벤트 발행
-            EventBus<ExecuteActiveSkillEffect>.Publish(new ExecuteActiveSkillEffect(data.Id,
+            EventBus<EffectPlayData>.Publish(new EffectPlayData(data.Id,
                                                                 ACTIVE_SKILL_EFFECT_TYPE.Target,
                                                         GetLastTargetPosition(owner.transform, 25f)));
             // 현재 차징 시간 초기화

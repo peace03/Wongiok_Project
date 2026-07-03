@@ -270,19 +270,19 @@ public class SkillSystemModel
     }
 
     /// <summary>
-    /// 액티브 스킬들 시간 진행 함수
+    /// 장착한 액티브 스킬들 시간 진행 함수
     /// </summary>
     public void TickActiveSkills(float time)
     {
-        // 장착된 액티브 스킬들의 수만큼
-        foreach(var skill in equippedActives)
+        // 장착한 액티브 스킬들의 수만큼
+        for(int i = 0; i < maxActiveCount; i++)
         {
-            // 해당 슬롯이 비어있다면
-            if (skill == null || skill.BaseData == null)
+            // 장착된 액티브 스킬이 없거나, 스킬 정보가 비어있다면
+            if (equippedActives[i] == null || equippedActives[i].BaseData == null)
                 continue;
 
             // 시간 진행
-            skill.Tick(time);
+            equippedActives[i].Tick(time);
         }
     }
 

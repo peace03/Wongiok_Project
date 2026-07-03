@@ -21,7 +21,7 @@ public class Bullet : MonoBehaviour, IPoolable
     [Tooltip("날아가는 총알이 유지되는 시간, 얼마든지 조장하셔도 됨")]
     [SerializeField] private float duration = 5f;           // 지속 시간
 
-    private IObjectPool<GameObject> returnRef;              // 반납 오브젝트 풀 주소
+    private IObjectPool<GameObject> returnRef;              // 반납할 오브젝트 풀 주소
 
     private Coroutine timerCoroutine;                       // 타이머 코루틴
     private WaitForSeconds returnTime;                      // 반납 시간

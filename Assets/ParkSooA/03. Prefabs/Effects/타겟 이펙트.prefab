@@ -136,3 +136,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1f453c3cb72c474da33923340b9ad31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Effect
+  type: 0

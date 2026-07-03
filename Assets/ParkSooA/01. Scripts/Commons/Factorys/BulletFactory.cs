@@ -41,18 +41,18 @@ public class BulletFactory : MonoBehaviour, IInitializable
     public Bullet GetBullet()
     {
         // 총알 오브젝트 풀에서 받아오기
-        var obj = bullets.Get();
+        var prefab = bullets.Get();
 
         // 총알 프리팹이 없다면
-        if(obj == null)
+        if(prefab == null)
         {
             Debug.Log($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 프리팹 : 없음", this);
             return null;
         }
         // 총알 스크립트가 없다면
-        else if (!obj.TryGetComponent<Bullet>(out var bullet))
+        else if (!prefab.TryGetComponent<Bullet>(out var bullet))
         {
-            Debug.Log($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 스크립트 없음", obj);
+            Debug.Log($"[Error | Bullet] 총알 가져오기 실패 => 입력 - 총알 스크립트 없음", prefab);
             return null;
         }
         // 총알 스크립트가 있다면
