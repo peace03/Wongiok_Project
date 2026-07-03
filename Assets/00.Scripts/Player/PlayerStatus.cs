@@ -173,7 +173,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         {
             status.CurrentHP = 0f;
         }
-
+        
         // 이벤트 발행
         PublishHealthChanged();
         PublishDamaged();

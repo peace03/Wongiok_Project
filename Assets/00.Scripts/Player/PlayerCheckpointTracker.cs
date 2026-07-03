@@ -94,8 +94,7 @@ public class PlayerCheckpointTracker : MonoBehaviour
         EnsureInitialized();
 
         // 같은 번호와 낮은 번호는 재접촉해도 위치/체력/회복 아이템 스냅샷을 갱신하지 않습니다.
-        if (hasActiveCheckpoint && checkpoint.CheckpointNumber <= activeCheckpointNumber)
-            return false;
+        if (hasActiveCheckpoint && checkpoint.CheckpointNumber <= activeCheckpointNumber) return false;
 
         hasActiveCheckpoint = true;
         activeCheckpointNumber = checkpoint.CheckpointNumber;
