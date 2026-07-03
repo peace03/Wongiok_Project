@@ -76,15 +76,14 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public BossStatus bossStatus { get; private set; }
     private Transform bossSkin;
     private Rigidbody rb;
-    private AnimatorStateInfo animState;
-    private float curTime_Anim = 0f;
-    private float curTime_Idle = 0f;
-    private bool isParryed = false;     //패링 되었는지 여부
-
     private Node kickAttack;
     private Node spinShardAttack;
     private Node jumpSlamAttack;
     private Node UltimateAttack;
+
+    private float curTime_Anim = 0f;
+    private float cachedLocomotionSpeed = -999f; //이전 프레임에 주입했던 파라미터 값
+    private AnimatorStateInfo animState;
     private AttackType attackType;  //현재 공격 타입
     private AttackType beforeType = AttackType.C;  //이전 공격 타입
     private Facing curFacing = Facing.Left; //보스가 현재 바라보는 방향
@@ -95,14 +94,20 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         -90,90,-90,90,-90,90, //Ultimate
         -90, 90, //Chase
         228, -228, //Parry
-        -90, 90 //Groggy
+        -90, 90, //Groggy
+        -90, 90 //걷기
     };
 
     //Idle
     private Vector3 RandomPos;
+    private float curTime_Idle = 0f;
+    private bool hasArrived = false; //목적지 도착여부
 
     //사전신호
     private bool telegraphExcuted = false;
+
+    //공격
+    private bool isParryed = false;     //패링 되었는지 여부
 
     //공격A 타입
     private bool chaseDone = false;    //추격 실행 여부
@@ -582,32 +587,76 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #endregion
 
     #region Idle
-    public void InitCurTime_Idle() { curTime_Idle = 0f; }  //시간 초기화
+    public void InitCurTime_Idle() { curTime_Idle = 0f; hasArrived = false; }  //시간 및 도착 플래그 초기화
     public void SetRandomPos() //플레이어 기준 좌우 좌표 지정
     {
         float element = move_idlePos + Random.Range(-move_idleRange, move_idleRange);
-        if (Math.Sign(Distance) <= 0) //플레이어가 보스 오른쪽에 위치
+        //플레이어가 보스 오른쪽에 위치
+        if (Math.Sign(Distance) <= 0) RandomPos = new Vector3(playerPos.position.x + element, 0, 0);
+        //플레이어가 보스 왼쪽에 위치
+        else RandomPos = new Vector3(playerPos.position.x - element, 0, 0);
+        //이동가능 범위 밖으로 벗어나지 않도록 클램핑
+        RandomPos.x = Mathf.Clamp(RandomPos.x, groundXMin, groundXMax); 
+    }
+    //캡슐화: 애니메이션과 방향 계산만 전담하는 헬퍼 메서드
+    private void SyncLocomotionAnim(float moveDirX)
+    {
+        //이번 프레임의 목표값 계산
+        int targetAnim;
+        float targetSpeed;
+
+        if(moveDirX == 0f)
         {
-            RandomPos = new Vector3(playerPos.position.x + element, 0, 0);
-            //Debug.Log($"플레이어 - 보스 = {Distance}");
-            //Debug.Log($"{RandomPos.x}, {RandomPos.y}, {RandomPos.z}");
+            targetAnim = (int)Animation.Idle;
+            targetSpeed = 0f;
         }
-        else    //플레이어가 보스 왼쪽에 위치
-            RandomPos = new Vector3(playerPos.position.x - element, 0, 0);
-        RandomPos.x = Mathf.Clamp(RandomPos.x, groundXMin, groundXMax); //이동가능 범위 밖으로 벗어나지 않도록 클램핑
+        else
+        {
+            targetAnim = (int)Animation.Walking;
+            float facingDir = (curFacing == Facing.Right) ? 1f : -1f; //시선(우측1, 좌측-1)
+            targetSpeed = moveDirX * facingDir; //전후진 판변(이동방향*시선방향)
+        }
+
+        //목표값이 이전 프레임과 동일하다면 렌더링 호출 생략
+        if (Mathf.Abs(cachedLocomotionSpeed - targetSpeed) < 0.01f) return;
+
+        //값이 변했을 때 1회 호출
+        PlayAnim_Time(targetAnim, idleDurationTime);
+        anim.SetFloat("MoveForward", targetSpeed);
+        cachedLocomotionSpeed = targetSpeed;
     }
     public void IdleMove() //보스 기준
     {
         UpdateFacing();
-        PlayAnim_Time((int)Animation.Idle, 1f);
-        if (Math.Sign(Distance) == Math.Sign(RandomPos.x - transform.position.x))
-            { Move(0, 0, 0); curTime_Idle += Time.deltaTime; }
-        else if (transform.position.x < RandomPos.x -0.5)    //지정좌표 왼쪽에 있을 때
-            Move(move_idleSpeed, 0, 0);
-        else if (transform.position.x > RandomPos.x +0.5)   //지정좌표 오른쪽에 있을 때
-            Move(-move_idleSpeed, 0, 0);
-        else { Move(0, 0, 0); curTime_Idle += Time.deltaTime; }
-        if (curTime_Idle > idleDurationTime) SetStateDone(true); //지속시간 지나면 상태전이
+        //walking
+        if (!hasArrived)
+        {
+            //목적지까지 절대거리 계산
+            float distToTarget = Mathf.Abs(RandomPos.x - transform.position.x);
+            //도착 판정 (오차범위 이내 or 플레이어 방향, 목표방향 같고)
+            if (distToTarget <= 0.5f || (Math.Sign(Distance) == Math.Sign(RandomPos.x - transform.position.x) && distToTarget > Math.Abs(Distance)) )
+            {
+                Debug.Log("걷기 종료");
+                hasArrived = true;      //상태락 걸기
+                Move(0, 0, 0);          //물리적 정지
+                SyncLocomotionAnim(0f); //시각적 정지
+            }
+            else //아직 도착 안했을 때
+            {
+                float moveDirX = (transform.position.x < RandomPos.x) ? 1f : -1f;
+                Move(moveDirX * move_idleSpeed, 0, 0);
+                SyncLocomotionAnim(moveDirX);
+            }
+        }
+        //Idle
+        else
+        {
+            curTime_Idle += Time.deltaTime;
+            if(curTime_Idle > idleDurationTime)
+            {
+                SetStateDone(true);
+            }
+        }
     }
     #endregion
 

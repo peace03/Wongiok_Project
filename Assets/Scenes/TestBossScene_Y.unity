@@ -1511,7 +1511,7 @@ MonoBehaviour:
   HitStopFrame: 30
   cameraShakeIntensity: 0.5
   idleDurationTime: 1.5
-  move_idleSpeed: 3
+  move_idleSpeed: 5
   move_idleRange: 3
   move_idlePos: 7
   durationEnranged: 10
@@ -1520,12 +1520,12 @@ MonoBehaviour:
   A_ChasePos: {x: 1.5, y: 0, z: 0}
   A_telegraphTime: 0.5
   A_attackDuration: 1
-  A_postAtkDelay: 3
+  A_postAtkDelay: 2
   A_parryStunDuration: 0.5
   B_ChaseSpeed: 15
   B_ChasePos: {x: 1.5, y: 0, z: 0}
   B_telegraphTime: 0.2
-  B_postAtkDelay: 3
+  B_postAtkDelay: 2
   C_ChaseSpeed: 15
   C_ChasePos: {x: 6, y: 0, z: 0}
   C_postAtkDelay: 3
