@@ -174,6 +174,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
             status.CurrentHP = 0f;
         }
 
+        // 이벤트 발행
         PublishHealthChanged();
         PublishDamaged();
 
@@ -184,6 +185,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
             return;
         }
 
+        // 경직, 무적시간
         StartHitInvincibility();
 
         // 살아 있다면 피격 상태로 진입해 경직과 넉백을 처리합니다.
@@ -192,8 +194,6 @@ public class PlayerStatus : MonoBehaviour, IDamageable
             playerController.EnterHitState();
         }
     }
-    // 플레이 hp 100 -> 패시브 1레벨 -> hp 120 -> 패시브 2레벨 -> 패시브 1레벨 제거 -> hp 100 -> 패시브 2렙 추가
-    // hp 100/110
 
     public void Heal(float amount)
     {
