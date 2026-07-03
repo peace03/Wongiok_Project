@@ -32,7 +32,7 @@ public struct StatAdjustment
 }
 
 [Serializable]
-// 영역 스킬 단계 정보
+// 범위 스킬 단계 정보
 public struct AreaSkillStageData
 {
     [Header("데미지")]

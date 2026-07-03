@@ -26,6 +26,9 @@ public abstract class BaseSkillData : ScriptableObject
     public int MaxLevel => maxLevel;
     public string Desc => desc;
 
+    // 액티브 스킬 데이터 변환
+    public ActiveSkillData AsActiveSkillData => this as ActiveSkillData;
+
     // 객체 생성 함수
     public abstract SkillInstance CreateInstance(GameObject owner);
 

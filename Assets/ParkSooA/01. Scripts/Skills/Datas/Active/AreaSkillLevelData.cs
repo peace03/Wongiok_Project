@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 [Serializable]
-// 영역 액티브 스킬 레벨 정보
+// 범위 액티브 스킬 레벨 정보
 public class AreaSkillLevelData : ActiveSkillLevelData
 {
     [Header("스킬 단계")]
@@ -35,16 +35,16 @@ public class AreaSkillLevelData : ActiveSkillLevelData
         // 소유자가 없다면
         if (owner == null)
         {
-            Debug.Log($"[Error | Skill] 영역 스킬 실행 실패 => 소유자 : 없음");
+            Debug.Log($"[Error | Skill] 범위 스킬 실행 실패 => 소유자 : 없음");
             return;
         }
-        // 영역 스킬 인터페이스가 없다면
+        // 범위 스킬 인터페이스가 없다면
         else if (owner.GetComponentInChildren<IAreaSkill>(true) is not IAreaSkill executer)
         {
-            Debug.Log($"[Error | Skill] 영역 스킬 실행 실패 => 영역 스킬 인터페이스 : 없음");
+            Debug.Log($"[Error | Skill] 범위 스킬 실행 실패 => 범위 스킬 인터페이스 : 없음");
             return;
         }
-        // 영역 스킬 인터페이스가 있다면
+        // 범위 스킬 인터페이스가 있다면
         else
             // 스킬 실행
             executer.ExecuteSkill(id, this);

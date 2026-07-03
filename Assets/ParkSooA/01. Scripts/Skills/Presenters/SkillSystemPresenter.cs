@@ -28,7 +28,7 @@ public class SkillSystemPresenter
         {
             // 스킬 모델 생성하기
             model = new(owner, skillDatas);
-            //model.OnActiveSkillsChanged
+            model.OnActiveSkillsChanged += RefreshActiveSkills;
         }
         // 스킬 데이터가 없다면
         else

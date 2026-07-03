@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: 0}
   skillName: "\uC0F7\uAC74"
   type: 1
-  unlockChapter: 0
+  unlockChapter: 1
   maxLevel: 3
   desc: 
   levelDatas:

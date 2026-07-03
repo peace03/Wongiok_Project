@@ -24,7 +24,7 @@ public enum ACTIVE_SKILL_EFFECT_TYPE
     Charging,       // 차징 이펙트
     Muzzle,         // 총구 이펙트
     Trail,          // 궤적 이펙트
-    Main,           // 메인(발사체, 영역) 이펙트
+    Main,           // 메인(발사체, 범위) 이펙트
     Target,         // 타겟(과녁) 이펙트
     Hit             // 타격/피격 이펙트
 }
@@ -64,7 +64,7 @@ public enum MODIFY_TYPE
 public enum ACTIVE_SKILL_TYPE
 {
     Projectile,     // 발사체
-    Area            // 영역
+    Area            // 범위
 }
 
 /// <summary>

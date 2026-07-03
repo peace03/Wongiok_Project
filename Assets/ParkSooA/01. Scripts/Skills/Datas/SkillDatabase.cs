@@ -11,7 +11,9 @@ public static class SkillDatabase
 
     public static IReadOnlyDictionary<int, BaseSkillData> SkillDataDictionary => skillDataDictionary;
 
-    // 초기화 함수
+    /// <summary>
+    /// 초기화 함수
+    /// </summary>
     public static void Init()
     {
         // 초기화가 됐다면
@@ -30,6 +32,11 @@ public static class SkillDatabase
             // ID에 해당하는 스킬 정보가 없다면
             if (!skillDataDictionary.TryGetValue(data.Id, out var existData))
             {
+                // 액티브 스킬 데이터 변환이 가능하다면
+                if(data.AsActiveSkillData != null)
+                    // 이펙트 정렬하기
+                    data.AsActiveSkillData.SortEffects();
+
                 // 스킬 정보 추가
                 skillDataDictionary[data.Id] = data;
                 skillDataList.Add(data);
@@ -46,12 +53,18 @@ public static class SkillDatabase
         Debug.Log($"[Skill] 데이터베이스 초기화 완료");
     }
 
-    // ID로 스킬 정보 찾는 함수
+    /// <summary>
+    /// ID로 스킬 정보 찾는 함수
+    /// </summary>
+    /// <param name="id">스킬 ID</param>
+    /// <param name="viewLog">로그 출력 여부</param>
+    /// <returns></returns>
     public static BaseSkillData FindDataById(int id, bool viewLog = true)
     {
         // ID에 해당하는 스킬 정보가 없다면
         if(!skillDataDictionary.TryGetValue(id, out var data))
         {
+            // 로그 출력 여부에 따라
             if(viewLog)
                 Debug.Log($"[Error | Skill] 해당 데이터 없음 => 입력 - ID : {id}");
 
@@ -61,7 +74,11 @@ public static class SkillDatabase
         return data;
     }
 
-    // ID로 스킬 정보들 찾는 함수
+    /// <summary>
+    /// ID로 스킬 정보들 찾는 함수
+    /// </summary>
+    /// <param name="ids">스킬 ID들</param>
+    /// <param name="results">스킬 정보들</param>
     public static void FindDatasById(int[] ids, List<BaseSkillData> results)
     {
         // ID들이 없거나, 찾는 ID가 없거나, 결과를 담을 리스트가 없다면
@@ -86,7 +103,11 @@ public static class SkillDatabase
                 results.Add(data);
     }
 
-    // 챕터 종류로 스킬 정보들 찾는 함수
+    /// <summary>
+    /// 챕터 종류로 스킬 정보들 찾는 함수
+    /// </summary>
+    /// <param name="chapter">챕터 종류</param>
+    /// <param name="results">스킬 정보들</param>
     public static void FindDatasByChapter(CHAPTER_TYPE chapter, List<BaseSkillData> results)
     {
         // 결과를 담을 리스트가 없다면

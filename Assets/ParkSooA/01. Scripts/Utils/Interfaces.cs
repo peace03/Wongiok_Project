@@ -14,12 +14,12 @@ public interface IProjectileSkill
 }
 
 /// <summary>
-/// 영역 액티브 스킬 인터페이스
+/// 범위 액티브 스킬 인터페이스
 /// </summary>
 public interface IAreaSkill
 {
     /// <summary>
-    /// 영역 액티브 스킬 실행 함수
+    /// 범위 액티브 스킬 실행 함수
     /// </summary>
     public void ExecuteSkill(int id, AreaSkillLevelData skillData);
 }

@@ -16,7 +16,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private readonly List<Transform> executePositions = new();                      // 실행 위치들
 
     private WaitForSeconds projectileDelayTime;                                     // 발사체 스킬 딜레이 시간
-    private WaitForSeconds areaDelayTime;                                           // 영역 스킬 딜레이 시간
+    private WaitForSeconds areaDelayTime;                                           // 범위 스킬 딜레이 시간
 
     private LayerMask skillLayer;                                                   // 스킬 레이어
 
@@ -105,23 +105,23 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     }
 
     /// <summary>
-    /// 영역 스킬 실행 함수
+    /// 범위 스킬 실행 함수
     /// </summary>
     public void ExecuteSkill(int id, AreaSkillLevelData skillData)
     {
         // 실행할 스킬 단계가 없다면
         if (skillData.Stages.Count == 0)
         {
-            Debug.Log($"[Skill] 영역 액티브 스킬 실행 실패 => 입력 - 스킬 ID : {id} / 스킬 단계 : 없음");
+            Debug.Log($"[Skill] 범위 액티브 스킬 실행 실패 => 입력 - 스킬 ID : {id} / 스킬 단계 : 없음");
             return;
         }
 
-        // 영역 스킬 실행
+        // 범위 스킬 실행
         StartCoroutine(AreaRoutine(skillData));
     }
 
     /// <summary>
-    /// 영역 스킬 코루틴 함수
+    /// 범위 스킬 코루틴 함수
     /// </summary>
     private IEnumerator AreaRoutine(AreaSkillLevelData skillData)
     {
@@ -131,7 +131,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         List<IDamageable> targets = new();
         // 스킬 단계 인덱스
         int stageIndex = 0;
-        // 영역 스킬 딜레이 시간 구하기
+        // 범위 스킬 딜레이 시간 구하기
         areaDelayTime = new WaitForSeconds(skillData.Stages[stageIndex].tickInterval);
 
         // 최대 지속 시간만큼
@@ -154,7 +154,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                     target.TakeDamage(skillData.Stages[stageIndex].damage);
             }
 
-            // 영역 스킬 딜레이 시간만큼 대기
+            // 범위 스킬 딜레이 시간만큼 대기
             yield return areaDelayTime;
             // 지속 시간 감소
             duration = Mathf.Max(0f, duration - skillData.Stages[stageIndex].tickInterval);
@@ -164,12 +164,12 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             {
                 // 다음 스킬 단계로
                 stageIndex++;
-                // 다음 영역 스킬 딜레이 시간 구하기
+                // 다음 범위 스킬 딜레이 시간 구하기
                 areaDelayTime = new WaitForSeconds(skillData.Stages[stageIndex].tickInterval);
             }
             // 지속 시간이 끝났다면
             else if (duration == 0f)
-                yield break;
+                break;
         }
 
         // 실행 위치들 초기화
