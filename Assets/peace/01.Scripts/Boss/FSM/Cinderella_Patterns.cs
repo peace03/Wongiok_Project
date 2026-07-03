@@ -9,6 +9,9 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public int Priority => (int)InitOrder.Boss + 1;
 
     #region 인스펙터
+    [Header("Test")]
+    [SerializeField] private ExcuteAttackType_InGame excuteAttackType_InGame;
+
     [Header("Animator")]
     [SerializeField] private Animator anim;
 
@@ -587,7 +590,12 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     #endregion
 
     #region Idle
-    public void InitCurTime_Idle() { curTime_Idle = 0f; hasArrived = false; }  //시간 및 도착 플래그 초기화
+    public void InitCurTime_Idle() //시간 및 도착 플래그 초기화
+    { 
+        curTime_Idle = 0f;
+        hasArrived = false;
+        cachedLocomotionSpeed = -999f;
+    }  
     public void SetRandomPos() //플레이어 기준 좌우 좌표 지정
     {
         float element = move_idlePos + Random.Range(-move_idleRange, move_idleRange);
@@ -628,6 +636,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public void IdleMove() //보스 기준
     {
         UpdateFacing();
+        curTime_Idle += Time.deltaTime;
         //walking
         if (!hasArrived)
         {
@@ -648,14 +657,9 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 SyncLocomotionAnim(moveDirX);
             }
         }
-        //Idle
-        else
+        if(curTime_Idle > idleDurationTime)
         {
-            curTime_Idle += Time.deltaTime;
-            if(curTime_Idle > idleDurationTime)
-            {
-                SetStateDone(true);
-            }
+            SetStateDone(true);
         }
     }
     #endregion
@@ -664,14 +668,30 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     public AttackType GetAttackType() { return attackType; }
     public Node GetAttackBT()
     {
-        do
+        //실행시 반복한 공격 타입 선택
+        switch (excuteAttackType_InGame)
         {
-            attackType = (AttackType)Random.Range(0, 3);
+            case ExcuteAttackType_InGame.A:
+                attackType = AttackType.A;
+                break;
+            case ExcuteAttackType_InGame.B:
+                attackType = AttackType.B;
+                break;
+            case ExcuteAttackType_InGame.C:
+                attackType = AttackType.C;
+                break;
+            case ExcuteAttackType_InGame.ALL:
+                do
+                {
+                    attackType = (AttackType)Random.Range(0, 3);
+                }
+                while (attackType == beforeType);
+                beforeType = attackType;
+                break;
         }
-        while (attackType == beforeType);
-        beforeType = attackType;
         //attackType = AttackType.B;
         //Debug.Log($"{attackType} 공격 실행");
+        //FSM에 BT 반환
         switch (attackType)
         {
             case AttackType.A:

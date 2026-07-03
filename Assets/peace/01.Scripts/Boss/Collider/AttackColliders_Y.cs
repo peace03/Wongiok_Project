@@ -35,7 +35,7 @@ public class AttackColliders_Y : MonoBehaviour
         for (int i = 0; i < attackColliders.Count; i++)
         {
             if (data.dir == Facing.Left) attackColliders[i].center = defaultPos[i];
-            else attackColliders[i].center = -defaultPos[i];
+            else attackColliders[i].center = new Vector3(-defaultPos[i].x, defaultPos[i].y, defaultPos[i].z);
         }
     }
 }

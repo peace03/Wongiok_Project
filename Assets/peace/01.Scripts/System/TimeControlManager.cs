@@ -8,6 +8,9 @@ public class TimeControlManager : MonoBehaviour, IInitializable
 
     private Coroutine timeCoroutine; //현재 실행중인 시간정지 메모리블록
     private float originalFixedDelta;   //물리 엔진 기본 1틱 시간
+    private float timeEventLockDuration = 2f; //타임 스케일 조절 이벤트 잠금 시간
+    private float curTime = 0f; //타임스케일 다중 접근 방지
+    private bool publishTimeEvent = false; //타임 이벤트 발행되었는지 확인
 
     public void Init()
     {
@@ -31,6 +34,11 @@ public class TimeControlManager : MonoBehaviour, IInitializable
             StopCoroutine(timeCoroutine);
             RestoreTime();
         }
+    }
+
+    private void Update()
+    {
+        
     }
 
     //히트스탑 처리

@@ -790,7 +790,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3503361922145606439, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: slowMoDuration
-      value: 0.2
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 5467757677575804266, guid: 5a02c05741024334a83245e867b18e74, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1503,6 +1503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bff7f09bf4502e48b9fefb1d96c0791, type: 3}
   m_Name: 
   m_EditorClassIdentifier: PeaceScripts::Cinderella_Patterns
+  excuteAttackType_InGame: 0
   anim: {fileID: 624802513}
   telegraph: {fileID: 335364873}
   spawnPos: {fileID: 415502605}
@@ -1532,8 +1533,8 @@ MonoBehaviour:
   UltimateChaseSpeed: 15
   UltimateChasePos: {x: 1.5, y: 0, z: 0}
   ULTI_telegraphTime1: 1.2
-  ULTI_telegraphTime2: 0.08
-  ULTI_telegraphTime3: 0.43
+  ULTI_telegraphTime2: 0.07
+  ULTI_telegraphTime3: 0.5
   groggyDuration: 2
 --- !u!54 &1650632862
 Rigidbody:
@@ -1583,8 +1584,8 @@ MonoBehaviour:
   defaultPos:
   - {x: -1, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0.5, z: 0}
-  - {x: 0, y: 0.5, z: 0}
+  - {x: 0, y: -0.5, z: 0}
+  - {x: 0, y: -0.75, z: 0}
   - {x: -1, y: 0, z: 0}
 --- !u!1 &1756871974
 GameObject:
@@ -1793,8 +1794,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 0
   serializedVersion: 3
-  m_Size: {x: 3, y: 1, z: 4}
-  m_Center: {x: 0, y: -0.5, z: 0}
+  m_Size: {x: 3, y: 0.5, z: 4}
+  m_Center: {x: 0, y: -0.75, z: 0}
 --- !u!1 &2111817618
 GameObject:
   m_ObjectHideFlags: 0
