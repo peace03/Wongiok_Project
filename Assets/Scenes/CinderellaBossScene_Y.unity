@@ -1503,7 +1503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bff7f09bf4502e48b9fefb1d96c0791, type: 3}
   m_Name: 
   m_EditorClassIdentifier: PeaceScripts::Cinderella_Patterns
-  excuteAttackType_InGame: 0
+  excuteAttackType_InGame: 3
   anim: {fileID: 624802513}
   telegraph: {fileID: 335364873}
   spawnPos: {fileID: 415502605}
@@ -1521,15 +1521,16 @@ MonoBehaviour:
   A_ChasePos: {x: 1.5, y: 0, z: 0}
   A_telegraphTime: 0.5
   A_attackDuration: 1
-  A_postAtkDelay: 2
+  A_postAtkDelay: 0.5
   A_parryStunDuration: 0.5
   B_ChaseSpeed: 15
   B_ChasePos: {x: 1.5, y: 0, z: 0}
   B_telegraphTime: 0.2
-  B_postAtkDelay: 2
+  B_postAtkDelay: 1
+  waveEffect: {fileID: 0}
   C_ChaseSpeed: 15
   C_ChasePos: {x: 6, y: 0, z: 0}
-  C_postAtkDelay: 3
+  C_postAtkDelay: 1.2
   UltimateChaseSpeed: 15
   UltimateChasePos: {x: 1.5, y: 0, z: 0}
   ULTI_telegraphTime1: 1.2

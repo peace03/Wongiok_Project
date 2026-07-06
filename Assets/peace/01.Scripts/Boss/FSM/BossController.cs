@@ -58,7 +58,7 @@ public class BossController : MonoBehaviour, IInitializable
     private void Update()
     {
         curState?.Update();
-        if (Input.GetKeyDown(KeyCode.Space)) status.TakeDamage(20);
+        if (Input.GetKeyDown(KeyCode.Space)) status.TakeDamage(10);
     }
 
     public void ChangeState(State state)

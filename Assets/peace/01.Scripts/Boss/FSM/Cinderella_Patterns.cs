@@ -51,8 +51,9 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     [SerializeField] private Vector3 B_ChasePos;
     [SerializeField] private float B_telegraphTime;
     [Tooltip("후딜 시간")][SerializeField] private float B_postAtkDelay;
-    
+
     [Header("AttackC 상태")]
+    [SerializeField] private ParticleSystem waveEffect;
     [SerializeField] private float C_ChaseSpeed;
     [SerializeField] private Vector3 C_ChasePos;
     [Tooltip("후딜 시간")][SerializeField] private float C_postAtkDelay;
@@ -255,7 +256,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
                 {
                     Parryed();
                     
-                    bossStatus.TakeDamage(30); //패링시 파편반사로 인한 데미지
+                    bossStatus.TakeDamage(30); //패링시 파편반사로 인한 데미지(나중에 플레이어 공격력 가져와서 더해주기)
                     SetStateDone(true);
                     return NodeState.Success;
                 })
@@ -471,6 +472,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
     }
 
     #region CommonLogic
+    #region Parrying
     private void ParryKeyDown(ParryKeyDown data) { isParryed = true; } //패링 여부 확인
     private void Parryed() //패링되었음(패링가능, 콜라이더 토글 끄기)
     {
@@ -480,16 +482,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
         EventBus<ColliderToggleEvent>.Publish(new ColliderToggleEvent(attackType, false));
     }
-    public bool IsAttacking() //애니메이터 파라미터 읽어 현재 공격 상태인지 식별
-    {
-        int currentAnim = anim.GetInteger("Boss");
-        return currentAnim == (int)Animation.AttackA ||
-            currentAnim == (int)Animation.AttackB ||
-            currentAnim == (int)Animation.AttackC ||
-            currentAnim == (int)Animation.Ultimate1 ||
-            currentAnim == (int)Animation.Ultimate2 ||
-            currentAnim == (int)Animation.Ultimate3;
-    }
+    #endregion
+    #region Moving
     private void Move(float x, float y, float z)
     {
         this.x = x;
@@ -501,6 +495,8 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         rb.linearVelocity = new Vector3(x, y, z);
         //Debug.Log($"{isParryed}");
     }
+    #endregion
+    #region Animation
     public void UpdateFacing() //보스가 플레이어 바라보는 방향 갱신
     {
         Facing newFacing = (Distance < 0) ? Facing.Left : Facing.Right;
@@ -573,6 +569,26 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         if (curTime_Anim < targetSeconds) return NodeState.Running;
         else { anim.speed = 1.0f; return NodeState.Success; }
     }
+    #endregion
+    #region Effect
+    public void PlayEffect(ParticleSystem excuteEffect, float x, float y, float z)
+    {
+        Vector3 effectPos = new Vector3(x, y, z);
+        excuteEffect.transform.position = effectPos;
+        excuteEffect.Play();
+    }
+    #endregion
+    #region Etc
+    public bool IsAttacking() //애니메이터 파라미터 읽어 현재 공격 상태인지 식별
+    {
+        int currentAnim = anim.GetInteger("Boss");
+        return currentAnim == (int)Animation.AttackA ||
+            currentAnim == (int)Animation.AttackB ||
+            currentAnim == (int)Animation.AttackC ||
+            currentAnim == (int)Animation.Ultimate1 ||
+            currentAnim == (int)Animation.Ultimate2 ||
+            currentAnim == (int)Animation.Ultimate3;
+    }
     public NodeState SetStateDone(bool set)
     {
         if(StateDone != set) StateDone = set;
@@ -580,6 +596,7 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         return NodeState.Success;
     }
     public bool GetStateDone() { return StateDone; } //상태 종료 확인
+    #endregion
     #endregion
 
     #region Spawn
@@ -773,9 +790,13 @@ public class Cinderella_Patterns : MonoBehaviour, IInitializable, IBossLogics
         if (anim.IsInTransition(0)) return NodeState.Running;
         //종료 판정
         animState = anim.GetCurrentAnimatorStateInfo(0);
-        //진행도 0.5일때 파동공격 콜라이더 실행
-        if (animState.normalizedTime >= 0.3f)
+        //진행도 0.5일때 파동공격 콜라이더 및 이펙트 실행
+        if (animState.normalizedTime >= 0.3f && attackType != AttackType.C_2)
+        {
+            //이펙트 재생
+            //PlayEffect(waveEffect, transform.position.x, ground.bounds.max.y, transform.position.z);
             attackType = AttackType.C_2;
+        }
         //진행도가 1.0에 근접했다면
         if(animState.normalizedTime >= 0.95f)
         {
