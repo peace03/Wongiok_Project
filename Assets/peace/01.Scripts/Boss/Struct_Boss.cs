@@ -13,11 +13,11 @@ public struct CanParryEvent
 //공격 콜라이더 토글 이벤트
 public struct ColliderToggleEvent
 {
-    public AttackType type { get; private set; }
+    public string attackId { get; private set; }
     public bool state { get; private set; }
-    public ColliderToggleEvent(AttackType type, bool state)
+    public ColliderToggleEvent(string attackId, bool state)
     {
-        this.type = type;
+        this.attackId = attackId;
         this.state = state;
     }
 }

@@ -6,11 +6,11 @@ using UnityEngine;
 public class BossAnimatorRelay : MonoBehaviour, IInitializable
 {
     public int Priority => (int)InitOrder.Boss + 5;
-    private Cinderella_Patterns logics;
+    private IBossAnimatorMoveHandler logics;
 
     public void Init()
     {
-        logics = ServiceLocator_Y.Get<Cinderella_Patterns>();
+        logics = GetComponentInParent<IBossAnimatorMoveHandler>();
     }
 
     //매 프레임 루트모션 통제권을 넘겨줌

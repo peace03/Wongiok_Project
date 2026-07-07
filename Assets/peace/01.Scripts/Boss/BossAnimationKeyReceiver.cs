@@ -30,12 +30,12 @@ public class BossAnimationKeyReceiver : MonoBehaviour, IInitializable
 
         //Debug.Log("공격 콜라이더 온!");
         EventBus<ColliderToggleEvent>.
-            Publish(new ColliderToggleEvent(bossPatternLogic.GetAttackType(), true));
+            Publish(new ColliderToggleEvent(bossPatternLogic.GetAttackId(), true));
     }
     public void OffCollider()
     {
         //Debug.Log("공격 콜라이더 오프!");
         EventBus<ColliderToggleEvent>.
-            Publish(new ColliderToggleEvent(bossPatternLogic.GetAttackType(), false));
+            Publish(new ColliderToggleEvent(bossPatternLogic.GetAttackId(), false));
     }
 }
