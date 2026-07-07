@@ -166,10 +166,10 @@ public class SkillInstance
         if(IsCharging)
         {
             // 차징 이펙트 종료 이벤트 발행
-            EventBus<StopActiveSkillEffect>.Publish(new StopActiveSkillEffect(data.Id,
+            EventBus<EffectStopData>.Publish(new EffectStopData(data.Id,
                                                                 ACTIVE_SKILL_EFFECT_TYPE.Charging));
             // 타겟(과녁) 이펙트 종료 이벤트 발행
-            EventBus<StopActiveSkillEffect>.Publish(new StopActiveSkillEffect(data.Id,
+            EventBus<EffectStopData>.Publish(new EffectStopData(data.Id,
                                                                 ACTIVE_SKILL_EFFECT_TYPE.Target));
         }
 

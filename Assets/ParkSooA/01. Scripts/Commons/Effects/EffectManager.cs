@@ -1,14 +1,25 @@
-using NUnit.Framework.Internal;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class EffectSingletonManager : MonoBehaviour
+public class EffectManager : MonoBehaviour
 {
-    public static EffectSingletonManager Instance { get; private set; }        // 싱글톤 인스턴스
+    public static EffectManager Instance { get; private set; }        // 싱글톤 인스턴스
 
     // 모든 이펙트 오브젝트 풀 딕셔너리
     private readonly Dictionary<GameObject, IObjectPool<GameObject>> effectPools = new();
+
+    private void OnEnable()
+    {
+        // 이펙트 추가 이벤트 구독
+        EventBus<EffectAddData>.action += AddEffect;
+        // 이펙트 실행 이벤트 구독
+        EventBus<EffectPlayData>.action += OnPlayEffectEvent;
+        // 이펙트 종료 이벤트 구독
+        EventBus<EffectStopData>.action += StopEffect;
+        // 이펙트 초기화 이벤트 구독
+        EventBus<EffectResetData>.action += ResetEffect;
+    }
 
     private void Awake()
     {
@@ -16,6 +27,18 @@ public class EffectSingletonManager : MonoBehaviour
             Instance = this;
         else
             Destroy(this);
+    }
+
+    private void OnDisable()
+    {
+        // 이펙트 추가 이벤트 구독 해제
+        EventBus<EffectAddData>.action -= AddEffect;
+        // 이펙트 실행 이벤트 구독 해제
+        EventBus<EffectPlayData>.action -= OnPlayEffectEvent;
+        // 이펙트 종료 이벤트 구독 해제
+        EventBus<EffectStopData>.action -= StopEffect;
+        // 이펙트 초기화 이벤트 구독 해제
+        EventBus<EffectResetData>.action -= ResetEffect;
     }
 
     /// <summary>
@@ -42,39 +65,44 @@ public class EffectSingletonManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 이펙트들 추가 함수
+    /// [구조체 | 이벤트] 이펙트 추가 함수
     /// </summary>
-    /// <param name="prefabs">추가할 이펙트 프리팹들</param>
-    /// <param name="size">이펙트 최대 생성 개수(생략 가능, 기본값 : 100)</param>
-    public void AddEffects(List<GameObject> prefabs, int size = 100)
+    /// <param name="data">추가할 이펙트 정보 구조체</param>
+    public void AddEffect(EffectAddData data) => AddEffect(data.prefab, data.size);
+
+    /// <summary>
+    /// [구조체] 이펙트들 추가 함수
+    /// </summary>
+    /// <param name="datas">추가할 이펙트 정보 구조체들</param>
+    public void AddEffects(List<EffectAddData> datas)
     {
         // 리스트가 없거나, 비어있다면
-        if(prefabs == null || prefabs.Count == 0)
+        if(datas == null || datas.Count == 0)
         {
-            Debug.Log($"[Error | Effect] 이펙트 추가 실패 => 입력 - 이펙트 프리팹들 : 없음");
+            Debug.Log($"[Error | Effect] 이펙트 추가 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
-        // 프리팹들의 수만큼
-        foreach (var prefab in prefabs)
+        // 이펙트들의 수만큼
+        for(int i = 0; i < datas.Count; i++)
             // 이펙트 추가
-            AddEffect(prefab, size);
+            AddEffect(datas[i]);
     }
 
     /// <summary>
-    /// 이펙트 실행 함수
+    /// 이펙트 실행 후 실행한 이펙트 반환하는 함수
     /// </summary>
     /// <param name="prefab">이펙트 프리팹</param>
     /// <param name="pos">위치</param>
     /// <param name="rot">각도</param>
     /// <param name="duration">지속 시간</param>
     /// <param name="parent">따라다닐 대상</param>
-    public void PlayEffect(GameObject prefab, Vector3 pos, Quaternion rot,
+    public Effect PlayEffect(GameObject prefab, Vector3 pos, Quaternion rot,
                                 float? duration = null, Transform parent = null)
     {
         // 실행할 이펙트가 없다면
         if (prefab == null)
-            return;
+            return null;
 
         // 이펙트 오브젝트 풀이 없다면
         if (!effectPools.TryGetValue(prefab, out var effectPool))
@@ -90,13 +118,13 @@ public class EffectSingletonManager : MonoBehaviour
 
         // 실행할 이펙트가 없다면
         if (effect == null)
-            return;
+            return null;
 
         // 실행자 인터페이스가 없다면
         if (!effect.TryGetComponent<IEffectExecuter>(out var executer))
         {
             Debug.Log($"[Error | Effect] 이펙트 실행 실패 => 입력 - 이펙트 실행자 : 없음", effect.gameObject);
-            return;
+            return null;
         }
 
         // 이펙트의 위치와 각도 설정
@@ -115,6 +143,9 @@ public class EffectSingletonManager : MonoBehaviour
         else
             // 꺼지지 않는 이펙트 실행
             executer.ExecuteEffect();
+
+        // 실행한 이펙트 반환
+        return effect;
     }
 
     /// <summary>
@@ -148,17 +179,64 @@ public class EffectSingletonManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 구조체로 하는 이펙트 실행 함수
+    /// [구조체] 이펙트 실행 후 실행한 이펙트 반환하는 함수
     /// </summary>
     /// <param name="data">실행할 이펙트 정보 구조체</param>
-    public void PlayEffect(EffectPlayData data)
+    public Effect PlayEffect(EffectPlayData data)
         => PlayEffect(data.prefab, data.position, data.rotation, data.duration, data.parent);
 
     /// <summary>
-    /// 이펙트들 실행 함수
+    /// [이벤트] 이펙트 실행 이벤트
+    /// </summary>
+    /// <param name="data">실행할 이펙트 정보 구조체</param>
+    private void OnPlayEffectEvent(EffectPlayData data) => PlayEffect(data);
+
+    /// <summary>
+    /// [구조체] 이펙트들 실행 후 실행한 이펙트를 리스트에 저장하는 함수
     /// </summary>
     /// <param name="datas">실행할 이펙트 정보 구조체들</param>
-    public void PlayEffects(List<EffectPlayData> datas)
+    /// <param name="results">실행할 이펙트들을 담을 리스트</param>
+    public void PlayEffects(List<EffectPlayData> datas, List<Effect> results)
+    {
+        // 리스트가 없거나, 비어있다면
+        if (datas == null || datas.Count == 0)
+            return;
+
+        // 리스트 초기화
+        results.Clear();
+
+        // 이펙트들의 수만큼
+        for (int i = 0; i < datas.Count; i++)
+            // 이펙트 실행 후 결과 리스트에 추가
+            results.Add(PlayEffect(datas[i]));
+    }
+
+    /// <summary>
+    /// 이펙트 종료 함수
+    /// </summary>
+    /// <param name="effect">종료할 이펙트</param>
+    /// <param name="immediately">즉시 종료 여부(생략 가능, 기본값 : 즉시 종료 안함)</param>
+    public void StopEffect(Effect effect, bool immediately = false)
+    {
+        // 종료할 이펙트가 없다면
+        if (effect == null)
+            return;
+
+        // 이펙트 종료
+        effect.StopEffect(immediately);
+    }
+
+    /// <summary>
+    /// [구조체 | 이벤트] 이펙트 종료 함수
+    /// </summary>
+    /// <param name="data">종료할 이펙트 정보 구조체</param>
+    public void StopEffect(EffectStopData data) => StopEffect(data.effect, data.immediately);
+
+    /// <summary>
+    /// [구조체] 이펙트들 종료 함수
+    /// </summary>
+    /// <param name="datas">종료할 이펙트 정보 구조체들</param>
+    public void StopEffects(List<EffectStopData> datas)
     {
         // 리스트가 없거나, 비어있다면
         if (datas == null || datas.Count == 0)
@@ -166,62 +244,43 @@ public class EffectSingletonManager : MonoBehaviour
 
         // 이펙트들의 수만큼
         for (int i = 0; i < datas.Count; i++)
-            // 이펙트 실행
-            PlayEffect(datas[i]);
-    }
-
-    /*
-    // 종료 함수를 만들려면 Play시 Effect를 반환하게 만들어야 함
-    /// <summary>
-    /// 이펙트 종료 함수
-    /// </summary>
-    private void StopEffect(GameObject prefab)
-    {
-        // 종료할 이펙트가 없다면
-        if (!effectPools.TryGetValue(prefab, out var effectPool))
-            return;
-
-        // 실행자 인터페이스가 없다면
-        if (!effect.prefab.TryGetComponent<IEffectExecuter>(out var executer))
-        {
-            Debug.Log($"[Effect] 이펙트 종료 실패 => " +
-                        $"입력 - 이펙트 종류 : {effect.type.ToKoreanString()} / " +
-                        $"이펙트 실행자 : 없음", effect.prefab);
-            continue;
-        }
+            // 이펙트 종료
+            StopEffect(datas[i]);
     }
 
     /// <summary>
     /// 이펙트 초기화 함수
     /// </summary>
-    private void ResetEffects(ResetActiveSkillEffect reset)
+    /// <param name="effect">초기화할 이펙트</param>
+    public void ResetEffect(Effect effect)
     {
         // 초기화할 이펙트가 없다면
-        if (!effectPools.TryGetValue(reset.id, out var skillEffect))
-        {
-            Debug.Log($"[Effect] 이펙트 초기화 실패 => 입력 - 스킬 ID : {reset.id} / " +
-                        $"이펙트 종류 : {reset.type.ToKoreanString()} / 초기화할 이펙트 : 없음");
+        if (effect == null)
             return;
-        }
 
-        // 스킬 이펙트들의 수만큼
-        foreach (var effect in skillEffect)
-        {
-            // 실행자 인터페이스가 없다면
-            if (!effect.prefab.TryGetComponent<IEffectExecuter>(out var executer))
-            {
-                Debug.Log($"[Effect] 이펙트 초기화 실패 => " +
-                            $"입력 - 이펙트 종류 : {effect.type.ToKoreanString()} / " +
-                            $"이펙트 실행자 : 없음", effect.prefab);
-                continue;
-            }
-            // 이펙트 종류가 다르다면
-            else if (effect.type != reset.type)
-                continue;
-
-            // 이펙트 초기화
-            executer.ResetEffect();
-        }
+        // 이펙트 초기화
+        effect.ResetEffect();
     }
-    */
+
+    /// <summary>
+    /// [구조체 | 이벤트] 이펙트 초기화 함수
+    /// </summary>
+    /// <param name="data">초기화할 이펙트 정보 구조체</param>
+    public void ResetEffect(EffectResetData data) => ResetEffect(data.effect);
+
+    /// <summary>
+    /// [구조체] 이펙트들 초기화 함수
+    /// </summary>
+    /// <param name="datas">초기화할 이펙트 정보 구조체들</param>
+    public void ResetEffects(List<EffectResetData> datas)
+    {
+        // 리스트가 없거나, 비어있다면
+        if (datas == null || datas.Count == 0)
+            return;
+
+        // 이펙트들의 수만큼
+        for (int i = 0; i < datas.Count; i++)
+            // 이펙트 초기화
+            ResetEffect(datas[i]);
+    }
 }
