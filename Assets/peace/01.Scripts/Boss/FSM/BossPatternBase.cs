@@ -31,8 +31,6 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     [Header("Idle")]
     [SerializeField] protected float idleDurationTime;
     [Tooltip("Move speed")][Min(0)][SerializeField] protected float move_idleSpeed;
-    [Tooltip("Random move range near target position")][Min(0)][SerializeField] protected float move_idleRange;
-    [Min(3)][SerializeField] protected float move_idlePos;
 
     [Header("Enranged")]
     [SerializeField] protected float durationEnranged;
@@ -63,6 +61,10 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
 
     // [최적화]: 애니메이터(C++)로 매 프레임 불필요한 데이터를 쏘지 않기 위한 '더티 플래그(Dirty Flag)' 캐싱 변수
     protected float cachedLocomotionSpeed = -999f;
+    // 이동 애니메이션은 Num/방향/MoveForward 중 하나라도 바뀔 때만 Animator에 다시 주입한다.
+    // RougeHood처럼 거리 유지 상태를 매 프레임 판정하는 보스가 Idle/Walk를 계속 처음부터 재생하는 문제를 막기 위한 캐시다.
+    protected int cachedLocomotionAnim = -1;
+    protected Facing cachedLocomotionFacing = Facing.Left;
     protected AnimatorStateInfo animState;
 
     protected AttackType attackType;
@@ -73,18 +75,16 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     // if-else 분기문으로 각도를 계산하지 않고, Enum 값을 정수 인덱스로 변환하여 O(1)의 속도로 Y축 회전값을 즉시 가져옵니다.
     protected readonly float[] rotValue =
     {
-        228, -228,               // Idle (0, 1)
-        -90, 90, 0, 0, -90, 90,  // Attack A, B, C (2~7)
-        -90, 90, -90, 90, -90, 90, // Ultimate 1, 2, 3 (8~13)
-        -90, 90,                 // Chase (14, 15)
-        228, -228,               // Parry (16, 17)
-        -90, 90,                 // Groggy (18, 19)
-        -90, 90                  // Walking (20, 21)
+        228, -228,               // Idle (0)
+        -90, 90, 0, 0, -90, 90,  // Attack A, B, C (1,2,3)
+        -90, 90, -90, 90, -90, 90, // Ultimate 1, 2, 3 (4,5,6)
+        -90, 90,                 // Chase (7)
+        228, -228,               // Parry (8)
+        -90, 90,                 // Groggy (9)
+        -90, 90                  // Walking (10)
     };
 
-    protected Vector3 RandomPos;
     protected float curTime_Idle = 0f;
-    protected bool hasArrived = false;
 
     // 플래그 변수들 (상태 제어용 스위치)
     protected bool telegraphExcuted = false;
@@ -168,13 +168,8 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
     }
 
-    protected NodeState PlayTelegraph(float baseTime)
-    {
-        if (telegraph != null) telegraph.SetActive(true);
-        telegraphDrawer?.PlaySignal(GetAdjustedTelegraphTime(baseTime));
-        telegraphExcuted = true;
-        return NodeState.Success;
-    }
+    //사전신호 재생
+    protected abstract NodeState PlayTelegraph(float baseTime);
 
     // 패링 성공 시 메모리 정리 및 글로벌 이벤트 발송
     protected void Parryed()
@@ -339,44 +334,45 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     public bool GetStateDone() { return StateDone; }
     public void Spawn() { if (spawnPos != null) transform.position = spawnPos.position; }
 
-    public void InitCurTime_Idle()
+    public virtual void InitCurTime_Idle()
     {
         curTime_Idle = 0f;
-        hasArrived = false;
         cachedLocomotionSpeed = -999f;
+        cachedLocomotionAnim = -1;
+        cachedLocomotionFacing = curFacing;
     }
 
     /// <summary>
     /// [공간 제어]: 플레이어의 주변을 기준으로 보스가 순찰(Idle)할 무작위 좌표를 수학적으로 1회 계산합니다.
     /// </summary>
-    public void SetRandomPos()
+    public virtual void SetRandomPos()
     {
         if (playerPos == null)
         {
-            RandomPos = transform.position;
             return;
         }
 
         // 1. 최소 유지거리(move_idlePos)에 무작위 범위(move_idleRange)를 더해 절대적인 거리를 구함
-        float element = move_idlePos + Random.Range(-move_idleRange, move_idleRange);
+        // 기본 구현은 목적지를 계산하지 않는다.
+        // Cinderella_Patterns가 아래 주석의 랜덤 목적지 계산을 override해서 실제로 수행한다.
 
         // 2. 플레이어가 내 왼쪽에 있으면 플레이어의 오른쪽(+)으로 맴돌고, 반대면 반대로 맴돔
-        if (Math.Sign(Distance) <= 0) RandomPos = new Vector3(playerPos.position.x + element, 0, 0);
-        else RandomPos = new Vector3(playerPos.position.x - element, 0, 0);
+        // if (Math.Sign(Distance) <= 0) RandomPos = new Vector3(playerPos.position.x + element, 0, 0);
+        // else RandomPos = new Vector3(playerPos.position.x - element, 0, 0);
 
         // 3. 계산된 좌표가 무대를 벗어나지 않도록 Ground Collider의 Min/Max로 클램핑(강제 범위 고정)
-        if (ground != null)
-            RandomPos.x = Mathf.Clamp(RandomPos.x, groundXMin, groundXMax);
+        // if (ground != null)
+        //     RandomPos.x = Mathf.Clamp(RandomPos.x, groundXMin, groundXMax);
     }
 
     /// <summary>
     /// [최적화 아키텍처: 더티 플래그(Dirty Flag) 패턴]
     /// 매 틱마다 C#이 C++ 애니메이터를 호출하는 마샬링 병목을 제거합니다. 값이 변했을 때만 엔진에 하달합니다.
     /// </summary>
-    private void SyncLocomotionAnim(float moveDirX)
+    protected void SyncLocomotionAnim(float moveDirX)
     {
         int targetAnim;
-        float targetSpeed;
+        float targetSpeed; //애니메이션 역재생 조절 변수
 
         if (moveDirX == 0f)
         {
@@ -391,48 +387,54 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         }
 
         // 캐시된 값과 목표값이 동일하면(상태 오염 없음) 즉시 리턴 (Bypass)
-        if (Mathf.Abs(cachedLocomotionSpeed - targetSpeed) < 0.01f) return;
+        // Num/방향/MoveForward를 모두 비교해야 Walk <-> Idle뿐 아니라 좌우 반전만 바뀌는 경우도 정확히 갱신된다.
+        if (cachedLocomotionAnim == targetAnim &&
+            cachedLocomotionFacing == curFacing &&
+            Mathf.Abs(cachedLocomotionSpeed - targetSpeed) < 0.01f)
+            return;
 
         // 값이 다를 때만 1회성(Edge Trigger)으로 렌더링 호출
-        PlayAnim_Time(targetAnim, idleDurationTime);
+        // PlayAnim_Time은 대기 시간 계산까지 포함하므로, 이동 루프에서는 애니메이션 전환만 담당하는 SyncFacingWithAnim을 직접 호출한다.
+        // 이렇게 해야 매 프레임 Idle/Walk 애니메이션이 0프레임으로 되감기는 현상을 피할 수 있다.
+        SyncFacingWithAnim(targetAnim);
         if (anim != null) anim.SetFloat("MoveForward", targetSpeed);
-
         // 메모리 동기화
+        cachedLocomotionAnim = targetAnim;
+        cachedLocomotionFacing = curFacing;
         cachedLocomotionSpeed = targetSpeed;
+    }
+
+    // 플레이어가 보스 기준 어느 방향에 있는지 1D 방향값으로 변환한다.
+    // Distance > 0이면 플레이어는 오른쪽, Distance < 0이면 왼쪽이다.
+    protected float GetDirectionToPlayer()
+    {
+        if (Mathf.Approximately(Distance, 0f))
+            return curFacing == Facing.Right ? 1f : -1f;
+
+        return Mathf.Sign(Distance);
+    }
+
+    // 맵 끝에서 바깥쪽으로 계속 이동하려는 입력을 0으로 막는다.
+    // RougeHood의 거리 유지 AI가 플레이어 반대편으로 물러나다가 ground bounds 밖으로 나가는 상황을 방지한다.
+    protected float BlockMoveOutsideGround(float moveDirX, float edgePadding)
+    {
+        if (ground == null || Mathf.Approximately(moveDirX, 0f))
+            return moveDirX;
+
+        float minX = groundXMin + edgePadding;
+        float maxX = groundXMax - edgePadding;
+        float curX = transform.position.x;
+
+        if (moveDirX < 0f && curX <= minX) return 0f;
+        if (moveDirX > 0f && curX >= maxX) return 0f;
+
+        return moveDirX;
     }
 
     /// <summary>
     /// [서브 스테이트 머신]: 타겟 도착 전(Walking)과 후(Idling)를 명확히 분리하여 지터링(Jittering)을 막는 로직.
     /// </summary>
-    public void IdleMove()
-    {
-        UpdateFacing();
-        curTime_Idle += Time.deltaTime;
-
-        if (!hasArrived) // [Phase 1: 이동 중]
-        {
-            float distToTarget = Mathf.Abs(RandomPos.x - transform.position.x);
-
-            // 도착 판정 2가지: 1) 목표점에 도달했거나, 2) 플레이어 길막(Bodyblock - 플레이어가 목표점보다 가깝고 방향이 같음)
-            if (distToTarget <= 0.5f || (Math.Sign(Distance) == Math.Sign(RandomPos.x - transform.position.x) && distToTarget > Mathf.Abs(Distance)))
-            {
-                hasArrived = true;      // 상태 락(Lock)
-                Move(0, 0, 0);          // 물리 정지
-                SyncLocomotionAnim(0f); // 시각 정지
-            }
-            else
-            {
-                // 아직 도착하지 않았다면 1D 벡터 연산으로 방향(1 또는 -1) 추출 후 이동
-                float moveDirX = (transform.position.x < RandomPos.x) ? 1f : -1f;
-                Move(moveDirX * move_idleSpeed, 0, 0);
-                SyncLocomotionAnim(moveDirX);
-            }
-        }
-
-        // [Phase 2: 이동 완료 후 단순 대기] - 불필요한 위치 연산 생략 (오버헤드 감소)
-        if (curTime_Idle > idleDurationTime)
-            SetStateDone(true);
-    }
+    public abstract void IdleMove();
 
     public AttackType GetAttackType() { return attackType; }
     public string GetAttackId() { return attackId; }
@@ -463,7 +465,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         return NodeState.Success;
     }
 
-    public void LogicInit()
+    public virtual void LogicInit()
     {
         chaseDone = false;
         telegraphExcuted = false;
@@ -533,8 +535,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         }
 
         // 기획 데이터 기입 실수 방지 (최소 사거리 보정)
-        if (move_idleRange >= move_idlePos)
-            move_idleRange = move_idlePos - 0.5f;
+        // 거리 유지 방식은 보스마다 다르므로, 최소/최대 거리 보정은 각 보스 구현에서 처리한다.
     }
     #endregion
 }

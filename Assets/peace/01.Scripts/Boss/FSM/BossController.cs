@@ -21,7 +21,7 @@ public class BossController : MonoBehaviour, IInitializable
         //능력치
         status = ServiceLocator_Y.Get<BossStatus>();
         //FSM+BT
-        logics = GetComponent<IBossLogics>();   //신데렐라 로직 참조
+        logics = GetComponent<IBossLogics>();   //보스 로직 참조
         bossState.Add(State.Spawn,      new SpawningState_Boss(this, logics));
         bossState.Add(State.Idle,       new IdleState_Boss(this, logics));
         bossState.Add(State.Attack,     new AttackingState_Boss(this, logics));

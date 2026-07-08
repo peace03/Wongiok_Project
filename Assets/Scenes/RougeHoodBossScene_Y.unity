@@ -245,7 +245,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_LocalPosition.z
@@ -253,15 +253,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.40673646
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.91354555
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_LocalRotation.z
@@ -273,7 +273,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 228
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -282,6 +282,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
       propertyPath: m_Name
       value: Kachujin G Rosales
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 954ff4034be88b34ea78c573da1c21a5, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -599,6 +607,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 550241337}
+  - component: {fileID: 550241340}
+  - component: {fileID: 550241339}
+  - component: {fileID: 550241338}
+  - component: {fileID: 550241341}
+  - component: {fileID: 550241342}
   m_Layer: 0
   m_Name: BossObj
   m_TagString: Untagged
@@ -622,6 +635,127 @@ Transform:
   - {fileID: 300338759}
   m_Father: {fileID: 1487805984}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &550241338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550241336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98c41efc7245f4f4aaf82dcf8e63a2c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossStatus
+  status:
+    maxHP:
+      baseValue: 0
+    attackSpeed:
+      baseValue: 0
+    telegraphSpeed:
+      baseValue: 0
+    attackAPower:
+      baseValue: 0
+    attackBPower:
+      baseValue: 0
+    attackCPower:
+      baseValue: 0
+    attackC_2Power:
+      baseValue: 0
+    attackDPower:
+      baseValue: 0
+    hpThresholds: []
+    groggyDamageMultiplier: 0
+--- !u!114 &550241339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550241336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b53896c3853c8847b9c1269c92e86c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RougeHood_Patterns
+  anim: {fileID: 1817315693}
+  telegraph: {fileID: 0}
+  spawnPos: {fileID: 2143229138}
+  playerPos: {fileID: 581796119}
+  ground: {fileID: 174314907}
+  HitStopFrame: 0
+  cameraShakeIntensity: 0
+  idleDurationTime: 50
+  move_idleSpeed: 5
+  durationEnranged: 0
+  enrangedAtkSpeed_Mul: 0
+  groggyDuration: 0
+  excuteAttackType_InGame: 0
+  idle_minDistance: 6
+  idle_maxDistance: 20
+  idle_groundEdgePadding: 0.5
+--- !u!114 &550241340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550241336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d6f710969f4f04192e66438348cdce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossController
+--- !u!54 &550241341
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550241336}
+  serializedVersion: 5
+  m_Mass: 50
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 120
+  m_CollisionDetection: 0
+--- !u!136 &550241342
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550241336}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.3
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &581796115
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,6 +1134,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 550241337}
+  - {fileID: 2143229138}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1521374774
@@ -1046,6 +1181,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39f0cdd380d4da949aa8fba6b9bd1cf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossUIBridge
+--- !u!95 &1817315693 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 2cac2a1f35f459f42baaa01b745aef72, type: 3}
+  m_PrefabInstance: {fileID: 300338758}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2111817618
 GameObject:
   m_ObjectHideFlags: 0
@@ -1145,6 +1285,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1034156362}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2143229137
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2143229138}
+  m_Layer: 0
+  m_Name: SpawnPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2143229138
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2143229137}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -10, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1487805984}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

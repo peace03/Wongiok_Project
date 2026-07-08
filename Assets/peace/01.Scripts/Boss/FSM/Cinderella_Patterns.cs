@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -40,6 +41,10 @@ public class Cinderella_Patterns : BossPatternBase
     [SerializeField] private float ULTI_telegraphTime1;
     [SerializeField] private float ULTI_telegraphTime2;
     [SerializeField] private float ULTI_telegraphTime3;
+
+    [Header("Cinderella Idle")]
+    [Tooltip("Random move range near target position")][Min(0)][SerializeField] private float move_idleRange;
+    [Min(3)][SerializeField] private float move_idlePos;
     #endregion
 
     #region [2. BT 노드 및 특수 상태 캐싱]
@@ -57,6 +62,11 @@ public class Cinderella_Patterns : BossPatternBase
     private Vector3 jumpStartPos;
     private Vector3 jumpTargetPos;
     private float currentJumpProgress = 0f;
+
+    // Cinderella는 Idle 진입 시 플레이어 주변 랜덤 좌표를 1회 찍고 그 지점까지 걷는다.
+    // 이 상태값은 RougeHood의 거리 유지 Idle과 성격이 달라서 신데렐라 전용으로 둔다.
+    private Vector3 RandomPos;
+    private bool hasArrived = false;
 
     // [Template Method 구현]: 점프 중일 때 베이스 클래스에게 "나 지금 점프 중이니까 기본 중력/물리 엔진 꺼줘!" 라고 알림
     protected override bool IsPhysicsControlOverridden => isJumping;
@@ -116,6 +126,81 @@ public class Cinderella_Patterns : BossPatternBase
     protected override void ResetPatternState()
     {
         isJumping = false;
+    }
+
+    protected override NodeState PlayTelegraph(float baseTime)
+    {
+        if (telegraph != null) telegraph.SetActive(true);
+        telegraphDrawer?.PlaySignal(GetAdjustedTelegraphTime(baseTime));
+        telegraphExcuted = true;
+        return NodeState.Success;
+    }
+
+    public override void InitCurTime_Idle()
+    {
+        base.InitCurTime_Idle();
+        hasArrived = false;
+
+        // 기획 데이터 기입 실수 방지 (최소 이동거리 보정)
+        // move_idleRange가 중심 거리보다 커지면 플레이어에게 너무 붙거나 좌표가 뒤집힐 수 있어 신데렐라 내부에서만 보정한다.
+        if (move_idleRange >= move_idlePos)
+            move_idleRange = move_idlePos - 0.5f;
+    }
+
+    /// <summary>
+    /// [공간 제어]: 플레이어의 주변을 기준으로 보스가 배회(Idle)할 무작위 좌표를 수학적으로 1회 계산합니다.
+    /// </summary>
+    public override void SetRandomPos()
+    {
+        if (playerPos == null)
+        {
+            RandomPos = transform.position;
+            return;
+        }
+
+        // 1. 최소 유지거리(move_idlePos)에 무작위 범위(move_idleRange)를 더해 절대적인 거리를 구함
+        float element = move_idlePos + Random.Range(-move_idleRange, move_idleRange);
+
+        // 2. 플레이어가 내 왼쪽에 있으면 플레이어의 오른쪽(+)으로 맴돌고, 반대면 반대로 맴돎
+        if (Math.Sign(Distance) <= 0) RandomPos = new Vector3(playerPos.position.x + element, 0, 0);
+        else RandomPos = new Vector3(playerPos.position.x - element, 0, 0);
+
+        // 3. 계산된 좌표가 무대를 벗어나지 않도록 Ground Collider의 Min/Max로 클램프(강제 범위 고정)
+        if (ground != null)
+            RandomPos.x = Mathf.Clamp(RandomPos.x, groundXMin, groundXMax);
+    }
+
+    /// <summary>
+    /// [서브 스테이트 머신]: 타겟 도착 전(Walking)과 후(Idling)를 명확히 분리하여 지터링(Jittering)을 막는 로직.
+    /// </summary>
+    public override void IdleMove()
+    {
+        UpdateFacing();
+        curTime_Idle += Time.deltaTime;
+
+        if (!hasArrived) // [Phase 1: 이동 중]
+        {
+            float distToTarget = Mathf.Abs(RandomPos.x - transform.position.x);
+
+            // 도착 판정 2가지: 1) 목표점에 도달했거나, 2) 플레이어 길막(Bodyblock - 플레이어가 목표점보다 가깝고 방향이 같음)
+            if (distToTarget <= 0.5f || (Math.Sign(Distance) == Math.Sign(RandomPos.x - transform.position.x) && distToTarget > Mathf.Abs(Distance)))
+            {
+                hasArrived = true;      // 상태 락(Lock)
+                Move(0, 0, 0);          // 물리 정지
+                SyncLocomotionAnim(0f); // 시각 정지
+            }
+            else
+            {
+                // 아직 도착하지 않았다면 1D 벡터 연산으로 방향(1 또는 -1) 추출 후 이동
+                float moveDirX = (transform.position.x < RandomPos.x) ? 1f : -1f;
+                Move(moveDirX * move_idleSpeed, 0, 0);
+                SyncLocomotionAnim(moveDirX);
+            }
+        }
+
+        // [Phase 2: 이동 완료 후 단순 대기] - 불필요한 위치 연산 생략 (오버헤드 감소)
+        if (curTime_Idle > idleDurationTime)
+            SetStateDone(true);
     }
     #endregion
 
