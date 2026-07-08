@@ -49,25 +49,22 @@ public struct AreaSkillStageData
 }
 
 /// <summary>
-/// 장착한 액티브 스킬 정보
+/// 추가할 무기 외형 정보
 /// </summary>
-public readonly struct EquippedActiveSkill
+public readonly struct WeaponVisualAddData
 {
     public readonly int id;                                         // 스킬 ID
     public readonly GameObject weapon;                              // 무기 프리팹
-    public readonly IReadOnlyList<ActiveSkillEffect> effects;       // 스킬 이펙트 정보들
 
     /// <summary>
-    /// 장착한 액티브 스킬 정보 생성자
+    /// 추가할 무기 외형 정보 생성자
     /// </summary>
     /// <param name="id">스킬 ID</param>
     /// <param name="weapon">무기 외형</param>
-    /// <param name="effects">스킬 이펙트 정보들</param>
-    public EquippedActiveSkill(int id, GameObject weapon, IReadOnlyList<ActiveSkillEffect> effects)
+    public WeaponVisualAddData(int id, GameObject weapon)
     {
         this.id = id;
         this.weapon = weapon;
-        this.effects = effects;
     }
 }
 
@@ -149,6 +146,20 @@ public readonly struct EffectAddData
         this.prefab = prefab;
         this.size = size;
     }
+}
+
+/// <summary>
+/// 추가할 이펙트 정보들
+/// </summary>
+public readonly struct EffectAddDatas
+{
+    public readonly List<EffectAddData> datas;                      // 추가할 이펙트 정보들
+
+    /// <summary>
+    /// 추가할 이펙트 정보들 생성자
+    /// </summary>
+    /// <param name="datas">추가할 이펙트 정보들</param>
+    public EffectAddDatas(List<EffectAddData> datas) => this.datas = datas;
 }
 
 /// <summary>

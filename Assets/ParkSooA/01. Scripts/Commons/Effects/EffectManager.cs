@@ -13,12 +13,9 @@ public class EffectManager : MonoBehaviour
     {
         // 이펙트 추가 이벤트 구독
         EventBus<EffectAddData>.action += AddEffect;
+        EventBus<EffectAddDatas>.action += AddEffects;
         // 이펙트 실행 이벤트 구독
         EventBus<EffectPlayData>.action += OnPlayEffectEvent;
-        // 이펙트 종료 이벤트 구독
-        EventBus<EffectStopData>.action += StopEffect;
-        // 이펙트 초기화 이벤트 구독
-        EventBus<EffectResetData>.action += ResetEffect;
     }
 
     private void Awake()
@@ -33,12 +30,9 @@ public class EffectManager : MonoBehaviour
     {
         // 이펙트 추가 이벤트 구독 해제
         EventBus<EffectAddData>.action -= AddEffect;
+        EventBus<EffectAddDatas>.action -= AddEffects;
         // 이펙트 실행 이벤트 구독 해제
         EventBus<EffectPlayData>.action -= OnPlayEffectEvent;
-        // 이펙트 종료 이벤트 구독 해제
-        EventBus<EffectStopData>.action -= StopEffect;
-        // 이펙트 초기화 이벤트 구독 해제
-        EventBus<EffectResetData>.action -= ResetEffect;
     }
 
     /// <summary>
@@ -77,17 +71,23 @@ public class EffectManager : MonoBehaviour
     public void AddEffects(List<EffectAddData> datas)
     {
         // 리스트가 없거나, 비어있다면
-        if(datas == null || datas.Count == 0)
+        if (datas == null || datas.Count == 0)
         {
             Debug.Log($"[Error | Effect] 이펙트 추가 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
         // 이펙트들의 수만큼
-        for(int i = 0; i < datas.Count; i++)
+        for (int i = 0; i < datas.Count; i++)
             // 이펙트 추가
             AddEffect(datas[i]);
     }
+
+    /// <summary>
+    /// [구조체 | 이벤트] 이펙트들 추가 함수
+    /// </summary>
+    /// <param name="eventData">추가할 이펙트 정보들 구조체</param>
+    public void AddEffects(EffectAddDatas eventData) => AddEffects(eventData.datas);
 
     /// <summary>
     /// 이펙트 실행 후 실행한 이펙트 반환하는 함수
@@ -120,10 +120,10 @@ public class EffectManager : MonoBehaviour
         if (effect == null)
             return null;
 
-        // 실행자 인터페이스가 없다면
+        // 실행기 인터페이스가 없다면
         if (!effect.TryGetComponent<IEffectExecuter>(out var executer))
         {
-            Debug.Log($"[Error | Effect] 이펙트 실행 실패 => 입력 - 이펙트 실행자 : 없음", effect.gameObject);
+            Debug.Log($"[Error | Effect] 이펙트 실행 실패 => 입력 - 이펙트 실행기 : 없음", effect.gameObject);
             return null;
         }
 
@@ -186,10 +186,25 @@ public class EffectManager : MonoBehaviour
         => PlayEffect(data.prefab, data.position, data.rotation, data.duration, data.parent);
 
     /// <summary>
-    /// [이벤트] 이펙트 실행 이벤트
+    /// [이벤트] 이펙트 실행 함수
     /// </summary>
     /// <param name="data">실행할 이펙트 정보 구조체</param>
-    private void OnPlayEffectEvent(EffectPlayData data) => PlayEffect(data);
+    private void OnPlayEffectEvent(EffectPlayData data)
+    {
+        // 이펙트 실행 후 받아오기
+        var effect = PlayEffect(data.prefab, data.position, data.rotation, data.duration, data.parent);
+
+        // 이펙트가 비어있거나, 지속시간이 비어있지 않다면
+        if (effect == null || data.duration != null)
+            return;
+
+        // 실행기 인터페이스가 없다면
+        if(!effect.TryGetComponent<IEffectExecuter>(out var executer))
+            return;
+
+        // 최대 이펙트 시간 후 자동으로 꺼지는 이펙트 실행으로 변경
+        executer.ExecuteEffect(effect.MaxEffectTime);
+    }
 
     /// <summary>
     /// [구조체] 이펙트들 실행 후 실행한 이펙트를 리스트에 저장하는 함수
@@ -227,7 +242,7 @@ public class EffectManager : MonoBehaviour
     }
 
     /// <summary>
-    /// [구조체 | 이벤트] 이펙트 종료 함수
+    /// [구조체] 이펙트 종료 함수
     /// </summary>
     /// <param name="data">종료할 이펙트 정보 구조체</param>
     public void StopEffect(EffectStopData data) => StopEffect(data.effect, data.immediately);
@@ -263,7 +278,7 @@ public class EffectManager : MonoBehaviour
     }
 
     /// <summary>
-    /// [구조체 | 이벤트] 이펙트 초기화 함수
+    /// [구조체] 이펙트 초기화 함수
     /// </summary>
     /// <param name="data">초기화할 이펙트 정보 구조체</param>
     public void ResetEffect(EffectResetData data) => ResetEffect(data.effect);

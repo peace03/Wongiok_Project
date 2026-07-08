@@ -22,6 +22,7 @@ public class SkillSystemModel
 
     private readonly Dictionary<int, SkillInstance> allSkillDictionary          // 모든 스킬 딕셔너리
                                                                     = new();
+    private readonly List<EffectAddData> effectDatas = new();                   // 스킬 이펙트 정보 리스트
 
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
     public event Action<SkillInstance> OnSkillEnhanced;                         // 스킬 강화 이벤트 변수
@@ -82,14 +83,18 @@ public class SkillSystemModel
                 (!skill.IsActiveSkill && equippedPassives.Count >= maxPassiveCount))
                 continue;
 
-            // 장착할 액티브 슬롯이 있다면
+            // 액티브 스킬이고 장착할 액티브 슬롯이 있다면
             if (skill.IsActiveSkill && equippedActives.Count < maxActiveCount)
             {
                 // 액티브 스킬 장착
                 equippedActives.Add(skill);
-                // 액티브 스킬 장착 이벤트 발행
-                EventBus<EquippedActiveSkill>.Publish(new EquippedActiveSkill(skill.ActiveData.Id,
-                                                    skill.ActiveData.Weapon, skill.ActiveData.Effects));
+                // 스킬 이펙트 정보 리스트 설정하기
+                SetEffectDatas(skill.ActiveData.Effects);
+                // 추가할 무기 외형 정보 이벤트 발행
+                EventBus<WeaponVisualAddData>.Publish(new WeaponVisualAddData(skill.ActiveData.Id,
+                                                                                skill.ActiveData.Weapon));
+                // 추가할 이펙트 정보들 이벤트 발행
+                EventBus<EffectAddDatas>.Publish(new EffectAddDatas(effectDatas));
                 // 미장착한 액티브 스킬 리스트에서 제거
                 unequippedActives.Remove(skill);
                 Debug.Log($"[Active | Skill] 스킬 장착 => " +
@@ -126,6 +131,27 @@ public class SkillSystemModel
                 // 빈 칸 생성
                 equippedPassives.Add(null);
         }
+    }
+
+    /// <summary>
+    /// 스킬 이펙트 정보 리스트 설정 함수
+    /// </summary>
+    /// <param name="effects">액티브 스킬 이펙트 리스트</param>
+    private void SetEffectDatas(IReadOnlyList<ActiveSkillEffect> effects)
+    {
+        // 리스트가 없거나, 비어있다면
+        if (effects == null || effects.Count == 0)
+            return;
+
+        // 리스트 초기화
+        effectDatas.Clear();
+
+        // 이펙트들의 수만큼
+        for (int i = 0; i < effects.Count; i++)
+            // 이펙트 프리팹이 있다면
+            if (effects[i].prefab != null)
+                // 스킬 이펙트 정보 리스트에 추가
+                effectDatas.Add(new EffectAddData(effects[i].prefab));
     }
 
     /// <summary>
@@ -321,9 +347,13 @@ public class SkillSystemModel
         {
             // 해당 슬롯에 변경할 스킬 저장
             equippedActives[(int)slot] = skill;
-            // 액티브 스킬 장착 이벤트 발행
-            EventBus<EquippedActiveSkill>.Publish(new EquippedActiveSkill(skill.ActiveData.Id,
-                                                skill.ActiveData.Weapon, skill.ActiveData.Effects));
+            // 스킬 이펙트 정보 리스트 설정하기
+            SetEffectDatas(skill.ActiveData.Effects);
+            // 무기 외형 정보 이벤트 발행
+            EventBus<WeaponVisualAddData>.Publish(new WeaponVisualAddData(skill.ActiveData.Id,
+                                                                        skill.ActiveData.Weapon));
+            // 스킬 이펙트 정보들 이벤트 발행
+            EventBus<EffectAddDatas>.Publish(new EffectAddDatas(effectDatas));
             // 미장착한 액티브 스킬 리스트에서 제거
             unequippedActives.Remove(skill);
             result = true;
@@ -348,9 +378,13 @@ public class SkillSystemModel
             unequippedActives.Add(equippedActives[(int)slot]);
             // 해당 슬롯에 변경할 스킬 저장
             equippedActives[(int)slot] = skill;
-            // 액티브 스킬 장착 이벤트 발행
-            EventBus<EquippedActiveSkill>.Publish(new EquippedActiveSkill(skill.ActiveData.Id,
-                                                skill.ActiveData.Weapon, skill.ActiveData.Effects));
+            // 스킬 이펙트 정보 리스트 설정하기
+            SetEffectDatas(skill.ActiveData.Effects);
+            // 무기 외형 정보 이벤트 발행
+            EventBus<WeaponVisualAddData>.Publish(new WeaponVisualAddData(skill.ActiveData.Id,
+                                                                        skill.ActiveData.Weapon));
+            // 스킬 이펙트 정보들 이벤트 발행
+            EventBus<EffectAddDatas>.Publish(new EffectAddDatas(effectDatas));
             // 미장착한 액티브 스킬 리스트에서 제거
             unequippedActives.Remove(skill);
             result = true;

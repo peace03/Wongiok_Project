@@ -165,12 +165,12 @@ public class SkillInstance
         // 현재 상태가 차징이였다면
         if(IsCharging)
         {
-            // 차징 이펙트 종료 이벤트 발행
-            EventBus<EffectStopData>.Publish(new EffectStopData(data.Id,
-                                                                ACTIVE_SKILL_EFFECT_TYPE.Charging));
-            // 타겟(과녁) 이펙트 종료 이벤트 발행
-            EventBus<EffectStopData>.Publish(new EffectStopData(data.Id,
-                                                                ACTIVE_SKILL_EFFECT_TYPE.Target));
+            //// 차징 이펙트 종료 이벤트 발행
+            //EventBus<EffectStopData>.Publish(new EffectStopData(data.Id,
+            //                                                    ACTIVE_SKILL_EFFECT_TYPE.Charging));
+            //// 타겟(과녁) 이펙트 종료 이벤트 발행
+            //EventBus<EffectStopData>.Publish(new EffectStopData(data.Id,
+            //                                                    ACTIVE_SKILL_EFFECT_TYPE.Target));
         }
 
         // 현재 상태 바꾸기
@@ -207,13 +207,14 @@ public class SkillInstance
         // 바꾼 상태가 차징 상태라면
         else if (IsCharging)
         {
-            // 차징 이펙트 실행 이벤트 발행
-            EventBus<EffectPlayData>.Publish(new EffectPlayData(data.Id,
-                                                                ACTIVE_SKILL_EFFECT_TYPE.Charging));
-            // 타겟(과녁) 이펙트 실행 이벤트 발행
-            EventBus<EffectPlayData>.Publish(new EffectPlayData(data.Id,
-                                                                ACTIVE_SKILL_EFFECT_TYPE.Target,
-                                                        GetLastTargetPosition(owner.transform, 25f)));
+            //// 차징 이펙트 실행 이벤트 발행
+            //EventBus<EffectPlayData>.Publish(new EffectPlayData(data.Id,
+            //                                                    ACTIVE_SKILL_EFFECT_TYPE.Charging));
+            //EffectManager.Instance.
+            //// 타겟(과녁) 이펙트 실행 이벤트 발행
+            //EventBus<EffectPlayData>.Publish(new EffectPlayData(data.Id,
+            //                                                    ACTIVE_SKILL_EFFECT_TYPE.Target,
+            //                                            GetLastTargetPosition(owner.transform, 25f)));
             // 현재 차징 시간 초기화
             curChargingTime = 0f;
         }

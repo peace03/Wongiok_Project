@@ -12,7 +12,7 @@ public class WeaponVisualManager : MonoBehaviour
     private void OnEnable()
     {
         // 액티브 스킬 장착 이벤트 구독
-        EventBus<EquippedActiveSkill>.action += AddWeapon;
+        EventBus<WeaponVisualAddData>.action += AddWeapon;
         // 무기 외형 상태 변경 이벤트 구독
         EventBus<ChangeWeaponState>.action += ChangeWeapon;
     }
@@ -20,7 +20,7 @@ public class WeaponVisualManager : MonoBehaviour
     private void OnDisable()
     {
         // 액티브 스킬 장착 이벤트 구독 해제
-        EventBus<EquippedActiveSkill>.action -= AddWeapon;
+        EventBus<WeaponVisualAddData>.action -= AddWeapon;
         // 무기 외형 상태 변경 이벤트 구독 해제
         EventBus<ChangeWeaponState>.action -= ChangeWeapon;
     }
@@ -28,7 +28,7 @@ public class WeaponVisualManager : MonoBehaviour
     /// <summary>
     /// 무기 외형 생성 및 추가 함수
     /// </summary>
-    private void AddWeapon(EquippedActiveSkill skill)
+    private void AddWeapon(WeaponVisualAddData skill)
     {
         // ID에 해당하는 무기가 없다면
         if(!weapons.ContainsKey(skill.id))

@@ -12,6 +12,8 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
 
     private float maxEffectTime = 0f;               // 최대 이펙트 시간
 
+    public float MaxEffectTime => maxEffectTime;
+
     private void Awake()
     {
         // 파티클 받아오기
