@@ -28,6 +28,11 @@ public class SkillInstance
     [NonSerialized] private List<SkillInstance> equippedActives;        // 장착된 액티브 스킬 목록
     [NonSerialized] private List<SkillInstance> equippedPassives;       // 장착된 패시브 스킬 목록
 
+    private readonly Dictionary<ACTIVE_SKILL_EFFECT_TYPE,               // 이펙트 종류별 실행 중인 이펙트들
+                                    List<Effect>> activeEffects = new();
+
+    private readonly List<GameObject> effectPrefabs = new();            // 이펙트 프리팹들
+
     [NonSerialized] private readonly GameObject owner;                  // 스킬 소유자
     #endregion
 
@@ -99,6 +104,17 @@ public class SkillInstance
     {
         this.owner = owner;
         this.data = data;
+        // 이펙트 종류마다 실행 중인 이펙트들 초기화
+        InitActiveEffects();
+    }
+
+    /// <summary>
+    /// 이펙트 종류마다 실행 중인 이펙트들 초기화 함수
+    /// </summary>
+    private void InitActiveEffects()
+    {
+        activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Charging] = new List<Effect>();
+        activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Target] = new List<Effect>();
     }
 
     /// <summary>
@@ -160,17 +176,17 @@ public class SkillInstance
     /// <summary>
     /// 스킬 상태 변경 함수
     /// </summary>
-    private void SwitchState(SKILL_STATE change)
+    /// <param name="change">스킬 상태</param>
+    /// <param name="effectClear">이펙트 초기화 여부</param>
+    private void SwitchState(SKILL_STATE change, bool effectClear = true)
     {
         // 현재 상태가 차징이였다면
         if(IsCharging)
         {
-            //// 차징 이펙트 종료 이벤트 발행
-            //EventBus<EffectStopData>.Publish(new EffectStopData(data.Id,
-            //                                                    ACTIVE_SKILL_EFFECT_TYPE.Charging));
-            //// 타겟(과녁) 이펙트 종료 이벤트 발행
-            //EventBus<EffectStopData>.Publish(new EffectStopData(data.Id,
-            //                                                    ACTIVE_SKILL_EFFECT_TYPE.Target));
+            // 차징 이펙트 종료
+            StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Charging, effectClear);
+            // 타겟 이펙트 종료
+            StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Target, effectClear);
         }
 
         // 현재 상태 바꾸기
@@ -192,7 +208,7 @@ public class SkillInstance
         else if (IsExecuting)
         {
             // 소유자가 없다면
-            if(owner == null)
+            if (owner == null)
             {
                 Debug.Log($"[Error | Skill] 사용 불가 => " +
                             $"입력 - {data.SkillName} : Lv.{curLevel} / 소유자(Owner) : 없음");
@@ -207,23 +223,85 @@ public class SkillInstance
         // 바꾼 상태가 차징 상태라면
         else if (IsCharging)
         {
-            //// 차징 이펙트 실행 이벤트 발행
-            //EventBus<EffectPlayData>.Publish(new EffectPlayData(data.Id,
-            //                                                    ACTIVE_SKILL_EFFECT_TYPE.Charging));
-            //EffectManager.Instance.
-            //// 타겟(과녁) 이펙트 실행 이벤트 발행
-            //EventBus<EffectPlayData>.Publish(new EffectPlayData(data.Id,
-            //                                                    ACTIVE_SKILL_EFFECT_TYPE.Target,
-            //                                            GetLastTargetPosition(owner.transform, 25f)));
+            // 차징 이펙트 실행
+            ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Charging, owner.transform.position,
+                                                                    owner.transform.rotation);
+            // 마지막 적 찾기
+            Transform target = GetLastTarget(owner.transform, 25f);
+            // 타겟 이펙트 실행
+            ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Target, target.position, target.rotation);
             // 현재 차징 시간 초기화
             curChargingTime = 0f;
         }
     }
 
     /// <summary>
-    /// 마지막 타겟 위치 반환 함수
+    /// 이펙트 종류별 이펙트들 실행 함수
     /// </summary>
-    private Vector3? GetLastTargetPosition(Transform origin, float distance)
+    /// <param name="type">이펙트 종류</param>
+    /// <param name="pos">위치</param>
+    /// <param name="rot">각도</param>
+    private void ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE type, Vector3 pos, Quaternion rot)
+    {
+        // 이펙트 종류에 맞는 이펙트 프리팹 받아오기
+        data.AsActiveSkillData.GetActiveSkillEffects(type, effectPrefabs);
+
+        // 받아온 이펙트 프리팹이 없다면
+        if (effectPrefabs.Count == 0)
+            return;
+
+        // 이펙트 프리팹의 수만큼
+        foreach (var prefab in effectPrefabs)
+        {
+            // 이펙트 실행 후 받아오기
+            var effect = EffectManager.Instance.PlayEffect(prefab, pos, rot);
+
+            // 실행 중인 이펙트들에 이펙트 종류가 없다면
+            if (!activeEffects.ContainsKey(type))
+            {
+                Debug.Log($"[Skill] 이펙트 종류[{type.ToKoreanString()}] 추가 => " +
+                            $"입력 - 스킬 ID : {data.Id} / 스킬 이름 : {data.SkillName}");
+                activeEffects[type] = new List<Effect>();
+            }
+
+            // 받아온 이펙트 추가
+            activeEffects[type].Add(effect);
+        }
+    }
+
+    /// <summary>
+    /// 이펙트 종류별 이펙트들 종료 함수
+    /// </summary>
+    /// <param name="type">이펙트 종류</param>
+    /// <param name="immediately">즉시 종료 여부(기본값 : 즉시 종료 안함)</param>
+    private void StopEffects(ACTIVE_SKILL_EFFECT_TYPE type, bool immediately = false)
+    {
+        // 이펙트 종류에 해당하는 이펙트들이 없다면
+        if(!activeEffects.TryGetValue(type, out var effects))
+        {
+            Debug.Log($"[Skill] 이펙트 종료 실패 => 입력 - {type.ToKoreanString()}");
+            return;
+        }
+
+        // 이펙트들의 수만큼
+        foreach(var effect in effects)
+        {
+            // 이펙트가 없거나, 이펙트가 비활성화 되어있다면
+            if (effect == null || !effect.gameObject.activeSelf)
+                continue;
+
+            // 이펙트 종료
+            effect.StopEffect(immediately);
+        }
+
+        // 이펙트들 초기화
+        effects.Clear();
+    }
+
+    /// <summary>
+    /// 마지막 타겟 반환 함수
+    /// </summary>
+    private Transform GetLastTarget(Transform origin, float distance)
     {
         // 원하는 위치에서 전방으로 사거리만큼 보이지 않는 레이저를 쏴서 부딪힌 물체 받아오기
         var hits = Physics.RaycastAll(origin.position, origin.forward, distance);
@@ -248,7 +326,7 @@ public class SkillInstance
                 if (hit.transform.TryGetComponent<IDamageable>(out _)
                         && hit.transform.gameObject.layer != owner.layer)
                     // 위치 반환
-                    return hit.transform.position;
+                    return hit.transform;
             }
 
             return null;
@@ -261,7 +339,7 @@ public class SkillInstance
             if (hits[i].transform.TryGetComponent<IDamageable>(out _)
                     && hits[i].transform.gameObject.layer != owner.layer)
                 // 위치 반환
-                return hits[i].transform.position;
+                return hits[i].transform;
         }
 
         return null;
@@ -278,8 +356,8 @@ public class SkillInstance
 
         // 차징이 끝났다면
         if (curChargingTime >= Math.Max(0f, data.GetMaxChargingTime(curLevel)))
-            // 실행 상태로 변경
-            SwitchState(SKILL_STATE.Executing);
+            // 실행 상태로 변경(이펙트 초기화 X)
+            SwitchState(SKILL_STATE.Executing, false);
         // 차징이 끝나지 않았다면
         else
         {

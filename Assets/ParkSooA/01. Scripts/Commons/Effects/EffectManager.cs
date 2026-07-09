@@ -44,10 +44,7 @@ public class EffectManager : MonoBehaviour
     {
         // 프리팹이 없다면
         if (prefab == null)
-        {
-            Debug.Log($"[Error | Effect] 이펙트 추가 실패 => 입력 - 이펙트 프리팹 : 없음");
             return;
-        }
         // 이펙트 오브젝트 풀이 있다면
         else if (effectPools.ContainsKey(prefab))
             return;
@@ -72,10 +69,7 @@ public class EffectManager : MonoBehaviour
     {
         // 리스트가 없거나, 비어있다면
         if (datas == null || datas.Count == 0)
-        {
-            Debug.Log($"[Error | Effect] 이펙트 추가 실패 => 입력 - 리스트 : 없음");
             return;
-        }
 
         // 이펙트들의 수만큼
         for (int i = 0; i < datas.Count; i++)
