@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 {
@@ -13,7 +11,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     [Tooltip("오브젝트 풀링 적용, 이것으로 스킬에 사용될 총알을 가져올 예정임")]
     [SerializeField] private BulletFactory bulletFactory;                           // 총알 공장
 
-    private readonly List<Transform> executePositions = new();                      // 실행 위치들
+    private readonly List<Transform> executePlaces = new();                         // 실행 위치들
+    private readonly List<GameObject> effectPrefabs = new();                        // 이펙트 프리팹들
 
     private WaitForSeconds projectileDelayTime;                                     // 발사체 스킬 딜레이 시간
     private WaitForSeconds areaDelayTime;                                           // 범위 스킬 딜레이 시간
@@ -40,19 +39,19 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     public void SetExecutePositions(ChangeActiveSkillExecutePositions change)
     {
         // 실행 위치들 초기화
-        executePositions.Clear();
+        executePlaces.Clear();
 
         // 위치들의 수만큼
         foreach (var pos in change.positions)
             // 위치가 비어있지 않다면
             if (pos != null)
                 // 실행 위치 추가
-                executePositions.Add(pos);
+                executePlaces.Add(pos);
 
         // 실행 위치가 없다면
-        if (executePositions.Count == 0)
+        if (executePlaces.Count == 0)
             // 기본 실행 위치 추가
-            executePositions.Add(defaultExecutePos);
+            executePlaces.Add(defaultExecutePos);
     }
 
     /// <summary>
@@ -61,9 +60,9 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     public void ResetExecutePositions()
     {
         // 실행 위치들 초기화
-        executePositions.Clear();
+        executePlaces.Clear();
         // 기본 실행 위치 추가
-        executePositions.Add(defaultExecutePos);
+        executePlaces.Add(defaultExecutePos);
     }
 
     /// <summary>
@@ -71,7 +70,17 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// </summary>
     public void ExecuteSkill(int id, ProjectileSkillLevelData skillData)
     {
-        Debug.Log($"[Skill] 발사체 액티브 스킬 실행 => 총 {skillData.ProjectileCount}개");
+        // 스킬 ID로 스킬 정보 찾기
+        var data = SkillDatabase.FindDataById(id);
+
+        // 총구 이펙트
+        data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, effectPrefabs);
+
+        foreach (var prefab in effectPrefabs)
+            foreach (var place in executePlaces)
+                EventBus<EffectPlayData>.Publish(new EffectPlayData(prefab, place.position, place.rotation,
+                    skillData.MaxDuration > 0f ? skillData.MaxDuration : null));
+
         // 발사체 스킬 딜레이 시간 구하기
         projectileDelayTime = new WaitForSeconds(skillData.MaxDuration /
                             (skillData.ProjectileCount == 0 ? 1 : skillData.ProjectileCount));
@@ -86,13 +95,13 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private IEnumerator ProjectileRoutine(int bulletCount, float damage, int penetrationCount)
     {
         // 발사체 수만큼
-        for (int i = 0; i < bulletCount; i += executePositions.Count)
+        for (int i = 0; i < bulletCount; i += executePlaces.Count)
         {
             // 실행 위치들의 수만큼
-            foreach (var pos in executePositions)
+            foreach (var place in executePlaces)
             {
                 // 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수)
-                bulletFactory.GetBullet().StartFire(pos, skillLayer, damage, penetrationCount);
+                bulletFactory.GetBullet().StartFire(place, skillLayer, damage, penetrationCount);
                 Debug.Log($"[Skill] 발사체 {i + 1} 번째 발사");
             }
 
@@ -138,7 +147,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         while (duration >= 0f)
         {
             // 실행 위치들의 수만큼
-            foreach (var pos in executePositions)
+            foreach (var pos in executePlaces)
             {
                 // 실행 위치에서 범위 안에 있는 타겟들 받아오기
                 targets = GetTargetsInArea(pos, skillData.Stages[stageIndex].distance,

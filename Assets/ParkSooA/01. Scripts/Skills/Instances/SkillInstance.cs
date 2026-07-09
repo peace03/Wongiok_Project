@@ -228,8 +228,12 @@ public class SkillInstance
                                                                     owner.transform.rotation);
             // 마지막 적 찾기
             Transform target = GetLastTarget(owner.transform, 25f);
-            // 타겟 이펙트 실행
-            ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Target, target.position, target.rotation);
+
+            // 마지막 적을 찾았다면
+            if(target != null)
+                // 타겟 이펙트 실행
+                ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Target, target.position, target.rotation);
+
             // 현재 차징 시간 초기화
             curChargingTime = 0f;
         }
@@ -244,7 +248,7 @@ public class SkillInstance
     private void ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE type, Vector3 pos, Quaternion rot)
     {
         // 이펙트 종류에 맞는 이펙트 프리팹 받아오기
-        data.AsActiveSkillData.GetActiveSkillEffects(type, effectPrefabs);
+        data.AsActiveSkillData.GetEffectsByEffectType(type, effectPrefabs);
 
         // 받아온 이펙트 프리팹이 없다면
         if (effectPrefabs.Count == 0)

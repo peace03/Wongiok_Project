@@ -22,7 +22,10 @@ MonoBehaviour:
   levelDatas:
   - rid: 4582174707458244765
   weapon: {fileID: 4942464512446496594, guid: 2eacda384154cde4fbdacd87f246c657, type: 3}
-  effects: []
+  effects:
+  - type: 1
+    priority: 0
+    prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
   references:
     version: 2
     RefIds:

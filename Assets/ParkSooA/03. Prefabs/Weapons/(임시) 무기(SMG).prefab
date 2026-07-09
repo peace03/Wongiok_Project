@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 1031642754253759316}
   - component: {fileID: 271923177465634293}
   m_Layer: 0
-  m_Name: "\uBB34\uAE30(SMG)"
+  m_Name: "(\uC784\uC2DC) \uBB34\uAE30(SMG)"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

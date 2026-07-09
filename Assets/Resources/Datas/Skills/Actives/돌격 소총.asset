@@ -24,8 +24,11 @@ MonoBehaviour:
   - rid: 4582174391890870377
   - rid: 4582174391890870378
   - rid: 4582174391890870379
-  weapon: {fileID: 0}
-  effects: []
+  weapon: {fileID: 2670156977725742063, guid: 7dc84920454783b48a5540c11710dbf3, type: 3}
+  effects:
+  - type: 1
+    priority: 0
+    prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
   references:
     version: 2
     RefIds:

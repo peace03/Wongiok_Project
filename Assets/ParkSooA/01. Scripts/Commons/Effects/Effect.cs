@@ -100,10 +100,12 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
             }
             else
             {
+                // 파티클이 재생될 수 있게 잠시 대기하기
+                yield return new WaitForSeconds(0.1f);
                 // 파티클 종료
                 particle.Stop();
-                // 타이머 시간만큼 대기하기
-                yield return new WaitForSeconds(time);
+                // 나머지 타이머 시간만큼 대기하기
+                yield return new WaitForSeconds(time - 0.1f);
             }
         }
         // 파티클이 없다면

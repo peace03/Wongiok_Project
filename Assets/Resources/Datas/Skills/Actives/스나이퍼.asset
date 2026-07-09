@@ -24,14 +24,17 @@ MonoBehaviour:
   - rid: 4582174548851687625
   - rid: 4582174548851687626
   - rid: 4582174548851687627
-  weapon: {fileID: 0}
+  weapon: {fileID: 6067163327744034894, guid: 2cdb23b2275c4534a9c3a0a02418373b, type: 3}
   effects:
   - type: 4
     priority: 0
     prefab: {fileID: 6561904271629179525, guid: e8ba8d48bcb1b3641a58f38e8b367a51, type: 3}
   - type: 0
     priority: 0
-    prefab: {fileID: 3601591287173406441, guid: 2ff99fe907f562a458a7a80f07b61dbe, type: 3}
+    prefab: {fileID: 3601591287173406441, guid: 716fd9840154b4448a616d863f170451, type: 3}
+  - type: 1
+    priority: 0
+    prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
   references:
     version: 2
     RefIds:

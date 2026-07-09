@@ -179,11 +179,11 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
     }
 
     /// <summary>
-    /// 액티브 스킬 이펙트 반환 함수
+    /// 이펙트 종류별 이펙트들 반환 함수
     /// </summary>
-    /// <param name="type">액티브 스킬 이펙트 종류</param>
+    /// <param name="type">이펙트 종류</param>
     /// <param name="results">이펙트 프리팹이 들어갈 리스트</param>
-    public void GetActiveSkillEffects(ACTIVE_SKILL_EFFECT_TYPE type, List<GameObject> results)
+    public void GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE type, List<GameObject> results)
     {
         // 리스트가 없다면
         if(results == null)
