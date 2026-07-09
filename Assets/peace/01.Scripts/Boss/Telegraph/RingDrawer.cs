@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 
@@ -7,35 +7,35 @@ public class RingDrawer : MonoBehaviour
 {
     [SerializeField] private RingDrawerSimple ringDrawerSimple;
 
-    [Header("Áß½ÉÁ¡ ¿¬Ãâ")]
+    [Header("ì¤‘ì‹¬ì  ì—°ì¶œ")]
     [SerializeField] private LineRenderer centerDotLine;
     [SerializeField] private int blinkCount = 3;
     [SerializeField] private Color blinkColor = new Color(4f, 4f, 4f);
     [SerializeField] private Color normalColor = new Color(1.8f, 1.3f, 0.4f);
 
-    [Header("ÇØ»óµµ ¹× ±½±â")]
+    [Header("í•´ìƒë„ ë° êµµê¸°")]
     [SerializeField] private int segments = 48;
     [SerializeField] private float width = 0.08f;
 
-    [Header("ÆĞ¸µ ¼öÃà ¼³Á¤")]
+    [Header("íŒ¨ë§ ìˆ˜ì¶• ì„¤ì •")]
     [SerializeField] private float startRadius = 3f;
-    [SerializeField] private float contactRadius = 0.5f;  // ¡Ú Áß½É ¿ø Å©±â¿¡ ¸ÂÃç
+    [SerializeField] private float contactRadius = 0.5f;  // â˜… ì¤‘ì‹¬ ì› í¬ê¸°ì— ë§ì¶°
     [SerializeField] private Color goldColor = new Color(1.8f, 1.3f, 0.4f);
 
-    [Header("´ê´Â ¼ø°£ ¿¬Ãâ")]
+    [Header("ë‹¿ëŠ” ìˆœê°„ ì—°ì¶œ")]
     [SerializeField] private Transform centerDot;
-    [SerializeField] private SpriteRenderer centerDotSprite; // »ö ¹øÂ½¿ë (¾øÀ¸¸é ºñ¿öµÖ)
+    [SerializeField] private SpriteRenderer centerDotSprite; // ìƒ‰ ë²ˆì©ìš© (ì—†ìœ¼ë©´ ë¹„ì›Œë‘¬)
     [SerializeField] private float dotFlashScale = 1.8f;
-    [SerializeField] private Color flashColor = new Color(3f, 2.5f, 1.5f); // ´êÀ» ¶§ »ö (°­ÇÏ°Ô)
+    [SerializeField] private Color flashColor = new Color(3f, 2.5f, 1.5f); // ë‹¿ì„ ë•Œ ìƒ‰ (ê°•í•˜ê²Œ)
 
-    [Tooltip("ÆĞ¸µ Á¤Á¡ µµ´Ş ½Ã ÀÏ½ÃÀûÀÎ ¿£Áø ½Ã°£ ¿Ö°î ¿©ºÎ")]
+    [Tooltip("íŒ¨ë§ ì •ì  ë„ë‹¬ ì‹œ ì¼ì‹œì ì¸ ì—”ì§„ ì‹œê°„ ì™œê³¡ ì—¬ë¶€")]
     [SerializeField] private bool useSlowMo = true;
     [SerializeField] private float slowMoScale = 0.2f;
     [SerializeField] private float slowMoDuration = 0.15f;
 
     private LineRenderer lr;
     private float radius;
-    private bool isPlaying = false;   // Áßº¹ ¹æÁö
+    private bool isPlaying = false;   // ì¤‘ë³µ ë°©ì§€
 
     public void Init()
     {
@@ -46,7 +46,7 @@ public class RingDrawer : MonoBehaviour
         lr.positionCount = segments;
         radius = startRadius;
         ringDrawerSimple.Init();
-        gameObject.SetActive(false); //²ô°í ½ÃÀÛ
+        gameObject.SetActive(false); //ë„ê³  ì‹œì‘
     }
 
     //void Update()
@@ -57,7 +57,7 @@ public class RingDrawer : MonoBehaviour
 
     public void PlaySignal(float windowDuration)
     {
-        if (isPlaying) return;        // ¡Ú Àç»ı ÁßÀÌ¸é ¹«½Ã (½½·Î¸ğ¼Ç ²¿ÀÓ ¹æÁö)
+        if (isPlaying) return;        // â˜… ì¬ìƒ ì¤‘ì´ë©´ ë¬´ì‹œ (ìŠ¬ë¡œëª¨ì…˜ ê¼¬ì„ ë°©ì§€)
         ringDrawerSimple.DrawCircle();
         DrawCircle();
         StopAllCoroutines();
@@ -68,12 +68,14 @@ public class RingDrawer : MonoBehaviour
     {
         isPlaying = true;
 
-        // 1) ¼öÃà
+        // 1) ìˆ˜ì¶•
         float t = 0f;
         while (t < dur)
         {
-            t += Time.deltaTime;
-            float p = t / dur;
+            // ì‚¬ì „ì‹ í˜¸ì˜ íŒì •/ì‹œê° íƒ€ì´ë°ì€ íˆíŠ¸ìŠ¤íƒ‘ì´ë‚˜ ë¶ˆë¦¿íƒ€ì„ì— ë°€ë¦¬ë©´ ì–´ìƒ‰í•´ì§„ë‹¤.
+            // ê·¸ë˜ì„œ ì „ì—­ timeScaleì˜ ì˜í–¥ì„ ë°›ì§€ ì•ŠëŠ” unscaledDeltaTimeìœ¼ë¡œ ìˆ˜ì¶• ì‹œê°„ì„ ê³„ì‚°í•œë‹¤.
+            t += Time.unscaledDeltaTime;
+            float p = dur <= 0f ? 1f : t / dur;
             radius = Mathf.Lerp(startRadius, contactRadius, p);
             DrawCircle();
             float bright = Mathf.Lerp(0.6f, 1.4f, p);
@@ -82,24 +84,28 @@ public class RingDrawer : MonoBehaviour
         }
         radius = contactRadius;
         DrawCircle();
-        Debug.Log("Á¤Á¡ µµ´Ş! ¿©±â¼­ ±ôºı+½½·Î¸ğ¼Ç ½ÃÀÛ");   // ¡ç ÀÌ ÁÙ Ãß°¡
+        Debug.Log("ì •ì  ë„ë‹¬! ì—¬ê¸°ì„œ ê¹œë¹¡+ìŠ¬ë¡œëª¨ì…˜ ì‹œì‘");   // â† ì´ ì¤„ ì¶”ê°€
 
-        // 2) ´ê´Â ¼ø°£ = Á¤Á¡
-        if (centerDot != null) StartCoroutine(DotFlash());
-
-
-        // 2) ´ê´Â ¼ø°£ = Á¤Á¡ (¹øÂ½ + ½½·Î¸ğ¼Ç µ¿½Ã¿¡)
+        // 2) ë‹¿ëŠ” ìˆœê°„ = ì •ì 
         if (centerDot != null) StartCoroutine(DotFlash());
 
         if (useSlowMo)
         {
-            EventBus<SlowMoEvent>.Publish(new SlowMoEvent(slowMoScale, slowMoDuration));
+            // ì‚¬ì „ì‹ í˜¸ ë¶ˆë¦¿íƒ€ì„ì€ ë³´ì¡° ì—°ì¶œì´ë‹¤.
+            // TimeControlManagerì—ì„œ íŒ¨ë§ íˆíŠ¸ìŠ¤íƒ‘ê³¼ ì¶©ëŒí•˜ë©´ ì´ ìš”ì²­ì´ ë¬´ì‹œë˜ê±°ë‚˜ ì·¨ì†Œëœë‹¤.
+            EventBus<SlowMoEvent>.Publish(new SlowMoEvent(
+                slowMoScale,
+                slowMoDuration,
+                TimeEffectSource.Telegraph,
+                TimeEffectPriority.Low,
+                TimeEffectGroups.CombatFeel));
             //Time.timeScale = slowMoScale;
             //yield return new WaitForSecondsRealtime(slowMoDuration);
-            //Time.timeScale = 1f;       // ¡Ú ¹«Á¶°Ç 1·Î º¹±¸
+            //Time.timeScale = 1f;       // â˜… ë¬´ì¡°ê±´ 1ë¡œ ë³µêµ¬
         }
 
-        yield return new WaitForSecondsRealtime(slowMoDuration);
+        if (slowMoDuration > 0f)
+            yield return new WaitForSecondsRealtime(slowMoDuration);
 
         isPlaying = false;
         gameObject.SetActive(false);

@@ -110,3 +110,6 @@ public enum Animation
 /// 횡스크롤 게임에서 보스의 X축 벡터(1, -1) 연산을 돕기 위한 직관적인 방향 상태입니다.
 /// </summary>
 public enum Facing { Left, Right }
+
+//사전신호 타입
+ public enum TelegraphType { RingDrawer, LaserSight, GroundMarker }

@@ -21,7 +21,7 @@ public interface IBossLogics
     public void EnrangedTimer();
     public void ExcuteMove(); //이동 실행(FixedUpdate 실행용)
     public void LogicInit(); //공격 변수 초기화
-    public bool CanTransitionToGroggy(); //패링 3회 성공시 그로기 전환
+    public bool CanTransitionToGroggy(); //패링 3회 성공시 그로기 전환 -> 추후 매개변수를 넣어 이 메서드 하나로 다른 상태로 전환 가능하도록 구현하기
 }
 
 public interface IBossAnimatorMoveHandler

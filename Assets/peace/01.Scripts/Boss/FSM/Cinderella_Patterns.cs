@@ -128,7 +128,7 @@ public class Cinderella_Patterns : BossPatternBase
         isJumping = false;
     }
 
-    protected override NodeState PlayTelegraph(float baseTime)
+    protected override NodeState PlayTelegraph(float baseTime, TelegraphType type)
     {
         if (telegraph != null) telegraph.SetActive(true);
         telegraphDrawer?.PlaySignal(GetAdjustedTelegraphTime(baseTime));
@@ -246,7 +246,7 @@ public class Cinderella_Patterns : BossPatternBase
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => telegraphExcuted),
-                    new Leaf(() => PlayTelegraph(A_telegraphTime))
+                    new Leaf(() => PlayTelegraph(A_telegraphTime, TelegraphType.RingDrawer))
                 }),
                 // [4. 타격]
                 new Selector(new List<Node>
@@ -308,7 +308,7 @@ public class Cinderella_Patterns : BossPatternBase
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => telegraphExcuted),
-                    new Leaf(() => PlayTelegraph(B_telegraphTime))
+                    new Leaf(() => PlayTelegraph(B_telegraphTime, TelegraphType.RingDrawer))
                 }),
                 new Selector(new List<Node>
                 {
@@ -420,7 +420,7 @@ public class Cinderella_Patterns : BossPatternBase
                         else if (comboStep == 1) time = ULTI_telegraphTime2;
                         else time = ULTI_telegraphTime3;
 
-                        return PlayTelegraph(time);
+                        return PlayTelegraph(time, TelegraphType.RingDrawer);
                     })
                 }),
                 new Selector(new List<Node>

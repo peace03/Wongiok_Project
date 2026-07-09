@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class RougeHood_Patterns : BossPatternBase
 {
     [Header("Test")]
     [SerializeField] private ExcuteAttackType_InGame excuteAttackType_InGame;
+    
+    [Header("Telegraph")]
+    [SerializeField] private LaserSight laserSight;
 
     [Header("Idle Distance")]
     [Tooltip("플레이어와 이 거리보다 가까우면 반대 방향으로 물러난다.")]
@@ -13,8 +17,15 @@ public class RougeHood_Patterns : BossPatternBase
     [Tooltip("맵 경계에서 이 정도 여유를 두고 바깥쪽 이동을 막는다.")]
     [SerializeField, Min(0f)] private float idle_groundEdgePadding = 0.5f;
 
+    [Header("AttackA")]
+    [Tooltip("레이저 사이트 지속시간"), SerializeField] private float laserSightDuration;
+    [Tooltip("공격 전 몇초부터 레이저사이트 깜빡이는지 설정"), SerializeField] private float blinkTimingBeforeAttack;
+
     //Idle
     private Node aimedShotAttack;
+
+    //Timer
+    private float curTelegraphTime = 0f; //현재 사전신호 진행 시간
 
     protected override void BuildPatterns()
     {
@@ -28,7 +39,22 @@ public class RougeHood_Patterns : BossPatternBase
         //공격 시퀀스
         // 레퍼런스가 들어오기 전까지는 Attack 상태가 멈추지 않도록 즉시 종료 노드를 반환한다.
         // 실제 조준 사격 BT가 구현되면 이 메서드 안에 Chase/Telegraph/Attack/PostDelay 순서를 조립한다.
-        return CreateEmptyPatternNode();
+        return new Sequence(new List<Node>
+        {
+            //플레이어와 거리 검사 -> 4m이내 접근시 공격B 전환
+            //사전신호: 레이저사이트
+            new Leaf(() => PlayTelegraph(laserSightDuration, TelegraphType.LaserSight)),
+            //총알 발사
+
+            //후딜
+            new Leaf(() =>
+            {
+                Debug.Log("실행됨");
+                curTelegraphTime = 0f;
+                return SetStateDone(true);
+            })
+        });
+        //return CreateEmptyPatternNode();
     }
     #endregion
 
@@ -48,14 +74,28 @@ public class RougeHood_Patterns : BossPatternBase
         return aimedShotAttack;
     }
 
-    protected override NodeState PlayTelegraph(float baseTime)
+    protected override NodeState PlayTelegraph(float baseTime, TelegraphType type)
     {
-        // 현재 루주후드 공격은 골격 단계이므로 telegraph가 없어도 성공 처리한다.
-        // 나중에 LaserSight나 RingDrawer를 쓰는 공격이 생기면 여기서 공통 예고 연출을 호출한다.
-        if (telegraph != null) telegraph.SetActive(true);
-        telegraphDrawer?.PlaySignal(GetAdjustedTelegraphTime(baseTime));
-        telegraphExcuted = true;
-        return NodeState.Success;
+        // 나중에 LaserSight나 GroundMarker를 쓰는 공격이 생기면 여기서 사전신호를 호출한다.
+        if (type == TelegraphType.LaserSight) //레이저 사이트 사전신호
+        {
+            if (type == TelegraphType.LaserSight && curTelegraphTime == 0f) //레이저 사이트 사전신호 발생
+            {
+                laserSight.StartAiming();
+            }
+            curTelegraphTime += Time.deltaTime;
+            if(curTelegraphTime > baseTime - blinkTimingBeforeAttack && laserSight.GetAimLock() == false) //깜빡임 시작
+            {
+                laserSight.LockAim();
+            }
+            if (curTelegraphTime > baseTime) //지정시간 지나면 레이저사이트 비활성화
+            {
+                laserSight.StopAiming();
+                return NodeState.Success;
+            }
+            return NodeState.Running;
+        }
+        return NodeState.Failure;
     }
 
     public override void IdleMove()
@@ -91,4 +131,14 @@ public class RougeHood_Patterns : BossPatternBase
         if (curTime_Idle > idleDurationTime)
             SetStateDone(true);
     }
+
+    #region CommonLogic
+    public override void LogicInit()
+    {
+        base.LogicInit();
+        curTelegraphTime = 0f;
+        // 패턴이 중간에 끊기거나 다른 상태로 전환되어도 이전 조준선이 화면에 남지 않게 정리한다.
+        laserSight?.StopAiming();
+    }
+    #endregion
 }

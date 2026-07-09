@@ -165,11 +165,16 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     protected void PublishParryImpact()
     {
         EventBus<CameraShakeEvent>.Publish(new CameraShakeEvent(cameraShakeIntensity));
-        EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
+        // 패링 성공 피드백은 사전신호 불릿타임보다 우선되는 CombatFeel 연출로 요청한다.
+        EventBus<HitStopEvent>.Publish(new HitStopEvent(
+            HitStopFrame,
+            TimeEffectSource.Parry,
+            TimeEffectPriority.High,
+            TimeEffectGroups.CombatFeel));
     }
 
     //사전신호 재생
-    protected abstract NodeState PlayTelegraph(float baseTime);
+    protected abstract NodeState PlayTelegraph(float baseTime, TelegraphType type);
 
     // 패링 성공 시 메모리 정리 및 글로벌 이벤트 발송
     protected void Parryed()
