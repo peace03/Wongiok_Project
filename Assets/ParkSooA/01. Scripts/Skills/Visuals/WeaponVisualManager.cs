@@ -57,8 +57,8 @@ public class WeaponVisualManager : MonoBehaviour
         // 무기 외형 상태 변경
         weaponVisual.SetActive(change.isActiveWeapon);
 
-        // 활성화 상태이고 무기 외형에 무기 인터페이스가 있다면
-        if(change.isActiveWeapon && weaponVisual.TryGetComponent<IWeapon>(out var weapon))
+        // 무기가 활성화 상태이고 총구 소유 인터페이스가 있다면
+        if(change.isActiveWeapon && weaponVisual.TryGetComponent<IHaveFirePoint>(out var weapon))
             // 액티브 스킬 실행 위치들 변경 이벤트 발행
             EventBus<ChangeActiveSkillExecutePositions>
                 .Publish(new ChangeActiveSkillExecutePositions(weapon.FirePoints));

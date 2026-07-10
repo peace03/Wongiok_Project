@@ -12,6 +12,7 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
 
     private float maxEffectTime = 0f;               // 최대 이펙트 시간
 
+    public Transform Container => container;
     public float MaxEffectTime => maxEffectTime;
 
     private void Awake()
@@ -31,12 +32,6 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
     {
         // 이펙트 초기화(남은 잔상 지우기)
         ResetEffect();
-
-        // 따라다니고 있는 대상이 있다면
-        if(transform.parent != container)
-            // 컨테이너로 돌려보내기
-            transform.SetParent(container, true);
-
         // 이펙트 반납하기
         returnRef?.Release(gameObject);
     }
@@ -98,6 +93,7 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
                 // 최대 이펙트 시간만큼 대기하기
                 yield return new WaitForSeconds(maxEffectTime);
             }
+            // 타이머 시간이 최대 이펙트 시간보다 작거나 같다면
             else
             {
                 // 파티클이 재생될 수 있게 잠시 대기하기
@@ -115,6 +111,12 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
 
         // 타이머 코루틴 초기화
         timerCoroutine = null;
+
+        // 따라다니고 있는 대상이 있다면
+        if (transform.parent != container)
+            // 컨테이너로 돌려보내기
+            transform.SetParent(container, true);
+
         // 오브젝트 비활성화
         gameObject.SetActive(false);
     }
@@ -133,6 +135,11 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
             // 타이머 코루틴 초기화
             timerCoroutine = null;
         }
+
+        // 따라다니고 있는 대상이 있다면
+        if (transform.parent != container)
+            // 컨테이너로 돌려보내기
+            transform.SetParent(container, true);
 
         // 파티클이 있다면
         if (particle != null)

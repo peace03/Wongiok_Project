@@ -60,8 +60,18 @@ public class Bullet : MonoBehaviour, IPoolable
 
                 // 관통 횟수가 남아있지 않다면
                 if (penetrationCount <= -1)
+                {
+                    if(transform.childCount > 0)
+                    {
+                        var executers = transform.GetComponentsInChildren<IEffectExecuter>(true);
+
+                        foreach (var executer in executers)
+                            executer.StopEffect();
+                    }
+
                     // 총알 반납
                     returnRef.Release(gameObject);
+                }
             }
         }
     }
@@ -130,6 +140,15 @@ public class Bullet : MonoBehaviour, IPoolable
         startFire = false;
         // 타이머 코루틴 초기화
         timerCoroutine = null;
+
+        if (transform.childCount > 0)
+        {
+            var executers = transform.GetComponentsInChildren<IEffectExecuter>(true);
+
+            foreach (var executer in executers)
+                executer.StopEffect();
+        }
+
         // 총알 반납
         returnRef.Release(gameObject);
     }

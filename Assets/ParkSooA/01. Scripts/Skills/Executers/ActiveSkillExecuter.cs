@@ -81,6 +81,9 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 EventBus<EffectPlayData>.Publish(new EffectPlayData(prefab, place.position, place.rotation,
                     skillData.MaxDuration > 0f ? skillData.MaxDuration : null));
 
+        // 발사체 이펙트
+        data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Main, effectPrefabs);
+
         // 발사체 스킬 딜레이 시간 구하기
         projectileDelayTime = new WaitForSeconds(skillData.MaxDuration /
                             (skillData.ProjectileCount == 0 ? 1 : skillData.ProjectileCount));
@@ -94,19 +97,30 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// </summary>
     private IEnumerator ProjectileRoutine(int bulletCount, float damage, int penetrationCount)
     {
-        // 발사체 수만큼
-        for (int i = 0; i < bulletCount; i += executePlaces.Count)
+        // 실행 위치들의 수만큼
+        foreach (var place in executePlaces)
         {
-            // 실행 위치들의 수만큼
-            foreach (var place in executePlaces)
+            // 발사체 수만큼
+            for (int i = 0; i < bulletCount; i += executePlaces.Count)
             {
-                // 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수)
-                bulletFactory.GetBullet().StartFire(place, skillLayer, damage, penetrationCount);
-                Debug.Log($"[Skill] 발사체 {i + 1} 번째 발사");
-            }
+                var bullet = bulletFactory.GetBullet();
+                bullet.transform.SetPositionAndRotation(place.position, place.rotation);
 
-            // 발사체 스킬 딜레이 시간만큼 대기
-            yield return projectileDelayTime;
+                foreach (var prefab in effectPrefabs)
+                {
+                    var effect = EffectManager.Instance.PlayEffect(prefab, new Vector3(0, 0, -0.5f),
+                                                    bullet.transform.rotation, parent: bullet.transform);
+
+                    if (effect.TryGetComponent<IWaveEffect>(out var wave))
+                        wave.SetInfo();
+                }
+
+                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수)
+                bullet.StartFire(place, skillLayer, damage, penetrationCount);
+
+                // 발사체 스킬 딜레이 시간만큼 대기
+                yield return projectileDelayTime;
+            }
         }
 
         // 실행 위치들 초기화

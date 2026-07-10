@@ -36,6 +36,17 @@ public interface IPoolable
 }
 
 /// <summary>
+/// 총구 소유 인터페이스
+/// </summary>
+public interface IHaveFirePoint
+{
+    /// <summary>
+    /// 총구 위치들
+    /// </summary>
+    public List<Transform> FirePoints { get; }
+}
+
+/// <summary>
 /// 이펙트 실행자 인터페이스
 /// </summary>
 public interface IEffectExecuter
@@ -64,12 +75,12 @@ public interface IEffectExecuter
 }
 
 /// <summary>
-/// 무기 인터페이스
+/// 나선 이펙트 인터페이스
 /// </summary>
-public interface IWeapon
+public interface IWaveEffect
 {
     /// <summary>
-    /// 총구 위치들
+    /// 정보 설정 함수
     /// </summary>
-    public List<Transform> FirePoints { get; }
+    public void SetInfo();
 }
