@@ -32,7 +32,7 @@ public class BossHitBox : MonoBehaviour, IInitializable
         if (other.CompareTag("Player") && !isTriggered)
         {
             isTriggered = true;
-            other.GetComponent<PlayerStatus_Y>().
+            other.GetComponent<IDamageable>().
                 TakeDamage(AtkPower.GetAtkPower(AtkType));
         }
     }
