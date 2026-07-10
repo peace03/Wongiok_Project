@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb75d44f8f5094e41812a082745487fc, type: 3}
+  m_Name: "\uC2A4\uB098\uC774\uD37C"
+  m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillData
+  id: 1003
+  icon: {fileID: 21300000, guid: 26bc37539cc89e74fbeb0c9198ac5955, type: 3}
+  skillName: "\uC2A4\uB098\uC774\uD37C"
+  type: 1
+  unlockChapter: 0
+  maxLevel: 3
+  desc: "\uC9E7\uC740 \uCC28\uC9D5 \uD6C4 \uC804\uBC29\uC744 \uD5A5\uD55C \uC800\uACA9\uD0C4\uC744
+    \uBC1C\uC0AC\uD568"
+  levelDatas:
+  - rid: 4582174548851687625
+  - rid: 4582174548851687626
+  - rid: 4582174548851687627
+  weapon: {fileID: 0}
+  effects:
+  - type: 4
+    priority: 0
+    prefab: {fileID: 6561904271629179525, guid: e8ba8d48bcb1b3641a58f38e8b367a51, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 4582174548851687625
+      type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        maxCoolTime: 8
+        maxDuration: 0
+        damage: 150
+        projectileCount: 1
+        penetrationCount: -1
+        maxChargingTime: 1
+    - rid: 4582174548851687626
+      type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        maxCoolTime: 7
+        maxDuration: 0
+        damage: 200
+        projectileCount: 1
+        penetrationCount: -1
+        maxChargingTime: 0.8
+    - rid: 4582174548851687627
+      type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        maxCoolTime: 6
+        maxDuration: 0
+        damage: 250
+        projectileCount: 1
+        penetrationCount: -1
+        maxChargingTime: 0.6
