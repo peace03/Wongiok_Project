@@ -1,16 +1,16 @@
 using UnityEngine;
 #region 플레이어가 가져야할 필수 스크립트
-[RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(PlayerController))]
-[RequireComponent(typeof(PlayerStatus))]
-[RequireComponent(typeof(PlayerMovement))]
-[RequireComponent(typeof(PlayerAttack))]
-[RequireComponent(typeof(PlayerParry))]
-[RequireComponent(typeof(PlayerCheckpointTracker))]
-[RequireComponent(typeof(PlayerHealItemInventory))]
-[RequireComponent(typeof(PlayerLifeTracker))]
-[RequireComponent(typeof(PlayerExperienceTracker))]
-[RequireComponent(typeof(HitFlashFeedback))]
+//[RequireComponent(typeof(CharacterController))]
+//[RequireComponent(typeof(PlayerController))]
+//[RequireComponent(typeof(PlayerStatus))]
+//[RequireComponent(typeof(PlayerMovement))]
+//[RequireComponent(typeof(PlayerAttack))]
+//[RequireComponent(typeof(PlayerParry))]
+//[RequireComponent(typeof(PlayerCheckpointTracker))]
+//[RequireComponent(typeof(PlayerHealItemInventory))]
+//[RequireComponent(typeof(PlayerLifeTracker))]
+//[RequireComponent(typeof(PlayerExperienceTracker))]
+//[RequireComponent(typeof(HitFlashFeedback))]
 #endregion
 public class PlayerInitializer : MonoBehaviour, IInitializable
 {

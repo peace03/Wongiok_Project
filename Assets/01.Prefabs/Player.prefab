@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3473339947051621306}
   - component: {fileID: 3789659101440768516}
-  - component: {fileID: 9181821032936425353}
   - component: {fileID: 822940817693250787}
   m_Layer: 6
   m_Name: Main Camera
@@ -85,14 +84,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &9181821032936425353
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3270525879389655030}
-  m_Enabled: 1
 --- !u!114 &822940817693250787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,11 +181,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 98.78
+      value: 98.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 0.46
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.z
@@ -280,9 +271,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6448603118492817629}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5696337494520077451}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8650343130422386955}
@@ -470,18 +458,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLifeTracker
   startLifeCount: 3
---- !u!114 &5696337494520077451
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6195647787250270839}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61fe390158b94084a96f804ab5530f31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInitializer
 --- !u!114 &8650343130422386955
 MonoBehaviour:
   m_ObjectHideFlags: 0

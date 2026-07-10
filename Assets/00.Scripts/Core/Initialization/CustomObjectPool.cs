@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.Pool;
 
 // 풀링 대상임을 표시하기 위한 마커 인터페이스입니다.
-public interface IPoolable
-{
-}
+//public interface IPoolable
+//{
+//}
 
 // 기존 BulletFactory가 기대하는 풀 생성 API를 현재 프로젝트에서 사용할 수 있게 보강합니다.
 public static class CustomObjectPool

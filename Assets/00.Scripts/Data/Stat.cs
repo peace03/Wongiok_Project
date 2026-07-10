@@ -15,6 +15,8 @@ public class Stat
     // 실제 게임 로직에서 사용하는 최종 스탯 값입니다.
     // 계산 순서: (기본값 + 고정 증가량) * 비율 증가량.
     public float FinalValue => (BaseValue + additive) * multiplier;
+    public float AdditiveModifier => additive;
+    public float Multiplier => multiplier;
 
     public Stat(float baseValue = 0f)
     {
@@ -40,6 +42,12 @@ public class Stat
         // 비율 보정값을 누적합니다.
         // 예: value가 0.1이면 최종값이 10% 증가합니다.
         multiplier += value;
+    }
+
+    public void SetModifiers(float additiveModifier, float multiplierModifier)
+    {
+        additive = additiveModifier;
+        multiplier = multiplierModifier;
     }
 
     public void ResetModifiers()

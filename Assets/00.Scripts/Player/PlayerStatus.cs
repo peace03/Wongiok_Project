@@ -22,6 +22,32 @@ public class PlayerStatusData : LivingStatus
     }
 }
 
+[Serializable]
+public struct PlayerStatModifierSnapshot
+{
+    public float Additive;
+    public float Multiplier;
+
+    public PlayerStatModifierSnapshot(float additive, float multiplier)
+    {
+        Additive = additive;
+        Multiplier = multiplier;
+    }
+}
+
+[Serializable]
+public struct PlayerPersistentStatSnapshot
+{
+    public bool IsValid;
+    public PlayerStatModifierSnapshot MaxHP;
+    public PlayerStatModifierSnapshot AttackPower;
+    public PlayerStatModifierSnapshot MoveSpeed;
+    public PlayerStatModifierSnapshot AttackSpeed;
+    public PlayerStatModifierSnapshot Cooldown;
+    public PlayerStatModifierSnapshot JumpPower;
+    public PlayerStatModifierSnapshot MaxJumpCount;
+}
+
 // 플레이어는 피격 피드백과 체크포인트 부활 기록을 함께 사용합니다.
 public class PlayerStatus : MonoBehaviour, IDamageable
 {
@@ -35,9 +61,9 @@ public class PlayerStatus : MonoBehaviour, IDamageable
     // 피격 경직 동안 뒤로 밀려나는 거리입니다.
     public const float HitKnockbackDistance = 0.3f;
 
-    // 1차 구현에서 사용하는 사망 후 자동 부활 대기 시간입니다.
     private const float ReviveDelay = 2f;
 
+    // 1차 구현에서 사용하는 사망 후 자동 부활 대기 시간입니다.
     [Header("Base Status")]
     // 인스펙터에서 조절하는 기본 체력입니다.
     [SerializeField] private float baseMaxHP = 100f;
@@ -88,8 +114,9 @@ public class PlayerStatus : MonoBehaviour, IDamageable
     // 사망 처리 중인지 확인해 회복, 추가 피격, 중복 부활을 막습니다.
     private bool isDeathProcessing;
 
-    // 사망 후 부활을 기다리는 코루틴 핸들입니다.
     private Coroutine reviveRoutine;
+
+    // 사망 후 부활을 기다리는 코루틴 핸들입니다.
     #endregion
     private void Awake()
     {
@@ -214,13 +241,44 @@ public class PlayerStatus : MonoBehaviour, IDamageable
     public void ResetStatus()
     {
         // 모든 임시 보정값을 제거하고 기본 스탯을 다시 적용합니다.
-        StopReviveRoutine();
         isDeathProcessing = false;
         invincibleEndTime = 0f;
         status.ResetAllModifiers();
         SetupBaseStatus();
         status.Init();
 
+        PublishHealthChanged();
+    }
+
+    public PlayerPersistentStatSnapshot CapturePersistentStatSnapshot()
+    {
+        return new PlayerPersistentStatSnapshot
+        {
+            IsValid = true,
+            MaxHP = CaptureModifier(status.MaxHP),
+            AttackPower = CaptureModifier(status.AttackPower),
+            MoveSpeed = CaptureModifier(status.MoveSpeed),
+            AttackSpeed = CaptureModifier(status.AttackSpeed),
+            Cooldown = CaptureModifier(status.Cooldown),
+            JumpPower = CaptureModifier(status.JumpPower),
+            MaxJumpCount = CaptureModifier(status.MaxJumpCount)
+        };
+    }
+
+    public void ApplyPersistentStatSnapshot(PlayerPersistentStatSnapshot snapshot)
+    {
+        if (!snapshot.IsValid)
+            return;
+
+        ApplyModifier(status.MaxHP, snapshot.MaxHP);
+        ApplyModifier(status.AttackPower, snapshot.AttackPower);
+        ApplyModifier(status.MoveSpeed, snapshot.MoveSpeed);
+        ApplyModifier(status.AttackSpeed, snapshot.AttackSpeed);
+        ApplyModifier(status.Cooldown, snapshot.Cooldown);
+        ApplyModifier(status.JumpPower, snapshot.JumpPower);
+        ApplyModifier(status.MaxJumpCount, snapshot.MaxJumpCount);
+
+        status.CurrentHP = status.MaxHP.FinalValue;
         PublishHealthChanged();
     }
 
@@ -371,15 +429,14 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         isDeathProcessing = true;
         invincibleEndTime = 0f;
 
+        ConsumeLifeOnDeath();
+
         DeathInfo deathInfo = CreateDeathInfo();
 
         EventBus<PlayerDeadEvent>.Publish(new PlayerDeadEvent(deathInfo));
 
         if (playerController != null)
             playerController.EnterDeathState(deathInfo);
-
-        StopReviveRoutine();
-        reviveRoutine = StartCoroutine(ReviveAfterDelay());
     }
 
     private DeathInfo CreateDeathInfo()
@@ -421,7 +478,6 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         // 체크포인트가 저장한 체력/회복 아이템 스냅샷으로 복원하고 목숨을 차감합니다.
         status.CurrentHP = GetReviveHP();
         RestoreHealItemCount();
-        ConsumeLifeOnRevive();
         isDeathProcessing = false;
         invincibleEndTime = 0f;
 
@@ -430,6 +486,21 @@ public class PlayerStatus : MonoBehaviour, IDamageable
 
         if (playerController != null)
             playerController.ExitDeathStateAfterRevive();
+    }
+
+    public bool TryReviveAtCheckpoint()
+    {
+        if (!isDeathProcessing || !status.IsDead)
+            return false;
+
+        if (lifeTracker == null)
+            lifeTracker = GetComponent<PlayerLifeTracker>();
+
+        if (lifeTracker == null || !lifeTracker.HasRemainingLife)
+            return false;
+
+        ReviveAtCheckpoint();
+        return true;
     }
 
     private Vector3 GetRevivePosition()
@@ -467,7 +538,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         healItemInventory.RestoreCount(checkpointTracker.SavedHealItemCount);
     }
 
-    private void ConsumeLifeOnRevive()
+    private void ConsumeLifeOnDeath()
     {
         // 부활이 실제로 진행되는 시점에 목숨을 1 차감합니다.
         if (lifeTracker == null)
@@ -475,7 +546,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
 
         if (lifeTracker == null) return;
 
-        lifeTracker.ConsumeLifeOnRevive();
+        lifeTracker.ConsumeLifeOnDeath();
     }
 
     private void PublishRevived(Vector3 revivePosition)
@@ -498,6 +569,18 @@ public class PlayerStatus : MonoBehaviour, IDamageable
 
         StopCoroutine(reviveRoutine);
         reviveRoutine = null;
+    }
+
+    private static PlayerStatModifierSnapshot CaptureModifier(Stat stat)
+    {
+        return new PlayerStatModifierSnapshot(
+            stat.AdditiveModifier,
+            stat.Multiplier);
+    }
+
+    private static void ApplyModifier(Stat stat, PlayerStatModifierSnapshot snapshot)
+    {
+        stat.SetModifiers(snapshot.Additive, snapshot.Multiplier);
     }
 
     private void CacheRequiredReferences()

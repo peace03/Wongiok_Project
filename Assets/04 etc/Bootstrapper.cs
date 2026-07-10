@@ -5,12 +5,19 @@ using System;
 //각자 스크립트 초기화 순서 정해줄 때 사용
 public enum InitOrder
 {
-    PlayerUIBridge = -10,
-    Player = 0,
+    //PlayerUIBridge = -10,
+    //Player = 0,
+    //Skill = 100,
+    //Mob = 200,
+    //Boss = 300,
+    //UI = 400
+
+    UI = -20,              // 화면 참조 등록, UI 초기화·Reset 완료
+    PlayerUIBridge = -10,  // Player 이벤트 → UI 이벤트 구독
+    Player = 0,            // 실제 HP·목숨·경험치 초기화 및 이벤트 발행
     Skill = 100,
     Mob = 200,
-    Boss = 300,
-    UI = 400
+    Boss = 300
 }
 
 public class Bootstrapper : MonoBehaviour

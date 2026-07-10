@@ -11,6 +11,14 @@ public class PlayerLifeTracker : MonoBehaviour
 
     public int CurrentLifeCount => currentLifeCount;
     public int StartLifeCount => startLifeCount;
+    public bool HasRemainingLife
+    {
+        get
+        {
+            EnsureInitialized();
+            return currentLifeCount > 0;
+        }
+    }
 
     public void Initialize()
     {
@@ -29,12 +37,12 @@ public class PlayerLifeTracker : MonoBehaviour
         PublishLifeChanged();
     }
 
-    public void ConsumeLifeOnRevive()
+    public bool ConsumeLifeOnDeath()
     {
         EnsureInitialized();
 
         // 목숨은 0 아래로 내려가지 않으며, 실제 감소가 없으면 변경 이벤트도 내지 않습니다.
-        if (currentLifeCount <= 0) return;
+        if (currentLifeCount <= 0) return false;
 
         currentLifeCount--;
         PublishLifeChanged();
@@ -44,6 +52,8 @@ public class PlayerLifeTracker : MonoBehaviour
             isLifeDepletedPublished = true;
             EventBus<PlayerLifeDepletedEvent>.Publish(new PlayerLifeDepletedEvent(gameObject));
         }
+
+        return true;
     }
 
     private void EnsureInitialized()
