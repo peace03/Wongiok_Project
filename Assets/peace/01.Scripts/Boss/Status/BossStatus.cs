@@ -4,7 +4,7 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
 {
     public int Priority => (int)InitOrder.Boss;
 
-    [SerializeField] public BossStatusData status;
+    [SerializeField] private BossStatusData status;
 
     private float playerMaxHP; //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
 
@@ -32,6 +32,10 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
         }
     }
 
+    public float GetBossCurHP()
+    {
+        return status.CurrentHP;
+    }
     public float GetAtkPower(AttackType type)
     {
         return status.GetAtkPower(type, playerMaxHP);
