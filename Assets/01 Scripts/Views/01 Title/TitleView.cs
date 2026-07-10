@@ -47,17 +47,17 @@ public class TitleView : UIViewBase
     {
         if (newGameButton != null)
         {
-            newGameButton.Setup("새 게임", HandleNewGameClicked);
+            newGameButton.Setup("New Story", HandleNewGameClicked);
         }
 
         if (continueButton != null)
         {
-            continueButton.Setup("이어하기", HandleContinueClicked, hasSaveFile);
+            continueButton.Setup("Continue", HandleContinueClicked, hasSaveFile);
         }
 
         if (exitButton != null)
         {
-            exitButton.Setup("게임 종료", HandleExitClicked);
+            exitButton.Setup("Quit", HandleExitClicked);
         }
     }
 

@@ -188,14 +188,14 @@ public class ChapterSelectView : UIViewBase
         if (enterButton == null)
             return;
 
-        enterButton.Setup("입장", HandleEnterClicked, selectedChapterId >= 0);
+        enterButton.Setup("Enter", HandleEnterClicked, selectedChapterId >= 0);
     }
 
     private void SetupBackButton()
     {
         if (backButton != null)
         {
-            backButton.Setup("뒤로가기", HandleBackClicked);
+            backButton.Setup("Back", HandleBackClicked);
         }
     }
 
