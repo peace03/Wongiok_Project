@@ -14,12 +14,12 @@ public interface IProjectileSkill
 }
 
 /// <summary>
-/// 영역 액티브 스킬 인터페이스
+/// 범위 액티브 스킬 인터페이스
 /// </summary>
 public interface IAreaSkill
 {
     /// <summary>
-    /// 영역 액티브 스킬 실행 함수
+    /// 범위 액티브 스킬 실행 함수
     /// </summary>
     public void ExecuteSkill(int id, AreaSkillLevelData skillData);
 }
@@ -36,6 +36,17 @@ public interface IPoolable
 }
 
 /// <summary>
+/// 총구 소유 인터페이스
+/// </summary>
+public interface IHaveFirePoint
+{
+    /// <summary>
+    /// 총구 위치들
+    /// </summary>
+    public List<Transform> FirePoints { get; }
+}
+
+/// <summary>
 /// 이펙트 실행자 인터페이스
 /// </summary>
 public interface IEffectExecuter
@@ -46,14 +57,16 @@ public interface IEffectExecuter
     public void ExecuteEffect();
 
     /// <summary>
-    /// 이펙트 실행 함수(time 초 이후 종료)
+    /// 이펙트 실행 함수
     /// </summary>
+    /// <param name="time">이펙트 종료 시간</param>
     public void ExecuteEffect(float time);
 
     /// <summary>
     /// 이펙트 종료 함수
     /// </summary>
-    public void StopEffect();
+    /// <param name="immediately">즉시 종료 여부(기본값 : 즉시 종료 안함)</param>
+    public void StopEffect(bool immediately = false);
 
     /// <summary>
     /// 이펙트 초기화 함수
@@ -62,12 +75,12 @@ public interface IEffectExecuter
 }
 
 /// <summary>
-/// 무기 인터페이스
+/// 나선 이펙트 인터페이스
 /// </summary>
-public interface IWeapon
+public interface IWaveEffect
 {
     /// <summary>
-    /// 총구 위치들
+    /// 정보 설정 함수
     /// </summary>
-    public List<Transform> FirePoints { get; }
+    public void SetInfo();
 }

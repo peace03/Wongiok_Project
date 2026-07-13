@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\uB9E4\uADF8\uB118"
   m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillData
   id: 1001
-  icon: {fileID: 21300000, guid: 075ff27c83de54b4294e43dec29219c4, type: 3}
+  icon: {fileID: 21300000, guid: cc0e7de07e4f3f64ebad5147b5304968, type: 3}
   skillName: "\uB9E4\uADF8\uB118"
   type: 1
   unlockChapter: 0
@@ -25,8 +25,17 @@ MonoBehaviour:
   - rid: 4582174391890870374
   - rid: 4582174391890870375
   - rid: 4582174391890870376
-  weapon: {fileID: 0}
-  effects: []
+  weapon: {fileID: 6892485771174561617, guid: 97f60aa499968204299d2a95f6eb2fc7, type: 3}
+  effects:
+  - type: 1
+    priority: 0
+    prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
+  - type: 3
+    priority: 0
+    prefab: {fileID: 6720752127956727181, guid: ba065b5a927590d4c95f68bbd6b75478, type: 3}
+  - type: 3
+    priority: 0
+    prefab: {fileID: 6720752127956727181, guid: 3cd679a5a5b2b9f4386906f988eb735e, type: 3}
   references:
     version: 2
     RefIds:

@@ -13,18 +13,21 @@ MonoBehaviour:
   m_Name: "\uC0F7\uAC74"
   m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillData
   id: 1004
-  icon: {fileID: 21300000, guid: e35972d1b40e86e43aadbc3a93ae4b69, type: 3}
+  icon: {fileID: 0}
   skillName: "\uC0F7\uAC74"
   type: 1
-  unlockChapter: 0
+  unlockChapter: 1
   maxLevel: 3
   desc: 
   levelDatas:
   - rid: 4582174684380397967
   - rid: 4582174684380397968
   - rid: 4582174684380397969
-  weapon: {fileID: 0}
-  effects: []
+  weapon: {fileID: 6952822294883039786, guid: 71758909e50c1fb4a9221702af4ccf66, type: 3}
+  effects:
+  - type: 1
+    priority: 0
+    prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
   references:
     version: 2
     RefIds:

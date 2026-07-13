@@ -78,7 +78,7 @@ public static class EnumExtensions
         return type switch
         {
             ACTIVE_SKILL_TYPE.Projectile            => "발사체",
-            ACTIVE_SKILL_TYPE.Area                  => "영역",
+            ACTIVE_SKILL_TYPE.Area                  => "범위",
             _                                       => ""
         };
     }
