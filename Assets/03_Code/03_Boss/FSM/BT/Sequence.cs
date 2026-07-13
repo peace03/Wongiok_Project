@@ -19,4 +19,12 @@ public class Sequence : Node
         }
         return NodeState.Success;
     }
+
+    public override void Reset()
+    {
+        foreach (var child in children)
+        {
+            child.Reset();
+        }
+    }
 }

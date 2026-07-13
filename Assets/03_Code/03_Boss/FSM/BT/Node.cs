@@ -10,4 +10,5 @@ public enum NodeState
 public abstract class Node
 {
     public abstract NodeState Evaluate();
+    public virtual void Reset() { }
 }

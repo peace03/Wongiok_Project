@@ -11,28 +11,28 @@ public class BossHitBox : MonoBehaviour, IInitializable
 
     public void Init()
     {
-        AtkPower = ServiceLocator.Get<BossStatus>();
+        AtkPower = ServiceLocator_Y.Get<BossStatus>();
         box = GetComponent<BoxCollider>();
     }
 
     private void OnEnable()
     {
-        EventBus<AttackFinish>.action += SetIsTriggered;
+        EventBus<AttackFinishEvent>.action += SetIsTriggered;
     }
 
     private void OnDisable()
     {
-        EventBus<AttackFinish>.action -= SetIsTriggered;
+        EventBus<AttackFinishEvent>.action -= SetIsTriggered;
     }
 
-    private void SetIsTriggered(AttackFinish data) { isTriggered = false; }
+    private void SetIsTriggered(AttackFinishEvent data) { isTriggered = false; }
 
     private void OnTriggerEnter(Collider other) //공격력 플레이어에게 넘겨주기
     {
         if (other.CompareTag("Player") && !isTriggered)
         {
             isTriggered = true;
-            other.GetComponent<PlayerStatus>().
+            other.GetComponent<IDamageable>().
                 TakeDamage(AtkPower.GetAtkPower(AtkType));
         }
     }

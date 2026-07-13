@@ -27,4 +27,14 @@ public class StatefulSequence : Node
         curIndex = 0;
         return NodeState.Success;
     }
+
+    //현재 노드인덱스 초기화
+    public override void Reset()
+    {
+        curIndex = 0;
+        foreach (var child in children)
+        {
+            child.Reset();
+        }
+    }
 }
