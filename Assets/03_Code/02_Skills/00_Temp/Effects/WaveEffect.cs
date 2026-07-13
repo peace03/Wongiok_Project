@@ -64,39 +64,5 @@ public class WaveEffect : Effect, IWaveEffect
         trail.enabled = true;
         // 트레일 렌더러 초기화
         trail.Clear();
-        //// 나선의 너비 설정
-        //waveWidth = width;
-        //// 나선의 간격 설정
-        //waveInterval = interval;
-        //// 나선의 시작 각도 설정
-        //offsetAngle = offset;
-        //// 나선의 회전 방식 설정
-        //this.useCos = useCos;
     }
-
-    /*
-    /// <summary>
-    /// 트레일 렌더러 색깔 설정 함수
-    /// </summary>
-    /// <param name="newColor">바꿀 색깔</param>
-    private void SetTrailColor(Color newColor)
-    {
-        // 기존 색상의 알파 값들 받아오기
-        var alphas = trail.colorGradient.alphaKeys;
-        // 기존 색상의 색깔 값들 받아오기
-        var colors = trail.colorGradient.colorKeys;
-
-        // 색깔 값들을 받아왔다면
-        if(colors.Length > 0)
-            // 첫번째 색깔 변경
-            colors[0].color = newColor;
-
-        // 바꾼 색깔을 담을 그라디언트 생성
-        Gradient newGradient = new();
-        // 그라디언트에 바꾼 색깔 저장하기
-        newGradient.SetKeys(colors, alphas);
-        // 트레일 렌더러에 바꾼 색깔 적용하기
-        trail.colorGradient = newGradient;
-    }
-    */
 }

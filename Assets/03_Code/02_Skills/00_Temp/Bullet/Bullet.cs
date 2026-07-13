@@ -61,11 +61,15 @@ public class Bullet : MonoBehaviour, IPoolable
                 // 관통 횟수가 남아있지 않다면
                 if (penetrationCount <= -1)
                 {
+                    // 하위 오브젝트가 있다면(자식이 있다면)
                     if(transform.childCount > 0)
                     {
+                        // 하위 오브젝트들의 이펙트 실행기 인터페이스 받아오기
                         var executers = transform.GetComponentsInChildren<IEffectExecuter>(true);
 
+                        // 이펙트 실행기들의 수만큼
                         foreach (var executer in executers)
+                            // 이펙트 종료
                             executer.StopEffect();
                     }
 
@@ -113,7 +117,7 @@ public class Bullet : MonoBehaviour, IPoolable
         // 반납 시간 초기화
         returnTime = new WaitForSeconds(duration);
         // 타이머 시작
-        timerCoroutine = StartCoroutine(ReturnRoutine());
+        timerCoroutine = StartCoroutine(TimerRoutine());
     }
 
     /// <summary>
@@ -132,7 +136,7 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <summary>
     /// 타이머 코루틴 함수
     /// </summary>
-    private IEnumerator ReturnRoutine()
+    private IEnumerator TimerRoutine()
     {
         // 반납 시간 기다리기
         yield return returnTime;
@@ -141,11 +145,15 @@ public class Bullet : MonoBehaviour, IPoolable
         // 타이머 코루틴 초기화
         timerCoroutine = null;
 
+        // 하위 오브젝트가 있다면(자식이 있다면)
         if (transform.childCount > 0)
         {
+            // 하위 오브젝트들의 이펙트 실행기 인터페이스 받아오기
             var executers = transform.GetComponentsInChildren<IEffectExecuter>(true);
 
+            // 이펙트 실행기들의 수만큼
             foreach (var executer in executers)
+                // 이펙트 종료
                 executer.StopEffect();
         }
 
