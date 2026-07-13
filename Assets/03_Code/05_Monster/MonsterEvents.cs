@@ -40,12 +40,12 @@ public readonly struct MonsterHealthChangedEvent
 }
 
 // 몬스터 체력이 0 이하가 되었을 때 발행하는 이벤트입니다.
-public readonly struct MonsterDeadEvent
-{
-    public readonly GameObject MonsterObject;
+//public readonly struct MonsterDeadEvent
+//{
+//    public readonly GameObject MonsterObject;
 
-    public MonsterDeadEvent(GameObject monsterObject)
-    {
-        MonsterObject = monsterObject;
-    }
-}
+//    public MonsterDeadEvent(GameObject monsterObject)
+//    {
+//        MonsterObject = monsterObject;
+//    }
+//}

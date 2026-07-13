@@ -8,5 +8,7 @@ public interface IInitializable
 // 데미지
 public interface IDamageable
 {
+    bool CanTakeDamage => true;
+
     public void TakeDamage(float amount);
 }
