@@ -109,7 +109,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     #region [4. 초기화 및 생명주기 (Lifecycle)]
     public virtual void Init()
     {
-        bossStatus = ServiceLocator_Y.Get<BossStatus>();
+        bossStatus = ServiceLocator.Get<BossStatus>();
         // 자식 오브젝트가 있으면 첫 번째 자식을 스킨으로, 없으면 자기 자신을 스킨으로 캐싱
         bossSkin = transform.childCount > 0 ? transform.GetChild(0).transform : transform;
         rb = GetComponent<Rigidbody>();

@@ -22,14 +22,14 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
 
     //그로기시 데미지 배율 설정
     public void SetGroggyDamageMultiplierActive(bool state) { status.SetGroggyDamageMultiplierActive(state); }
-    public void TakeDamage(float amount, Vector3 hitPoint = default)
+    public void TakeDamage(float amount)//, Vector3 hitPoint = default)
     {
         status.SubCurrentHP(amount);
         //Debug.Log($"보스 현재 체력: {status.CurrentHP}");
-        if(hitPoint != default)
-        {
-            //이벤트 버스로 이펙트 실행시켜주기
-        }
+        //if (hitPoint != default)
+        //{
+        //    이벤트 버스로 이펙트 실행시켜주기
+        //}
     }
 
     public float GetBossCurHP()

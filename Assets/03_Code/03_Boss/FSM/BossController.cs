@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public class BossController : MonoBehaviour, IInitializable
 {
@@ -9,6 +10,10 @@ public class BossController : MonoBehaviour, IInitializable
     private Rigidbody rb;
     private IBossLogics logics; //보스패턴 로직(Cinderella_Patterns)
     private BossStatus status; //능력치
+    private Animator animator;
+    private bool isDefeated;
+
+    private const float DefeatPresentationDuration = 2f;
     public Dictionary<State,BossState> bossState { get; }
         = new Dictionary<State, BossState>(); //상태 Dictionary
     private BossState curState; //현재 상태 패턴
@@ -18,8 +23,9 @@ public class BossController : MonoBehaviour, IInitializable
     {
         //rigidbody
         rb = GetComponent<Rigidbody>();
+        animator = GetComponentInChildren<Animator>();
         //능력치
-        status = ServiceLocator_Y.Get<BossStatus>();
+        status = ServiceLocator.Get<BossStatus>();
         //FSM+BT
         logics = GetComponent<IBossLogics>();   //보스 로직 참조
         bossState.Add(State.Spawn,      new SpawningState_Boss(this, logics));
@@ -29,7 +35,8 @@ public class BossController : MonoBehaviour, IInitializable
         bossState.Add(State.Groggy,     new GroggyState_Boss(this, logics, status));
         bossState.Add(State.Defeated,   new DefeatedState_Boss(this, logics));
 
-        curState = bossState[State.Spawn];
+        isDefeated = false;
+        curState = bossState[State.Idle];
         curState?.Enter();
         //Debug.Log("BossController Init()실행 완료");
     }
@@ -37,14 +44,19 @@ public class BossController : MonoBehaviour, IInitializable
     private void OnEnable()
     {
         EventBus<UltimateInvokeEvent>.action += SetUltimateState;
+        EventBus<BossDeadEvent>.action += SetDefeatedState;
     }
     private void OnDisable()
     {
         EventBus<UltimateInvokeEvent>.action -= SetUltimateState;
+        EventBus<BossDeadEvent>.action -= SetDefeatedState;
     }
 
     private void FixedUpdate()
     {
+        if (isDefeated)
+            return;
+
         // 1. 보스가 공중에 있고, 현재 아래로 떨어지는 중일 때만 작동 (y 속도가 0보다 작을 때)
         if (rb.linearVelocity.y < 0 && !logics.IsPhysicsOverridden)
         {
@@ -57,12 +69,18 @@ public class BossController : MonoBehaviour, IInitializable
     }
     private void Update()
     {
+        if (isDefeated)
+            return;
+
         curState?.Update();
         if (Input.GetKeyDown(KeyCode.Space)) status.TakeDamage(10);
     }
 
     public void ChangeState(State state)
     {
+        if (isDefeated && state != State.Defeated)
+            return;
+
         curState?.Exit();
         curState = bossState[state];
         curState?.Enter();
@@ -70,4 +88,33 @@ public class BossController : MonoBehaviour, IInitializable
     }
     //궁극기 발동상태 전환
     public void SetUltimateState(UltimateInvokeEvent data) { ChangeState(State.Ultimate); }
+
+    private void SetDefeatedState(BossDeadEvent data)
+    {
+        if (isDefeated)
+            return;
+
+        isDefeated = true;
+        ChangeState(State.Defeated);
+
+        EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
+        EventBus<ColliderToggleEvent>.Publish(
+            new ColliderToggleEvent(logics.GetAttackId(), false));
+
+        if (rb != null)
+            rb.linearVelocity = Vector3.zero;
+
+        if (animator != null)
+            animator.SetInteger("Num", (int)Animation.Groggy);
+
+        StartCoroutine(DefeatPresentation());
+    }
+
+    private IEnumerator DefeatPresentation()
+    {
+        yield return new WaitForSeconds(DefeatPresentationDuration);
+
+        EventBus<BossDeathPresentationFinishedEvent>.Publish(default);
+        gameObject.SetActive(false);
+    }
 }

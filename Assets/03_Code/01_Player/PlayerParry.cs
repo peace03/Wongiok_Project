@@ -42,13 +42,13 @@ public class PlayerParry : MonoBehaviour
     private void OnEnable()
     {
         EventBus<CanParryEvent>.action += SetBossParryWindow;
-        EventBus<UltimateInvoke>.action += CloseBossParryWindow;
+        EventBus<UltimateInvokeEvent>.action += CloseBossParryWindow;
     }
 
     private void OnDisable()
     {
         EventBus<CanParryEvent>.action -= SetBossParryWindow;
-        EventBus<UltimateInvoke>.action -= CloseBossParryWindow;
+        EventBus<UltimateInvokeEvent>.action -= CloseBossParryWindow;
         ResetPlayerParryWindow();
         isBossParryWindowOpen = false;
         parrySuccessDamageBlockEndTime = 0f;
@@ -163,7 +163,7 @@ public class PlayerParry : MonoBehaviour
         isBossParryWindowOpen = data.CanParry;
     }
 
-    private void CloseBossParryWindow(UltimateInvoke data)
+    private void CloseBossParryWindow(UltimateInvokeEvent data)
     {
         // 궁극기 전환 시 이전 패링 가능 창이 남지 않도록 닫습니다.
         isBossParryWindowOpen = false;

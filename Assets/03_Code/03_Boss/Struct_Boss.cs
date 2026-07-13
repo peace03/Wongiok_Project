@@ -56,3 +56,6 @@ public struct BossHPChangedEvent
 }
 //보스 죽음 이벤트(UI 연출 시작용)
 public struct BossDeadEvent { }
+
+//보스 사망 연출 완료 이벤트(UI 종료용)
+public struct BossDeathPresentationFinishedEvent { }

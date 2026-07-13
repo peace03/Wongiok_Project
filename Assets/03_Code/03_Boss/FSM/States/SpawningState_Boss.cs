@@ -11,6 +11,8 @@ public class SpawningState_Boss : BossState
         logics.Spawn();
         //Debug.Log("SpawningState 애니메이션, 효과음 재생");
         controller.ChangeState(State.Idle);
+        EventBus<UISetBossHudVisibleEvent>.Publish(new UISetBossHudVisibleEvent(true));
+        Debug.Log("sadfdsfa보스체력");
     }
     public override void Update()
     {

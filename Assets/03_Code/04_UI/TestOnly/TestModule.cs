@@ -354,6 +354,8 @@ public class TestModule : MonoBehaviour
 
         bossCurrentHp = Mathf.Max(0f, bossCurrentHp - bossDamageAmount);
 
+        
+
         EventBus<UISetBossHudDataEvent>.Publish(
             new UISetBossHudDataEvent(bossName, bossCurrentHp, bossMaxHp));
 

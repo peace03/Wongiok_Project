@@ -65,7 +65,7 @@ public class ShardAreaHitBox : MonoBehaviour
         if(other.CompareTag("Player") && !isTriggered)
         {
             isTriggered = true;
-            other.GetComponent<PlayerStatus_Y>().
+            other.GetComponent<PlayerStatus>().
                 TakeDamage(damageAmount);
         }
     }

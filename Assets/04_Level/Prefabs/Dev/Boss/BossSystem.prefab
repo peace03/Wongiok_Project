@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 827850364075370813}
-  - component: {fileID: 4022813829226346951}
   - component: {fileID: 5467959723029080613}
   - component: {fileID: 7029927558556455593}
   - component: {fileID: 1695194536462057764}
@@ -40,18 +39,6 @@ Transform:
   - {fileID: 5024425942180049550}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4022813829226346951
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 929095895650088052}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 731a51f9bd8e1b445bb1e122dbfc8eb4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bootstrapper_Boss
 --- !u!114 &5467959723029080613
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -32,6 +32,7 @@ public class BossStatusData
     public void Init()
     {
         currentHP = maxHP.FinalValue;
+        index = 0;
     }
 
     public void ResetAllModifiers()
@@ -50,19 +51,27 @@ public class BossStatusData
 
     public void SubCurrentHP(float amount)
     {
+        if (IsDead)
+            return;
+
         if (isGroggyState)
         {
             amount *= groggyDamageMultiplier;
             Debug.Log("오 실행된다");
         }
-        currentHP -= amount;
+        currentHP = Mathf.Clamp(currentHP - amount, 0f, maxHP.FinalValue);
         EventBus<BossHPChangedEvent>.Publish(new BossHPChangedEvent(currentHP)); //UI bridge
         Debug.Log("보스 체력: "+currentHP);
-        if (currentHP < 0)
+
+        if (IsDead)
         {
-            currentHP = 0f;  //사망 검사
+            EventBus<BossDeadEvent>.Publish(default);
+            return;
         }
-        if(currentHP < maxHP.FinalValue * hpThresholds[index])  //궁극기 체력 임계치 검사
+
+        if (hpThresholds != null &&
+            index < hpThresholds.Length &&
+            currentHP < maxHP.FinalValue * hpThresholds[index])  //궁극기 체력 임계치 검사
         {
             EventBus<UltimateInvokeEvent>.Publish(default); //UI bridge
             index++;
