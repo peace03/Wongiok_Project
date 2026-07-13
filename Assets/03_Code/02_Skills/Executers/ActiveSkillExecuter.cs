@@ -98,42 +98,43 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// <summary>
     /// 발사체 스킬 코루틴 함수
     /// </summary>
+    /// <param name="bulletCount">발사체 개수</param>
+    /// <param name="damage">데미지</param>
+    /// <param name="penetrationCount">관통 횟수</param>
     private IEnumerator ProjectileRoutine(int bulletCount, float damage, int penetrationCount)
     {
-        // 현재 총알 개수
+        // 현재 발사체 개수를 저장할 변수
         int curBulletCount = 0;
 
         // 실행 위치들의 수만큼
-        foreach(var place in executePlaces)
+        foreach (var place in executePlaces)
         {
-            // 총알 가져오기
-            var bullet = bulletFactory.GetBullet();
-            // 총알 위치와 각도 설정하기
-            bullet.transform.SetPositionAndRotation(place.position, place.rotation);
-
-            // 총알 이펙트들의 수만큼
-            foreach (var prefab in effectPrefabs)
+            // 발사체 개수만큼
+            for (; curBulletCount < bulletCount; curBulletCount++)
             {
-                // 이펙트 실행 및 실행한 이펙트 받아오기
-                var effect = EffectManager.Instance.PlayEffect(prefab, new Vector3(0, 0, -0.5f),
-                                                bullet.transform.rotation, parent: bullet.transform);
+                // 총알 가져오기
+                var bullet = bulletFactory.GetBullet();
+                // 총알 위치와 각도 설정하기
+                bullet.transform.SetPositionAndRotation(place.position, place.rotation);
 
-                // 나선 이펙트라면
-                if (effect.TryGetComponent<IWaveEffect>(out var wave))
-                    // 나선 이펙트 정보 설정하기
-                    wave.SetInfo();
+                // 총알 이펙트들의 수만큼
+                foreach (var prefab in effectPrefabs)
+                {
+                    // 이펙트 실행 및 실행한 이펙트 받아오기
+                    var effect = EffectManager.Instance.PlayEffect(prefab, new Vector3(0, 0, -0.5f),
+                                                    bullet.transform.rotation, parent: bullet.transform);
+
+                    // 나선 이펙트라면
+                    if (effect.TryGetComponent<IWaveEffect>(out var wave))
+                        // 나선 이펙트 정보 설정하기
+                        wave.SetInfo();
+                }
+
+                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수)
+                bullet.StartFire(place, skillLayer, damage, penetrationCount);
+                // 발사체 스킬 딜레이 시간만큼 대기
+                yield return projectileDelayTime;
             }
-
-            // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수)
-            bullet.StartFire(place, skillLayer, damage, penetrationCount);
-            // 현재 총알 개수 증가하기
-            curBulletCount++;
-            // 발사체 스킬 딜레이 시간만큼 대기
-            yield return projectileDelayTime;
-
-            // 현재 총알 개수가 발사할 총알 개수보다 크거나 같다면
-            if (curBulletCount >= bulletCount)
-                break;
         }
 
         // 실행 위치들 초기화
@@ -235,7 +236,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             forward.y = dir.y = 0;
 
             // 대상이 범위(각도) 안에 있다면
-            if(Vector3.Angle(forward.normalized, dir.normalized) <= angle)
+            if (Vector3.Angle(forward.normalized, dir.normalized) <= angle)
                 // 데미지를 받을 수 있는 대상이라면
                 if (hit.TryGetComponent<IDamageable>(out var target))
                     // 타겟들 리스트에 추가

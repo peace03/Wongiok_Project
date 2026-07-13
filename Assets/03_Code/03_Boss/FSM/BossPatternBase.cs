@@ -337,7 +337,18 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     }
 
     public bool GetStateDone() { return StateDone; }
-    public void Spawn() { if (spawnPos != null) transform.position = spawnPos.position; }
+    public void Spawn()
+    {
+        if (spawnPos == null)
+            return;
+
+        Vector3 spawnPosition = spawnPos.position;
+
+        if (playerPos != null)
+            spawnPosition.z = playerPos.position.z;
+
+        transform.position = spawnPosition;
+    }
 
     public virtual void InitCurTime_Idle()
     {

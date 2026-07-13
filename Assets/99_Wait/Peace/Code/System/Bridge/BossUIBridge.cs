@@ -6,6 +6,7 @@ public class BossUIBridge : MonoBehaviour, IInitializable
     public int Priority => (int)InitOrder.Boss +10;
 
     private BossStatus bossStatus;
+    private UIManager uiManager;
     private float bossMaxHP;        //보스 최대 체력
     private string bossName;
     private bool bossIsDead;        //보스 사망 여부
@@ -13,6 +14,7 @@ public class BossUIBridge : MonoBehaviour, IInitializable
     public void Init()
     {
         bossStatus = ServiceLocator.Get<BossStatus>();
+        uiManager = ServiceLocator.Get<UIManager>();
         bossMaxHP = bossStatus.BossMaxHP.FinalValue;
         bossName = bossStatus.gameObject.name;
         bossIsDead = false;
@@ -20,11 +22,12 @@ public class BossUIBridge : MonoBehaviour, IInitializable
 
     private void Start()
     {
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.InGame));
-
-        EventBus<UISetBossHudVisibleEvent>.Publish(new UISetBossHudVisibleEvent(true));
+        uiManager.ChangeScreen(UIScreenState.InGame);
+        uiManager.SetBossHudVisible(true);
         PublishBossHudData(bossStatus.GetBossCurHP());
+
+        Debug.Log($"[BossUIBridge] HUD 표시 요청 완료: {bossName}, " +
+                  $"{bossStatus.GetBossCurHP()} / {bossMaxHP}");
     }
 
     private void OnEnable()
@@ -60,7 +63,7 @@ public class BossUIBridge : MonoBehaviour, IInitializable
 
     private void BossDeathPresentationFinished(BossDeathPresentationFinishedEvent data)
     {
-        EventBus<UISetBossHudVisibleEvent>.Publish(new UISetBossHudVisibleEvent(false));
+        uiManager.SetBossHudVisible(false);
     }
 
     private void PublishBossHudData(float currentHP)
