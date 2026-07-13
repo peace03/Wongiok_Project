@@ -26,9 +26,6 @@ MonoBehaviour:
   - rid: 4582174548851687627
   weapon: {fileID: 6067163327744034894, guid: 2cdb23b2275c4534a9c3a0a02418373b, type: 3}
   effects:
-  - type: 4
-    priority: 0
-    prefab: {fileID: 6561904271629179525, guid: e8ba8d48bcb1b3641a58f38e8b367a51, type: 3}
   - type: 0
     priority: 0
     prefab: {fileID: 3601591287173406441, guid: 716fd9840154b4448a616d863f170451, type: 3}
@@ -41,6 +38,9 @@ MonoBehaviour:
   - type: 3
     priority: 0
     prefab: {fileID: 6720752127956727181, guid: 057d654aa0cf7ec4b886f0ca3cdc6c7c, type: 3}
+  - type: 4
+    priority: 0
+    prefab: {fileID: 6561904271629179525, guid: e8ba8d48bcb1b3641a58f38e8b367a51, type: 3}
   references:
     version: 2
     RefIds:
@@ -49,7 +49,7 @@ MonoBehaviour:
       data:
         maxCoolTime: 8
         maxDuration: 0
-        damage: 150
+        damage: 9
         projectileCount: 1
         penetrationCount: -1
         maxChargingTime: 1

@@ -1,7 +1,8 @@
-using UnityEngine;
-using UnityEngine.Pool;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Pool;
 
 public class Bullet : MonoBehaviour, IPoolable
 {
@@ -21,12 +22,13 @@ public class Bullet : MonoBehaviour, IPoolable
     [Tooltip("날아가는 총알이 유지되는 시간, 얼마든지 조장하셔도 됨")]
     [SerializeField] private float duration = 5f;           // 지속 시간
 
-    private IObjectPool<GameObject> returnRef;              // 반납할 오브젝트 풀 주소
+    private IObjectPool<GameObject> returnRef;              // 반납 오브젝트 풀 주소
 
     private Coroutine timerCoroutine;                       // 타이머 코루틴
     private WaitForSeconds returnTime;                      // 반납 시간
 
     private bool startFire = false;                         // 사격 시작 여부
+    private bool isReturnedToPool;                          // 풀 반환 완료 여부
 
     private void Update()
     {
@@ -40,50 +42,41 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void OnTriggerEnter(Collider other)
     {
-        // 닿은 물체의 레이어가 소유자 레이어와 같다면
-        if (((1 << other.gameObject.layer) & ownerLayer.value) != 0)
+        if (!startFire || isReturnedToPool)
             return;
-        // 데미지를 입을 수 없는 물체라면
-        else if (!other.TryGetComponent<IDamageable>(out var target))
-            // 총알 반납
-            returnRef.Release(gameObject);
-        else
+
+        IDamageable target = other.GetComponentInParent<IDamageable>();
+
+        // 데미지를 입을 수 없는 물체라면 총알을 반납합니다.
+        if (target == null)
         {
-            // 데미지 전달
-            target.TakeDamage(damage);
+            ReturnToPool();
+            return;
+        }
 
-            // 무한 관통이 아니라면
-            if (penetrationCount != -1)
-            {
-                // 관통 횟수 감소
-                penetrationCount = Math.Max(-1, penetrationCount - 1);
+        // 부모에 있는 피해 대상의 레이어가 소유자 레이어라면 자기 충돌을 무시합니다.
+        if (IsOwnerTarget(target, other))
+            return;
 
-                // 관통 횟수가 남아있지 않다면
-                if (penetrationCount <= -1)
-                {
-                    // 하위 오브젝트가 있다면(자식이 있다면)
-                    if(transform.childCount > 0)
-                    {
-                        // 하위 오브젝트들의 이펙트 실행기 인터페이스 받아오기
-                        var executers = transform.GetComponentsInChildren<IEffectExecuter>(true);
+        // 데미지 전달
+        target.TakeDamage(damage);
 
-                        // 이펙트 실행기들의 수만큼
-                        foreach (var executer in executers)
-                            // 이펙트 종료
-                            executer.StopEffect();
-                    }
+        // 무한 관통이 아니라면
+        if (penetrationCount != -1)
+        {
+            // 관통 횟수 감소
+            penetrationCount = Math.Max(-1, penetrationCount - 1);
 
-                    // 총알 반납
-                    returnRef.Release(gameObject);
-                }
-            }
+            // 관통 횟수가 남아있지 않다면 총알을 반납합니다.
+            if (penetrationCount <= -1)
+                ReturnToPool();
         }
     }
 
     private void OnDisable()
     {
         // 타이머 코루틴이 비어있지 않다면
-        if(timerCoroutine != null)
+        if (timerCoroutine != null)
         {
             // 타이머 중지
             StopCoroutine(timerCoroutine);
@@ -105,8 +98,13 @@ public class Bullet : MonoBehaviour, IPoolable
     {
         // 타이머 코루틴이 비어있지 않다면
         if (timerCoroutine != null)
+        {
             // 타이머 중지
             StopCoroutine(timerCoroutine);
+            timerCoroutine = null;
+        }
+
+        isReturnedToPool = false;
 
         // 위치, 각도 설정
         transform.SetPositionAndRotation(origin.position, origin.rotation);
@@ -117,7 +115,34 @@ public class Bullet : MonoBehaviour, IPoolable
         // 반납 시간 초기화
         returnTime = new WaitForSeconds(duration);
         // 타이머 시작
-        timerCoroutine = StartCoroutine(TimerRoutine());
+        timerCoroutine = StartCoroutine(ReturnRoutine());
+    }
+
+    private bool IsOwnerTarget(IDamageable target, Collider hitCollider)
+    {
+        Component targetComponent = target as Component;
+        int targetLayer = targetComponent != null
+            ? targetComponent.gameObject.layer
+            : hitCollider.gameObject.layer;
+
+        return ((1 << targetLayer) & ownerLayer.value) != 0;
+    }
+
+    private void ReturnToPool()
+    {
+        if (isReturnedToPool)
+            return;
+
+        isReturnedToPool = true;
+        startFire = false;
+
+        if (timerCoroutine != null)
+        {
+            StopCoroutine(timerCoroutine);
+            timerCoroutine = null;
+        }
+
+        returnRef.Release(gameObject);
     }
 
     /// <summary>
@@ -136,28 +161,13 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <summary>
     /// 타이머 코루틴 함수
     /// </summary>
-    private IEnumerator TimerRoutine()
+    private IEnumerator ReturnRoutine()
     {
         // 반납 시간 기다리기
         yield return returnTime;
-        // 사격 종료
-        startFire = false;
         // 타이머 코루틴 초기화
         timerCoroutine = null;
-
-        // 하위 오브젝트가 있다면(자식이 있다면)
-        if (transform.childCount > 0)
-        {
-            // 하위 오브젝트들의 이펙트 실행기 인터페이스 받아오기
-            var executers = transform.GetComponentsInChildren<IEffectExecuter>(true);
-
-            // 이펙트 실행기들의 수만큼
-            foreach (var executer in executers)
-                // 이펙트 종료
-                executer.StopEffect();
-        }
-
         // 총알 반납
-        returnRef.Release(gameObject);
+        ReturnToPool();
     }
 }

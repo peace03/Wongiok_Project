@@ -44,7 +44,7 @@ MonoBehaviour:
       data:
         maxCoolTime: 3
         maxDuration: 0
-        damage: 30
+        damage: 25
         projectileCount: 1
         penetrationCount: 0
         maxChargingTime: 0
