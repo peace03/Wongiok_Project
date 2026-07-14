@@ -165,6 +165,29 @@ public class PrototypeTestScene : MonoBehaviour
         PublishCurrentPlayerSkillSlots();
     }
 
+    private bool TryLevelUpSkill(UIPauseSkillInfoData[] skills, int skillId)
+    {
+        const int maxSkillLevel = 3;
+
+        int skillIndex = FindSkillIndex(skills, skillId);
+
+        if (skillIndex < 0) return false;
+
+        UIPauseSkillInfoData skill = skills[skillIndex];
+
+        if (skill.Level >= maxSkillLevel) return false;
+
+        skills[skillIndex] = new UIPauseSkillInfoData(
+            skill.Icon,
+            skill.SkillName,
+            Mathf.Min(skill.Level + 1, maxSkillLevel),
+            skill.Description,
+            skill.IsEquipped,
+            skill.SkillId);
+
+        return true;
+    }
+
     private void HandlePauseSkillEquipRequested(UIPauseSkillEquipRequestedEvent eventData)
     {
         EnsurePauseTestData();
@@ -241,21 +264,11 @@ public class PrototypeTestScene : MonoBehaviour
     {
         EnsurePauseTestData();
 
-        int skillIndex = FindSkillIndex(currentActiveSkills, eventData.SkillId);
-
-        if (skillIndex < 0) return;
-
-        UIPauseSkillInfoData skill = currentActiveSkills[skillIndex];
-
-        currentActiveSkills[skillIndex] = new UIPauseSkillInfoData(
-            skill.Icon,
-            skill.SkillName,
-            skill.Level + 1,
-            skill.Description,
-            true,
-            skill.SkillId);
-
-        PublishCurrentPauseData();
+        if (TryLevelUpSkill(currentActiveSkills, eventData.SkillId) ||
+            TryLevelUpSkill(currentOwnedSkills, eventData.SkillId))
+        {
+            PublishCurrentPauseData();
+        }
     }
 
     private void HandleRestoreSkillCheckpoint(

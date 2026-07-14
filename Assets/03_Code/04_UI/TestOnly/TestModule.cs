@@ -181,7 +181,7 @@ public class TestModule : MonoBehaviour
         if (status != null)
             status.ApplyPersistentStatSnapshot(snapshot.PersistentStats);
 
-        BaseSkillData[] skillDatas = LoadActiveSkillDatas();
+        BaseSkillData[] skillDatas = LoadSkillDatas();
 
         UIPauseSkillInfoData[] equippedSkills = new UIPauseSkillInfoData[3];
 
@@ -424,9 +424,6 @@ public class TestModule : MonoBehaviour
     {
         UILevelUpSkillOptionData[] options = CreateLevelUpOptionsFromRealSkills();
 
-        if (options.Length == 0)
-            options = CreateFallbackLevelUpOptionsFromResource();
-
         EventBus<UISetLevelUpOptionsEvent>.Publish(
             new UISetLevelUpOptionsEvent(options));
 
@@ -509,13 +506,15 @@ public class TestModule : MonoBehaviour
 
     private void HandleChapterClearNextRequested(UIChapterClearNextRequestedEvent eventData)
     {
-        int nextChpaterId = Mathf.Min(currentChapterId + 1, maxChapterId);
-
-        Time.timeScale = 1f;
-
-        PrototypeGameSession.PrepareNextChapter(nextChpaterId);
-
-        UnityEngine.SceneManagement.SceneManager.LoadScene(titleSceneName);
+        EventBus<UIShowAlertPopupEvent>.Publish(
+            new UIShowAlertPopupEvent(
+                "알림",
+                "플레이 해주셔서 감사합니다. \n현재 공개된 챕터는 여기까지입니다.",
+                () =>
+                {
+                    EventBus<UIChapterClearMainMenuRequestedEvent>.Publish(
+                        new UIChapterClearMainMenuRequestedEvent());
+                }));
     }
 
     private void HandleChapterClearMainMenuRequested(UIChapterClearMainMenuRequestedEvent eventData)
@@ -561,13 +560,13 @@ public class TestModule : MonoBehaviour
         ApplyPrototypeSnapshot(PrototypeGameSession.GetChapterStart());
     }
 
-    private BaseSkillData[] LoadActiveSkillDatas()
+    private BaseSkillData[] LoadSkillDatas()
     {
         if (cachedActiveSkillDatas != null)
             return cachedActiveSkillDatas;
 
         cachedActiveSkillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills")
-            .Where(data => data != null && data.Type == SKILL_TYPE.Active)
+            .Where(data => data != null)
             .OrderBy(data => data.Id)
             .ToArray();
 
@@ -576,43 +575,43 @@ public class TestModule : MonoBehaviour
 
     private UILevelUpSkillOptionData[] CreateLevelUpOptionsFromRealSkills()
     {
-        if (cachedEquippedActiveSkills != null)
+        const int maxSkillLevel = 3;
+
+        IEnumerable<UIPauseSkillInfoData> allOwnedSkills =
+            (cachedEquippedActiveSkills ?? System.Array.Empty<UIPauseSkillInfoData>())
+            .Concat(cachedOwnedSkills ?? System.Array.Empty<UIPauseSkillInfoData>());
+
+        List<UIPauseSkillInfoData> candidates = allOwnedSkills
+            .Where(skill => skill.SkillId >= 0 && skill.Level < maxSkillLevel)
+            .GroupBy(skill => skill.SkillId)
+            .Select(group => group.First())
+            .OrderBy(_ => UnityEngine.Random.value)
+            .Take(3)
+            .ToList();
+
+        UILevelUpSkillOptionData[] options = new UILevelUpSkillOptionData[candidates.Count];
+
+        for (int i = 0; i < candidates.Count; i++)
         {
-            UIPauseSkillInfoData[] equippedSkills = cachedEquippedActiveSkills
-                .Where(skill => skill.SkillId >= 0)
-                .Take(3)
-                .ToArray();
+            UIPauseSkillInfoData skill = candidates[i];
 
-            if (equippedSkills.Length > 0)
-            {
-                UILevelUpSkillOptionData[] options = new UILevelUpSkillOptionData[equippedSkills.Length];
-
-                for (int i = 0; i < equippedSkills.Length; i++)
-                {
-                    UIPauseSkillInfoData skill = equippedSkills[i];
-
-                    options[i] = new UILevelUpSkillOptionData(
-                        skill.SkillId,
-                        skill.Icon,
-                        skill.SkillName,
-                        skill.Level,
-                        skill.Level + 1,
-                        skill.Description,
-                        skill.Description,
-                        false);
-                }
-
-                return options;
-            }
-
+            options[i] = new UILevelUpSkillOptionData(
+                skill.SkillId,
+                skill.Icon,
+                skill.SkillName,
+                skill.Level,
+                Mathf.Min(skill.Level + 1, maxSkillLevel),
+                skill.Description,
+                skill.Description,
+                false);
         }
 
-        return System.Array.Empty<UILevelUpSkillOptionData>();
+        return options;
     }
 
     private UILevelUpSkillOptionData[] CreateFallbackLevelUpOptionsFromResource()
     {
-        BaseSkillData[] skillDatas = LoadActiveSkillDatas();
+        BaseSkillData[] skillDatas = LoadSkillDatas();
         int optionCount = Mathf.Min(3, skillDatas.Length);
 
         UILevelUpSkillOptionData[] options = new UILevelUpSkillOptionData[optionCount];
