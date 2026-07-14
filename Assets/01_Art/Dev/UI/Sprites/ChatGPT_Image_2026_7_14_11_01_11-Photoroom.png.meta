@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8b8fb2aec0d3f62448fafd5e2a03041d
+guid: 342260bda5d6e8644baccee906af731c
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,23 +110,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: chapterBackGround_0
+      name: ChatGPT_Image_2026_7_14_11_01_11-Photoroom_0
       rect:
         serializedVersion: 2
-        x: 13
-        y: 12
-        width: 639
-        height: 355
+        x: 217
+        y: 156
+        width: 1272
+        height: 657
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 13, y: 9, z: 13, w: 9}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bd5df57544507814ba33bf4651986a2f
-      internalID: 40431281
+      spriteID: f94842c7eaaef274f8230c555231aa6a
+      internalID: 262524219
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: ea86da2298cf2d84595a506e02931dc7
     internalID: 0
     vertices: []
     indices: 
@@ -143,11 +143,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries:
-      - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+      entries: []
     nameFileIdTable:
-      chapterBackGround_0: 40431281
+      ChatGPT_Image_2026_7_14_11_01_11-Photoroom_0: 262524219
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

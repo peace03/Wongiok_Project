@@ -25,9 +25,9 @@ public class ChapterSelectView : UIViewBase
 
         [Header("Boss Info")]
         public Sprite bossPortrait;
-        public string bossName;
-        public string bossCodeName;
-        public string bossJob;
+        [TextArea] public string bossName;
+        [TextArea] public string bossCodeName;
+        [TextArea] public string bossJob;
     }
 
     [Header("Chapter")]
@@ -46,6 +46,7 @@ public class ChapterSelectView : UIViewBase
     [SerializeField] private Text bossNameText;
     [SerializeField] private Text bossCodeNameText;
     [SerializeField] private Text bossJobText;
+    [SerializeField] private GameObject bossPanel;
 
 
     private int selectedChapterId = -1;
@@ -105,6 +106,8 @@ public class ChapterSelectView : UIViewBase
     private void HandleChapterSelected(int chapterId)
     {
         selectedChapterId = chapterId;
+
+        if (bossPanel != null) bossPanel.SetActive(true);
 
         foreach (ChapterBinding binding in chapterBindings)
         {
@@ -201,6 +204,7 @@ public class ChapterSelectView : UIViewBase
 
     private void ClearSelection()
     {
+        if (bossPanel != null) bossPanel.SetActive(false);
         selectedChapterId = -1;
         SetText(chapterTitleText, string.Empty);
         SetText(chapterDescriptionText, string.Empty);

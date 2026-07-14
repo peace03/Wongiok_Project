@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 367022dd36660d3439ea04eb813ed0db
+guid: 9ef8c0ed020f7104d8288f901f75cfab
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -34,7 +34,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -110,23 +110,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 2312312-removebg-preview_0
+      name: ChatGPT_Image_2026_7_14__12_19_49-removebg-preview_0
       rect:
         serializedVersion: 2
-        x: 48
-        y: 35
-        width: 903
-        height: 174
+        x: 41
+        y: 45
+        width: 679
+        height: 243
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 43, y: 35, z: 43, w: 35}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2c4c64d0daf471e4ba9435fec73457b9
-      internalID: 300472540
+      spriteID: 53d41822db51c57429b26e3ffc84c650
+      internalID: 323082489
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 1f9776bb35780df42aad98a21150e4db
     internalID: 0
     vertices: []
     indices: 
@@ -143,9 +143,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      2312312-removebg-preview_0: 300472540
+      ChatGPT_Image_2026_7_14__12_19_49-removebg-preview_0: 323082489
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
