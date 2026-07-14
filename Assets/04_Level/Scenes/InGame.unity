@@ -611,7 +611,7 @@ GameObject:
   m_Component:
   - component: {fileID: 419612414}
   - component: {fileID: 419612415}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uC2E4\uD589\uAE30"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -723,7 +723,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 477075121}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uBB34\uAE30 \uCEE8\uD14C\uC774\uB108"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -914,7 +914,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletFactory
   container: {fileID: 507628365}
-  bullet: {fileID: 89748929391278128, guid: 1c0152f012197da4ebf1cd617831d240, type: 3}
+  bullet: {fileID: 89748929391278128, guid: b0d48c8431b97774b9d9efe4d6409136, type: 3}
   maxCount: 1000
 --- !u!65 &570583127
 BoxCollider:
@@ -2741,7 +2741,7 @@ GameObject:
   - component: {fileID: 1764689989}
   - component: {fileID: 1764689988}
   - component: {fileID: 1764689987}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -2872,11 +2872,11 @@ PrefabInstance:
       objectReference: {fileID: 507628366}
     - target: {fileID: 3986897394805655502, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: ownerLayer.m_Bits
-      value: 0
+      value: 128
       objectReference: {fileID: 0}
     - target: {fileID: 5088727624942643532, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Layer
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6195647787250270839, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Name
@@ -2884,7 +2884,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6195647787250270839, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Layer
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6195647787250270839, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_TagString

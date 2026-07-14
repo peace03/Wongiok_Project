@@ -255,7 +255,7 @@ MonoBehaviour:
   bulletFactory: {fileID: 0}
   ownerLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   penetrationCount: 0
 --- !u!114 &2325928613518686973
 MonoBehaviour:
