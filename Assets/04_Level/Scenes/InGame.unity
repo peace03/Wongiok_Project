@@ -1757,7 +1757,7 @@ MonoBehaviour:
   fallbackMoveSpeed: 2.5
   playerHitMask:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 128
   attackRange: 1.3
   fallbackAttackDamage: 10
   attackCooldown: 1.2
@@ -2872,7 +2872,7 @@ PrefabInstance:
       objectReference: {fileID: 507628366}
     - target: {fileID: 3986897394805655502, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: ownerLayer.m_Bits
-      value: 1024
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5088727624942643532, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Layer
@@ -3358,6 +3358,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1649574705083335001, guid: a62fc656c2156454da6c0f406c249556, type: 3}
       propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1649574705083335001, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1649574705083335001, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1649574705083335001, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_LocalScale.z
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1649574705083335001, guid: a62fc656c2156454da6c0f406c249556, type: 3}
