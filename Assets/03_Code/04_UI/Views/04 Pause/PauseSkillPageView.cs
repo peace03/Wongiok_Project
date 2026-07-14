@@ -330,35 +330,6 @@ public class PauseSkillPageView : MonoBehaviour
         targetText.text = value;
     }
 
-    // 미리 배치된 View 배열에 스킬 데이터를 순서대로 주입
-    // 데이터가 없는 남는 View는 Clear 후 비활성 처리
-    private void RefreshSkillViewArray(PauseSkillInfoView[] targetViews, UIPauseSkillInfoData[] skillDataArray)
-    {
-        if (targetViews == null)
-            return;
-
-        for (int i = 0; i < targetViews.Length; i++)
-        {
-            if (targetViews[i] == null)
-                continue;
-
-            bool hasData = skillDataArray != null &&
-                i < skillDataArray.Length &&
-                skillDataArray[i].SkillId >= 0;
-
-            if (hasData)
-            {
-                targetViews[i].gameObject.SetActive(true);
-                targetViews[i].Setup(skillDataArray[i]);
-            }
-            else
-            {
-                targetViews[i].Clear();
-                targetViews[i].gameObject.SetActive(false);
-            }
-        }
-    }
-
     private void RefreshEquippedDragItems()
     {
         if (equippedActiveDragItems == null)

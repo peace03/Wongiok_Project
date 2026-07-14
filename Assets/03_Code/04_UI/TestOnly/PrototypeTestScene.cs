@@ -17,8 +17,6 @@ public class PrototypeTestScene : MonoBehaviour
     private UIPauseSkillInfoData[] currentPassiveSkills;
     private UIPauseSkillInfoData[] currentOwnedSkills;
 
-    [SerializeField] private float testSkillCooldownDuration = 3f;
-
     private static readonly string[] SkillKeyTexts = { "A", "S", "D" };
 
     private float[] skillCooldownRemaining = new float[3];
@@ -188,6 +186,23 @@ public class PrototypeTestScene : MonoBehaviour
         return true;
     }
 
+    private float GetSkillCooldownDuration(int slotIndex)
+    {
+        if (!IsValidSlotIndex(slotIndex)) return 0f;
+
+        UIPauseSkillInfoData skill = currentActiveSkills[slotIndex];
+
+        if (skill.SkillId < 0) return 0f;
+
+        BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
+
+        BaseSkillData skillData = skillDatas.FirstOrDefault(data => data != null && data.Id == skill.SkillId);
+
+        if (skillData == null) return 0f;
+
+        return Mathf.Max(0f, skillData.GetMaxCoolTime(skill.Level));
+    }
+
     private void HandlePauseSkillEquipRequested(UIPauseSkillEquipRequestedEvent eventData)
     {
         EnsurePauseTestData();
@@ -343,9 +358,10 @@ public class PrototypeTestScene : MonoBehaviour
 
         if (skillCooldownRemaining[eventData.SlotIndex] > 0f) return;
 
-        skillCooldownDuration[eventData.SlotIndex] = Mathf.Max(0.01f, testSkillCooldownDuration);
+        float cooldownDuration = GetSkillCooldownDuration(eventData.SlotIndex);
 
-        skillCooldownRemaining[eventData.SlotIndex] = skillCooldownDuration[eventData.SlotIndex];
+        skillCooldownDuration[eventData.SlotIndex] = cooldownDuration;
+        skillCooldownRemaining[eventData.SlotIndex] = cooldownDuration;
 
         PublishCurrentPlayerSkillSlots();
     }
@@ -386,7 +402,7 @@ public class PrototypeTestScene : MonoBehaviour
         skillCooldownDuration = new float[slotCount];
 
         for (int i = 0; i < skillCooldownDuration.Length; i++)
-            skillCooldownDuration[i] = Mathf.Max(0.01f, testSkillCooldownDuration);
+            skillCooldownDuration[i] = GetSkillCooldownDuration(i);
     }
 
     private void ResetSkillCooldowns()
@@ -404,7 +420,7 @@ public class PrototypeTestScene : MonoBehaviour
         if (slotIndex < 0 || slotIndex >= skillCooldownRemaining.Length) return;
 
         skillCooldownRemaining[slotIndex] = 0f;
-        skillCooldownDuration[slotIndex] = Mathf.Max(0.01f, testSkillCooldownDuration);
+        skillCooldownDuration[slotIndex] = GetSkillCooldownDuration(slotIndex);
     }
 
     private bool IsValidSlotIndex(int slotIndex)

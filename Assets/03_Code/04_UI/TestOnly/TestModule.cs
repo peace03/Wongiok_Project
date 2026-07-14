@@ -582,7 +582,7 @@ public class TestModule : MonoBehaviour
             .Concat(cachedOwnedSkills ?? System.Array.Empty<UIPauseSkillInfoData>());
 
         List<UIPauseSkillInfoData> candidates = allOwnedSkills
-            .Where(skill => skill.SkillId >= 0 && skill.Level < maxSkillLevel)
+            .Where(skill => skill.SkillId >= 0 && skill.Level < maxSkillLevel && skill.SkillId != 1004 && skill.SkillId != 1005)
             .GroupBy(skill => skill.SkillId)
             .Select(group => group.First())
             .OrderBy(_ => UnityEngine.Random.value)
@@ -595,44 +595,48 @@ public class TestModule : MonoBehaviour
         {
             UIPauseSkillInfoData skill = candidates[i];
 
+            BaseSkillData skillData = LoadSkillDatas().FirstOrDefault(data => data != null && data.Id == skill.SkillId);
+
+            string comparisonText = BuildLevelUpComparison(skillData, skill.Level, Mathf.Min(skill.Level + 1, maxSkillLevel));
+
             options[i] = new UILevelUpSkillOptionData(
                 skill.SkillId,
                 skill.Icon,
                 skill.SkillName,
                 skill.Level,
                 Mathf.Min(skill.Level + 1, maxSkillLevel),
-                skill.Description,
-                skill.Description,
+                comparisonText,
+                string.Empty,
                 false);
         }
 
         return options;
     }
 
-    private UILevelUpSkillOptionData[] CreateFallbackLevelUpOptionsFromResource()
-    {
-        BaseSkillData[] skillDatas = LoadSkillDatas();
-        int optionCount = Mathf.Min(3, skillDatas.Length);
+    //private UILevelUpSkillOptionData[] CreateFallbackLevelUpOptionsFromResource()
+    //{
+    //    BaseSkillData[] skillDatas = LoadSkillDatas();
+    //    int optionCount = Mathf.Min(3, skillDatas.Length);
 
-        UILevelUpSkillOptionData[] options = new UILevelUpSkillOptionData[optionCount];
+    //    UILevelUpSkillOptionData[] options = new UILevelUpSkillOptionData[optionCount];
 
-        for (int i = 0; i < optionCount; i++)
-        {
-            BaseSkillData data = skillDatas[i];
+    //    for (int i = 0; i < optionCount; i++)
+    //    {
+    //        BaseSkillData data = skillDatas[i];
 
-            options[i] = new UILevelUpSkillOptionData(
-                data.Id,
-                data.Icon,
-                data.SkillName,
-                Mathf.Max(1, playerLevel - 1),
-                playerLevel,
-                data.Desc,
-                data.Desc,
-                false);
-        }
+    //        options[i] = new UILevelUpSkillOptionData(
+    //            data.Id,
+    //            data.Icon,
+    //            data.SkillName,
+    //            Mathf.Max(1, playerLevel - 1),
+    //            playerLevel,
+    //            data.Desc,
+    //            data.Desc,
+    //            false);
+    //    }
 
-        return options;
-    }
+    //    return options;
+    //}
 
     private UIPauseSkillInfoData CreateEmptyPauseSkillData()
     {
@@ -650,6 +654,51 @@ public class TestModule : MonoBehaviour
         return source == null
             ? System.Array.Empty<UIPauseSkillInfoData>()
             : source.ToArray();
+    }
+
+    private string BuildLevelUpComparison(BaseSkillData skillData, int currentLevel, int nextLevel)
+    {
+        if (skillData is not ActiveSkillData activeSkillData) return string.Empty;
+
+        if (activeSkillData.GetLevelData(currentLevel)
+            is not ProjectileSkillLevelData currentData ||
+            activeSkillData.GetLevelData(nextLevel)
+            is not ProjectileSkillLevelData nextData)
+        {
+            return string.Empty;
+        }
+
+        List<string> lines = new();
+
+        AddComparisonLine(lines, "쿨타임", FormatSeconds(currentData.MaxCoolTime), FormatSeconds(nextData.MaxCoolTime));
+
+        AddComparisonLine(lines, "발사 횟수", Mathf.Max(1, currentData.ProjectileCount).ToString(), Mathf.Max(1, nextData.ProjectileCount).ToString());
+
+        AddComparisonLine(lines, "차징 시간", FormatSeconds(currentData.MaxChargingTime), FormatSeconds(nextData.MaxChargingTime));
+
+        return string.Join("\n", lines);
+    }
+
+    private void AddComparisonLine(List<string> lines, string label, string currentValue, string nextValue)
+    {
+        if (currentValue == nextValue) return;
+
+        lines.Add($"{label}: {currentValue} -> {nextValue}");
+    }
+
+    private string FormatNumber(float value)
+    {
+        return value.ToString("0.##");
+    }
+
+    private string FormatSeconds(float value)
+    {
+        return $"{FormatNumber(value)}초";
+    }
+
+    private string FormatPenetration(int value)
+    {
+        return value < 0 ? "무한" : value.ToString();
     }
 }
 
