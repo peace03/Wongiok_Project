@@ -21,7 +21,7 @@ MonoBehaviour:
   desc: 
   levelDatas:
   - rid: 4582174707458244765
-  weapon: {fileID: 4942464512446496594, guid: 2eacda384154cde4fbdacd87f246c657, type: 3}
+  weapon: {fileID: 4942464512446496594, guid: 0d73448f16ba67d4ca3ca8b836dcd762, type: 3}
   effects:
   - type: 1
     priority: 0
