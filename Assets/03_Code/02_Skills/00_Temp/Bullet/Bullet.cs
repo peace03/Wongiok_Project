@@ -108,7 +108,7 @@ public class Bullet : MonoBehaviour, IPoolable
         }
 
         // 하위 오브젝트가 있다면
-        if(transform.childCount > 0)
+        if (transform.childCount > 0)
         {
             // 하위 오브젝트들의 이펙트 실행기 인터페이스들 받아오기
             var executers = transform.GetComponentsInChildren<IEffectExecuter>(true);

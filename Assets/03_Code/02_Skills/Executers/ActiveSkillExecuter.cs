@@ -107,7 +107,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         int curBulletCount = 0;
 
         // 실행 위치들의 수만큼
-        foreach(var place in executePlaces)
+        foreach (var place in executePlaces)
         {
             // 발사체 개수만큼
             for (; curBulletCount < bulletCount; curBulletCount++)
@@ -236,7 +236,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             forward.y = dir.y = 0;
 
             // 대상이 범위(각도) 안에 있다면
-            if(Vector3.Angle(forward.normalized, dir.normalized) <= angle)
+            if (Vector3.Angle(forward.normalized, dir.normalized) <= angle)
                 // 데미지를 받을 수 있는 대상이라면
                 if (hit.TryGetComponent<IDamageable>(out var target))
                     // 타겟들 리스트에 추가
