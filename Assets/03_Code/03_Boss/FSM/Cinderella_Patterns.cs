@@ -557,7 +557,7 @@ public class Cinderella_Patterns : BossPatternBase
         float newY = transform.position.y + anim.deltaPosition.y;
 
         // 3. Z축(깊이): 횡스크롤이므로 0으로 고정
-        float curZ = 0f;
+        float curZ = worldZPos.position.z;
 
         // 물리 엔진을 완전히 무시하고 보스의 좌표를 멱살 잡아 강제로 꽂아 넣습니다.
         transform.position = new Vector3(newX, newY, curZ);

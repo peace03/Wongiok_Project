@@ -20,9 +20,10 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     protected RingDrawer telegraphDrawer; // 빈번한 GetComponent 방지를 위한 캐싱 메모리
 
     [Header("Position")]
-    [Tooltip("Boss spawn position")][SerializeField] protected Transform spawnPos;
-    [Tooltip("Player position")][SerializeField] protected Transform playerPos;
-    [Tooltip("Movable ground area")][SerializeField] protected BoxCollider ground;
+    [Tooltip("월드 Z축 고정")][SerializeField] protected Transform worldZPos;
+    [Tooltip("보스 스폰 지점")][SerializeField] protected Transform spawnPos;
+    [Tooltip("플레이어 위치")][SerializeField] protected Transform playerPos;
+    [Tooltip("이동 가능한 지역")][SerializeField] protected BoxCollider ground;
 
     [Header("Hit Stop")]
     [Tooltip("Hit stop frames")][SerializeField] protected int HitStopFrame;
@@ -342,10 +343,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         if (spawnPos == null)
             return;
 
-        Vector3 spawnPosition = spawnPos.position;
-
-        if (playerPos != null)
-            spawnPosition.z = playerPos.position.z;
+        Vector3 spawnPosition = new Vector3(spawnPos.position.x, spawnPos.position.y, worldZPos.position.z);
 
         transform.position = spawnPosition;
     }
