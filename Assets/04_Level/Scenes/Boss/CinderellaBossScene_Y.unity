@@ -767,7 +767,7 @@ GameObject:
   - component: {fileID: 304059392}
   - component: {fileID: 304059394}
   - component: {fileID: 304059393}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -1505,7 +1505,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 885382666}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uBB34\uAE30 \uCEE8\uD14C\uC774\uB108"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1541,11 +1541,11 @@ PrefabInstance:
       objectReference: {fileID: 428295083}
     - target: {fileID: 3986897394805655502, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: ownerLayer.m_Bits
-      value: 0
+      value: 128
       objectReference: {fileID: 0}
     - target: {fileID: 5088727624942643532, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Layer
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6195647787250270839, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Name
@@ -1553,7 +1553,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6195647787250270839, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_Layer
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6195647787250270839, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
       propertyPath: m_TagString
@@ -1781,7 +1781,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1122346916}
   - component: {fileID: 1122346917}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uC2E4\uD589\uAE30"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
