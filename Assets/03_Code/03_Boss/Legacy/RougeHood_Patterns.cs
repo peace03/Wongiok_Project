@@ -58,7 +58,7 @@ public class RougeHood_Patterns : BossPatternBase
         {
             //플레이어와 거리 검사 -> 4m이내 접근시 공격B 전환
             //사전신호: 레이저사이트
-            new Leaf(() => PlayTelegraph(laserSightDuration, TelegraphType.LaserSight)),
+            new Leaf(() => PlayTelegraph(TelegraphType.LaserSight)),
             //총알 연사: 코루틴이 bulletNum회 발사를 끝낼 때까지 Running을 유지한다.
             new Leaf(FireBulletAPattern),
 
@@ -146,7 +146,7 @@ public class RougeHood_Patterns : BossPatternBase
     }
 
     //사전 신호 재생(레이저 사이트, 오소리)
-    protected override NodeState PlayTelegraph(float baseTime, TelegraphType type)
+    protected override NodeState PlayTelegraph(TelegraphType type)
     {
         // 나중에 LaserSight나 GroundMarker를 쓰는 공격이 생기면 여기서 사전신호를 호출한다.
         if (type == TelegraphType.LaserSight) //레이저 사이트 사전신호
@@ -156,11 +156,11 @@ public class RougeHood_Patterns : BossPatternBase
                 laserSight.StartAiming();
             }
             curTelegraphTime += Time.deltaTime;
-            if(curTelegraphTime > baseTime - blinkTimingBeforeAttack && laserSight.GetAimLock() == false) //깜빡임 시작
+            if(curTelegraphTime > laserSightDuration - blinkTimingBeforeAttack && laserSight.GetAimLock() == false) //깜빡임 시작
             {
                 laserSight.LockAim();
             }
-            if (curTelegraphTime > baseTime) //지정시간 지나면 레이저사이트 비활성화
+            if (curTelegraphTime > laserSightDuration) //지정시간 지나면 레이저사이트 비활성화
             {
                 laserSight.StopAiming();
                 return NodeState.Success;
