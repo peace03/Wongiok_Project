@@ -10,7 +10,7 @@ public class PauseSkillPageView : MonoBehaviour
     [Header("Equipped Active Skills")]
     [SerializeField] private PauseSkillInfoView[] equippedActiveSkillViews;
 
-    [Header("Owned Skills")]
+    [Header("보유 스킬 목록")]
     // 보유 중인 교체 가능 스킬 목록 View
     [SerializeField] private Transform ownedSkillContentRoot;
     [SerializeField] private GameObject ownedSkillItemPrefab;
@@ -18,6 +18,10 @@ public class PauseSkillPageView : MonoBehaviour
     [SerializeField] private RectTransform dragPreviewRoot;
     [SerializeField] private Image dragPreviewIconImage;
     [SerializeField] private int ownedSkillPoolMaxSize = 100;
+    [SerializeField] private Image ownedSkillLockImage;
+
+    private PauseSkillOwnedDropView ownedSkillDropView;
+    private bool isOwnedSkillListUnlocked;
 
     private UnityEngine.Pool.IObjectPool<GameObject> ownedSkillPool;
     private readonly List<GameObject> activeOwnedSkillObjects = new();
@@ -59,6 +63,11 @@ public class PauseSkillPageView : MonoBehaviour
 
     private void Awake()
     {
+        if (ownedSkillContentRoot != null)
+        {
+            ownedSkillDropView = ownedSkillContentRoot.GetComponent<PauseSkillOwnedDropView>();
+        }
+
         ownedSkillPool = CustomObjectPool.CreatePool(
             ownedSkillItemPrefab,
             ownedSkillPoolMaxSize,
@@ -110,6 +119,7 @@ public class PauseSkillPageView : MonoBehaviour
         currentOwnedSkills = eventData.OwnedSkills;
         hasSelectedSkill = eventData.HasSelectedSkills;
         currentSelectedSkill = eventData.SelectedSkill;
+        isOwnedSkillListUnlocked = eventData.IsOwnedSkillListUnlocked;
 
         RefreshAll();
     }
@@ -136,6 +146,7 @@ public class PauseSkillPageView : MonoBehaviour
         currentOwnedSkills = null;
         hasSelectedSkill = false;
         currentSelectedSkill = default;
+        isOwnedSkillListUnlocked = false;
 
         RefreshAll();
     }
@@ -143,9 +154,25 @@ public class PauseSkillPageView : MonoBehaviour
     private void RefreshAll()
     {
         RefreshEquippedActiveSkills();
+        RefreshOwnedSkillLock();
         RefreshOwnedSkills();
         RefreshSelectedSkillDetail();
         HideHoverPreview();
+    }
+
+    private void RefreshOwnedSkillLock()
+    {
+        bool isLocked = !isOwnedSkillListUnlocked;
+
+        if (ownedSkillLockImage != null)
+        {
+            ownedSkillLockImage.gameObject.SetActive(isLocked);
+        }
+
+        if (ownedSkillDropView != null)
+        {
+            ownedSkillDropView.enabled = !isLocked;
+        }
     }
 
     // 캐릭터 모델 프리뷰 초기화 전용
@@ -222,6 +249,16 @@ public class PauseSkillPageView : MonoBehaviour
     private void RefreshOwnedSkills()
     {
         ClearOwnedSkillItems();
+
+        if (!isOwnedSkillListUnlocked)
+        {
+            if (emptyOwnedSkillObject != null)
+            {
+                emptyOwnedSkillObject.SetActive(false);
+            }
+
+            return;
+        }
 
         bool hasOwnedSkills = currentOwnedSkills != null && currentOwnedSkills.Length > 0;
         if (emptyOwnedSkillObject != null)

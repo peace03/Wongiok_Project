@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
@@ -134,7 +135,7 @@ public class PrototypeTestScene : MonoBehaviour
                 data.Icon,
                 data.SkillName,
                 Mathf.Max(1, state.Level),
-                data.Desc,
+                BuildPauseSkillDescription(data, Mathf.Max(1, State.Level)),
                 isEquipped,
                 data.Id);
 
@@ -153,7 +154,8 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<UISetPauseSkillPageEvent>.Publish(
             new UISetPauseSkillPageEvent(
                 currentActiveSkills,
-                currentOwnedSkills));
+                currentOwnedSkills,
+                isOwnedSkillListUnlocked: PrototypeGameSession.CurrentChapterId >= 2));
 
         EventBus<RefreshUIEventT>.Publish(
             new RefreshUIEventT(
@@ -175,11 +177,16 @@ public class PrototypeTestScene : MonoBehaviour
 
         if (skill.Level >= maxSkillLevel) return false;
 
+        BaseSkillData skillData = Resources.LoadAll<BaseSkillData>("Datas/Skills").
+            FirstOrDefault(data => data != null && data.Id == skill.SkillId);
+
+        int nextLevel = Mathf.Min(skill.Level + 1, maxSkillLevel);
+
         skills[skillIndex] = new UIPauseSkillInfoData(
             skill.Icon,
             skill.SkillName,
-            Mathf.Min(skill.Level + 1, maxSkillLevel),
-            skill.Description,
+            nextLevel,
+            BuildPauseSkillDescription(skillData, nextLevel),
             skill.IsEquipped,
             skill.SkillId);
 
@@ -440,6 +447,59 @@ public class PrototypeTestScene : MonoBehaviour
         }
 
         return -1;
+    }
+
+    private string BuildPauseSkillDescription(BaseSkillData skillData, int level)
+    {
+        if (skillData is ActiveSkillData activeSkillData)
+        {
+            ActiveSkillLevelData levelData = activeSkillData.GetLevelData(level);
+
+            if (levelData == null) return string.Empty;
+
+            List<string> lines = new();
+
+            if (levelData is ProjectileSkillLevelData projectileData)
+            {
+                
+            }
+            else if (LevelBasedSkillData is AreaSkillLevelData areaData)
+            {
+
+            }
+
+            return string.Join("\n", lines);
+        }
+
+        if (skillData is LevelBasedSkillData<PassiveSkillLevelData> passiveSkillData)
+        {
+            PassiveSkillLevelData levelData = passiveSkillData.GetLevelData(level);
+
+            if (levelData == null) return string.Empty;
+
+            List<string> lines = new();
+
+            foreach (StatAdjustment stat in levelData.GetAppliedStats())
+            {
+                float signedAmount = stat.modify == MODIFY_TYPE.Addition
+                    ? stat.amount
+                    : -stat.amount;
+
+                AddEffectLine(lines, GetStatDisplayName(stat.stat),
+                    $"{signedAmount:+0.##;-0.##}");
+            }
+
+            return string.Join("\n", lines);
+        }
+
+        return string.Empty;
+    }
+
+    private void AddAreaSkillEffectLines(List<string> lines, AreaSkillLevelData areaData)
+    {
+        if (areaData.Stages == null || areaData.Stages.Count == 0) return;
+
+
     }
 
     private void AddOwnedSkill(UIPauseSkillInfoData skillData)

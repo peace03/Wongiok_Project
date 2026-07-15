@@ -1376,7 +1376,7 @@ GameObject:
   - component: {fileID: 899693277}
   - component: {fileID: 899693276}
   m_Layer: 5
-  m_Name: Image
+  m_Name: LockImgae
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3448,6 +3448,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1729647626}
     m_Modifications:
+    - target: {fileID: 377886092389941342, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -350
+      objectReference: {fileID: 0}
+    - target: {fileID: 583731532558703451, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 583731532558703451, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 583731532558703451, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 583731532558703451, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 583731532558703451, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -80
+      objectReference: {fileID: 0}
+    - target: {fileID: 653377462477656301, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 653377462477656301, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 964209912, guid: 77a0461e13ab38e4c9824608335e10f1, type: 3}
     - target: {fileID: 897650842500323370, guid: a62fc656c2156454da6c0f406c249556, type: 3}
       propertyPath: m_FontData.m_Alignment
       value: 4
@@ -3564,9 +3596,41 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -130
       objectReference: {fileID: 0}
+    - target: {fileID: 5792096512191072685, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: highlightObject
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5914732261403426038, guid: a62fc656c2156454da6c0f406c249556, type: 3}
       propertyPath: m_SizeDelta.x
       value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 6314239946783846185, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: ownedSkillLockImage
+      value: 
+      objectReference: {fileID: 899693276}
+    - target: {fileID: 6433968120249135434, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6433968120249135434, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6433968120249135434, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6433968120249135434, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6433968120249135434, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6433968120249135434, guid: a62fc656c2156454da6c0f406c249556, type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6831030212054202623, guid: a62fc656c2156454da6c0f406c249556, type: 3}
       propertyPath: m_Name
