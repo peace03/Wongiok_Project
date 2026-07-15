@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/03_Code/06_System.meta
 guid: 27541e4e575bedb4ba6b8906fdaf4946
+========
+guid: e6f44960b3980cb4883586bbc167f3a2
+>>>>>>>> 4dfe2c1 (feat : 스나이퍼 이펙트 수정):Assets/01_Art/Dev/Skill/Shaders.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

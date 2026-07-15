@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/01_Art/Dev/UI/Sprites/ChapterTitleCard.meta
 guid: 698faf1e300ba5a43917a453cdbc7b95
+========
+guid: 868da0e034edcf74f93d24038f2a9941
+>>>>>>>> 4dfe2c1 (feat : 스나이퍼 이펙트 수정):Assets/01_Art/Dev/Skill/Textures.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
