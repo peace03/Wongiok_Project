@@ -492,6 +492,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1760176733824110290, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.65
+      objectReference: {fileID: 0}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: ground
       value: 
@@ -504,6 +508,22 @@ PrefabInstance:
       propertyPath: worldZPos
       value: 
       objectReference: {fileID: 1816822191}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: A_telegraphTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: B_telegraphTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: ULTI_telegraphTime1
+      value: 1.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: ULTI_telegraphTime2
+      value: 0.09
+      objectReference: {fileID: 0}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: excuteAttackType_InGame
       value: 3
@@ -696,7 +716,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3187099092208369772, guid: 67908368695eefd41882919494b66490, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -105.74249
+      value: -115.48
       objectReference: {fileID: 0}
     - target: {fileID: 3187099092208369772, guid: 67908368695eefd41882919494b66490, type: 3}
       propertyPath: m_LocalRotation.w
