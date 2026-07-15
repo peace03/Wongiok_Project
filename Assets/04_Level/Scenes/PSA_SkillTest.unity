@@ -134,7 +134,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &31176916
 Transform:
   m_ObjectHideFlags: 0
@@ -161,7 +161,7 @@ GameObject:
   m_Component:
   - component: {fileID: 64696649}
   - component: {fileID: 64696650}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uBC18\uB300\uD3B8"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,7 +260,7 @@ GameObject:
   m_Component:
   - component: {fileID: 214646145}
   - component: {fileID: 214646146}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uC2E4\uD589\uAE30"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -279,7 +279,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 458110775}
   m_Father: {fileID: 215864537}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &214646146
@@ -291,7 +292,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 214646144}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5177d2ea04780764d964527fd0e644fe, type: 3}
+  m_Script: {fileID: 11500000, guid: 0e7826dc0b726d942934e9a080709387, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillExecuter
   defaultExecutePos: {fileID: 458110775}
@@ -305,7 +306,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 215864537}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uC2A4\uD0AC"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -320,17 +321,16 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 215864536}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -8.5, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1040518482}
   - {fileID: 307771758}
   - {fileID: 214646145}
-  - {fileID: 458110775}
   - {fileID: 274106806}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 265199219}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &222888120
 GameObject:
@@ -352,7 +352,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &222888121
 Transform:
   m_ObjectHideFlags: 0
@@ -380,7 +380,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
 --- !u!54 &222888123
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -616,7 +615,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
 --- !u!54 &244755816
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -685,11 +683,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 255983501}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62cbd78eebc2aff41b0f879fb543eef8, type: 3}
+  m_Script: {fileID: 11500000, guid: d20f73f73f23adb45bb037e7fcd86f08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletFactory
   container: {fileID: 255983502}
-  bullet: {fileID: 89748929391278128, guid: 1c0152f012197da4ebf1cd617831d240, type: 3}
+  bullet: {fileID: 89748929391278128, guid: b0d48c8431b97774b9d9efe4d6409136, type: 3}
   maxCount: 1000
 --- !u!1 &265199218
 GameObject:
@@ -704,7 +702,7 @@ GameObject:
   - component: {fileID: 265199222}
   - component: {fileID: 265199221}
   - component: {fileID: 265199220}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uD50C\uB808\uC774\uC5B4"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -723,7 +721,8 @@ Transform:
   m_LocalPosition: {x: -8.5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 215864537}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &265199220
@@ -735,9 +734,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 265199218}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b5115e338279574f9717a77bf925301, type: 3}
+  m_Script: {fileID: 11500000, guid: d48019c9f684d21478bd1e108ce02abf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatus
+  baseMaxHP: 100
+  baseAttackPower: 10
+  baseMoveSpeed: 6
+  baseAttackSpeed: 1
+  baseCooldown: 1
+  baseJumpPower: 10
+  baseMaxJumpCount: 2
+  status:
+    MaxHP:
+      BaseValue: 0
+    AttackPower:
+      BaseValue: 0
+    MoveSpeed:
+      BaseValue: 0
+    AttackSpeed:
+      BaseValue: 0
+    Cooldown:
+      BaseValue: 0
+    CurrentHP: 0
+    JumpPower:
+      BaseValue: 0
+    MaxJumpCount:
+      BaseValue: 0
 --- !u!136 &265199221
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -828,7 +850,7 @@ GameObject:
   m_Component:
   - component: {fileID: 274106806}
   - component: {fileID: 274106807}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uBB34\uAE30 \uAD00\uB9AC\uC790"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -860,7 +882,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 274106805}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8adc64e5de2bbc74cae8dbb2b41612dd, type: 3}
+  m_Script: {fileID: 11500000, guid: 2705ec5e5dfb45644a448cb1acb98f55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillVisualDirector
   weaponContainer: {fileID: 597514877}
@@ -907,7 +929,7 @@ GameObject:
   m_Component:
   - component: {fileID: 307771758}
   - component: {fileID: 307771759}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uCEE8\uD2B8\uB864\uB7EC"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -938,7 +960,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 307771757}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc20aeb2306a23e48a33a336009bd842, type: 3}
+  m_Script: {fileID: 11500000, guid: d557f0d4f5346b849b04898736ad6c76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillTestController
   owner: {fileID: 265199218}
@@ -1366,7 +1388,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 458110775}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uAE30\uBCF8 \uC2E4\uD589 \uC704\uCE58"
   m_TagString: Untagged
   m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
@@ -1386,7 +1408,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 215864537}
+  m_Father: {fileID: 214646145}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &597514876
 GameObject:
@@ -1397,7 +1419,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 597514877}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uBB34\uAE30 \uCEE8\uD14C\uC774\uB108"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1488,7 +1510,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &912412283
 Transform:
   m_ObjectHideFlags: 0
@@ -1516,7 +1538,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
 --- !u!54 &912412285
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1634,7 +1655,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1040518482}
   - component: {fileID: 1040518483}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: "\uBC94\uC704 \uBCF4\uAE30"
   m_TagString: Untagged
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
@@ -1700,7 +1721,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1123311280
 Transform:
   m_ObjectHideFlags: 0
@@ -1728,7 +1749,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
 --- !u!54 &1123311282
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1852,7 +1872,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1193304746
 Transform:
   m_ObjectHideFlags: 0
@@ -1881,7 +1901,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
 --- !u!1 &1223745706
 GameObject:
   m_ObjectHideFlags: 0
@@ -1902,7 +1921,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1223745707
 Transform:
   m_ObjectHideFlags: 0
@@ -2037,7 +2056,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
 --- !u!1 &1279118473
 GameObject:
   m_ObjectHideFlags: 0
@@ -2052,7 +2070,7 @@ GameObject:
   - component: {fileID: 1279118475}
   - component: {fileID: 1279118478}
   - component: {fileID: 1279118479}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: "\uBAAC\uC2A4\uD130 \uCF5C\uB77C\uC774\uB354+\uC2A4\uD06C\uB9BD\uD2B8"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2190,10 +2208,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1279118473}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
+  m_Script: {fileID: 11500000, guid: 3720da978a0e8d24faabeaa1f2e72653, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
+  maxHp: 100
+  resetHpOnEnable: 1
+  invulnerable: 0
 --- !u!1 &1582245198
 GameObject:
   m_ObjectHideFlags: 0
@@ -2206,13 +2226,13 @@ GameObject:
   - component: {fileID: 1582245201}
   - component: {fileID: 1582245200}
   - component: {fileID: 1582245199}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: "\uBCBD"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1582245199
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2390,7 +2410,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1839278136
 Transform:
   m_ObjectHideFlags: 0
@@ -2418,7 +2438,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
 --- !u!54 &1839278138
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2546,7 +2565,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2146837161
 Transform:
   m_ObjectHideFlags: 0
@@ -2681,7 +2700,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2378317693564429d020e687e342dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  Hp: 100
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -2691,7 +2709,6 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 285734780}
   - {fileID: 265199219}
-  - {fileID: 215864537}
   - {fileID: 1582245202}
   - {fileID: 244755814}
   - {fileID: 31176916}
