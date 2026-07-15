@@ -147,7 +147,7 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Magnum"",
+                    ""name"": ""SkillA"",
                     ""type"": ""Button"",
                     ""id"": ""d2fb5bda-4b2e-4fcc-a7c6-8211aa3fe66b"",
                     ""expectedControlType"": """",
@@ -156,7 +156,7 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Rifle"",
+                    ""name"": ""SkillS"",
                     ""type"": ""Button"",
                     ""id"": ""306b4ce7-b143-4d5f-a5ba-9f5395b6d68e"",
                     ""expectedControlType"": """",
@@ -165,7 +165,7 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Sniper"",
+                    ""name"": ""SkillD"",
                     ""type"": ""Button"",
                     ""id"": ""bed552cb-6eba-4bf7-b99b-14f50baa88d6"",
                     ""expectedControlType"": """",
@@ -292,7 +292,7 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Magnum"",
+                    ""action"": ""SkillA"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -303,7 +303,7 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Rifle"",
+                    ""action"": ""SkillS"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -314,7 +314,7 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Sniper"",
+                    ""action"": ""SkillD"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -359,9 +359,9 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_Parry = m_Player.FindAction("Parry", throwIfNotFound: true);
         m_Player_UseHealItem = m_Player.FindAction("UseHealItem", throwIfNotFound: true);
-        m_Player_Magnum = m_Player.FindAction("Magnum", throwIfNotFound: true);
-        m_Player_Rifle = m_Player.FindAction("Rifle", throwIfNotFound: true);
-        m_Player_Sniper = m_Player.FindAction("Sniper", throwIfNotFound: true);
+        m_Player_SkillA = m_Player.FindAction("SkillA", throwIfNotFound: true);
+        m_Player_SkillS = m_Player.FindAction("SkillS", throwIfNotFound: true);
+        m_Player_SkillD = m_Player.FindAction("SkillD", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_ToggleMenu = m_UI.FindAction("ToggleMenu", throwIfNotFound: true);
@@ -452,9 +452,9 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_Parry;
     private readonly InputAction m_Player_UseHealItem;
-    private readonly InputAction m_Player_Magnum;
-    private readonly InputAction m_Player_Rifle;
-    private readonly InputAction m_Player_Sniper;
+    private readonly InputAction m_Player_SkillA;
+    private readonly InputAction m_Player_SkillS;
+    private readonly InputAction m_Player_SkillD;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -491,17 +491,17 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @UseHealItem => m_Wrapper.m_Player_UseHealItem;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Magnum".
+        /// Provides access to the underlying input action "Player/SkillA".
         /// </summary>
-        public InputAction @Magnum => m_Wrapper.m_Player_Magnum;
+        public InputAction @SkillA => m_Wrapper.m_Player_SkillA;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Rifle".
+        /// Provides access to the underlying input action "Player/SkillS".
         /// </summary>
-        public InputAction @Rifle => m_Wrapper.m_Player_Rifle;
+        public InputAction @SkillS => m_Wrapper.m_Player_SkillS;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Sniper".
+        /// Provides access to the underlying input action "Player/SkillD".
         /// </summary>
-        public InputAction @Sniper => m_Wrapper.m_Player_Sniper;
+        public InputAction @SkillD => m_Wrapper.m_Player_SkillD;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -546,15 +546,15 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
             @UseHealItem.started += instance.OnUseHealItem;
             @UseHealItem.performed += instance.OnUseHealItem;
             @UseHealItem.canceled += instance.OnUseHealItem;
-            @Magnum.started += instance.OnMagnum;
-            @Magnum.performed += instance.OnMagnum;
-            @Magnum.canceled += instance.OnMagnum;
-            @Rifle.started += instance.OnRifle;
-            @Rifle.performed += instance.OnRifle;
-            @Rifle.canceled += instance.OnRifle;
-            @Sniper.started += instance.OnSniper;
-            @Sniper.performed += instance.OnSniper;
-            @Sniper.canceled += instance.OnSniper;
+            @SkillA.started += instance.OnSkillA;
+            @SkillA.performed += instance.OnSkillA;
+            @SkillA.canceled += instance.OnSkillA;
+            @SkillS.started += instance.OnSkillS;
+            @SkillS.performed += instance.OnSkillS;
+            @SkillS.canceled += instance.OnSkillS;
+            @SkillD.started += instance.OnSkillD;
+            @SkillD.performed += instance.OnSkillD;
+            @SkillD.canceled += instance.OnSkillD;
         }
 
         /// <summary>
@@ -584,15 +584,15 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
             @UseHealItem.started -= instance.OnUseHealItem;
             @UseHealItem.performed -= instance.OnUseHealItem;
             @UseHealItem.canceled -= instance.OnUseHealItem;
-            @Magnum.started -= instance.OnMagnum;
-            @Magnum.performed -= instance.OnMagnum;
-            @Magnum.canceled -= instance.OnMagnum;
-            @Rifle.started -= instance.OnRifle;
-            @Rifle.performed -= instance.OnRifle;
-            @Rifle.canceled -= instance.OnRifle;
-            @Sniper.started -= instance.OnSniper;
-            @Sniper.performed -= instance.OnSniper;
-            @Sniper.canceled -= instance.OnSniper;
+            @SkillA.started -= instance.OnSkillA;
+            @SkillA.performed -= instance.OnSkillA;
+            @SkillA.canceled -= instance.OnSkillA;
+            @SkillS.started -= instance.OnSkillS;
+            @SkillS.performed -= instance.OnSkillS;
+            @SkillS.canceled -= instance.OnSkillS;
+            @SkillD.started -= instance.OnSkillD;
+            @SkillD.performed -= instance.OnSkillD;
+            @SkillD.canceled -= instance.OnSkillD;
         }
 
         /// <summary>
@@ -772,26 +772,26 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnUseHealItem(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Magnum" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "SkillA" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnMagnum(InputAction.CallbackContext context);
+        void OnSkillA(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Rifle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "SkillS" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRifle(InputAction.CallbackContext context);
+        void OnSkillS(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Sniper" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "SkillD" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSniper(InputAction.CallbackContext context);
+        void OnSkillD(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

@@ -61,7 +61,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Magnum",
+                    "name": "SkillA",
                     "type": "Button",
                     "id": "d2fb5bda-4b2e-4fcc-a7c6-8211aa3fe66b",
                     "expectedControlType": "",
@@ -70,7 +70,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Rifle",
+                    "name": "SkillS",
                     "type": "Button",
                     "id": "306b4ce7-b143-4d5f-a5ba-9f5395b6d68e",
                     "expectedControlType": "",
@@ -79,7 +79,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Sniper",
+                    "name": "SkillD",
                     "type": "Button",
                     "id": "bed552cb-6eba-4bf7-b99b-14f50baa88d6",
                     "expectedControlType": "",
@@ -206,7 +206,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Magnum",
+                    "action": "SkillA",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -217,7 +217,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Rifle",
+                    "action": "SkillS",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -228,7 +228,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Sniper",
+                    "action": "SkillD",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

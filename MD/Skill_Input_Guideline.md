@@ -14,13 +14,13 @@ GameInputAction → GameInputReader → SkillSystemController → EventBus → P
 
 | 액션 | 키 | 슬롯 |
 | --- | --- | --- |
-| `Magnum` | A | `ACTIVE_SKILL_SLOT_TYPE.A` |
-| `Rifle` | S | `ACTIVE_SKILL_SLOT_TYPE.S` |
-| `Sniper` | D | `ACTIVE_SKILL_SLOT_TYPE.D` |
+| `SkillA` | A | `ACTIVE_SKILL_SLOT_TYPE.A` |
+| `SkillS` | S | `ACTIVE_SKILL_SLOT_TYPE.S` |
+| `SkillD` | D | `ACTIVE_SKILL_SLOT_TYPE.D` |
 
 - 키 변경은 Input Actions 자산의 바인딩만 수정합니다.
-- 액션은 `Player.Magnum`, `Player.Rifle`, `Player.Sniper`처럼 사용합니다.
-- Action Map은 중첩되지 않으므로 `Player.Skill.Magnum` 구조는 사용하지 않습니다.
+- 액션은 `Player.SkillA`, `Player.SkillS`, `Player.SkillD`처럼 사용합니다.
+- Action Map은 중첩되지 않으므로 `Player.Skill.SkillA` 구조는 사용하지 않습니다.
 
 ## GameInputReader 규칙
 
@@ -28,14 +28,14 @@ Input System API는 `GameInputReader`에서만 호출합니다.
 
 ```csharp
 #region Skill Input
-public bool MagnumPressed => _input.Player.Magnum.WasPressedThisFrame();
-public bool MagnumReleased => _input.Player.Magnum.WasReleasedThisFrame();
+public bool SkillAPressed => _input.Player.SkillA.WasPressedThisFrame();
+public bool SkillAReleased => _input.Player.SkillA.WasReleasedThisFrame();
 
-public bool RiflePressed => _input.Player.Rifle.WasPressedThisFrame();
-public bool RifleReleased => _input.Player.Rifle.WasReleasedThisFrame();
+public bool SkillSPressed => _input.Player.SkillS.WasPressedThisFrame();
+public bool SkillSReleased => _input.Player.SkillS.WasReleasedThisFrame();
 
-public bool SniperPressed => _input.Player.Sniper.WasPressedThisFrame();
-public bool SniperReleased => _input.Player.Sniper.WasReleasedThisFrame();
+public bool SkillDPressed => _input.Player.SkillD.WasPressedThisFrame();
+public bool SkillDReleased => _input.Player.SkillD.WasReleasedThisFrame();
 #endregion
 ```
 
@@ -52,20 +52,20 @@ public bool SniperReleased => _input.Player.Sniper.WasReleasedThisFrame();
 `SkillSystemController`는 `GameInputReader`를 참조하고, Reader의 입력을 기존 스킬 슬롯 이벤트로 변환합니다.
 
 ```csharp
-if (_inputReader.MagnumPressed)
+if (_inputReader.SkillAPressed)
 {
     EventBus<StartedPressSkillSlot>.Publish(
         new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.A));
 }
 
-if (_inputReader.MagnumReleased)
+if (_inputReader.SkillAReleased)
 {
     EventBus<CanceledPressSkillSlot>.Publish(
         new CanceledPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.A));
 }
 ```
 
-`Rifle`과 `Sniper`도 각각 S, D 슬롯으로 같은 방식으로 변환합니다.
+`SkillS`와 `SkillD`도 각각 S, D 슬롯으로 같은 방식으로 변환합니다.
 
 이벤트에 슬롯 값이 이미 포함되므로 실행과 취소 메서드에서 다시 A/S/D를 `switch`로 구분하지 않습니다.
 
@@ -98,7 +98,7 @@ private void CancelSkill(CanceledPressSkillSlot input)
 
 ## 확인 항목
 
-- A/S/D를 누르면 Magnum/Rifle/Sniper의 Pressed 값이 해당 프레임에만 true가 된다.
+- A/S/D를 누르면 SkillA/SkillS/SkillD의 Pressed 값이 해당 프레임에만 true가 된다.
 - A/S/D를 떼면 Released 값이 해당 프레임에만 true가 된다.
 - `SkillSystemController`에 Legacy `Input.GetKey*` 호출이 남아 있지 않다.
 - 기존 A/S/D 슬롯에 장착된 스킬이 정상적으로 시작·취소된다.

@@ -19,9 +19,14 @@ public class GameInputReader : MonoBehaviour
     #endregion
 
     #region Skill Input
-    public bool MagnumPressed => _input.Player.Magnum.WasPressedThisFrame();
-    public bool RiflePressed => _input.Player.Rifle.WasPressedThisFrame();
-    public bool SniperPressed => _input.Player.Sniper.WasPressedThisFrame();
+    public bool SkillAPressed => _input.Player.SkillA.WasPressedThisFrame();
+    public bool SkillSPressed => _input.Player.SkillS.WasPressedThisFrame();
+    public bool SkillDPressed => _input.Player.SkillD.WasPressedThisFrame();
+    public bool SkillAReleased => _input.Player.SkillA.WasReleasedThisFrame();
+    public bool SkillSReleased => _input.Player.SkillS.WasReleasedThisFrame();
+    public bool SkillDReleased => _input.Player.SkillD.WasReleasedThisFrame();
+
+
     
     #endregion
 

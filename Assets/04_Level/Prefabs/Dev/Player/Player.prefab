@@ -143,6 +143,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8650343130422386955}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1102723354271703662}
   m_SourcePrefab: {fileID: 100100000, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
 --- !u!1 &6195647787250270839 stripped
 GameObject:
@@ -255,7 +258,7 @@ MonoBehaviour:
   bulletFactory: {fileID: 0}
   ownerLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   penetrationCount: 0
 --- !u!114 &2325928613518686973
 MonoBehaviour:
@@ -342,6 +345,18 @@ MonoBehaviour:
   startLevel: 1
   expPerLevel: 100
   currentExp: 0
+--- !u!114 &1102723354271703662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f6db590c61a4f5894a70ce9758d3b21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameInputReader
 --- !u!4 &6823107894079953101 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
