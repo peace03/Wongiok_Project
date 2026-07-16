@@ -19,6 +19,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
     private LayerMask skillLayer;                                                   // 스킬 레이어
 
+    private float projectileDelayTimeValue;                                         // 발사체 스킬 딜레이 시간량
+
     // 액티브 스킬 실행 위치들 변경 이벤트 구독
     private void OnEnable() => EventBus<ChangeActiveSkillExecutePositions>.action += SetExecutePositions;
 
@@ -86,10 +88,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 발사체 이펙트에 해당하는 이펙트 프리팹 받아오기
         data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Main, effectPrefabs);
-
-        // 발사체 스킬 딜레이 시간 구하기
-        projectileDelayTime = new WaitForSeconds(skillData.MaxDuration /
-                            (skillData.ProjectileCount == 0 ? 1 : skillData.ProjectileCount));
+        // 발사체 스킬 딜레이 시간 구하고 저장하기
+        projectileDelayTimeValue = skillData.MaxDuration / (skillData.ProjectileCount == 0 ?
+                                                                    1 : skillData.ProjectileCount);
+        projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(skillData.ProjectileCount, skillData.GetDamage(),
                                                                         skillData.PenetrationCount));
@@ -130,8 +132,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                         wave.SetInfo();
                 }
 
-                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수)
-                bullet.StartFire(place, skillLayer, damage, penetrationCount);
+                //// 총알 속도 구하기
+                //float bulletSpeed = 25f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
+                //// 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수, 총알 속도)
+                //bullet.StartFire(skillLayer, damage, penetrationCount, Mathf.Clamp(bulletSpeed, 10f, 50f));
+                bullet.StartFire(skillLayer, damage, penetrationCount, 25f);
                 // 발사체 스킬 딜레이 시간만큼 대기
                 yield return projectileDelayTime;
             }

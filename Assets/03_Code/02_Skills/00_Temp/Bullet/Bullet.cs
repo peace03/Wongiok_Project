@@ -5,17 +5,15 @@ using UnityEngine.Pool;
 
 public class Bullet : MonoBehaviour, IPoolable
 {
-    [Header("총알 스탯")][Space(5)]
-    [Header("속도")]
-    [Tooltip("날아가는 (임시)속도, 얼마든지 조정하셔도 됨")]
-    [SerializeField] private float speed = 10f;             // 속도
-    [Header("지속 시간")]
-    [Tooltip("날아가는 총알이 유지되는 시간, 얼마든지 조장하셔도 됨")]
-    [SerializeField] private float duration = 5f;           // 지속 시간
+    [Header("최대 사거리")]
+    [SerializeField] private float maxRange = 30f;          // 최대 사거리
+    [Header("최대 유지 시간")]
+    [SerializeField] private float maxLifeTime = 5f;        // 최대 유지 시간
 
     private LayerMask ownerLayer;                           // 소유자 레이어
-    private float damage = 0f;                              // 데미지
-    private int penetrationCount = 0;                       // 관통 횟수
+    private float damage;                                   // 데미지
+    private int penetrationCount;                           // 관통 횟수
+    public float bulletSpeed;                              // 총알 속도
 
     private IObjectPool<GameObject> returnRef;              // 반납 오브젝트 풀 주소
 
@@ -32,7 +30,7 @@ public class Bullet : MonoBehaviour, IPoolable
             return;
 
         // 전방으로 총알 발사
-        transform.position += speed * Time.deltaTime * transform.forward;
+        transform.position += bulletSpeed * Time.deltaTime * transform.forward;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -131,15 +129,21 @@ public class Bullet : MonoBehaviour, IPoolable
         => ((1 << hit.gameObject.layer) & ownerLayer.value) != 0;
 
     /// <summary>
-    /// 오브젝트 풀 주소 설정 함수(반환 주소 설정)
+    /// 오브젝트 풀 주소 설정 함수
     /// </summary>
+    /// <param name="poolRef">반환 주소</param>
     public void SetPoolRef(IObjectPool<GameObject> poolRef) => returnRef = poolRef;
 
     /// <summary>
     /// 사격 시작 함수
     /// </summary>
-    public void StartFire(Transform origin, LayerMask ownerLayer, float damage,
-                                                            int penetrationCount = 0)
+    /// <param name="spawnPoint">생성 장소</param>
+    /// <param name="ownerLayer">소유자 레이어</param>
+    /// <param name="damage">데미지</param>
+    /// <param name="penetrationCount">관통 횟수(생략 가능, 기본값 : 0)</param>
+    /// <param name="speed">총알 속도(생략 가능, 기본값 : 10f)</param>
+    public void StartFire(Transform spawnPoint, LayerMask ownerLayer, float damage,
+                                            int penetrationCount = 0, float speed = 10f)
     {
         // 타이머 코루틴이 비어있지 않다면
         if (timerCoroutine != null)
@@ -150,24 +154,40 @@ public class Bullet : MonoBehaviour, IPoolable
             timerCoroutine = null;
         }
 
-        // 위치, 각도 설정
-        transform.SetPositionAndRotation(origin.position, origin.rotation);
+        // 총알의 위치, 각도 설정
+        transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
         // 총알 정보 설정
-        SetInfo(ownerLayer, damage, penetrationCount);
+        SetInfo(ownerLayer, damage, penetrationCount, speed);
         // 사격 시작
         startFire = true;
         // 풀 반환 완료 여부 초기화
         isReturnedToPool = false;
+        // 최대 유지 시간 설정
+        maxLifeTime = maxRange / speed;
         // 반납 시간 초기화
-        returnTime = new WaitForSeconds(duration);
+        returnTime = new WaitForSeconds(maxLifeTime);
         // 타이머 시작
         timerCoroutine = StartCoroutine(ReturnRoutine());
     }
 
     /// <summary>
+    /// 사격 시작 함수(위치+각도 설정이 필요가 없거나, 이미 위치+각도 설정을 했음)
+    /// </summary>
+    /// <param name="ownerLayer">소유자 레이어</param>
+    /// <param name="damage">데미지</param>
+    /// <param name="penetrationCount">관통 횟수(생략 가능, 기본값 : 0)</param>
+    /// <param name="speed">총알 속도(생략 가능, 기본값 : 10f)</param>
+    public void StartFire(LayerMask ownerLayer, float damage, int penetrationCount = 0, float speed = 10f)
+                    => StartFire(transform, ownerLayer, damage, penetrationCount, speed);
+
+    /// <summary>
     /// 총알 정보 설정 함수
     /// </summary>
-    private void SetInfo(LayerMask layer, float amount, int count)
+    /// <param name="layer">소유자 레이어</param>
+    /// <param name="amount">데미지</param>
+    /// <param name="count">관통 횟수</param>
+    /// <param name="speed">총알 속도</param>
+    private void SetInfo(LayerMask layer, float amount, int count, float speed)
     {
         // 소유자 레이어 설정
         ownerLayer = layer;
@@ -175,6 +195,8 @@ public class Bullet : MonoBehaviour, IPoolable
         damage = amount;
         // 관통 횟수 설정
         penetrationCount = count;
+        // 총알 속도 설정
+        bulletSpeed = speed;
     }
 
     /// <summary>
