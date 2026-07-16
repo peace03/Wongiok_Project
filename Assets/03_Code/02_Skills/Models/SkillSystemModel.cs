@@ -62,7 +62,7 @@ public class SkillSystemModel
             }
             // 해당 스킬이 있다면
             else
-                Debug.LogWarning($"[Error | Skill] {data.SkillName} 스킬 존재 => 입력 - 대상 {owner.name}\n", owner);
+                Debug.Log($"[Error | Skill] {data.SkillName} 스킬 존재 => 입력 - 대상 {owner.name}\n", owner);
         }
 
         // 스킬 장착
@@ -106,7 +106,8 @@ public class SkillSystemModel
             {
                 // 패시브 스킬 장착
                 equippedPassives.Add(skill);
-                Debug.Log($"[Passive | Skill] 스킬 장착 => 위치 : {equippedPassives.Count} / {skill.BaseData.SkillName}");
+                Debug.Log($"[Passive | Skill] 스킬 장착 => " +
+                            $"위치 : {equippedPassives.Count} / {skill.BaseData.SkillName}");
             }
         }
 
