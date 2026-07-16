@@ -5,18 +5,18 @@ public class Test_Y : MonoBehaviour
     private bool canParry;
     private void OnEnable()
     {
-        EventBus<CanParryEvent>.action += SetCanParry;
-        EventBus<UltimateInvokeEvent>.action += SetFalseParry;
+        //EventBus<CanParryEvent>.action += SetCanParry;
+        //EventBus<UltimateInvokeEvent>.action += SetFalseParry;
     }
     private void OnDisable()
     {
-        EventBus<CanParryEvent>.action -= SetCanParry;
-        EventBus<UltimateInvokeEvent>.action -= SetFalseParry;
+        //EventBus<CanParryEvent>.action -= SetCanParry;
+        //EventBus<UltimateInvokeEvent>.action -= SetFalseParry;
     }
     private void Update()
     {
-        if (canParry == true && Input.GetKeyDown(KeyCode.E))
-            EventBus<ParryKeyDown>.Publish(default);
+        //if (canParry == true && Input.GetKeyDown(KeyCode.E))
+            //EventBus<ParryKeyDown>.Publish(default);
     }
     public void SetCanParry(CanParryEvent data)
     {
