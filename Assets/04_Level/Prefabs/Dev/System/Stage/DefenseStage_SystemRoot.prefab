@@ -55,7 +55,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5466048526587615417}
-  - component: {fileID: 7300132979199510962}
+  - component: {fileID: 5919169795382811853}
   m_Layer: 0
   m_Name: ArenaBounds
   m_TagString: Untagged
@@ -78,7 +78,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8752373367679938971}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7300132979199510962
+--- !u!114 &5919169795382811853
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -330,7 +330,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DefenseStageController
   cameraFollow: {fileID: 0}
   cameraLockPoint: {fileID: 8519246472309211660}
-  arenaBounds: {fileID: 7300132979199510962}
+  arenaBounds: {fileID: 5919169795382811853}
   blockingObjects:
   - {fileID: 6318241232662696528}
   - {fileID: 4496008323451033213}

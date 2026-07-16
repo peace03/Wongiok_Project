@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09a5fa7a1b7480b4283a2f3ad3d2ea40, type: 3}
+  m_Name: CH_STAGE01_CP_002
+  m_EditorClassIdentifier: Assembly-CSharp::CheckpointDefinition
+  checkpointId: CH_01_002
+  displayNumber: 2
+  sceneAsset: {fileID: 102900000, guid: 147ea8e77f732c84eb67c66ddc4c9b53, type: 3}
+  scenePath: Assets/_ExternalAssets/CopiedScene/InGame_TestingMobs.unity
+  respawnPosition: {x: 0, y: 0, z: 0}
+  respawnEulerAngles: {x: 0, y: 0, z: 0}
+  restoreHealth: 1
+  restoreLives: 1
+  restoreHealItems: 1

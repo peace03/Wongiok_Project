@@ -1,64 +1,115 @@
 using UnityEngine;
 
+[DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerStatus))]
-[RequireComponent(typeof(PlayerCheckpointTracker))]
+[RequireComponent(typeof(PlayerLifeTracker))]
+[RequireComponent(typeof(PlayerHealItemInventory))]
 public class CheckpointHealSystem : MonoBehaviour
 {
-    [Header("References")]
+    [Header("Player References")]
     [SerializeField] private PlayerStatus playerStatus;
-    [SerializeField] private PlayerCheckpointTracker checkpointTracker;
+    [SerializeField] private PlayerLifeTracker lifeTracker;
+    [SerializeField]
+    private PlayerHealItemInventory healItemInventory;
 
-    [Header("Recovery")]
-    [SerializeField] private bool healToFull = true;
-    [SerializeField] private float fixedHealAmount = 50f;
-
-    // 체크포인트 회복 시스템에 필요한 참조를 준비합니다
+    // 같은 Player 오브젝트의 회복 관련 컴포넌트를 준비합니다
     private void Awake()
+    {
+        playerStatus ??= GetComponent<PlayerStatus>();
+        lifeTracker ??= GetComponent<PlayerLifeTracker>();
+        healItemInventory ??=
+            GetComponent<PlayerHealItemInventory>();
+    }
+
+    // Definition 설정에 따라 부족한 자원만 최대치까지 복구합니다
+    public bool RecoverMissingResources(
+        CheckpointDefinition definition)
+    {
+        if (definition == null)
+        {
+            return false;
+        }
+
+        bool didRecover = false;
+
+        if (definition.RestoreHealth)
+        {
+            didRecover |= RestoreHealthToFull();
+        }
+
+        if (definition.RestoreLives)
+        {
+            didRecover |= RestoreLivesToFull();
+        }
+
+        if (definition.RestoreHealItems)
+        {
+            didRecover |= RestoreHealItemsToFull();
+        }
+
+        return didRecover;
+    }
+
+    // 현재 Player 상태를 체크포인트 스냅샷으로 반환합니다
+    public void CaptureSnapshot(
+        out float currentHP,
+        out int currentHealItemCount)
+    {
+        currentHP =
+            playerStatus != null
+                ? playerStatus.GetCurrentHP()
+                : 0f;
+
+        currentHealItemCount =
+            healItemInventory != null
+                ? healItemInventory.CurrentCount
+                : 0;
+    }
+
+    // 체력이 부족할 때 최대 체력까지 회복합니다
+    private bool RestoreHealthToFull()
     {
         if (playerStatus == null)
         {
-            playerStatus = GetComponent<PlayerStatus>();
+            return false;
         }
 
-        if (checkpointTracker == null)
+        float missingHP =
+            playerStatus.GetMaxHP() -
+            playerStatus.GetCurrentHP();
+
+        if (missingHP <= 0f)
         {
-            checkpointTracker = GetComponent<PlayerCheckpointTracker>();
+            return false;
         }
+
+        playerStatus.Heal(missingHP);
+        return true;
     }
 
-    // 플레이어를 회복한 뒤 회복된 상태로 체크포인트 스냅샷을 갱신합니다
-    public void RecoverAndRefreshSnapshot()
+    // 잔기가 부족할 때 시작 잔기 수까지 복구합니다
+    private bool RestoreLivesToFull()
     {
-        RecoverPlayer();
-
-        if (checkpointTracker != null)
+        if (lifeTracker == null)
         {
-            checkpointTracker.RefreshCurrentSnapshot();
+            return false;
         }
+
+        return lifeTracker.RestoreToFull();
     }
 
-    // 설정에 따라 플레이어 체력을 완전 또는 고정량 회복합니다
-    private void RecoverPlayer()
+    // 회복 아이템이 부족할 때 최대 보유량까지 복구합니다
+    private bool RestoreHealItemsToFull()
     {
-        if (playerStatus == null || playerStatus.Status == null)
+        if (healItemInventory == null ||
+            healItemInventory.CurrentCount >=
+            healItemInventory.MaxCount)
         {
-            return;
+            return false;
         }
 
-        float healAmount = fixedHealAmount;
-
-        if (healToFull)
-        {
-            float maxHp = playerStatus.Status.MaxHP.FinalValue;
-            float currentHp = playerStatus.Status.CurrentHP;
-            healAmount = maxHp - currentHp;
-        }
-
-        if (healAmount <= 0f)
-        {
-            return;
-        }
-
-        playerStatus.Heal(healAmount);
+        healItemInventory.RestoreCount(
+            healItemInventory.MaxCount);
+        return true;
     }
 }

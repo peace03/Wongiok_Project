@@ -1,200 +1,156 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class CheckpointInteractionZone :
-    MonoBehaviour,
-    IPlayerInteractable
+public class CheckpointInteractionZone : MonoBehaviour
 {
     [Header("Checkpoint")]
-    [SerializeField] private Checkpoint checkpoint;
+    [SerializeField]
+    private CheckpointDefinitionBinder definitionBinder;
 
     [Header("Prompt")]
     [SerializeField] private CanvasGroup promptCanvasGroup;
     [SerializeField] private TMP_Text promptText;
     [SerializeField]
     private string availableMessage =
-        "E키로 세이브";
+        "방향키 위로 체크포인트 활성화";
     [SerializeField]
     private string activatedMessage =
-        "저장 완료";
+        "방향키 위로 체크포인트 갱신";
 
     [Header("Behavior")]
-    [SerializeField] private bool hideAfterActivation = true;
+    [SerializeField]
+    private bool hidePromptAfterActivation;
 
-    private PlayerInteractionController currentPlayerInteraction;
-    private PlayerCheckpointTracker currentCheckpointTracker;
-    private GameObject currentPlayerObject;
-    private bool isActivated;
+    private readonly HashSet<Collider> overlappingColliders =
+        new HashSet<Collider>();
 
-    public string PromptText
-    {
-        get
-        {
-            return isActivated
-                ? activatedMessage
-                : availableMessage;
-        }
-    }
+    private CheckpointPlayerAgent currentAgent;
+    private bool hasActivatedBefore;
 
-    // 체크포인트 상호작용 영역과 안내 UI를 초기화합니다
+    public CheckpointDefinition Definition =>
+        definitionBinder != null
+            ? definitionBinder.Definition
+            : null;
+
+    public string PromptText =>
+        hasActivatedBefore
+            ? activatedMessage
+            : availableMessage;
+
+    // Trigger와 Definition 참조 및 안내 UI를 초기화합니다
     private void Awake()
     {
-        Collider interactionCollider =
-            GetComponent<Collider>();
-
+        Collider interactionCollider = GetComponent<Collider>();
         interactionCollider.isTrigger = true;
 
-        if (checkpoint == null)
+        if (definitionBinder == null)
         {
-            checkpoint =
-                GetComponentInParent<Checkpoint>();
+            definitionBinder =
+                GetComponentInParent<CheckpointDefinitionBinder>();
         }
 
         SetPromptVisible(false);
         UpdatePromptText();
     }
 
-    // 플레이어가 접근하면 상호작용 대상에 등록하고 안내문을 표시합니다
+    // 플레이어가 진입하면 Agent에 이 체크포인트 영역을 등록합니다
     private void OnTriggerEnter(Collider other)
     {
-        PlayerInteractionController interactionController =
-            other.GetComponentInParent<PlayerInteractionController>();
+        CheckpointPlayerAgent agent =
+            other.GetComponentInParent<CheckpointPlayerAgent>();
 
-        if (interactionController == null)
+        if (agent == null)
         {
             return;
         }
 
-        PlayerCheckpointTracker checkpointTracker =
-            other.GetComponentInParent<PlayerCheckpointTracker>();
-
-        if (checkpointTracker == null)
+        if (currentAgent != null && currentAgent != agent)
         {
             return;
         }
 
-        currentPlayerInteraction = interactionController;
-        currentCheckpointTracker = checkpointTracker;
-        currentPlayerObject =
-            interactionController.gameObject;
-
-        currentPlayerInteraction.RegisterInteractable(this);
+        overlappingColliders.Add(other);
+        currentAgent = agent;
+        currentAgent.RegisterZone(this);
 
         UpdatePromptText();
         SetPromptVisible(CanShowPrompt());
     }
 
-    // 플레이어가 영역을 벗어나면 상호작용 등록과 안내문을 해제합니다
+    // 플레이어의 모든 Collider가 빠져나가면 영역 등록을 해제합니다
     private void OnTriggerExit(Collider other)
     {
-        PlayerInteractionController interactionController =
-            other.GetComponentInParent<PlayerInteractionController>();
+        CheckpointPlayerAgent agent =
+            other.GetComponentInParent<CheckpointPlayerAgent>();
 
-        if (interactionController == null)
+        if (agent == null || agent != currentAgent)
         {
             return;
         }
 
-        if (interactionController != currentPlayerInteraction)
+        overlappingColliders.Remove(other);
+
+        if (overlappingColliders.Count > 0)
         {
             return;
         }
 
-        currentPlayerInteraction.UnregisterInteractable(this);
-
-        currentPlayerInteraction = null;
-        currentCheckpointTracker = null;
-        currentPlayerObject = null;
+        currentAgent.UnregisterZone(this);
+        currentAgent = null;
 
         SetPromptVisible(false);
     }
 
-    // 컴포넌트 비활성화 시 등록된 상호작용을 안전하게 해제합니다
+    // 컴포넌트가 꺼질 때 Agent 등록과 안내 UI를 정리합니다
     private void OnDisable()
     {
-        if (currentPlayerInteraction != null)
+        if (currentAgent != null)
         {
-            currentPlayerInteraction.UnregisterInteractable(this);
+            currentAgent.UnregisterZone(this);
         }
 
-        currentPlayerInteraction = null;
-        currentCheckpointTracker = null;
-        currentPlayerObject = null;
-
+        overlappingColliders.Clear();
+        currentAgent = null;
         SetPromptVisible(false);
     }
 
-    // 현재 플레이어가 이 체크포인트를 사용할 수 있는지 확인합니다
-    public bool CanInteract(GameObject playerObject)
+    // 전달된 Agent가 현재 체크포인트를 활성화할 수 있는지 확인합니다
+    public bool CanActivate(CheckpointPlayerAgent agent)
     {
-        if (checkpoint == null)
+        if (agent == null || agent != currentAgent)
         {
             return false;
         }
 
-        if (playerObject == null)
+        CheckpointDefinition definition = Definition;
+
+        return definition != null && definition.IsValid;
+    }
+
+    // 체크포인트 활성화 이벤트를 발행하고 안내 상태를 갱신합니다
+    public bool TryActivate(CheckpointPlayerAgent agent)
+    {
+        if (!CanActivate(agent))
         {
             return false;
         }
 
-        if (playerObject != currentPlayerObject)
-        {
-            return false;
-        }
+        hasActivatedBefore = true;
+        UpdatePromptText();
+        SetPromptVisible(!hidePromptAfterActivation);
 
-        if (currentCheckpointTracker == null)
-        {
-            return false;
-        }
-
-        if (isActivated)
-        {
-            return false;
-        }
+        EventBus<StageCheckpointActivatedEvent>.Publish(
+            new StageCheckpointActivatedEvent(
+                agent.gameObject,
+                definitionBinder.gameObject,
+                Definition));
 
         return true;
     }
 
-    // 기존 PlayerCheckpointTracker를 통해 체크포인트를 활성화합니다
-    public void Interact(GameObject playerObject)
-    {
-        if (!CanInteract(playerObject))
-        {
-            return;
-        }
-
-        bool activated =
-            currentCheckpointTracker.TryActivateCheckpoint(
-                checkpoint
-            );
-
-        if (!activated)
-        {
-            return;
-        }
-
-        isActivated = true;
-        UpdatePromptText();
-
-        if (hideAfterActivation)
-        {
-            SetPromptVisible(false);
-
-            if (currentPlayerInteraction != null)
-            {
-                currentPlayerInteraction.UnregisterInteractable(
-                    this
-                );
-            }
-
-            return;
-        }
-
-        SetPromptVisible(true);
-    }
-
-    // 현재 상태에 맞는 안내 문구를 갱신합니다
+    // 현재 활성화 상태에 맞는 안내 문구를 반영합니다
     private void UpdatePromptText()
     {
         if (promptText == null)
@@ -205,18 +161,24 @@ public class CheckpointInteractionZone :
         promptText.text = PromptText;
     }
 
-    // 현재 체크포인트 안내문을 표시할 수 있는지 확인합니다
+    // 현재 상태에서 안내 UI를 표시할 수 있는지 확인합니다
     private bool CanShowPrompt()
     {
-        if (isActivated && hideAfterActivation)
+        if (currentAgent == null)
         {
             return false;
         }
 
-        return currentPlayerObject != null;
+        if (hasActivatedBefore &&
+            hidePromptAfterActivation)
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    // World Space 안내 Canvas의 표시 상태를 설정합니다
+    // World Space 안내 Canvas의 표시 상태를 변경합니다
     private void SetPromptVisible(bool visible)
     {
         if (promptCanvasGroup == null)

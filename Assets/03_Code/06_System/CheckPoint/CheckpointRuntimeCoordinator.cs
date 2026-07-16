@@ -7,92 +7,109 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
     [SerializeField] private CheckpointUI checkpointUI;
     [SerializeField] private BossPreparationUI bossPreparationUI;
 
+    [Header("Optional Features")]
+    [SerializeField] private bool enablePersistentSave;
+    [SerializeField] private bool enableBossPreparationUI;
+
     [Header("Boss Checkpoints")]
     [SerializeField] private int[] bossCheckpointNumbers;
 
     [Header("Debug")]
     [SerializeField] private bool logProcessing;
 
-    // 체크포인트 이벤트를 구독합니다
+    // Stage 체크포인트 활성화 이벤트를 구독합니다
     private void OnEnable()
     {
-        EventBus<CheckpointActivatedEvent>.action += HandleCheckpointActivated;
+        EventBus<StageCheckpointActivatedEvent>.action +=
+            HandleCheckpointActivated;
     }
 
-    // 체크포인트 이벤트 구독을 해제합니다
+    // Stage 체크포인트 활성화 이벤트 구독을 해제합니다
     private void OnDisable()
     {
-        EventBus<CheckpointActivatedEvent>.action -= HandleCheckpointActivated;
+        EventBus<StageCheckpointActivatedEvent>.action -=
+            HandleCheckpointActivated;
     }
 
-    // 체크포인트 후처리를 정해진 순서대로 실행합니다
-    private void HandleCheckpointActivated(CheckpointActivatedEvent checkpointEvent)
+    // 회복과 런타임 저장 및 체크포인트 연출을 처리합니다
+    private void HandleCheckpointActivated(
+        StageCheckpointActivatedEvent checkpointEvent)
     {
-        if (!TryResolvePlayerServices(
+        if (!TryResolveHealSystem(
                 checkpointEvent.PlayerObject,
-                out PlayerCheckpointTracker checkpointTracker,
                 out CheckpointHealSystem healSystem))
         {
             return;
         }
 
+        CheckpointDefinition definition =
+            checkpointEvent.Definition;
+
+        bool didRecover =
+            healSystem.RecoverMissingResources(definition);
+
+        healSystem.CaptureSnapshot(
+            out float currentHP,
+            out int currentHealItemCount);
+
+        CheckpointRuntimeData runtimeData =
+            CheckpointRuntimeData.FromDefinition(
+                definition,
+                currentHP,
+                currentHealItemCount);
+
+        CheckpointRuntimeSession.SetActiveCheckpoint(
+            runtimeData);
+
+        if (enablePersistentSave && saveSystem != null)
+        {
+            saveSystem.SaveCheckpoint(runtimeData);
+        }
+
+        ShowCheckpointUI(definition.DisplayNumber);
+        PlayCheckpointEffect(
+            checkpointEvent.CheckpointObject);
+        OpenBossPreparationIfNeeded(
+            definition.DisplayNumber);
+
         if (logProcessing)
         {
             Debug.Log(
-                $"Checkpoint processing started: {checkpointEvent.CheckpointNumber}",
-                checkpointEvent.CheckpointObject
-            );
+                $"Checkpoint activated: " +
+                $"{definition.CheckpointId}, " +
+                $"Recovered: {didRecover}",
+                checkpointEvent.CheckpointObject);
         }
-
-        healSystem.RecoverAndRefreshSnapshot();
-        SaveCheckpoint(checkpointTracker);
-        ShowCheckpointUI(checkpointEvent.CheckpointNumber);
-        PlayCheckpointEffect(checkpointEvent.CheckpointObject);
-        OpenBossPreparationIfNeeded(checkpointEvent.CheckpointNumber);
     }
 
-    // 이벤트의 플레이어 오브젝트에서 체크포인트 관련 컴포넌트를 찾습니다
-    private bool TryResolvePlayerServices(
+    // Player에 부착된 Stage 소유 회복 시스템을 찾습니다
+    private bool TryResolveHealSystem(
         GameObject playerObject,
-        out PlayerCheckpointTracker checkpointTracker,
         out CheckpointHealSystem healSystem)
     {
-        checkpointTracker = null;
         healSystem = null;
 
         if (playerObject == null)
         {
-            Debug.LogWarning("Checkpoint event has no player object", this);
+            Debug.LogWarning(
+                "Checkpoint event has no player object",
+                this);
             return false;
         }
 
-        checkpointTracker = playerObject.GetComponentInParent<PlayerCheckpointTracker>();
-        healSystem = playerObject.GetComponentInParent<CheckpointHealSystem>();
+        healSystem =
+            playerObject.GetComponentInParent<
+                CheckpointHealSystem>();
 
-        if (checkpointTracker == null)
+        if (healSystem != null)
         {
-            Debug.LogWarning("PlayerCheckpointTracker is missing on the checkpoint player", playerObject);
-            return false;
+            return true;
         }
 
-        if (healSystem == null)
-        {
-            Debug.LogWarning("CheckpointHealSystem is missing on the checkpoint player", playerObject);
-            return false;
-        }
-
-        return true;
-    }
-
-    // 회복된 체크포인트 스냅샷을 영구 저장합니다
-    private void SaveCheckpoint(PlayerCheckpointTracker checkpointTracker)
-    {
-        if (saveSystem == null)
-        {
-            return;
-        }
-
-        saveSystem.SaveCheckpoint(checkpointTracker);
+        Debug.LogWarning(
+            "CheckpointHealSystem is missing on Player",
+            playerObject);
+        return false;
     }
 
     // 체크포인트 번호를 알림 UI에 표시합니다
@@ -106,36 +123,35 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
         checkpointUI.ShowCheckpoint(checkpointNumber);
     }
 
-    // 실제로 활성화된 체크포인트 오브젝트의 연출만 재생합니다
-    private void PlayCheckpointEffect(GameObject checkpointObject)
+    // 실제 활성화된 체크포인트의 최초 연출만 재생합니다
+    private void PlayCheckpointEffect(
+        GameObject checkpointObject)
     {
         if (checkpointObject == null)
         {
             return;
         }
 
-        CheckpointEffect checkpointEffect = checkpointObject.GetComponent<CheckpointEffect>();
+        CheckpointEffect checkpointEffect =
+            checkpointObject.GetComponent<CheckpointEffect>();
 
         if (checkpointEffect == null)
         {
-            checkpointEffect = checkpointObject.GetComponentInChildren<CheckpointEffect>(true);
+            checkpointEffect =
+                checkpointObject.GetComponentInChildren<
+                    CheckpointEffect>(true);
         }
 
-        if (checkpointEffect != null)
-        {
-            checkpointEffect.PlayOnce();
-        }
+        checkpointEffect?.PlayOnce();
     }
 
-    // 보스 직전 체크포인트에서만 준비 화면을 엽니다
-    private void OpenBossPreparationIfNeeded(int checkpointNumber)
+    // 설정된 보스 체크포인트에서만 준비 화면을 엽니다
+    private void OpenBossPreparationIfNeeded(
+        int checkpointNumber)
     {
-        if (bossPreparationUI == null)
-        {
-            return;
-        }
-
-        if (!IsBossCheckpoint(checkpointNumber))
+        if (!enableBossPreparationUI ||
+            bossPreparationUI == null ||
+            !IsBossCheckpoint(checkpointNumber))
         {
             return;
         }
@@ -151,9 +167,12 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
             return false;
         }
 
-        for (int i = 0; i < bossCheckpointNumbers.Length; i++)
+        for (int i = 0;
+             i < bossCheckpointNumbers.Length;
+             i++)
         {
-            if (bossCheckpointNumbers[i] == checkpointNumber)
+            if (bossCheckpointNumbers[i] ==
+                checkpointNumber)
             {
                 return true;
             }

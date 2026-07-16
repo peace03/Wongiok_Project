@@ -1,15 +1,13 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Checkpoint))]
 public class CheckpointEffect : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] private Checkpoint checkpoint;
-
     [Header("Visual")]
     [SerializeField] private Animator animator;
-    [SerializeField] private string activateTriggerName = "Activate";
-    [SerializeField] private ParticleSystem activationParticle;
+    [SerializeField]
+    private string activateTriggerName = "Activate";
+    [SerializeField]
+    private ParticleSystem activationParticle;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
@@ -20,11 +18,6 @@ public class CheckpointEffect : MonoBehaviour
     // 체크포인트 연출에 필요한 참조를 준비합니다
     private void Awake()
     {
-        if (checkpoint == null)
-        {
-            checkpoint = GetComponent<Checkpoint>();
-        }
-
         if (animator == null)
         {
             animator = GetComponentInChildren<Animator>();
@@ -36,7 +29,7 @@ public class CheckpointEffect : MonoBehaviour
         }
     }
 
-    // 체크포인트 활성화 연출을 한 번만 실행합니다
+    // 체크포인트 활성화 연출을 최초 한 번만 실행합니다
     public void PlayOnce()
     {
         if (hasPlayed)
@@ -54,10 +47,11 @@ public class CheckpointEffect : MonoBehaviour
         hasPlayed = false;
     }
 
-    // 체크포인트 활성화 애니메이션과 파티클과 사운드를 실행합니다
+    // 체크포인트 애니메이션과 파티클 및 사운드를 실행합니다
     private void PlayActivationEffect()
     {
-        if (animator != null && !string.IsNullOrEmpty(activateTriggerName))
+        if (animator != null &&
+            !string.IsNullOrEmpty(activateTriggerName))
         {
             animator.SetTrigger(activateTriggerName);
         }
@@ -67,7 +61,8 @@ public class CheckpointEffect : MonoBehaviour
             activationParticle.Play();
         }
 
-        if (audioSource != null && activationClip != null)
+        if (audioSource != null &&
+            activationClip != null)
         {
             audioSource.PlayOneShot(activationClip);
         }
