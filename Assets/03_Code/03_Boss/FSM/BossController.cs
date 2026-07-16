@@ -17,6 +17,7 @@ public class BossController : MonoBehaviour, IInitializable
     public Dictionary<State,BossState> bossState { get; }
         = new Dictionary<State, BossState>(); //상태 Dictionary
     private BossState curState; //현재 상태 패턴
+    private GameInputReader _input;
 
     //초기화
     public void Init()

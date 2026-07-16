@@ -3,6 +3,7 @@ using UnityEngine;
 public class UIInputBridge : MonoBehaviour, IInitializable
 {
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private GameInputReader _input;
 
     private bool isInitialized;
 
@@ -40,7 +41,8 @@ public class UIInputBridge : MonoBehaviour, IInitializable
     {
         if (uiManager.CurrentScreenState != UIScreenState.Prologue) return;
 
-        if (!Input.GetKeyDown(KeyCode.BackQuote)) return;
+        //if (!Input.GetKeyDown(KeyCode.BackQuote)) return;
+        if (!_input.TitleStartPressed) return;
 
         EventBus<UICutsceneSkipRequestedEvent>.Publish(
             new UICutsceneSkipRequestedEvent());
