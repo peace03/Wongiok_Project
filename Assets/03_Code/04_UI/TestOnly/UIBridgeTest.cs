@@ -61,16 +61,8 @@ public class UIBridgeTest : MonoBehaviour
                 "첫 번째 이야기",
                 "테스트 용",
                 null,
+                null,
                 null));
-    }
-
-    public void ShowLoading()
-    {
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.Loading));
-
-        EventBus<UISetLoadingProgressEvent>.Publish(
-            new UISetLoadingProgressEvent(0.5f, "불러오는 중..."));
     }
 
     public void ShowConfirm()

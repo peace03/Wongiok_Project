@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
+using System.Collections;
 
 public class ChapterTitleCardView : UIViewBase
 {
@@ -16,6 +18,28 @@ public class ChapterTitleCardView : UIViewBase
     [SerializeField] private CommonButtonView continueButton;
     [SerializeField] private CommonButtonView backButton;
 
+    [Header("로딩 세션")]
+    [SerializeField] private VideoPlayer loadingVideoPlayer;
+    [SerializeField] private RawImage loadingVideoImage;
+    [SerializeField] private RectTransform loadingSpinner;
+    [SerializeField] private GameObject[] cardDetailObjects;
+    [SerializeField, Min(0f)] private float titleCardZoomDuration = 0.5f;
+    [SerializeField] private float loadingSpinnerSpeed = 180f;
+    [SerializeField, Min(1f)] private float titleCardZoomEndScale = 1.35f;
+    [SerializeField] private Vector2 titleCardZoomEndPosition = Vector2.zero;
+
+    private VideoClip currentLoadingVideoClip;
+    private bool isTransitioning;
+    private bool isLoadingVisualActive;
+    private Coroutine transitionCoroutine;
+
+    private Vector2 initialAnchorMin;
+    private Vector2 initialAnchorMax;
+    private Vector2 initialAnchorPosition;
+    private Vector2 initialSizeDelta;
+    private Vector3 initialLocalScale;
+    private bool[] initialDetailActiveStates;
+
     private int currentChapterId = -1;
     private Sprite currentThumbnail;
     private Sprite currentBackground;
@@ -23,6 +47,8 @@ public class ChapterTitleCardView : UIViewBase
     protected override void Awake()
     {
         base.Awake();
+
+        CaptureInitialVisualState();
         SubscribeEvents();
     }
 
@@ -33,13 +59,23 @@ public class ChapterTitleCardView : UIViewBase
 
     protected override void OnShow()
     {
+        ResetLoadingVisual();
         RefreshContinueButton();
         SetupBackButton();
     }
 
     protected override void OnHide()
     {
+        ResetLoadingVisual();
+        currentLoadingVideoClip = null;
         Clear();
+    }
+
+    private void Update()
+    {
+        if (!isLoadingVisualActive || loadingSpinner == null) return;
+
+        loadingSpinner.Rotate(0f, 0f, -loadingSpinnerSpeed * Time.unscaledDeltaTime);
     }
 
     public void Setup(
@@ -48,11 +84,13 @@ public class ChapterTitleCardView : UIViewBase
         string subtitle,
         string description,
         Sprite thumbnail,
-        Sprite background)
+        Sprite background,
+        VideoClip loadingVideoClip)
     {
         currentChapterId = chapterId;
         currentThumbnail = thumbnail;
         currentBackground = background;
+        currentLoadingVideoClip = loadingVideoClip;
 
         SetText(titleText, title);
         SetText(subtitleText, subtitle);
@@ -106,7 +144,8 @@ public class ChapterTitleCardView : UIViewBase
             eventData.Subtitle,
             eventData.Description,
             eventData.Thumbnail,
-            eventData.Background);
+            eventData.Background,
+            eventData.LoadingVideoClip);
     }
 
     private void HandleInputContinueRequested(UIChapterTitleCardInputContinueRequestedEvent eventData)
@@ -140,11 +179,182 @@ public class ChapterTitleCardView : UIViewBase
 
     private void HandleContinueClicked()
     {
-        if (currentChapterId < 0)
-            return;
+        if (currentChapterId < 0 || isTransitioning) return;
+
+        isTransitioning = true;
+
+        if (continueButton != null)
+            continueButton.SetInteractable(false);
+
+        if (backButton != null)
+            backButton.SetInteractable(false);
+
+        transitionCoroutine = StartCoroutine(PlayLoadingTransition());
+    }
+
+    private IEnumerator PlayLoadingTransition()
+    {
+        RectTransform titleCardRect = thumbnailImage.rectTransform;
+
+        Vector2 startPosition = titleCardRect.anchoredPosition;
+        Vector3 startScale = titleCardRect.localScale;
+
+        Vector3 targetScale = initialLocalScale * titleCardZoomEndScale;
+        Vector2 targetPosition = titleCardZoomEndPosition;
+
+        float elapsed = 0f;
+
+        while (elapsed < titleCardZoomDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+
+            float progress = titleCardZoomDuration <= 0f
+                ? 1f
+                : Mathf.Clamp01(elapsed / titleCardZoomDuration);
+
+            titleCardRect.anchoredPosition = Vector2.Lerp(
+                startPosition,
+                targetPosition,
+                progress);
+
+            titleCardRect.localScale = Vector3.Lerp(
+                startScale,
+                targetScale,
+                progress);
+
+            yield return null;
+        }
+
+        titleCardRect.anchoredPosition = targetPosition;
+        titleCardRect.localScale = targetScale;
+
+        SetCardDetailObjectsActive(false);
+
+        yield return StartCoroutine(StartLoadingVisualAfterVideoStarts());
 
         EventBus<UIChapterTitleCardContinueRequestedEvent>.Publish(
             new UIChapterTitleCardContinueRequestedEvent(currentChapterId));
+
+        transitionCoroutine = null;
+    }
+
+    private IEnumerator StartLoadingVisualAfterVideoStarts()
+    {
+        isLoadingVisualActive = true;
+
+        if (loadingSpinner != null)
+        {
+            loadingSpinner.localRotation = Quaternion.identity;
+            loadingSpinner.gameObject.SetActive(true);
+        }
+
+        if (currentLoadingVideoClip == null || loadingVideoPlayer == null || loadingVideoImage == null)
+        {
+            yield break;
+        }
+
+        loadingVideoImage.gameObject.SetActive(true);
+
+        loadingVideoPlayer.Stop();
+        loadingVideoPlayer.clip = currentLoadingVideoClip;
+        loadingVideoPlayer.isLooping = true;
+        loadingVideoPlayer.Prepare();
+
+        while (!loadingVideoPlayer.isPrepared)
+            yield return null;
+
+        loadingVideoPlayer.Play();
+
+        while (!loadingVideoPlayer.isPlaying)
+            yield return null;
+
+        yield return null;
+    }
+
+    private void CaptureInitialVisualState()
+    {
+        if (thumbnailImage != null)
+        {
+            RectTransform titleCardRect = thumbnailImage.rectTransform;
+
+            initialAnchorMin = titleCardRect.anchorMin;
+            initialAnchorMax = titleCardRect.anchorMax;
+            initialAnchorPosition = titleCardRect.anchoredPosition;
+            initialSizeDelta = titleCardRect.sizeDelta;
+            initialLocalScale = titleCardRect.localScale;
+        }
+
+        initialDetailActiveStates = new bool[cardDetailObjects.Length];
+
+        for (int i = 0; i < cardDetailObjects.Length; i++)
+        {
+            if (cardDetailObjects[i] != null)
+            {
+                initialDetailActiveStates[i] = cardDetailObjects[i].activeSelf;
+            }
+        }
+    }
+
+    private void ResetLoadingVisual()
+    {
+        if (transitionCoroutine != null)
+        {
+            StopCoroutine(transitionCoroutine);
+            transitionCoroutine = null;
+        }
+
+        isTransitioning = false;
+        isLoadingVisualActive = false;
+
+        if (thumbnailImage != null)
+        {
+            RectTransform titleCardRect = thumbnailImage.rectTransform;
+
+            titleCardRect.anchorMin = initialAnchorMin;
+            titleCardRect.anchorMax = initialAnchorMax;
+            titleCardRect.anchoredPosition = initialAnchorPosition;
+            titleCardRect.sizeDelta = initialSizeDelta;
+            titleCardRect.localScale = initialLocalScale;
+        }
+
+        if (loadingVideoPlayer != null)
+        {
+            loadingVideoPlayer.Stop();
+            loadingVideoPlayer.clip = null;
+        }
+
+        if (loadingVideoImage != null)
+        {
+            loadingVideoImage.gameObject.SetActive(false);
+        }
+
+        if (loadingSpinner != null)
+        {
+            loadingSpinner.localRotation = Quaternion.identity;
+            loadingSpinner.gameObject.SetActive(false);
+        }
+
+        RestoreCardDetailObjects();
+    }
+
+    private void SetCardDetailObjectsActive(bool isActive)
+    {
+        foreach (GameObject detailObject in cardDetailObjects)
+        {
+            if (detailObject != null)
+                detailObject.SetActive(isActive);
+        }
+    }
+
+    private void RestoreCardDetailObjects()
+    {
+        for (int i = 0; i < cardDetailObjects.Length; i++)
+        {
+            if (cardDetailObjects[i] != null)
+            {
+                cardDetailObjects[i].SetActive(initialDetailActiveStates[i]);
+            }
+        }
     }
 
     private void SetText(Text targetText, string value)

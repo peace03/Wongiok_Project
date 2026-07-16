@@ -18,11 +18,13 @@ public class PrototypeSceneBridge : MonoBehaviour
         [TextArea] public string description;
         public Sprite thumbnail;
         public Sprite background;
+        public VideoClip loadingVideoClip;
     }
 
     [SerializeField] private List<ChapterTitleCardBinding> chapterTitleCards = new();
     [SerializeField] private string inGameSceneName = "InGame";
-    [SerializeField] private float testLoadingTime = 3f;
+
+    [SerializeField, Min(0f)] private float testMinimumLoadingPreviewTime = 3f;
 
     // 프롤로그 영상
     [SerializeField] private VideoClip prologueVideoClip;
@@ -102,7 +104,8 @@ public class PrototypeSceneBridge : MonoBehaviour
                     binding.subtitle,
                     binding.description,
                     thumbnail,
-                    background));
+                    background,
+                    binding.loadingVideoClip));
 
             return;
         }
@@ -148,29 +151,25 @@ public class PrototypeSceneBridge : MonoBehaviour
 
     private IEnumerator LoadInGame()
     {
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.Loading));
+        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(inGameSceneName);
+
+        // 테스트 용 (빌드 시 삭제 코드)
+        loadOperation.allowSceneActivation = false;
 
         float elapsedTime = 0f;
 
-        EventBus<UISetLoadingProgressEvent>.Publish(
-            new UISetLoadingProgressEvent(0f, "페이지 넘기는 중 . . ."));
-
-        while (elapsedTime < testLoadingTime)
+        // 씬 로딩 기다림
+        while (loadOperation.progress < 0.9f || elapsedTime < testMinimumLoadingPreviewTime)
         {
             elapsedTime += Time.unscaledDeltaTime;
-
-            float progress = testLoadingTime <= 0f ? 1f : Mathf.Clamp01(elapsedTime / testLoadingTime);
-
-            EventBus<UISetLoadingProgressEvent>.Publish(
-                new UISetLoadingProgressEvent(progress, "페이지 넘기는 중 . . ."));
-
             yield return null;
         }
 
-        EventBus<UISetLoadingProgressEvent>.Publish(
-            new UISetLoadingProgressEvent(1f, "페이지 넘기는 중 . . ."));
+        loadOperation.allowSceneActivation = true;
 
-        SceneManager.LoadScene(inGameSceneName);
+        while (!loadOperation.isDone)
+        {
+            yield return null;
+        }
     }
 }

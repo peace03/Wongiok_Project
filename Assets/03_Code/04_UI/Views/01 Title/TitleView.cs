@@ -196,10 +196,16 @@ public class TitleView : UIViewBase
 
     private void PlayTitleWaitingVideo()
     {
+        titleVideoState = TitleVidoeState.Waiting;
+
         isTitleInputReady = false;
         RefreshButtons();
 
         StopButtonRevealCoroutine();
+        HideTitleButtons();
+
+        PlayVideo(titleWaitingVideoClip, true);
+
         buttonRevealCoroutine = StartCoroutine(RevealButtonsSequentially());
     }
 
