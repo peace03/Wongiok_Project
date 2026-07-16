@@ -199,6 +199,12 @@ public class ChapterTitleCardView : UIViewBase
         Vector2 startPosition = titleCardRect.anchoredPosition;
         Vector3 startScale = titleCardRect.localScale;
 
+        if (continueButton != null)
+            continueButton.gameObject.SetActive(false);
+
+        if (backButton != null)
+            backButton.gameObject.SetActive(false);
+
         Vector3 targetScale = initialLocalScale * titleCardZoomEndScale;
         Vector2 targetPosition = titleCardZoomEndPosition;
 

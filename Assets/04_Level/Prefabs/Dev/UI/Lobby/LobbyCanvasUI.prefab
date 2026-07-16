@@ -75,6 +75,14 @@ MonoBehaviour:
   backgroundImage: {fileID: 0}
   continueButton: {fileID: 7421183576449888748}
   backButton: {fileID: 854121270872692333}
+  loadingVideoPlayer: {fileID: 0}
+  loadingVideoImage: {fileID: 0}
+  loadingSpinner: {fileID: 0}
+  cardDetailObjects: []
+  titleCardZoomDuration: 0.5
+  loadingSpinnerSpeed: 180
+  titleCardZoomEndScale: 1.35
+  titleCardZoomEndPosition: {x: 0, y: 0}
 --- !u!1 &327862884510826522
 GameObject:
   m_ObjectHideFlags: 0
@@ -723,8 +731,8 @@ RectTransform:
   m_Children:
   - {fileID: 8741961926007861401}
   - {fileID: 8364930438516120869}
-  - {fileID: 2086113534499492833}
   - {fileID: 5554226752934149066}
+  - {fileID: 2086113534499492833}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2779,6 +2787,13 @@ MonoBehaviour:
   newGameButton: {fileID: 2855545748029968795}
   continueButton: {fileID: 589710112431865342}
   exitButton: {fileID: 7039786982271151388}
+  newGameButtonCanvasGroup: {fileID: 0}
+  continueButtonCanvasGroup: {fileID: 0}
+  exitButtonCanvasGroup: {fileID: 0}
+  newGameRevealDelay: 0
+  continueRevealDelay: 0.15
+  exitRevealDelay: 0.15
+  buttonRevealDuration: 0.3
   videoPlayer: {fileID: 856155571920357772}
   videoImage: {fileID: 6414803645364227827}
   titleEnterVideoClip: {fileID: 32900000, guid: 869a6ce19fb4d59429a088f2fb6d8bf1, type: 3}
@@ -5438,7 +5453,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7178310296724353988}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 
@@ -21,13 +22,20 @@ public class PrototypeSceneBridge : MonoBehaviour
         public VideoClip loadingVideoClip;
     }
 
+    [Header("페이드")]
+    [SerializeField] private float fadeOutDuration = 0.35f;
+    [SerializeField] private float fadeInDuration = 0.35f;
+
+
+
     [SerializeField] private List<ChapterTitleCardBinding> chapterTitleCards = new();
     [SerializeField] private string inGameSceneName = "InGame";
 
-    [SerializeField, Min(0f)] private float testMinimumLoadingPreviewTime = 3f;
+    [SerializeField] private float testMinimumLoadingPreviewTime = 3f;
 
     // 프롤로그 영상
     [SerializeField] private VideoClip prologueVideoClip;
+
 
     private IEnumerator Start()
     {
@@ -75,8 +83,11 @@ public class PrototypeSceneBridge : MonoBehaviour
     {
         if (eventData.CutsceneId != "prologue") return;
 
-        EventBus<UIChangeScreenEvent>.Publish(
+        ChangeScreenWithFade(() =>
+        {
+            EventBus<UIChangeScreenEvent>.Publish(
             new UIChangeScreenEvent(UIScreenState.Title));
+        });
     }
 
     private void ShowChapterTitleCard(int chapterId, Sprite fallbackThumbnail = null, Sprite fallbackBackground = null)
@@ -121,27 +132,33 @@ public class PrototypeSceneBridge : MonoBehaviour
 
     private void HandleTitleNewGameRequested(UITitleNewGameRequestedEvent eventData)
     {
-        PrototypeGameSession.StartNewGame();
+        ChangeScreenWithFade(() =>
+        {
+            PrototypeGameSession.StartNewGame();
 
-        EventBus<UISetTitleSaveStateEvent>.Publish(
-            new UISetTitleSaveStateEvent(true));
+            EventBus<UISetTitleSaveStateEvent>.Publish(
+                new UISetTitleSaveStateEvent(true));
 
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.ChapterSelect));
+            EventBus<UIChangeScreenEvent>.Publish(
+                new UIChangeScreenEvent(UIScreenState.ChapterSelect));
 
-        EventBus<UISetChapterProgressEvent>.Publish(
-            new UISetChapterProgressEvent(PrototypeGameSession.HighestClearedChapterId));
+            EventBus<UISetChapterProgressEvent>.Publish(
+                new UISetChapterProgressEvent(PrototypeGameSession.HighestClearedChapterId));
+        });
     }
 
     private void HandleTitleContinueRequested(UITitleContinueRequestedEvent eventData)
     {
-        PrototypeGameSession.EnsureInitialized();
+        ChangeScreenWithFade(() =>
+        {
+            PrototypeGameSession.EnsureInitialized();
 
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.ChapterSelect));
+            EventBus<UIChangeScreenEvent>.Publish(
+                new UIChangeScreenEvent(UIScreenState.ChapterSelect));
 
-        EventBus<UISetChapterProgressEvent>.Publish(
-            new UISetChapterProgressEvent(PrototypeGameSession.HighestClearedChapterId));
+            EventBus<UISetChapterProgressEvent>.Publish(
+                new UISetChapterProgressEvent(PrototypeGameSession.HighestClearedChapterId));
+        });
     }
 
     private void HandleChapterTitleCardContinueRequested(UIChapterTitleCardContinueRequestedEvent eventData)
@@ -171,5 +188,24 @@ public class PrototypeSceneBridge : MonoBehaviour
         {
             yield return null;
         }
+    }
+
+    private void ChangeScreenWithFade(System.Action changeScreenAction)
+    {
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                0f,
+                1f,
+                fadeOutDuration,
+                () =>
+                {
+                    changeScreenAction?.Invoke();
+
+                    EventBus<UIFadeEvent>.Publish(
+                        new UIFadeEvent(
+                            1f,
+                            0f,
+                            fadeInDuration));
+                }));
     }
 }
