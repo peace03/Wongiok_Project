@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -349,7 +351,7 @@ public class PauseSkillPageView : MonoBehaviour
 
         SetHoverText(hoverSkillNameText, skillData.SkillName);
         SetHoverText(hoverSkillLevelText, $"Lv.{skillData.Level}");
-        SetHoverText(hoverSkillDescriptionText, skillData.Description);
+        SetHoverText(hoverSkillDescriptionText, BuildSkillEffectDescription(skillData.SkillId, skillData.Level));
     }
 
     public void HideHoverPreview()
@@ -365,6 +367,183 @@ public class PauseSkillPageView : MonoBehaviour
         if (targetText == null) return;
 
         targetText.text = value;
+    }
+
+    private string BuildSkillEffectDescription(int skillId, int level)
+    {
+        BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
+
+        BaseSkillData skillData = null;
+
+        foreach (BaseSkillData data in skillDatas)
+        {
+            if (data != null && data.Id == skillId)
+            {
+                skillData = data;
+                break;
+            }
+        }
+
+        if (skillData == null) return string.Empty;
+
+        if (skillData is ActiveSkillData activeSkillData)
+            return BuildActiveSkillEffectDescription(activeSkillData, level);
+
+        if (skillData is PassiveSkillData passiveSkillData)
+            return BuildPassiveSkillEffectDescription(passiveSkillData, level);
+
+        return string.Empty;
+    }
+
+    private string BuildActiveSkillEffectDescription(ActiveSkillData skillData, int level)
+    {
+        ActiveSkillLevelData levelData = skillData.GetLevelData(level);
+
+        if (levelData == null) return string.Empty;
+
+        List<string> lines = new();
+
+        if (levelData is ProjectileSkillLevelData projectileData)
+        {
+            AddEffectNumberLine(lines, "피해량", projectileData.GetDamage());
+            AddEffectSecondsLine(lines, "쿨타임", projectileData.MaxCoolTime);
+
+            if (projectileData.ProjectileCount > 1)
+            {
+                AddEffectLine(lines, "발사 횟수", projectileData.ProjectileCount.ToString());
+            }
+
+            if (projectileData.PenetrationCount < 0)
+            {
+                AddEffectLine(lines, "관통 횟수", "무한");
+            }
+            else if (projectileData.PenetrationCount > 0)
+            {
+                AddEffectLine(lines, "관통 횟수", projectileData.PenetrationCount.ToString());
+            }
+
+            AddEffectSecondsLine(lines, "차징 시간", projectileData.MaxChargingTime);
+            AddEffectSecondsLine(lines, "지속시간", projectileData.MaxDuration);
+        }
+        else if (levelData is AreaSkillLevelData areaData)
+        {
+            AddAreaSkillEffectLines(lines, areaData);
+        }
+
+        return string.Join("\n", lines);
+    }
+
+    private string BuildPassiveSkillEffectDescription(PassiveSkillData skillData, int level)
+    {
+        PassiveSkillLevelData levelData = skillData.GetLevelData(level);
+
+        if (levelData == null) return string.Empty;
+
+        List<string> lines = new();
+
+        foreach (StatAdjustment stat in levelData.GetAppliedStats())
+        {
+            float value = stat.modify == MODIFY_TYPE.Addition
+                ? stat.amount
+                : -stat.amount;
+
+            string sign = value > 0f ? "+" : string.Empty;
+
+            AddEffectLine(lines, GetStatDisplayName(stat.stat), $"{sign}{FormatEffectNumber(value)}");
+        }
+
+        return string.Join("\n", lines);
+    }
+
+    private void AddAreaSkillEffectLines(List<string> lines, AreaSkillLevelData areaData)
+    {
+        if (areaData.Stages == null || areaData.Stages.Count == 0) return;
+
+        float minDamage = float.MaxValue;
+        float maxDamage = float.MinValue;
+        float maxDistance = 0f;
+        float minTickInterval = float.MaxValue;
+        bool hasDamage = false;
+        bool hasTickInterval = false;
+
+        foreach (AreaSkillStageData stage in areaData.Stages)
+        {
+            if (stage.damage > 0f)
+            {
+                minDamage = Mathf.Min(minDamage, stage.damage);
+                maxDamage = Mathf.Max(maxDamage, stage.damage);
+                hasDamage = true;
+            }
+
+            maxDistance = Mathf.Max(maxDistance, stage.distance);
+
+            if (stage.tickInterval > 0f)
+            {
+                minTickInterval = Mathf.Min(minTickInterval, stage.tickInterval);
+
+                hasTickInterval = true;
+            }
+        }
+
+        if (hasDamage)
+        {
+            string damageText = Mathf.Approximately(minDamage, maxDamage)
+                ? FormatEffectNumber(maxDamage)
+                : $"{FormatEffectNumber(minDamage)}~{FormatEffectNumber(maxDamage)}";
+
+            AddEffectLine(lines, "피해량", damageText);
+        }
+
+        AddEffectSecondsLine(lines, "쿨타임", areaData.MaxCoolTime);
+        AddEffectSecondsLine(lines, "지속시간", areaData.MaxDuration);
+
+        if (hasTickInterval)
+        {
+            AddEffectSecondsLine(lines, "타격 간격", minTickInterval);
+        }
+
+        if (maxDistance > 0f)
+        {
+            AddEffectLine(lines, "범위", $"플레이어 전방 약 {FormatEffectNumber(maxDistance)}");
+        }
+    }
+
+    private void AddEffectLine(List<string> lines, string label, string value)
+    {
+        if (string.IsNullOrEmpty(value)) return;
+
+        lines.Add($"{label}: {value}");
+    }
+
+    private void AddEffectNumberLine(List<string> lines, string label, float value)
+    {
+        if (value <= 0f) return;
+
+        AddEffectLine(lines, label, FormatEffectNumber(value));
+    }
+
+    private void AddEffectSecondsLine(List<string> lines, string label, float value)
+    {
+        if (value <= 0f) return;
+
+        AddEffectLine(lines, label, $"{FormatEffectNumber(value)}초");
+    }
+
+    private string FormatEffectNumber(float value)
+    {
+        return value.ToString("0.##");
+    }
+
+    private string GetStatDisplayName(STAT_TYPE statType)
+    {
+        return statType switch
+        {
+            STAT_TYPE.Health => "체력",
+            STAT_TYPE.AtkPower => "공격력",
+            STAT_TYPE.MoveSpeed => "이동 속도",
+            STAT_TYPE.AtkSpeed => "공격 속도",
+            _ => statType.ToString()
+        };
     }
 
     private void RefreshEquippedDragItems()

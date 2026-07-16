@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2096511455302144989}
   - component: {fileID: 3195199281699703496}
   - component: {fileID: 287139078677395553}
+  - component: {fileID: 6342794808984572233}
   m_Layer: 0
   m_Name: LobbyManagers
   m_TagString: Untagged
@@ -49,6 +50,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   screenBindings:
+  - state: 1
+    view: {fileID: 0}
   - state: 2
     view: {fileID: 0}
   - state: 5
@@ -57,6 +60,7 @@ MonoBehaviour:
     view: {fileID: 0}
   - state: 4
     view: {fileID: 0}
+  initialScreenState: 1
   overlayBindings: []
   playerHudView: {fileID: 0}
   bossHudView: {fileID: 0}
@@ -126,3 +130,17 @@ MonoBehaviour:
     background: {fileID: 21300000, guid: 17c44fd13c0cdef4e95e52839de45d6d, type: 3}
   inGameSceneName: InGame
   testLoadingTime: 3
+  prologueVideoClip: {fileID: 32900000, guid: 9b1b18f31c316d0489bd80089bfa2dcb, type: 3}
+--- !u!114 &6342794808984572233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8518077897031764906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bc7d9a7f4995ed49a601361a55c7d1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIInputBridge
+  uiManager: {fileID: 8247197954084837672}

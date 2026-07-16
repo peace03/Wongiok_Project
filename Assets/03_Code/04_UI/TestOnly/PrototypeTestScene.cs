@@ -3,13 +3,10 @@ using System.Collections;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class PrototypeTestScene : MonoBehaviour
 {
-    [SerializeField] private Sprite fireIcon;
-    [SerializeField] private Sprite iceIcon;
-    [SerializeField] private Sprite dashIcon;
-    [SerializeField] private Sprite powerUpIcon;
     [SerializeField] private string mainMenuSceneName = "Lobby";
 
     // 테스트용 Pause 스킬 데이터를 캐싱해서 드래그 교체 결과를 유지
@@ -135,7 +132,7 @@ public class PrototypeTestScene : MonoBehaviour
                 data.Icon,
                 data.SkillName,
                 Mathf.Max(1, state.Level),
-                BuildPauseSkillDescription(data, Mathf.Max(1, State.Level)),
+                data.Desc,
                 isEquipped,
                 data.Id);
 
@@ -186,7 +183,7 @@ public class PrototypeTestScene : MonoBehaviour
             skill.Icon,
             skill.SkillName,
             nextLevel,
-            BuildPauseSkillDescription(skillData, nextLevel),
+            skill.Description,
             skill.IsEquipped,
             skill.SkillId);
 
@@ -447,59 +444,6 @@ public class PrototypeTestScene : MonoBehaviour
         }
 
         return -1;
-    }
-
-    private string BuildPauseSkillDescription(BaseSkillData skillData, int level)
-    {
-        if (skillData is ActiveSkillData activeSkillData)
-        {
-            ActiveSkillLevelData levelData = activeSkillData.GetLevelData(level);
-
-            if (levelData == null) return string.Empty;
-
-            List<string> lines = new();
-
-            if (levelData is ProjectileSkillLevelData projectileData)
-            {
-                
-            }
-            else if (LevelBasedSkillData is AreaSkillLevelData areaData)
-            {
-
-            }
-
-            return string.Join("\n", lines);
-        }
-
-        if (skillData is LevelBasedSkillData<PassiveSkillLevelData> passiveSkillData)
-        {
-            PassiveSkillLevelData levelData = passiveSkillData.GetLevelData(level);
-
-            if (levelData == null) return string.Empty;
-
-            List<string> lines = new();
-
-            foreach (StatAdjustment stat in levelData.GetAppliedStats())
-            {
-                float signedAmount = stat.modify == MODIFY_TYPE.Addition
-                    ? stat.amount
-                    : -stat.amount;
-
-                AddEffectLine(lines, GetStatDisplayName(stat.stat),
-                    $"{signedAmount:+0.##;-0.##}");
-            }
-
-            return string.Join("\n", lines);
-        }
-
-        return string.Empty;
-    }
-
-    private void AddAreaSkillEffectLines(List<string> lines, AreaSkillLevelData areaData)
-    {
-        if (areaData.Stages == null || areaData.Stages.Count == 0) return;
-
-
     }
 
     private void AddOwnedSkill(UIPauseSkillInfoData skillData)

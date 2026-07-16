@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Video;
 
 
 // 테스트 씬 전환
@@ -23,11 +24,14 @@ public class PrototypeSceneBridge : MonoBehaviour
     [SerializeField] private string inGameSceneName = "InGame";
     [SerializeField] private float testLoadingTime = 3f;
 
+    // 프롤로그 영상
+    [SerializeField] private VideoClip prologueVideoClip;
+
     private IEnumerator Start()
     {
         PrototypeGameSession.EnsureInitialized();
 
-        yield return null;
+        yield return null;  
 
         EventBus<UISetTitleSaveStateEvent>.Publish(
             new UISetTitleSaveStateEvent(PrototypeGameSession.HasSaveData));
@@ -36,12 +40,17 @@ public class PrototypeSceneBridge : MonoBehaviour
             new UISetChapterProgressEvent(
                 PrototypeGameSession.HighestClearedChapterId));
 
+        EventBus<UISetCutsceneEvent>.Publish(
+            new UISetCutsceneEvent("prologue", prologueVideoClip, string.Empty));
+
         if (PrototypeGameSession.TryConsumePendingTitleCard(out int chapterId))
             ShowChapterTitleCard(chapterId);
     }
 
     private void OnEnable()
     {
+        EventBus<UICutsceneFinishedEvent>.action += HandleCutsceneFinished;
+
         EventBus<UITitleNewGameRequestedEvent>.action += HandleTitleNewGameRequested;
         EventBus<UITitleContinueRequestedEvent>.action += HandleTitleContinueRequested;
 
@@ -51,11 +60,21 @@ public class PrototypeSceneBridge : MonoBehaviour
 
     private void OnDisable()
     {
+        EventBus<UICutsceneFinishedEvent>.action -= HandleCutsceneFinished;
+
         EventBus<UITitleNewGameRequestedEvent>.action -= HandleTitleNewGameRequested;
         EventBus<UITitleContinueRequestedEvent>.action -= HandleTitleContinueRequested;
 
         EventBus<UIChapterEnterRequestedEvent>.action -= HandleChapterEnterRequested;
         EventBus<UIChapterTitleCardContinueRequestedEvent>.action -= HandleChapterTitleCardContinueRequested;
+    }
+
+    private void HandleCutsceneFinished(UICutsceneFinishedEvent eventData)
+    {
+        if (eventData.CutsceneId != "prologue") return;
+
+        EventBus<UIChangeScreenEvent>.Publish(
+            new UIChangeScreenEvent(UIScreenState.Title));
     }
 
     private void ShowChapterTitleCard(int chapterId, Sprite fallbackThumbnail = null, Sprite fallbackBackground = null)

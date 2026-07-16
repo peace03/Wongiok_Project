@@ -163,6 +163,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1831582810}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &311934422 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3338948187830713029, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+  m_PrefabInstance: {fileID: 938769384}
+  m_PrefabAsset: {fileID: 0}
+--- !u!225 &311934428
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311934422}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,25 +561,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 664734352}
     m_Modifications:
+    - target: {fileID: 856155571920357772, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: 4d7e7b0b14dd58b4aaf2902460491938, type: 2}
     - target: {fileID: 954141477838998032, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_Name
       value: LobbyCanvasUI
       objectReference: {fileID: 0}
-    - target: {fileID: 5275660373214379240, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
-      propertyPath: m_Sprite
+    - target: {fileID: 3881884473409420717, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -410
+      objectReference: {fileID: 0}
+    - target: {fileID: 4144447257398262626, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      propertyPath: exitButtonCanvasGroup
       value: 
-      objectReference: {fileID: -635490514, guid: 8bbcd15ad43a373418ca776b81c303b2, type: 3}
-    - target: {fileID: 5275660373214379240, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
-      propertyPath: m_Color.b
-      value: 0.8490566
-      objectReference: {fileID: 0}
-    - target: {fileID: 5275660373214379240, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
-      propertyPath: m_Color.g
-      value: 0.8490566
-      objectReference: {fileID: 0}
-    - target: {fileID: 5275660373214379240, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
-      propertyPath: m_Color.r
-      value: 0.8490566
+      objectReference: {fileID: 311934428}
+    - target: {fileID: 4144447257398262626, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      propertyPath: newGameButtonCanvasGroup
+      value: 
+      objectReference: {fileID: 1062639116}
+    - target: {fileID: 4144447257398262626, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      propertyPath: continueButtonCanvasGroup
+      value: 
+      objectReference: {fileID: 1395293083}
+    - target: {fileID: 4709698501265509807, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -280
       objectReference: {fileID: 0}
     - target: {fileID: 7822516277850861636, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_Pivot.x
@@ -644,22 +669,27 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8757697120934597634, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+    - target: {fileID: 8741961926007861401, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 80
+      value: 1920
       objectReference: {fileID: 0}
-    - target: {fileID: 8774670150331869338, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
-      propertyPath: m_Type
-      value: 1
+    - target: {fileID: 8741961926007861401, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1080
       objectReference: {fileID: 0}
-    - target: {fileID: 8774670150331869338, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3282327299835956612, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1062639116}
+    - targetCorrespondingSourceObject: {fileID: 878555844784918328, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1395293083}
+    - targetCorrespondingSourceObject: {fileID: 3338948187830713029, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 311934428}
   m_SourcePrefab: {fileID: 100100000, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
 --- !u!114 &945343942 stripped
 MonoBehaviour:
@@ -677,6 +707,23 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7822516277850861636, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
   m_PrefabInstance: {fileID: 938769384}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1062639110 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3282327299835956612, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+  m_PrefabInstance: {fileID: 938769384}
+  m_PrefabAsset: {fileID: 0}
+--- !u!225 &1062639116
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062639110}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1171682642
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -736,17 +783,21 @@ PrefabInstance:
     - target: {fileID: 8247197954084837672, guid: b81a18d939d00ea4db4a8eb264b121de, type: 3}
       propertyPath: screenBindings.Array.data[0].view
       value: 
-      objectReference: {fileID: 945343942}
+      objectReference: {fileID: 1864913606}
     - target: {fileID: 8247197954084837672, guid: b81a18d939d00ea4db4a8eb264b121de, type: 3}
       propertyPath: screenBindings.Array.data[1].view
       value: 
-      objectReference: {fileID: 1359305002}
+      objectReference: {fileID: 945343942}
     - target: {fileID: 8247197954084837672, guid: b81a18d939d00ea4db4a8eb264b121de, type: 3}
       propertyPath: screenBindings.Array.data[2].view
       value: 
-      objectReference: {fileID: 470935168}
+      objectReference: {fileID: 1359305002}
     - target: {fileID: 8247197954084837672, guid: b81a18d939d00ea4db4a8eb264b121de, type: 3}
       propertyPath: screenBindings.Array.data[3].view
+      value: 
+      objectReference: {fileID: 470935168}
+    - target: {fileID: 8247197954084837672, guid: b81a18d939d00ea4db4a8eb264b121de, type: 3}
+      propertyPath: screenBindings.Array.data[4].view
       value: 
       objectReference: {fileID: 883904029}
     - target: {fileID: 8518077897031764906, guid: b81a18d939d00ea4db4a8eb264b121de, type: 3}
@@ -769,6 +820,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaaf386f602ec1848844fc147143611b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1395293077 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 878555844784918328, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+  m_PrefabInstance: {fileID: 938769384}
+  m_PrefabAsset: {fileID: 0}
+--- !u!225 &1395293083
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395293077}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &1550138801 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7289925529554033610, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
@@ -832,6 +900,17 @@ Transform:
   - {fileID: 832575519}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1864913606 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5728073733894781707, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+  m_PrefabInstance: {fileID: 938769384}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f34de52d37589594a80384b1e6e30b6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CutsceneView
 --- !u!1001 &7830142848269437943
 PrefabInstance:
   m_ObjectHideFlags: 0

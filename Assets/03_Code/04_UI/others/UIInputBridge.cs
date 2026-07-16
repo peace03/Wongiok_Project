@@ -24,18 +24,26 @@ public class UIInputBridge : MonoBehaviour, IInitializable
 
     private void Update()
     {
-        if (!isInitialized)
-            return;
+        if (!isInitialized) return;
 
-        if (uiManager == null)
-            return;
+        if (uiManager == null) return;
 
-        if (uiManager.CurrentPopupType != UIPopupType.None)
-            return;
+        if (uiManager.CurrentPopupType != UIPopupType.None) return;
 
+        HandlePrologueSkipInput();
         HandleEscapeInput();
         HandlePauseTabInput();
         HandleSpaceInput();
+    }
+
+    private void HandlePrologueSkipInput()
+    {
+        if (uiManager.CurrentScreenState != UIScreenState.Prologue) return;
+
+        if (!Input.GetKeyDown(KeyCode.BackQuote)) return;
+
+        EventBus<UICutsceneSkipRequestedEvent>.Publish(
+            new UICutsceneSkipRequestedEvent());
     }
 
     private void HandleEscapeInput()
