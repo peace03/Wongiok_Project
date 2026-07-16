@@ -121,6 +121,38 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
         gameObject.SetActive(false);
     }
 
+    public void PauseEffect()
+    {
+        if (transform.childCount > 0)
+        {
+            var particles = transform.GetComponentsInChildren<ParticleSystem>();
+
+            if (particles == null || particles.Length == 0)
+                return;
+
+            for (int i = 0; i < particles.Length; i++)
+            {
+                particles[i].Pause();
+
+                if (particles[i].main.simulationSpace == ParticleSystemSimulationSpace.Local)
+                    continue;
+
+                var module = particles[i].main;
+                module.simulationSpace = ParticleSystemSimulationSpace.Local;
+            }
+        }
+        else if (particle != null)
+        {
+            particle.Pause();
+
+            if(particle.main.simulationSpace != ParticleSystemSimulationSpace.Local)
+            {
+                var module = particle.main;
+                module.simulationSpace = ParticleSystemSimulationSpace.Local;
+            }
+        }
+    }
+
     /// <summary>
     /// 이펙트 종료 함수
     /// </summary>

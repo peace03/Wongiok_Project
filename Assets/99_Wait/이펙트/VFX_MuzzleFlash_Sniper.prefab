@@ -13,6 +13,10 @@ PrefabInstance:
       value: VFX_MuzzleFlash_Sniper
       objectReference: {fileID: 0}
     - target: {fileID: 3469493672806105758, guid: e9970291deebdd24ca49c8cc47d0cc65, type: 3}
+      propertyPath: looping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3469493672806105758, guid: e9970291deebdd24ca49c8cc47d0cc65, type: 3}
       propertyPath: InitialModule.startSize.scalar
       value: 0.85
       objectReference: {fileID: 0}
