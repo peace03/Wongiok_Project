@@ -25,11 +25,13 @@ public class PlayerParry : MonoBehaviour
     private bool isPlayerParryWindowOpen;
     private bool isParryConsumed;
     private bool isBossParryWindowOpen;
+    private bool isInBossAttackRange;
     private float playerParryWindowEndTime;
     private float parrySuccessDamageBlockEndTime;
 
     // 다른 공격 판정 스크립트가 현재 일반 근접 패링 창이 열려 있는지 확인할 때 사용합니다.
     public bool IsParryWindowOpen => IsPlayerParryWindowValid();
+    public bool IsInBossAttackRange => isInBossAttackRange;
 
     // 디버그나 후처리에서 마지막 패링 성공 여부를 확인할 때 사용합니다.
     public bool LastParrySucceeded { get; private set; }
@@ -51,6 +53,7 @@ public class PlayerParry : MonoBehaviour
         EventBus<UltimateInvokeEvent>.action -= CloseBossParryWindow;
         ResetPlayerParryWindow();
         isBossParryWindowOpen = false;
+        isInBossAttackRange = false;
         parrySuccessDamageBlockEndTime = 0f;
     }
 
@@ -81,7 +84,7 @@ public class PlayerParry : MonoBehaviour
         isPlayerParryWindowOpen = true;
         playerParryWindowEndTime = Time.time + Mathf.Max(0f, parryWindowDuration);
 
-        if (isBossParryWindowOpen)
+        if (isBossParryWindowOpen || isInBossAttackRange)
         {
             // 보스 패턴은 입력 순간 ParryKeyDown을 받아 패링 분기로 넘어가는 구조입니다.
             return CompleteBossParry();
@@ -89,6 +92,11 @@ public class PlayerParry : MonoBehaviour
 
         Debug.Log("플레이어 패링 입력");
         return true;
+    }
+
+    public void SetInBossAttackRange(bool isInside)
+    {
+        isInBossAttackRange = isInside;
     }
 
     public bool TryConsumeBossParry()
@@ -99,7 +107,7 @@ public class PlayerParry : MonoBehaviour
         // 보스 히트박스가 데미지를 넣는 순간, 보스/플레이어 패링 창이 모두 열려 있는지 확인합니다.
         if (!EnsureInitialized()) return false;
         if (!CanUseParry()) return false;
-        if (!isBossParryWindowOpen) return false;
+        if (!isBossParryWindowOpen && !isInBossAttackRange) return false;
         if (!IsPlayerParryWindowValid()) return false;
 
         return CompleteBossParry();
@@ -126,6 +134,7 @@ public class PlayerParry : MonoBehaviour
         isParryConsumed = true;
         ResetPlayerParryWindow();
         isBossParryWindowOpen = false;
+        isInBossAttackRange = false;
         LastParrySucceeded = true;
         parrySuccessDamageBlockEndTime = Time.time + ParrySuccessDamageBlockDuration;
 

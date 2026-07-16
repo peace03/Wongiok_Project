@@ -12,10 +12,29 @@ public class GameInputReader : MonoBehaviour
     public bool DashTriggered => _input.Player.Dash.WasPressedThisFrame();
     public bool ParryTriggered => _input.Player.Parry.WasPressedThisFrame();
     public bool UseHealItemTriggered => _input.Player.UseHealItem.WasPressedThisFrame();
+    public bool UseParry => _input.Player.UseParry.WasPressedThisFrame();
     #endregion
 
     #region UI Input
     public bool MenuPressed => _input.UI.ToggleMenu.WasPressedThisFrame();
+    public bool TitleStartPressed => _input.UI.StartTitle.WasPressedThisFrame();
+    public bool PreviousPauseTabPressed => _input.UI.PreviousPauseTab.WasPressedThisFrame();
+    public bool NextPauseTabPressed => _input.UI.NextPauseTab.WasPressedThisFrame();
+    public bool SubmitPressed => _input.UI.Submit.WasPressedThisFrame();
+    public Vector2 UINavigationInput => _input.UI.Navigate.ReadValue<Vector2>();
+    #endregion
+
+    #region Test Input
+    public bool TestF1Pressed => _input.Test.F1.WasPressedThisFrame();
+    public bool TestF2Pressed => _input.Test.F2.WasPressedThisFrame();
+    public bool TestF3Pressed => _input.Test.F3.WasPressedThisFrame();
+    public bool TestF4Pressed => _input.Test.F4.WasPressedThisFrame();
+    public bool TestF5Pressed => _input.Test.F5.WasPressedThisFrame();
+    public bool TestF6Pressed => _input.Test.F6.WasPressedThisFrame();
+    public bool TestF7Pressed => _input.Test.F7.WasPressedThisFrame();
+    public bool TestF8Pressed => _input.Test.F8.WasPressedThisFrame();
+    public bool TestF9Pressed => _input.Test.F9.WasPressedThisFrame();
+    public bool TestF10Pressed => _input.Test.F10.WasPressedThisFrame();
     #endregion
 
     #region Skill Input
