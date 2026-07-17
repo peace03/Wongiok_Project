@@ -53,6 +53,7 @@ public static class PrototypeGameSession
     private static PrototypeProgressSnapshot chapterStartSnapshot;
     private static PrototypeProgressSnapshot checkpointSnapshot;
     private static int pendingTitleCardChapterId = -1;
+    private static bool skipPrologueOnNextLobbyEnter;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatic()
@@ -74,6 +75,7 @@ public static class PrototypeGameSession
         HighestClearedChapterId = 0;
         CurrentChapterId = 1;
         pendingTitleCardChapterId = -1;
+        skipPrologueOnNextLobbyEnter = false;
         checkpointSnapshot = null;
 
         committedSnapshot = new PrototypeProgressSnapshot
@@ -175,11 +177,20 @@ public static class PrototypeGameSession
         return chapterId >= 0;
     }
 
+    public static bool TryConsumeSkipPrologueOnNextLobbyEnter()
+    {
+        bool shouldSkipPrologue = skipPrologueOnNextLobbyEnter;
+        skipPrologueOnNextLobbyEnter = false;
+
+        return shouldSkipPrologue;
+    }
+
     public static void ReturnToMainMenu()
     {
         checkpointSnapshot = null;
         chapterStartSnapshot = committedSnapshot.Clone();
         pendingTitleCardChapterId = -1;
+        skipPrologueOnNextLobbyEnter = true;
     }
 
     private static void AddUnlockedSkill(

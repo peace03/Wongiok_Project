@@ -50,8 +50,19 @@ public class PrototypeSceneBridge : MonoBehaviour
             new UISetChapterProgressEvent(
                 PrototypeGameSession.HighestClearedChapterId));
 
-        EventBus<UISetCutsceneEvent>.Publish(
-            new UISetCutsceneEvent("prologue", prologueVideoClip, string.Empty));
+        if (PrototypeGameSession.TryConsumeSkipPrologueOnNextLobbyEnter())
+        {
+            EventBus<UIChangeScreenEvent>.Publish(
+                new UIChangeScreenEvent(UIScreenState.Title));
+        }
+        else
+        {
+            EventBus<UISetCutsceneEvent>.Publish(
+                new UISetCutsceneEvent(
+                    "prologue",
+                    prologueVideoClip,
+                    string.Empty));
+        }
 
         if (PrototypeGameSession.TryConsumePendingTitleCard(out int chapterId))
             ShowChapterTitleCard(chapterId);

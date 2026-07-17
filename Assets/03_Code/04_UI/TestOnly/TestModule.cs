@@ -35,6 +35,8 @@ public class TestModule : MonoBehaviour
     [SerializeField] private PlayerStatus playerStatus;
     [SerializeField] private PlayerExperienceTracker playerExperienceTracker;
 
+    [SerializeField] private GameInputReader _input;
+
     private void Start()
     {
         PrototypeGameSession.EnsureInitialized();
@@ -79,48 +81,48 @@ public class TestModule : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (_input.TestF1Pressed)
             CompleteCurrentChapter();
 
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        if (_input.TestF2Pressed)
             GainExp();
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if (_input.TestF3Pressed)
             ShowLevelUp();
 
-        if (Input.GetKeyDown(KeyCode.Alpha4))
+        if (_input.TestF4Pressed)
             DamagePlayer();
 
-        if (Input.GetKeyDown(KeyCode.Alpha5))
+        if (_input.TestF5Pressed)
             ShowGameOver();
 
-        if (Input.GetKeyDown(KeyCode.Alpha6))
+        if (_input.TestF6Pressed)
             SpawnBoss();
 
-        if (Input.GetKeyDown(KeyCode.Alpha7))
+        if (_input.TestF7Pressed)
             DamageBoss();
 
-        if (Input.GetKeyDown(KeyCode.Alpha8))
+        if (_input.TestF8Pressed)
             KillBossAndClearChapter();
 
-        if (Input.GetKeyDown(KeyCode.Alpha9))
+        if (_input.TestF9Pressed)
             ShowChapterSelect();
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        if (_input.TestF10Pressed)
             ResetTestState();
 
-        if (Input.GetKeyDown(KeyCode.Period))
+        if (_input.TestF2Pressed)
             SaveCheckpoint();
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (_input.SkillAPressed)
             EventBus<TestPlayerSkillUsedEvent>.Publish(
                 new TestPlayerSkillUsedEvent(0));
 
-        if (Input.GetKeyDown(KeyCode.S))
+        if (_input.SkillSPressed)
             EventBus<TestPlayerSkillUsedEvent>.Publish(
                 new TestPlayerSkillUsedEvent(1));
 
-        if (Input.GetKeyDown(KeyCode.D))
+        if (_input.SkillDPressed)
             EventBus<TestPlayerSkillUsedEvent>.Publish(
                 new TestPlayerSkillUsedEvent(2));
     }
