@@ -97,7 +97,9 @@ public class BossController : MonoBehaviour, IInitializable
         isDefeated = true;
         ChangeState(State.Defeated);
 
-        EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
+        // 보스가 죽으면 현재 공격의 패링 창도 함께 닫는다.
+        EventBus<CanParryEvent>.Publish(
+            new CanParryEvent(logics.GetAttackId(), false));
         EventBus<ColliderToggleEvent>.Publish(
             new ColliderToggleEvent(logics.GetAttackId(), false));
 

@@ -14,27 +14,29 @@ public class BossAnimationKeyReceiver : MonoBehaviour, IInitializable
     //애니메이션 키로 이벤트 발생
     public void EnableParry()
     {
-        //Debug.Log("패링 가능!");
-        EventBus<CanParryEvent>.Publish(new CanParryEvent(true));
+        // 현재 공격 ID와 함께 "지금부터 패링 시간"임을 알린다.
+        EventBus<CanParryEvent>.Publish(
+            new CanParryEvent(bossPatternLogic.GetAttackId(), true));
     }
     public void DisableParry()
     {
-        //Debug.Log("패링 불가능!");
-        EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
+        // 패링 시간만 닫는다. 콜라이더는 이후 EnableAttack까지 켜 둬서 범위 정보를 유지한다.
+        EventBus<CanParryEvent>.Publish(
+            new CanParryEvent(bossPatternLogic.GetAttackId(), false));
     }
-    public void OnCollider()
+    public void EnableAttack()
     {
-        //방어코드
-        if (bossPatternLogic.IsParryed) return; //패링 쳤는지
-        if (!bossPatternLogic.IsAttacking()) return; //트랜지션 중인지
+        // 이미 패링된 공격이거나 공격 애니메이션이 끝난 경우에는 피해 판정을 켜지 않는다.
+        if (bossPatternLogic.IsParryed) return;
+        if (!bossPatternLogic.IsAttacking()) return;
 
-        //Debug.Log("공격 콜라이더 온!");
+        // 같은 콜라이더를 RangeCheck 상태에서 실제 피해 상태로 전환한다.
         EventBus<ColliderToggleEvent>.
             Publish(new ColliderToggleEvent(bossPatternLogic.GetAttackId(), true));
     }
-    public void OffCollider()
+    public void DisableAttack()
     {
-        //Debug.Log("공격 콜라이더 오프!");
+        // 공격 애니메이션의 피해 프레임이 끝났으므로 콜라이더와 범위 정보를 정리한다.
         EventBus<ColliderToggleEvent>.
             Publish(new ColliderToggleEvent(bossPatternLogic.GetAttackId(), false));
     }

@@ -141,7 +141,9 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     {
         EventBus<ParryKeyDown>.action -= ParryKeyDown;
         telegraphDrawer?.StopSignal(); // 비활성화 뒤에도 남을 수 있는 사전신호와 연출 코루틴을 정리
-        EventBus<CanParryEvent>.Publish(new CanParryEvent(false)); // PlayerParry의 보스 패링 창을 강제로 닫음
+        // 비활성화되는 보스가 열어 둔 패링 창만 닫도록 현재 attackId를 함께 보낸다.
+        EventBus<CanParryEvent>.Publish(
+            new CanParryEvent(attackId, false)); // PlayerParry의 보스 패링 창을 강제로 닫음
     }
     #endregion
 
@@ -209,7 +211,9 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         telegraphExcuted = false;
         isParryed = false;
         isParryCanceled = true; // 공격 캔슬 플래그 발동
-        EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
+        // 패링 성공으로 공격이 취소됐으므로 이 공격의 패링 시간과 콜라이더를 모두 닫는다.
+        EventBus<CanParryEvent>.Publish(
+            new CanParryEvent(attackId, false));
         EventBus<ColliderToggleEvent>.Publish(new ColliderToggleEvent(attackId, false));
     }
 

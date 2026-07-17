@@ -84,7 +84,7 @@ public class PlayerParry : MonoBehaviour
         isPlayerParryWindowOpen = true;
         playerParryWindowEndTime = Time.time + Mathf.Max(0f, parryWindowDuration);
 
-        if (isBossParryWindowOpen || isInBossAttackRange)
+        if (isBossParryWindowOpen && isInBossAttackRange)
         {
             // 보스 패턴은 입력 순간 ParryKeyDown을 받아 패링 분기로 넘어가는 구조입니다.
             return CompleteBossParry();
