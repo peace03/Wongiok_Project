@@ -124,8 +124,9 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 foreach (var prefab in effectPrefabs)
                 {
                     // 이펙트 실행 및 실행한 이펙트 받아오기
-                    var effect = EffectManager.Instance.PlayEffect(prefab, new Vector3(0, 0, -0.5f),
-                                                        Quaternion.identity, parent: bullet.transform);
+                    var effect = EffectManager.Instance.PlayEffect(prefab,
+                                                                place.position + new Vector3(0, 0, -0.5f),
+                                                                    place.rotation, parent: bullet.transform);
                     // 나선 이펙트라면
                     if (effect.TryGetComponent<IWaveEffect>(out var wave))
                         // 나선 이펙트 정보 설정하기
@@ -141,7 +142,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 //bullet.StartFire(skillLayer, damage, penetrationCount, Mathf.Clamp(bulletSpeed, 10f, 50f));
                 bullet.StartFire(skillLayer, damage, penetrationCount);
 
-                if(effects.Count != 0)
+                if(effects.Count > 0)
                     StartCoroutine(PauseEffectRoutine(effects));
 
                 // 발사체 스킬 딜레이 시간만큼 대기하기
