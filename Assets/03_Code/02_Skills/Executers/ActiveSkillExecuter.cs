@@ -14,6 +14,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private readonly List<Transform> executePlaces = new();                         // 실행 위치들
     private readonly List<GameObject> effectPrefabs = new();                        // 이펙트 프리팹들
 
+    private readonly WaitForSeconds effectPauseTime = new(0.3f);                    // 이펙트 일시정지 시간
     private WaitForSeconds projectileDelayTime;                                     // 발사체 스킬 딜레이 시간
     private WaitForSeconds areaDelayTime;                                           // 범위 스킬 딜레이 시간
 
@@ -88,9 +89,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 발사체 이펙트에 해당하는 이펙트 프리팹 받아오기
         data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Main, effectPrefabs);
-        // 발사체 스킬 딜레이 시간 구하고 저장하기
+        // 발사체 스킬 딜레이 시간량 구하기
         projectileDelayTimeValue = skillData.MaxDuration / (skillData.ProjectileCount == 0 ?
                                                                     1 : skillData.ProjectileCount);
+        // 발사체 스킬 딜레이 저장하기
         projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(skillData.ProjectileCount, skillData.GetDamage(),
@@ -105,45 +107,58 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// <param name="penetrationCount">관통 횟수</param>
     private IEnumerator ProjectileRoutine(int bulletCount, float damage, int penetrationCount)
     {
-        // 현재 발사체 개수를 저장할 변수
-        int curBulletCount = 0;
-
-        // 실행 위치들의 수만큼
-        foreach (var place in executePlaces)
+        // 현재 발사체 개수만큼
+        for (int count = 0; count < bulletCount; count += executePlaces.Count)
         {
-            // 발사체 개수만큼
-            for (; curBulletCount < bulletCount; curBulletCount++)
+            // 실행 위치들의 수만큼
+            foreach (var place in executePlaces)
             {
                 // 총알 가져오기
                 var bullet = bulletFactory.GetBullet();
                 // 총알 위치와 각도 설정하기
                 bullet.transform.SetPositionAndRotation(place.position, place.rotation);
+                // 실행한 총알 이펙트들을 저장할 리스트
+                List<Effect> effects = new();
 
                 // 총알 이펙트들의 수만큼
                 foreach (var prefab in effectPrefabs)
                 {
                     // 이펙트 실행 및 실행한 이펙트 받아오기
                     var effect = EffectManager.Instance.PlayEffect(prefab, new Vector3(0, 0, -0.5f),
-                                                    bullet.transform.rotation, parent: bullet.transform);
-
+                                                        Quaternion.identity, parent: bullet.transform);
                     // 나선 이펙트라면
                     if (effect.TryGetComponent<IWaveEffect>(out var wave))
                         // 나선 이펙트 정보 설정하기
                         wave.SetInfo();
+
+                    // 리스트에 저장하기
+                    effects.Add(effect);
                 }
 
                 //// 총알 속도 구하기
                 //float bulletSpeed = 25f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
                 //// 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수, 총알 속도)
                 //bullet.StartFire(skillLayer, damage, penetrationCount, Mathf.Clamp(bulletSpeed, 10f, 50f));
-                bullet.StartFire(skillLayer, damage, penetrationCount, 25f);
-                // 발사체 스킬 딜레이 시간만큼 대기
+                bullet.StartFire(skillLayer, damage, penetrationCount);
+
+                if(effects.Count != 0)
+                    StartCoroutine(PauseEffectRoutine(effects));
+
+                // 발사체 스킬 딜레이 시간만큼 대기하기
                 yield return projectileDelayTime;
             }
         }
 
         // 실행 위치들 초기화
         ResetExecutePositions();
+    }
+
+    private IEnumerator PauseEffectRoutine(List<Effect> effects)
+    {
+        yield return effectPauseTime;
+
+        foreach (var effect in effects)
+            effect.PauseEffect();
     }
 
     /// <summary>

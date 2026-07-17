@@ -153,10 +153,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39f869b35cd0f31469ce619af0d04600, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
-  ownerLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  damage: 0
-  penetrationCount: 1
-  speed: 10
-  duration: 5
+  bulletSpeed: 25
