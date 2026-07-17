@@ -97,10 +97,10 @@ public class PlayerDashState : PlayerBaseState
 
     private Vector3 GetDashDirection()
     {
-        if (controller.MoveInput.x > 0f) return Vector3.left;
-        if (controller.MoveInput.x < 0f) return Vector3.right;
+        if (controller.MoveInput.x < 0f) return Vector3.left;
+        if (controller.MoveInput.x > 0f) return Vector3.right;
 
-        return controller.IsFacingRight ? Vector3.left : Vector3.right;
+        return controller.IsFacingRight ? Vector3.right : Vector3.left;
     }
 
     #endregion

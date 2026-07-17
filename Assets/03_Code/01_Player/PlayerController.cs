@@ -258,12 +258,20 @@ public class PlayerController : MonoBehaviour
         // x 입력을 기준으로 마지막 바라본 방향을 갱신합니다.
         if (MoveInput.x > 0f)
         {
-            _isFacingRight = true;
+            SetFacingDirection(true);
         }
         else if (MoveInput.x < 0f)
         {
-            _isFacingRight = false;
+            SetFacingDirection(false);
         }
+    }
+
+    private void SetFacingDirection(bool isFacingRight)
+    {
+        if (_isFacingRight == isFacingRight)
+            return;
+
+        _isFacingRight = isFacingRight;
     }
 
     private void HandleAttackInput()

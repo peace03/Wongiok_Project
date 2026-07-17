@@ -71,13 +71,13 @@ public class PlayerAttack : MonoBehaviour
         // 바닥을 향해 바로 발사하는 어색한 상황을 막기 위한 예외 처리입니다.
         if (isGrounded && Mathf.Approximately(x, 0f) && y < 0f)
         {
-            return isFacingRight ? Vector3.left : Vector3.right;
+            return isFacingRight ? Vector3.right : Vector3.left;
         }
 
         // 방향 입력이 없으면 마지막으로 바라보는 방향으로 공격합니다.
         if (Mathf.Approximately(x, 0f) && Mathf.Approximately(y, 0f))
         {
-            return isFacingRight ? Vector3.left : Vector3.right;
+            return isFacingRight ? Vector3.right : Vector3.left;
         }
 
         // 수평 입력 없이 위아래 입력만 있으면 수직 방향으로 공격합니다.
@@ -89,10 +89,10 @@ public class PlayerAttack : MonoBehaviour
         // 좌하단/우하단 입력은 대각선 아래 공격으로 쓰지 않고 수평 공격으로 보정합니다.
         if (y < 0f)
         {
-            return new Vector3(-Mathf.Sign(x), 0f, 0f);
+            return new Vector3(Mathf.Sign(x), 0f, 0f);
         }
 
-        Vector3 direction = new Vector3(-x, y, 0f);
+        Vector3 direction = new Vector3(x, y, 0f);
         return direction.normalized;
     }
     #region 플레이어 경고 문구 ( 특정 오브젝트 or 스크립트 존재의 확인 )
