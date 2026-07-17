@@ -19,7 +19,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     }
 
     // 임시 초기화
-    private void Awake() => Init();
+    //private void Awake() => Init();
 
     private void Update()
     {
