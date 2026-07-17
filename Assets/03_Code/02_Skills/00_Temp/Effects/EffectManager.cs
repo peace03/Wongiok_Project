@@ -121,13 +121,13 @@ public class EffectManager : MonoBehaviour
             return null;
         }
 
+        // 이펙트의 로컬 위치와 각도 설정
+        effect.transform.SetLocalPositionAndRotation(pos, rot);
+
         // 따라다닐 대상이 있다면
         if (parent != null)
             // 따라다닐 대상 설정(위치, 각도 유지)
             effect.transform.SetParent(parent, true);
-
-        // 이펙트의 로컬 위치와 각도 설정
-        effect.transform.SetLocalPositionAndRotation(pos, rot);
 
         // 이펙트 지속 시간이 있다면
         if (duration != null)
