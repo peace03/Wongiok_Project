@@ -9,8 +9,17 @@ public class PlayerLifeTracker : MonoBehaviour
     private bool isInitialized;
     private bool isLifeDepletedPublished;
 
-    public int CurrentLifeCount => currentLifeCount;
+    public int CurrentLifeCount
+    {
+        get
+        {
+            EnsureInitialized();
+            return currentLifeCount;
+        }
+    }
+
     public int StartLifeCount => startLifeCount;
+
     public bool HasRemainingLife
     {
         get
@@ -53,6 +62,36 @@ public class PlayerLifeTracker : MonoBehaviour
             EventBus<PlayerLifeDepletedEvent>.Publish(new PlayerLifeDepletedEvent(gameObject));
         }
 
+        return true;
+    }
+
+    // 현재 잔기를 시작 잔기 수까지 복구합니다
+    public bool RestoreToFull()
+    {
+        return RestoreCount(startLifeCount);
+    }
+
+    // 현재 잔기를 지정한 수량으로 복원하고 UI 이벤트를 발행합니다
+    public bool RestoreCount(int targetCount)
+    {
+        EnsureInitialized();
+
+        int restoredCount =
+            Mathf.Clamp(
+                targetCount,
+                0,
+                startLifeCount);
+
+        if (restoredCount == currentLifeCount)
+        {
+            return false;
+        }
+
+        currentLifeCount = restoredCount;
+        isLifeDepletedPublished =
+            currentLifeCount == 0;
+
+        PublishLifeChanged();
         return true;
     }
 

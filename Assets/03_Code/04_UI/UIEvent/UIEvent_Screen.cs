@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Video;
 
 // 타이틀 화면의 저장 파일 존재 여부 갱신 이벤트
 public struct UISetTitleSaveStateEvent
@@ -73,6 +74,7 @@ public struct UISetChapterTitleCardEvent
     public string Description { get; private set; }
     public Sprite Thumbnail { get; private set; }
     public Sprite Background { get; private set; }
+    public VideoClip LoadingVideoClip { get; private set; }
 
     public UISetChapterTitleCardEvent(
         int chapterId,
@@ -80,7 +82,8 @@ public struct UISetChapterTitleCardEvent
         string subtitle,
         string description,
         Sprite thumbnail,
-        Sprite background)
+        Sprite background,
+        VideoClip loadingVideoClip)
     {
         ChapterId = chapterId;
         Title = title;
@@ -88,6 +91,7 @@ public struct UISetChapterTitleCardEvent
         Description = description;
         Thumbnail = thumbnail;
         Background = background;
+        LoadingVideoClip = loadingVideoClip;
     }
 }
 

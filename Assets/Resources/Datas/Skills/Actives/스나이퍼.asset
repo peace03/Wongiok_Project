@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\uC2A4\uB098\uC774\uD37C"
   m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillData
   id: 1003
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 26bc37539cc89e74fbeb0c9198ac5955, type: 3}
   skillName: "\uC2A4\uB098\uC774\uD37C"
   type: 1
   unlockChapter: 0
@@ -34,10 +34,7 @@ MonoBehaviour:
     prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
   - type: 3
     priority: 0
-    prefab: {fileID: 6720752127956727181, guid: 787ac5dfaabf0264288e0a2032c19b43, type: 3}
-  - type: 3
-    priority: 0
-    prefab: {fileID: 6720752127956727181, guid: 057d654aa0cf7ec4b886f0ca3cdc6c7c, type: 3}
+    prefab: {fileID: 6628276393031643956, guid: 6b235e51b019a9f478b3da92c24ccfd5, type: 3}
   - type: 4
     priority: 0
     prefab: {fileID: 6561904271629179525, guid: 2cdd3bb1227ee9348b2be96e207b9731, type: 3}

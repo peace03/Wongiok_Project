@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using System.Collections;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class PrototypeTestScene : MonoBehaviour
 {
-    [SerializeField] private Sprite fireIcon;
-    [SerializeField] private Sprite iceIcon;
-    [SerializeField] private Sprite dashIcon;
-    [SerializeField] private Sprite powerUpIcon;
     [SerializeField] private string mainMenuSceneName = "Lobby";
 
     // 테스트용 Pause 스킬 데이터를 캐싱해서 드래그 교체 결과를 유지
@@ -16,8 +14,6 @@ public class PrototypeTestScene : MonoBehaviour
     private UIPauseSkillInfoData[] currentActiveSkills;
     private UIPauseSkillInfoData[] currentPassiveSkills;
     private UIPauseSkillInfoData[] currentOwnedSkills;
-
-    [SerializeField] private float testSkillCooldownDuration = 3f;
 
     private static readonly string[] SkillKeyTexts = { "A", "S", "D" };
 
@@ -155,7 +151,8 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<UISetPauseSkillPageEvent>.Publish(
             new UISetPauseSkillPageEvent(
                 currentActiveSkills,
-                currentOwnedSkills));
+                currentOwnedSkills,
+                isOwnedSkillListUnlocked: PrototypeGameSession.CurrentChapterId >= 2));
 
         EventBus<RefreshUIEventT>.Publish(
             new RefreshUIEventT(
@@ -163,6 +160,51 @@ public class PrototypeTestScene : MonoBehaviour
                 currentOwnedSkills));
 
         PublishCurrentPlayerSkillSlots();
+    }
+
+    private bool TryLevelUpSkill(UIPauseSkillInfoData[] skills, int skillId)
+    {
+        const int maxSkillLevel = 3;
+
+        int skillIndex = FindSkillIndex(skills, skillId);
+
+        if (skillIndex < 0) return false;
+
+        UIPauseSkillInfoData skill = skills[skillIndex];
+
+        if (skill.Level >= maxSkillLevel) return false;
+
+        BaseSkillData skillData = Resources.LoadAll<BaseSkillData>("Datas/Skills").
+            FirstOrDefault(data => data != null && data.Id == skill.SkillId);
+
+        int nextLevel = Mathf.Min(skill.Level + 1, maxSkillLevel);
+
+        skills[skillIndex] = new UIPauseSkillInfoData(
+            skill.Icon,
+            skill.SkillName,
+            nextLevel,
+            skill.Description,
+            skill.IsEquipped,
+            skill.SkillId);
+
+        return true;
+    }
+
+    private float GetSkillCooldownDuration(int slotIndex)
+    {
+        if (!IsValidSlotIndex(slotIndex)) return 0f;
+
+        UIPauseSkillInfoData skill = currentActiveSkills[slotIndex];
+
+        if (skill.SkillId < 0) return 0f;
+
+        BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
+
+        BaseSkillData skillData = skillDatas.FirstOrDefault(data => data != null && data.Id == skill.SkillId);
+
+        if (skillData == null) return 0f;
+
+        return Mathf.Max(0f, skillData.GetMaxCoolTime(skill.Level));
     }
 
     private void HandlePauseSkillEquipRequested(UIPauseSkillEquipRequestedEvent eventData)
@@ -241,21 +283,11 @@ public class PrototypeTestScene : MonoBehaviour
     {
         EnsurePauseTestData();
 
-        int skillIndex = FindSkillIndex(currentActiveSkills, eventData.SkillId);
-
-        if (skillIndex < 0) return;
-
-        UIPauseSkillInfoData skill = currentActiveSkills[skillIndex];
-
-        currentActiveSkills[skillIndex] = new UIPauseSkillInfoData(
-            skill.Icon,
-            skill.SkillName,
-            skill.Level + 1,
-            skill.Description,
-            true,
-            skill.SkillId);
-
-        PublishCurrentPauseData();
+        if (TryLevelUpSkill(currentActiveSkills, eventData.SkillId) ||
+            TryLevelUpSkill(currentOwnedSkills, eventData.SkillId))
+        {
+            PublishCurrentPauseData();
+        }
     }
 
     private void HandleRestoreSkillCheckpoint(
@@ -330,9 +362,10 @@ public class PrototypeTestScene : MonoBehaviour
 
         if (skillCooldownRemaining[eventData.SlotIndex] > 0f) return;
 
-        skillCooldownDuration[eventData.SlotIndex] = Mathf.Max(0.01f, testSkillCooldownDuration);
+        float cooldownDuration = GetSkillCooldownDuration(eventData.SlotIndex);
 
-        skillCooldownRemaining[eventData.SlotIndex] = skillCooldownDuration[eventData.SlotIndex];
+        skillCooldownDuration[eventData.SlotIndex] = cooldownDuration;
+        skillCooldownRemaining[eventData.SlotIndex] = cooldownDuration;
 
         PublishCurrentPlayerSkillSlots();
     }
@@ -373,7 +406,7 @@ public class PrototypeTestScene : MonoBehaviour
         skillCooldownDuration = new float[slotCount];
 
         for (int i = 0; i < skillCooldownDuration.Length; i++)
-            skillCooldownDuration[i] = Mathf.Max(0.01f, testSkillCooldownDuration);
+            skillCooldownDuration[i] = GetSkillCooldownDuration(i);
     }
 
     private void ResetSkillCooldowns()
@@ -391,7 +424,7 @@ public class PrototypeTestScene : MonoBehaviour
         if (slotIndex < 0 || slotIndex >= skillCooldownRemaining.Length) return;
 
         skillCooldownRemaining[slotIndex] = 0f;
-        skillCooldownDuration[slotIndex] = Mathf.Max(0.01f, testSkillCooldownDuration);
+        skillCooldownDuration[slotIndex] = GetSkillCooldownDuration(slotIndex);
     }
 
     private bool IsValidSlotIndex(int slotIndex)

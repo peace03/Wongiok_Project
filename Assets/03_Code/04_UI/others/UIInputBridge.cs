@@ -3,6 +3,7 @@ using UnityEngine;
 public class UIInputBridge : MonoBehaviour, IInitializable
 {
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private GameInputReader _input;
 
     private bool isInitialized;
 
@@ -24,18 +25,27 @@ public class UIInputBridge : MonoBehaviour, IInitializable
 
     private void Update()
     {
-        if (!isInitialized)
-            return;
+        if (!isInitialized) return;
 
-        if (uiManager == null)
-            return;
+        if (uiManager == null) return;
 
-        if (uiManager.CurrentPopupType != UIPopupType.None)
-            return;
+        if (uiManager.CurrentPopupType != UIPopupType.None) return;
 
+        HandlePrologueSkipInput();
         HandleEscapeInput();
         HandlePauseTabInput();
         HandleSpaceInput();
+    }
+
+    private void HandlePrologueSkipInput()
+    {
+        if (uiManager.CurrentScreenState != UIScreenState.Prologue) return;
+
+        //if (!Input.GetKeyDown(KeyCode.BackQuote)) return;
+        if (!_input.TitleStartPressed) return;
+
+        EventBus<UICutsceneSkipRequestedEvent>.Publish(
+            new UICutsceneSkipRequestedEvent());
     }
 
     private void HandleEscapeInput()

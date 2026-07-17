@@ -48,7 +48,7 @@ public class WaveEffect : Effect, IWaveEffect
         // 회전 방식 : 사인 OR 코사인 함수(타겟의 총 이동거리 * 나선의 간격 + 나선의 시작 각도)
         // 타겟의 총 이동거리 : 나선의 현재 높이를 결정함(최대/최소 높이가 정해져 있음)
         curwaveHeight = !useCos ? Mathf.Sin(moveDistance * waveInterval + offsetAngle)
-                                : Mathf.Cos(moveDistance * waveInterval + offsetAngle);
+                                    : Mathf.Cos(moveDistance * waveInterval + offsetAngle);
         // 현재 위치 변경(나선의 처음 위치 + 나선의 현재 높이 * 나선의 너비)
         transform.localPosition = baseLocalPos + new Vector3(0f, curwaveHeight * waveWidth, 0f);
     }

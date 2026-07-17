@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/05_Video.meta
+guid: 2d84c5a33ca9afd41b16c9a11226a958
+========
 guid: 478ecf914ee084d4196587af3ddaac7e
+>>>>>>>> 9dff42f (fix : 스킬 오류 수정):Assets/01_Art/Dev/Skill/Sprites.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

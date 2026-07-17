@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SMG
   m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillData
   id: 1005
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 0ec502f0929cb0541906b8610aa1e7d0, type: 3}
   skillName: SMG
   type: 1
   unlockChapter: 1

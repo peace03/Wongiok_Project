@@ -169,17 +169,20 @@ public struct UISetPauseSkillPageEvent
     public UIPauseSkillInfoData[] OwnedSkills { get; private set; }
     public bool HasSelectedSkills { get; private set; }
     public UIPauseSkillInfoData SelectedSkill { get; private set; }
+    public bool IsOwnedSkillListUnlocked { get; private set; }
 
     public UISetPauseSkillPageEvent(
         UIPauseSkillInfoData[] equippedActiveSkills,
         UIPauseSkillInfoData[] ownedSkills,
         bool hasSelectedSkill = false,
-        UIPauseSkillInfoData selectedSkill = default)
+        UIPauseSkillInfoData selectedSkill = default,
+        bool isOwnedSkillListUnlocked = false)
     {
         EquippedActiveSkills = equippedActiveSkills;
         OwnedSkills = ownedSkills;
         HasSelectedSkills = hasSelectedSkill;
         SelectedSkill = selectedSkill;
+        IsOwnedSkillListUnlocked = isOwnedSkillListUnlocked;
     }
 }
 

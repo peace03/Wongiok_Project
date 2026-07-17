@@ -82,8 +82,7 @@ public class GameClearView : UIViewBase
         {
             nextChapterButton.Setup(
                 "다음 이야기 읽기",
-                HandleNextChapterClicked,
-                hasNextChapter);
+                HandleNextChapterClicked);
         }
 
         if (mainMenuButton != null)
@@ -122,8 +121,7 @@ public class GameClearView : UIViewBase
     // 다음 챕터가 없으면 버튼 클릭 X
     private void HandleNextChapterClicked()
     {
-        if (!hasNextChapter)
-            return;
+        //if (!hasNextChapter) return;
 
         EventBus<UIChapterClearNextRequestedEvent>.Publish(
             new UIChapterClearNextRequestedEvent());

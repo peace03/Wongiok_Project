@@ -77,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
 
         // 현재 게임 축 기준으로 입력 x를 z축 이동에 매핑합니다.
         // 오른쪽 입력은 Vector3.back 방향으로 이동합니다.
-        Vector3 move = new Vector3(input.x, 0f, 0f);
+        Vector3 move = new Vector3(-input.x, 0f, 0f);
 
         cc.Move(move * moveSpeed * Time.deltaTime);
     }
