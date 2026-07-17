@@ -117,9 +117,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 var bullet = bulletFactory.GetBullet();
                 // 총알 위치와 각도 설정하기
                 bullet.transform.SetPositionAndRotation(place.position, place.rotation);
-                // 실행한 총알 이펙트들을 저장할 리스트
-                List<Effect> effects = new();
-
+                
                 // 총알 이펙트들의 수만큼
                 foreach (var prefab in effectPrefabs)
                 {
@@ -131,20 +129,13 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                     if (effect.TryGetComponent<IWaveEffect>(out var wave))
                         // 나선 이펙트 정보 설정하기
                         wave.SetInfo();
-
-                    // 리스트에 저장하기
-                    effects.Add(effect);
                 }
 
-                //// 총알 속도 구하기
-                //float bulletSpeed = 25f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
-                //// 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수, 총알 속도)
-                //bullet.StartFire(skillLayer, damage, penetrationCount, Mathf.Clamp(bulletSpeed, 10f, 50f));
-                bullet.StartFire(skillLayer, damage, penetrationCount);
-
-                if(effects.Count > 0)
-                    StartCoroutine(PauseEffectRoutine(effects));
-
+                // 총알 속도 구하기
+                float bulletSpeed = 50f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
+                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수, 총알 속도)
+                bullet.StartFire(skillLayer, damage, penetrationCount, Mathf.Clamp(bulletSpeed, 10f, 50f));
+                
                 // 발사체 스킬 딜레이 시간만큼 대기하기
                 yield return projectileDelayTime;
             }
@@ -152,14 +143,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 실행 위치들 초기화
         ResetExecutePositions();
-    }
-
-    private IEnumerator PauseEffectRoutine(List<Effect> effects)
-    {
-        yield return effectPauseTime;
-
-        foreach (var effect in effects)
-            effect.PauseEffect();
     }
 
     /// <summary>
