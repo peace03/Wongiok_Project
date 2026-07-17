@@ -410,6 +410,11 @@ public class Cinderella_Patterns : BossPatternBase
                     Parryed();
                     parryCount++;   // 패링 성공 누적 카운트 증가 (3회 도달 시 그로기)
                     comboStep++;    // 현재 공격 캔슬 및 다음 콤보 단계로 강제 스킵
+                    if(comboStep >= 3) //parryCount가 2이하에 3번째 패링 시 1프레임 더 돌아서 PlayTelegraph가 실행되는거 방어
+                    {
+                        attackDone = true;
+                        if(!CanTransitionToGroggy()) SetStateDone(true);
+                    }
                     return NodeState.Success;
                 })
             }),
@@ -483,6 +488,7 @@ public class Cinderella_Patterns : BossPatternBase
                         }),
                         new Leaf(() =>
                         {
+                            telegraphExcuted = false;
                             attackDone = true;
                             return SetStateDone(true); // 3연타 최종 완료
                         })
