@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour, IPoolable
     private LayerMask ownerLayer;                           // 소유자 레이어
     private float damage;                                   // 데미지
     private int penetrationCount;                           // 관통 횟수
-    public float bulletSpeed;                              // 총알 속도
+    private float bulletSpeed;                              // 총알 속도
 
     private IObjectPool<GameObject> returnRef;              // 반납 오브젝트 풀 주소
 
@@ -163,7 +163,7 @@ public class Bullet : MonoBehaviour, IPoolable
         // 풀 반환 완료 여부 초기화
         isReturnedToPool = false;
         // 최대 유지 시간 설정
-        //maxLifeTime = maxRange / speed;
+        maxLifeTime = maxRange / speed;
         // 반납 시간 초기화
         returnTime = new WaitForSeconds(maxLifeTime);
         // 타이머 시작
@@ -196,7 +196,7 @@ public class Bullet : MonoBehaviour, IPoolable
         // 관통 횟수 설정
         penetrationCount = count;
         // 총알 속도 설정
-        //bulletSpeed = speed;
+        bulletSpeed = speed;
     }
 
     /// <summary>

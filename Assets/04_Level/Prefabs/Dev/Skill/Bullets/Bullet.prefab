@@ -155,4 +155,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
   maxRange: 30
   maxLifeTime: 5
-  bulletSpeed: 25
+  bulletSpeed: 10
