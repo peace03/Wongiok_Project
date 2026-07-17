@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour, IPoolable
     private LayerMask ownerLayer;                           // 소유자 레이어
     private float damage;                                   // 데미지
     private int penetrationCount;                           // 관통 횟수
-    public float bulletSpeed;                              // 총알 속도
+    private float bulletSpeed;                              // 총알 속도
 
     private IObjectPool<GameObject> returnRef;              // 반납 오브젝트 풀 주소
 
