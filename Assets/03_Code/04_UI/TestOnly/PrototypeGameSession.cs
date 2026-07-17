@@ -27,6 +27,7 @@ public sealed class PrototypeProgressSnapshot
     public float MaxHp;
     public PlayerPersistentStatSnapshot PersistentStats;
     public PrototypeSkillState[] Skills;
+    public int[] OwnedSkillOrder;
 
     public PrototypeProgressSnapshot Clone()
     {
@@ -37,7 +38,8 @@ public sealed class PrototypeProgressSnapshot
             RequiredExp = RequiredExp,
             MaxHp = MaxHp,
             PersistentStats = PersistentStats,
-            Skills = Skills == null ? Array.Empty<PrototypeSkillState>() : Skills.ToArray()
+            Skills = Skills == null ? Array.Empty<PrototypeSkillState>() : Skills.ToArray(),
+            OwnedSkillOrder = OwnedSkillOrder == null ? Array.Empty<int>() : OwnedSkillOrder.ToArray()
         };
     }
 }
@@ -89,6 +91,13 @@ public static class PrototypeGameSession
                 new PrototypeSkillState(1001, 1, 0),
                 new PrototypeSkillState(1002, 1, 1),
                 new PrototypeSkillState(1003, 1, 2)
+            },
+            OwnedSkillOrder = new[]
+            {
+                1004, 1005, 1006, 1007,
+                -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1,
+                -1, -1, -1, -1
             }
         };
 

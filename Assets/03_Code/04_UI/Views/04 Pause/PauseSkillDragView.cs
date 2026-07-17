@@ -23,6 +23,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
     private int skillId = -1;
     private int sourceSlotIndex = -1;
     private bool canDrag;
+    private int sourceOwnedSlotIndex = -1;
 
     public PauseSkillDragSourceType SourceType => sourceType;
     public int SkillId => skillId;

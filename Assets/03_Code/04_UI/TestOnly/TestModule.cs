@@ -111,7 +111,7 @@ public class TestModule : MonoBehaviour
         if (_input.TestF10Pressed)
             ResetTestState();
 
-        if (_input.TestF2Pressed)
+        if (_input.TestF11Pressed)
             SaveCheckpoint();
 
         if (_input.SkillAPressed)

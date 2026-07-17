@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 
@@ -32,6 +31,9 @@ public class PrototypeSceneBridge : MonoBehaviour
     [SerializeField] private string inGameSceneName = "InGame";
 
     [SerializeField] private float testMinimumLoadingPreviewTime = 3f;
+    private AsyncOperation pendingInGameLoadOperation;
+    private int pendingInGameLoadChapterId = -1;
+    private bool isInGameLoading;
 
     // 프롤로그 영상
     [SerializeField] private VideoClip prologueVideoClip;
@@ -77,6 +79,7 @@ public class PrototypeSceneBridge : MonoBehaviour
 
         EventBus<UIChapterEnterRequestedEvent>.action += HandleChapterEnterRequested;
         EventBus<UIChapterTitleCardContinueRequestedEvent>.action += HandleChapterTitleCardContinueRequested;
+        EventBus<UIChapterTitleCardActivateSceneRequestedEvent>.action += HandleChapterTitleCardActivateSceneRequested;
     }
 
     private void OnDisable()
@@ -88,6 +91,7 @@ public class PrototypeSceneBridge : MonoBehaviour
 
         EventBus<UIChapterEnterRequestedEvent>.action -= HandleChapterEnterRequested;
         EventBus<UIChapterTitleCardContinueRequestedEvent>.action -= HandleChapterTitleCardContinueRequested;
+        EventBus<UIChapterTitleCardActivateSceneRequestedEvent>.action -= HandleChapterTitleCardActivateSceneRequested;
     }
 
     private void HandleCutsceneFinished(UICutsceneFinishedEvent eventData)
@@ -174,31 +178,45 @@ public class PrototypeSceneBridge : MonoBehaviour
 
     private void HandleChapterTitleCardContinueRequested(UIChapterTitleCardContinueRequestedEvent eventData)
     {
-        StartCoroutine(LoadInGame());
+        if (isInGameLoading) return;
+
+        StartCoroutine(LoadInGame(eventData.ChapterId));
     }
 
-    private IEnumerator LoadInGame()
+    private void HandleChapterTitleCardActivateSceneRequested(UIChapterTitleCardActivateSceneRequestedEvent eventData)
     {
-        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(inGameSceneName);
+        if (!isInGameLoading || pendingInGameLoadOperation == null || eventData.ChapterId != pendingInGameLoadChapterId) return;
 
-        // 테스트 용 (빌드 시 삭제 코드)
-        loadOperation.allowSceneActivation = false;
+        pendingInGameLoadOperation.allowSceneActivation = true;
+    }
+
+    private IEnumerator LoadInGame(int chapterId)
+    {
+        isInGameLoading = true;
+        pendingInGameLoadChapterId = chapterId;
+
+        pendingInGameLoadOperation = SceneManager.LoadSceneAsync(inGameSceneName);
+        pendingInGameLoadOperation.allowSceneActivation = false;
 
         float elapsedTime = 0f;
 
-        // 씬 로딩 기다림
-        while (loadOperation.progress < 0.9f || elapsedTime < testMinimumLoadingPreviewTime)
+        while (pendingInGameLoadOperation.progress < 0.9f || elapsedTime < testMinimumLoadingPreviewTime)
         {
             elapsedTime += Time.unscaledDeltaTime;
             yield return null;
         }
 
-        loadOperation.allowSceneActivation = true;
+        EventBus<UIChapterTitleCardLoadingReadyEvent>.Publish(
+            new UIChapterTitleCardLoadingReadyEvent(chapterId));
 
-        while (!loadOperation.isDone)
+        while (!pendingInGameLoadOperation.isDone)
         {
             yield return null;
         }
+
+        pendingInGameLoadOperation = null;
+        pendingInGameLoadChapterId = -1;
+        isInGameLoading = false;
     }
 
     private void ChangeScreenWithFade(System.Action changeScreenAction)

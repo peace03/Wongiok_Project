@@ -7,7 +7,7 @@ public class PauseSkillHoverPreviewView : MonoBehaviour, IPointerEnterHandler, I
     private UIPauseSkillInfoData skillData;
     private bool hasData;
 
-    public void Setup(PauseSkillPageView owner, UIPauseSkillInfoData skillData)
+    public void Setup(PauseSkillPageView owner, UIPauseSkillInfoData skillData, bool canHover)
     {
         this.owner = owner;
         this.skillData = skillData;

@@ -15,6 +15,12 @@ public class PrototypeTestScene : MonoBehaviour
     private UIPauseSkillInfoData[] currentPassiveSkills;
     private UIPauseSkillInfoData[] currentOwnedSkills;
 
+    [Header("액티브 스킬 카탈로그")]
+    [SerializeField] private ActiveSkillData[] activeSkillCatalog = new ActiveSkillData[21];
+
+    private const int EquippedSkillSlotCount = 3;
+    private const int OwnedSkillSlotCount = 18;
+
     private static readonly string[] SkillKeyTexts = { "A", "S", "D" };
 
     private float[] skillCooldownRemaining = new float[3];
@@ -474,6 +480,20 @@ public class PrototypeTestScene : MonoBehaviour
         currentOwnedSkills = nextOwnedSkills;
     }
 
+    private void BuildOwnedSkillSlots(PrototypeProgressSnapshot snapshot, int[] ownedSkillOrder)
+    {
+        currentOwnedSkills = new UIPauseSkillInfoData[OwnedSkillSlotCount];
+
+        for (int i = 0; i < OwnedSkillSlotCount; i++)
+        {
+            int skillId = ownedSkillOrder != null && i < ownedSkillOrder.Length
+                ? ownedSkillOrder[i]
+                : -1;
+
+            //currentOwnedSkills[i] = CreateOwnedSlotData(snapshot, skillId);
+        }
+    }
+
     private UIPauseSkillInfoData SetEquipped(UIPauseSkillInfoData skillData, bool isEquipped)
     {
         return new UIPauseSkillInfoData(
@@ -483,20 +503,6 @@ public class PrototypeTestScene : MonoBehaviour
             skillData.Description,
             isEquipped,
             skillData.SkillId);
-    }
-
-    private UIPauseSkillInfoData CreateSkillData(BaseSkillData skillData, bool isEquipped)
-    {
-        if (skillData == null)
-            return CreateEmptySkillData();
-
-        return new UIPauseSkillInfoData(
-            skillData.Icon,
-            skillData.SkillName,
-            1,
-            skillData.Desc,
-            isEquipped,
-            skillData.Id);
     }
 
     private UIPauseSkillInfoData CreateEmptySkillData()

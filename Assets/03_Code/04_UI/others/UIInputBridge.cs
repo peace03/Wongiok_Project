@@ -35,6 +35,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         HandleEscapeInput();
         HandlePauseTabInput();
         HandleSpaceInput();
+        HandleChapterLoadingSkipInput();
     }
 
     private void HandlePrologueSkipInput()
@@ -101,13 +102,21 @@ public class UIInputBridge : MonoBehaviour, IInitializable
 
     private void HandleSpaceInput()
     {
-        if (!_input.useGUILayout)
-            return;
+        if (uiManager.CurrentScreenState != UIScreenState.ChapterTitleCard) return;
 
-        if (uiManager.CurrentScreenState != UIScreenState.ChapterTitleCard)
-            return;
+        if (!_input.SubmitPressed) return;
 
         EventBus<UIChapterTitleCardInputContinueRequestedEvent>.Publish(
             new UIChapterTitleCardInputContinueRequestedEvent());
+    }
+
+    private void HandleChapterLoadingSkipInput()
+    {
+        if (uiManager.CurrentScreenState != UIScreenState.ChapterTitleCard) return;
+
+        if (!_input.TitleStartPressed) return;
+
+        EventBus<UIChapterTitleCardInputSkipRequestedEvent>.Publish(
+            new UIChapterTitleCardInputSkipRequestedEvent());
     }
 }
