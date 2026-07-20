@@ -217,10 +217,12 @@ public class PauseSkillPageView : MonoBehaviour
                 equippedActiveSkillViews[i].Setup(currentEquippedActiveSkills[i]);
                 equippedActiveSkillViews[i].SetDetailVisible(false);
 
-                //if (equippedActiveSkillViews[i].TryGetComponent(out PauseSkillHoverPreviewView hoverView))
-                //{
-                //    hoverView.Setup(this, currentEquippedActiveSkills[i]);
-                //}
+                if (equippedActiveSkillViews[i].TryGetComponent(out PauseSkillHoverPreviewView hoverView))
+                {
+                    UIPauseSkillInfoData skillData = currentEquippedActiveSkills[i];
+
+                    hoverView.Setup(this, skillData, skillData.IsUnlocked);
+                }
             }
             else
             {

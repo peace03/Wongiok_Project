@@ -32,7 +32,7 @@ public class PauseSkillInfoView : MonoBehaviour
 
         SetText(nameText, isLocked ? string.Empty : data.SkillName);
         SetText(levelText, isLocked ? string.Empty : $"Lv.{data.Level}");
-        SetText(descriptionText, string.Empty);
+        SetText(descriptionText, data.Description);
 
         if (lockImage != null)
         {
