@@ -1,14 +1,14 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(GameInputReader))]
 public class PlayerController : MonoBehaviour
 {
     #region 플레이어 관련 변수, 상태, 참조등
     // 현재 실행 중인 플레이어 상태입니다.
     private PlayerBaseState _currentState;
 
-    // Input System에서 생성된 입력 액션 클래스입니다.
-    private PlayerInputAction _input;
+    // Input System 값을 읽어 제공하는 입력 전용 컴포넌트입니다.
+    private GameInputReader _inputReader;
 
     // 충돌과 이동을 담당하는 Unity CharacterController입니다.
     private CharacterController _cc;
@@ -81,18 +81,16 @@ public class PlayerController : MonoBehaviour
     #endregion
     private void Awake()
     {
-        // 입력 액션과 필수 컴포넌트들을 초기화합니다.
+        // 입력 전용 컴포넌트와 필수 컴포넌트들을 초기화합니다.
         EnsurePlayerParry();
+        _inputReader = GetComponent<GameInputReader>();
+
+        if (_inputReader == null)
+            _inputReader = gameObject.AddComponent<GameInputReader>();
 
         // 실제 참조 캐싱과 상태 생성은 PlayerInitializer에서 순서를 보장해 처리합니다.
 
         // 상태 객체를 미리 만들어두고, 이후에는 TransitionTo로 상태만 교체합니다.
-    }
-
-    private void OnEnable()
-    {
-        // 오브젝트가 활성화될 때 입력을 받을 수 있게 합니다.
-        _input?.Enable();
     }
 
     public void Initialize(
@@ -104,7 +102,6 @@ public class PlayerController : MonoBehaviour
         // PlayerInitializer에서 넘긴 플레이어 하위 컴포넌트를 캐싱하고 상태 객체를 한 번만 생성합니다.
         EnsurePlayerParry();
 
-        _input ??= new PlayerInputAction();
         _cc = GetComponent<CharacterController>();
         _moveMent = movement != null ? movement : GetComponent<PlayerMovement>();
         _attack = attack != null ? attack : GetComponent<PlayerAttack>();
@@ -122,8 +119,6 @@ public class PlayerController : MonoBehaviour
 
         isInitialized = true;
 
-        if (isActiveAndEnabled)
-            _input.Enable();
     }
 
     public void EnterInitialState()
@@ -132,12 +127,6 @@ public class PlayerController : MonoBehaviour
         if (!isInitialized) return;
 
         TransitionTo(PlayerIdleState);
-    }
-
-    private void OnDisable()
-    {
-        // 비활성화 시 입력도 함께 끄면 불필요한 입력 처리와 이벤트 누수를 막을 수 있습니다.
-        _input?.Disable();
     }
 
     private void Start()
@@ -250,14 +239,14 @@ public class PlayerController : MonoBehaviour
 
     private void PlayerInput()
     {
-        // Input System 액션에서 현재 프레임 입력 값을 읽어 상태들이 사용할 수 있게 저장합니다.
-        MoveInput = _input.Player.Move.ReadValue<Vector2>();
-        JumpTriggered = _input.Player.Jump.WasPressedThisFrame();
-        IsJumping = _input.Player.Jump.IsPressed();
-        AttackTriggered = _input.Player.Attack.WasPressedThisFrame();
-        DashTriggered = _input.Player.Dash.WasPressedThisFrame();
-        ParryTriggered = _input.Player.Parry.WasPressedThisFrame();
-        UseHealItemTriggered = _input.Player.UseHealItem.WasPressedThisFrame();
+        // 입력 전용 컴포넌트에서 현재 프레임 입력 값을 읽어 상태들이 사용할 수 있게 저장합니다.
+        MoveInput = _inputReader.MoveInput;
+        JumpTriggered = _inputReader.JumpTriggered;
+        IsJumping = _inputReader.IsJumping;
+        AttackTriggered = _inputReader.AttackTriggered;
+        DashTriggered = _inputReader.DashTriggered;
+        ParryTriggered = _inputReader.ParryTriggered;
+        UseHealItemTriggered = _inputReader.UseHealItemTriggered;
     }
 
     private void UpdateFacingDirection()
@@ -269,12 +258,20 @@ public class PlayerController : MonoBehaviour
         // x 입력을 기준으로 마지막 바라본 방향을 갱신합니다.
         if (MoveInput.x > 0f)
         {
-            _isFacingRight = true;
+            SetFacingDirection(true);
         }
         else if (MoveInput.x < 0f)
         {
-            _isFacingRight = false;
+            SetFacingDirection(false);
         }
+    }
+
+    private void SetFacingDirection(bool isFacingRight)
+    {
+        if (_isFacingRight == isFacingRight)
+            return;
+
+        _isFacingRight = isFacingRight;
     }
 
     private void HandleAttackInput()

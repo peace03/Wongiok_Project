@@ -41,3 +41,11 @@ This Unity project uses Karpathy-inspired coding guidelines to keep AI-assisted 
 - Keep runtime logic out of `Update()` unless frame-by-frame behavior is necessary.
 - For stat, combat, inventory, and UI systems, separate data calculation from presentation/UI updates.
 - When changing gameplay formulas, state the formula before editing and verify with at least one concrete example.
+
+## 6. Architecture And Design Guidance
+
+- Explain and design system structures using established production game-development workflows as the baseline.
+- Describe component responsibilities, state transitions, data flow, lifecycle, failure cases, and verification points before proposing implementation details.
+- Distinguish common industry practice from project-specific choices, and explain the tradeoffs when adapting that practice to this project's existing architecture and scope.
+- Prefer the smallest production-ready design that fits the current project instead of copying large-scale patterns or adding speculative abstractions.
+- For Unity gameplay systems, account for animation-event timing, physics update timing, collider lifecycle, duplicate callbacks, and explicit state cleanup.

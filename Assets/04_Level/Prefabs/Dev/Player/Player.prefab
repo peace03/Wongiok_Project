@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5940288447506964194}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: FirePosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53,15 +53,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 98.4
+      value: 138.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.46
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 60
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_LocalRotation.w
@@ -93,7 +93,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_Name
@@ -101,7 +101,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -143,6 +147,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8650343130422386955}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1102723354271703662}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 225248562857805736}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2752539239372548199}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 165371711297624294}
   m_SourcePrefab: {fileID: 100100000, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}
 --- !u!1 &6195647787250270839 stripped
 GameObject:
@@ -255,7 +271,7 @@ MonoBehaviour:
   bulletFactory: {fileID: 0}
   ownerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   penetrationCount: 0
 --- !u!114 &2325928613518686973
 MonoBehaviour:
@@ -342,6 +358,57 @@ MonoBehaviour:
   startLevel: 1
   expPerLevel: 100
   currentExp: 0
+--- !u!114 &1102723354271703662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f6db590c61a4f5894a70ce9758d3b21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameInputReader
+--- !u!114 &225248562857805736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ae08be25d1d08746b8cf5fa18bc3896, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CheckpointHealSystem
+  playerStatus: {fileID: 3981435725155728153}
+  lifeTracker: {fileID: 6448603118492817629}
+  healItemInventory: {fileID: 8121973273855103618}
+--- !u!114 &2752539239372548199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b436235ab5e320c45b5fa30a00635c2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CheckpointPlayerAgent
+--- !u!114 &165371711297624294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195647787250270839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61fe390158b94084a96f804ab5530f31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInitializer
 --- !u!4 &6823107894079953101 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 126e366b5f44329459fb74c23ca5dd11, type: 3}

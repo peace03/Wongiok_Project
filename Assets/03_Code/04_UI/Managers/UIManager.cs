@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 // EventBus와 Bootstrapper에서의 초기화 진행을 위한 수정이 필요합니다.
@@ -31,6 +30,7 @@ public class UIManager : MonoBehaviour, IInitializable
     // 서로 동시에 떠 있으면 안 되는 기본 화면 View 목록입니다.
     [Header("Screen Views")]
     [SerializeField] private List<ScreenBinding> screenBindings = new();
+    [SerializeField] private UIScreenState initialScreenState = UIScreenState.Title;
 
     // 기본 화면 위에 올라오는 차단형 UI View 목록입니다.
     [Header("Overlay Views")]
@@ -104,7 +104,7 @@ public class UIManager : MonoBehaviour, IInitializable
         CurrentOverlayState = UIOverlayState.None;
         Time.timeScale = 1f;
 
-        ChangeScreen(UIScreenState.Title);
+        ChangeScreen(initialScreenState);
     }
 
     // UI 관련 EventBus 이벤트를 UIManager의 실제 처리 메서드에 연결합니다.

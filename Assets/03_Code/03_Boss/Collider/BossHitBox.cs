@@ -27,7 +27,7 @@ public class BossHitBox : MonoBehaviour, IInitializable
 
     private void SetIsTriggered(AttackFinishEvent data) { isTriggered = false; }
 
-    private void OnTriggerEnter(Collider other) //공격력 플레이어에게 넘겨주기
+    private void OnTriggerEnter(Collider other) //플레이어가 공격 범위 내에 있음
     {
         if (other.CompareTag("Player") && !isTriggered)
         {
@@ -36,6 +36,11 @@ public class BossHitBox : MonoBehaviour, IInitializable
                 TakeDamage(AtkPower.GetAtkPower(AtkType));
         }
     }
+
+    //private void OnTriggerExit(Collider other) //플레이어가 공격 범위 내에 없음
+    //{
+    //
+    //}
 
     private void OnDrawGizmos()
     {

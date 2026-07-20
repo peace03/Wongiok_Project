@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
+using UnityEngine.Video;
 
 
 // 테스트 씬 전환
@@ -17,17 +19,29 @@ public class PrototypeSceneBridge : MonoBehaviour
         [TextArea] public string description;
         public Sprite thumbnail;
         public Sprite background;
+        public VideoClip loadingVideoClip;
     }
+
+    [Header("페이드")]
+    [SerializeField] private float fadeOutDuration = 0.35f;
+    [SerializeField] private float fadeInDuration = 0.35f;
+
+
 
     [SerializeField] private List<ChapterTitleCardBinding> chapterTitleCards = new();
     [SerializeField] private string inGameSceneName = "InGame";
-    [SerializeField] private float testLoadingTime = 3f;
+
+    [SerializeField] private float testMinimumLoadingPreviewTime = 3f;
+
+    // 프롤로그 영상
+    [SerializeField] private VideoClip prologueVideoClip;
+
 
     private IEnumerator Start()
     {
         PrototypeGameSession.EnsureInitialized();
 
-        yield return null;
+        yield return null;  
 
         EventBus<UISetTitleSaveStateEvent>.Publish(
             new UISetTitleSaveStateEvent(PrototypeGameSession.HasSaveData));
@@ -36,12 +50,17 @@ public class PrototypeSceneBridge : MonoBehaviour
             new UISetChapterProgressEvent(
                 PrototypeGameSession.HighestClearedChapterId));
 
+        EventBus<UISetCutsceneEvent>.Publish(
+            new UISetCutsceneEvent("prologue", prologueVideoClip, string.Empty));
+
         if (PrototypeGameSession.TryConsumePendingTitleCard(out int chapterId))
             ShowChapterTitleCard(chapterId);
     }
 
     private void OnEnable()
     {
+        EventBus<UICutsceneFinishedEvent>.action += HandleCutsceneFinished;
+
         EventBus<UITitleNewGameRequestedEvent>.action += HandleTitleNewGameRequested;
         EventBus<UITitleContinueRequestedEvent>.action += HandleTitleContinueRequested;
 
@@ -51,11 +70,24 @@ public class PrototypeSceneBridge : MonoBehaviour
 
     private void OnDisable()
     {
+        EventBus<UICutsceneFinishedEvent>.action -= HandleCutsceneFinished;
+
         EventBus<UITitleNewGameRequestedEvent>.action -= HandleTitleNewGameRequested;
         EventBus<UITitleContinueRequestedEvent>.action -= HandleTitleContinueRequested;
 
         EventBus<UIChapterEnterRequestedEvent>.action -= HandleChapterEnterRequested;
         EventBus<UIChapterTitleCardContinueRequestedEvent>.action -= HandleChapterTitleCardContinueRequested;
+    }
+
+    private void HandleCutsceneFinished(UICutsceneFinishedEvent eventData)
+    {
+        if (eventData.CutsceneId != "prologue") return;
+
+        ChangeScreenWithFade(() =>
+        {
+            EventBus<UIChangeScreenEvent>.Publish(
+            new UIChangeScreenEvent(UIScreenState.Title));
+        });
     }
 
     private void ShowChapterTitleCard(int chapterId, Sprite fallbackThumbnail = null, Sprite fallbackBackground = null)
@@ -83,7 +115,8 @@ public class PrototypeSceneBridge : MonoBehaviour
                     binding.subtitle,
                     binding.description,
                     thumbnail,
-                    background));
+                    background,
+                    binding.loadingVideoClip));
 
             return;
         }
@@ -99,27 +132,33 @@ public class PrototypeSceneBridge : MonoBehaviour
 
     private void HandleTitleNewGameRequested(UITitleNewGameRequestedEvent eventData)
     {
-        PrototypeGameSession.StartNewGame();
+        ChangeScreenWithFade(() =>
+        {
+            PrototypeGameSession.StartNewGame();
 
-        EventBus<UISetTitleSaveStateEvent>.Publish(
-            new UISetTitleSaveStateEvent(true));
+            EventBus<UISetTitleSaveStateEvent>.Publish(
+                new UISetTitleSaveStateEvent(true));
 
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.ChapterSelect));
+            EventBus<UIChangeScreenEvent>.Publish(
+                new UIChangeScreenEvent(UIScreenState.ChapterSelect));
 
-        EventBus<UISetChapterProgressEvent>.Publish(
-            new UISetChapterProgressEvent(PrototypeGameSession.HighestClearedChapterId));
+            EventBus<UISetChapterProgressEvent>.Publish(
+                new UISetChapterProgressEvent(PrototypeGameSession.HighestClearedChapterId));
+        });
     }
 
     private void HandleTitleContinueRequested(UITitleContinueRequestedEvent eventData)
     {
-        PrototypeGameSession.EnsureInitialized();
+        ChangeScreenWithFade(() =>
+        {
+            PrototypeGameSession.EnsureInitialized();
 
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.ChapterSelect));
+            EventBus<UIChangeScreenEvent>.Publish(
+                new UIChangeScreenEvent(UIScreenState.ChapterSelect));
 
-        EventBus<UISetChapterProgressEvent>.Publish(
-            new UISetChapterProgressEvent(PrototypeGameSession.HighestClearedChapterId));
+            EventBus<UISetChapterProgressEvent>.Publish(
+                new UISetChapterProgressEvent(PrototypeGameSession.HighestClearedChapterId));
+        });
     }
 
     private void HandleChapterTitleCardContinueRequested(UIChapterTitleCardContinueRequestedEvent eventData)
@@ -129,29 +168,44 @@ public class PrototypeSceneBridge : MonoBehaviour
 
     private IEnumerator LoadInGame()
     {
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.Loading));
+        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(inGameSceneName);
+
+        // 테스트 용 (빌드 시 삭제 코드)
+        loadOperation.allowSceneActivation = false;
 
         float elapsedTime = 0f;
 
-        EventBus<UISetLoadingProgressEvent>.Publish(
-            new UISetLoadingProgressEvent(0f, "페이지 넘기는 중 . . ."));
-
-        while (elapsedTime < testLoadingTime)
+        // 씬 로딩 기다림
+        while (loadOperation.progress < 0.9f || elapsedTime < testMinimumLoadingPreviewTime)
         {
             elapsedTime += Time.unscaledDeltaTime;
-
-            float progress = testLoadingTime <= 0f ? 1f : Mathf.Clamp01(elapsedTime / testLoadingTime);
-
-            EventBus<UISetLoadingProgressEvent>.Publish(
-                new UISetLoadingProgressEvent(progress, "페이지 넘기는 중 . . ."));
-
             yield return null;
         }
 
-        EventBus<UISetLoadingProgressEvent>.Publish(
-            new UISetLoadingProgressEvent(1f, "페이지 넘기는 중 . . ."));
+        loadOperation.allowSceneActivation = true;
 
-        SceneManager.LoadScene(inGameSceneName);
+        while (!loadOperation.isDone)
+        {
+            yield return null;
+        }
+    }
+
+    private void ChangeScreenWithFade(System.Action changeScreenAction)
+    {
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                0f,
+                1f,
+                fadeOutDuration,
+                () =>
+                {
+                    changeScreenAction?.Invoke();
+
+                    EventBus<UIFadeEvent>.Publish(
+                        new UIFadeEvent(
+                            1f,
+                            0f,
+                            fadeInDuration));
+                }));
     }
 }

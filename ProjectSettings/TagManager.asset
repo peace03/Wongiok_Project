@@ -13,6 +13,18 @@ TagManager:
   - 
   - Water
   - UI
+  - Player
+  - Bullet
+  - Enemy
+  - PlayerProjectile
+  - EnemyProjectile
+  - 
+  - CheckPoint
+  - HealItem
+  - Boss
+  - CharaterPreview
+  - 
+  - Player
   - 
   - Player
   - 
@@ -23,19 +35,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
   - 
   - 
   - 

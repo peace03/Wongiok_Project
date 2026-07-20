@@ -1,5 +1,5 @@
 using UnityEngine;
-using static UnityEditor.LightingExplorerTableColumn;
+//using static UnityEditor.LightingExplorerTableColumn;
 
 public class ShardAreaHitBox : MonoBehaviour
 {

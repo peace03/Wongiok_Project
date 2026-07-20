@@ -17,6 +17,8 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
     private bool hasHealItemState;
     private bool hasExperienceState;
 
+    private UIPauseSkillInfoData[] currentEquippedActiveSkills = System.Array.Empty<UIPauseSkillInfoData>();
+
     public int Priority => (int)InitOrder.PlayerUIBridge;
 
     public void Init()
@@ -43,6 +45,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         EventBus<PlayerExperienceChangedEvent>.action += HandlePlayerExperienceChanged;
         EventBus<PlayerDeadEvent>.action += HandlePlayerDead;
         EventBus<UIChangeScreenEvent>.action += HandleChangeScreen;
+        EventBus<RefreshUIEventT>.action += HandleRefreshUI;
     }
 
     private void UnsubscribeEvents()
@@ -53,6 +56,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         EventBus<PlayerExperienceChangedEvent>.action -= HandlePlayerExperienceChanged;
         EventBus<PlayerDeadEvent>.action -= HandlePlayerDead;
         EventBus<UIChangeScreenEvent>.action -= HandleChangeScreen;
+        EventBus<RefreshUIEventT>.action -= HandleRefreshUI;
     }
 
     private void HandlePlayerHealthChanged(PlayerHealthChangedEvent eventData)
@@ -133,6 +137,12 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         PublishCurrentPlayerHudState();
     }
 
+    private void HandleRefreshUI(RefreshUIEventT eventData)
+    {
+        currentEquippedActiveSkills = eventData.EquippedActiveSkills ?? System.Array.Empty<UIPauseSkillInfoData>();
+
+        PublishPauseStatus();
+    }
     private void PublishCurrentPlayerHudState()
     {
         if (hasExperienceState)
@@ -177,7 +187,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
                 maxHp,
                 GetDisplayLifeCount(),
                 GetDisplayMaxLifeCount(),
-                System.Array.Empty<UIPauseSkillInfoData>(),
+                currentEquippedActiveSkills,
                 System.Array.Empty<UIPauseSkillInfoData>()));
     }
 

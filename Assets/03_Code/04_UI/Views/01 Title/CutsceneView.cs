@@ -112,6 +112,12 @@ public class CutsceneView : UIViewBase
         if (isSkipPopupOpen)
             return;
 
+        if (currentCutsceneId == "prologue")
+        {
+            FinishedCutscene(true);
+            return;
+        }
+
         PauseCurrentCutscene();
         ShowSkipConfirmPopup();
     }
@@ -133,7 +139,7 @@ public class CutsceneView : UIViewBase
         if (skipGuideObject != null)
             skipGuideObject.SetActive(true);
 
-        SetText(skipGuideText, "ESC: Skip");
+        SetText(skipGuideText, currentCutsceneId == "prologue" ? "~ : Skip" : "ESC : Skip");
     }
 
     // 현재 저장된 VideoClip을 비디오 플레이어에 넣고 재생
