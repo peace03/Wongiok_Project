@@ -32,6 +32,7 @@ public class TestModule : MonoBehaviour
     private BaseSkillData[] cachedActiveSkillDatas;
     private UIPauseSkillInfoData[] cachedEquippedActiveSkills;
     private UIPauseSkillInfoData[] cachedOwnedSkills;
+    private int[] cachedOwnedSkillOrder;
     [SerializeField] private PlayerStatus playerStatus;
     [SerializeField] private PlayerExperienceTracker playerExperienceTracker;
 
@@ -147,7 +148,7 @@ public class TestModule : MonoBehaviour
         {
             foreach (UIPauseSkillInfoData skill in cachedOwnedSkills)
             {
-                if (skill.SkillId >= 0)
+                if (skill.SkillId >= 0 && skill.IsUnlocked)
                     skills.Add(new PrototypeSkillState(skill.SkillId, skill.Level, -1));
             }
         }
@@ -161,7 +162,10 @@ public class TestModule : MonoBehaviour
             PersistentStats = status != null
                 ? status.CapturePersistentStatSnapshot()
                 : default,
-            Skills = skills.ToArray()
+            Skills = skills.ToArray(),
+            OwnedSkillOrder = cachedOwnedSkillOrder == null
+                ? System.Array.Empty<int>()
+                : cachedOwnedSkillOrder.ToArray()
         };
     }
 
@@ -252,7 +256,8 @@ public class TestModule : MonoBehaviour
         EventBus<TestRestoreSkillCheckpointEvent>.Publish(
             new TestRestoreSkillCheckpointEvent(
                 CloneSkills(cachedEquippedActiveSkills),
-                CloneSkills(cachedOwnedSkills)));
+                CloneSkills(cachedOwnedSkills),
+                snapshot.OwnedSkillOrder));
 
         EventBus<UISetBossHudVisibleEvent>.Publish(
             new UISetBossHudVisibleEvent(false));
@@ -301,17 +306,6 @@ public class TestModule : MonoBehaviour
         OpenLevelUpOverlay();
     }
 
-    //private void DamagePlayer()
-    //{
-    //    currentHp = Mathf.Max(0f, currentHp - hpDamageAmount);
-
-    //    if (currentHp > 0f)
-    //    {
-    //        PublishPlayerState();
-    //        return;
-    //    }
-    //    HandlePlayerDeath();
-    //}
     private void DamagePlayer()
     {
         PlayerStatus status = GetPlayerStatus();
@@ -414,6 +408,7 @@ public class TestModule : MonoBehaviour
     {
         cachedEquippedActiveSkills = CloneSkills(eventData.EquippedActiveSkills);
         cachedOwnedSkills = CloneSkills(eventData.OwnedSkills);
+        cachedOwnedSkillOrder = eventData.OwnedSkillOrder;
     }
 
     private void HandlePlayerLevelUp(PlayerLevelUpEvent eventData)
@@ -615,6 +610,7 @@ public class TestModule : MonoBehaviour
         return options;
     }
 
+    //참조 안함
     //private UILevelUpSkillOptionData[] CreateFallbackLevelUpOptionsFromResource()
     //{
     //    BaseSkillData[] skillDatas = LoadSkillDatas();
@@ -708,13 +704,17 @@ public struct TestRestoreSkillCheckpointEvent
 {
     public UIPauseSkillInfoData[] EquippedSkills { get; private set; }
     public UIPauseSkillInfoData[] OwnedSkills { get; private set; }
+    public int[] OwnedSkillOrder { get; private set;  }
 
     public TestRestoreSkillCheckpointEvent(
         UIPauseSkillInfoData[] equippedSkills,
-        UIPauseSkillInfoData[] ownedSkills)
+        UIPauseSkillInfoData[] ownedSkills,
+        int[] ownedSkillOrder)
     {
         EquippedSkills = equippedSkills;
         OwnedSkills = ownedSkills;
+        OwnedSkillOrder = ownedSkillOrder;
+
     }
 }
 

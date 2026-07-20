@@ -28,6 +28,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
     public PauseSkillDragSourceType SourceType => sourceType;
     public int SkillId => skillId;
     public int SourceSlotIndex => sourceSlotIndex;
+    public int SourceOwnedSlotIndex => sourceOwnedSlotIndex;
 
     private void Awake()
     {
@@ -39,10 +40,11 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         HideDragPreview();
     }
 
-    public void SetupOwnedSkill(int skillId, bool canDrag = true)
+    public void SetupOwnedSkill(int skillId, int sourceOwnedSlotIndex, bool canDrag)
     {
         sourceType = PauseSkillDragSourceType.OwnedSkill;
         this.skillId = skillId;
+        this.sourceOwnedSlotIndex = sourceOwnedSlotIndex;
         sourceSlotIndex = -1;
         this.canDrag = canDrag && skillId >= 0;
     }
@@ -67,6 +69,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         sourceType = PauseSkillDragSourceType.None;
         skillId = -1;
         sourceSlotIndex = -1;
+        sourceOwnedSlotIndex = -1;
         canDrag = false;
         HideDragPreview();
         RestoreOriginalVisual();

@@ -41,7 +41,7 @@ public class PauseSkillInfoView : MonoBehaviour
 
         if (equippedMarkObject != null)
         {
-            equippedMarkObject.SetActive(false);
+            equippedMarkObject.SetActive(data.IsEquipped);
         }
 
     }

@@ -35,7 +35,6 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<UIPauseQuitGameRequestedEvent>.action += HandlePauseOuitGameRequested;
         EventBus<UIPauseSkillEquipRequestedEvent>.action += HandlePauseSkillEquipRequested;
         EventBus<UIPauseSkillSwapRequestedEvent>.action += HandlePauseSkillSwapRequested;
-        EventBus<UIPauseSkillUnequipRequestedEvent>.action += HandlePauseSkillUnequipRequsted;
         EventBus<UILevelUpSkillSelectedEvent>.action += HandleLevelUpSkillSelected;
         EventBus<TestRestoreSkillCheckpointEvent>.action += HandleRestoreSkillCheckpoint;
         EventBus<TestPlayerSkillUsedEvent>.action += HandleTestPlayerSkillUsed;
@@ -48,7 +47,6 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<UIPauseQuitGameRequestedEvent>.action -= HandlePauseOuitGameRequested;
         EventBus<UIPauseSkillEquipRequestedEvent>.action -= HandlePauseSkillEquipRequested;
         EventBus<UIPauseSkillSwapRequestedEvent>.action -= HandlePauseSkillSwapRequested;
-        EventBus<UIPauseSkillUnequipRequestedEvent>.action -= HandlePauseSkillUnequipRequsted;
         EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
         EventBus<TestRestoreSkillCheckpointEvent>.action -= HandleRestoreSkillCheckpoint;
         EventBus<TestPlayerSkillUsedEvent>.action -= HandleTestPlayerSkillUsed;
@@ -123,32 +121,9 @@ public class PrototypeTestScene : MonoBehaviour
         for (int i = 0; i < currentActiveSkills.Length; i++)
             currentActiveSkills[i] = CreateEmptySkillData();
 
-        List<UIPauseSkillInfoData> ownedSkills = new();
+        BuildEquippedSkills(snapshot);
+        BuildOwnedSkillSlots(snapshot);
 
-        foreach (PrototypeSkillState state in snapshot.Skills)
-        {
-            BaseSkillData data = skillDatas.FirstOrDefault(skill => skill.Id == state.SkillId);
-
-            if (data == null)
-                continue;
-
-            bool isEquipped = state.SlotIndex >= 0 && state.SlotIndex < currentActiveSkills.Length;
-
-            UIPauseSkillInfoData uiData = new(
-                data.Icon,
-                data.SkillName,
-                Mathf.Max(1, state.Level),
-                data.Desc,
-                isEquipped,
-                data.Id);
-
-            if (isEquipped)
-                currentActiveSkills[state.SlotIndex] = uiData;
-            else
-                ownedSkills.Add(uiData);
-        }
-
-        currentOwnedSkills = ownedSkills.ToArray();
         currentPassiveSkills = System.Array.Empty<UIPauseSkillInfoData>();
     }
 
@@ -163,7 +138,10 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<RefreshUIEventT>.Publish(
             new RefreshUIEventT(
                 currentActiveSkills,
-                currentOwnedSkills));
+                currentOwnedSkills,
+                currentOwnedSkills
+                    .Select(skill => skill.SkillId)
+                    .ToArray()));
 
         PublishCurrentPlayerSkillSlots();
     }
@@ -191,7 +169,8 @@ public class PrototypeTestScene : MonoBehaviour
             nextLevel,
             skill.Description,
             skill.IsEquipped,
-            skill.SkillId);
+            skill.SkillId,
+            skill.IsUnlocked);
 
         return true;
     }
@@ -220,26 +199,28 @@ public class PrototypeTestScene : MonoBehaviour
         if (!IsValidSlotIndex(eventData.TargetSlotIndex))
             return;
 
-        int ownedIndex = FindSkillIndex(currentOwnedSkills, eventData.SkillId);
+        int ownedIndex = eventData.SourceOwnedSlotIndex;
+
+        if (!IsValidSlotIndex(eventData.TargetSlotIndex) || ownedIndex < 0 || ownedIndex >= currentOwnedSkills.Length)
+        {
+            return;
+        }
+
+        UIPauseSkillInfoData selectedSkill = currentOwnedSkills[ownedIndex];
+
+        UIPauseSkillInfoData previousSkill = currentActiveSkills[eventData.TargetSlotIndex];
+
+        if (!selectedSkill.IsUnlocked || selectedSkill.SkillId < 0 || previousSkill.SkillId < 0)
+        {
+            return;
+        }
 
         if (ownedIndex < 0)
             return;
 
-        UIPauseSkillInfoData selectedOwnedSkill = currentOwnedSkills[ownedIndex];
-        UIPauseSkillInfoData previousEquippedSkill = currentActiveSkills[eventData.TargetSlotIndex];
+        currentActiveSkills[eventData.TargetSlotIndex] = SetEquipped(selectedSkill, true);
 
-        currentActiveSkills[eventData.TargetSlotIndex] = SetEquipped(selectedOwnedSkill, true);
-
-        List<UIPauseSkillInfoData> nextOwnedSkills = currentOwnedSkills.ToList();
-
-        nextOwnedSkills.RemoveAt(ownedIndex);
-
-        if (previousEquippedSkill.SkillId >= 0)
-        {
-            nextOwnedSkills.Add(SetEquipped(previousEquippedSkill, false));
-        }
-
-        currentOwnedSkills = nextOwnedSkills.ToArray();
+        currentOwnedSkills[ownedIndex] = SetEquipped(previousSkill, false);
 
         ResetSkillCooldown(eventData.TargetSlotIndex);
         PublishCurrentPauseData();
@@ -266,25 +247,6 @@ public class PrototypeTestScene : MonoBehaviour
         PublishCurrentPauseData();
     }
 
-    private void HandlePauseSkillUnequipRequsted(UIPauseSkillUnequipRequestedEvent eventData)
-    {
-        EnsurePauseTestData();
-
-        if (!IsValidSlotIndex(eventData.SourceSlotIndex))
-            return;
-
-        UIPauseSkillInfoData unequippedSkill = currentActiveSkills[eventData.SourceSlotIndex];
-
-        if (unequippedSkill.SkillId < 0)
-            return;
-
-        currentActiveSkills[eventData.SourceSlotIndex] = CreateEmptySkillData();
-        AddOwnedSkill(SetEquipped(unequippedSkill, false));
-
-        ResetSkillCooldown(eventData.SourceSlotIndex);
-        PublishCurrentPauseData();
-    }
-
     private void HandleLevelUpSkillSelected(UILevelUpSkillSelectedEvent eventData)
     {
         EnsurePauseTestData();
@@ -303,12 +265,54 @@ public class PrototypeTestScene : MonoBehaviour
             ? System.Array.Empty<UIPauseSkillInfoData>()
             : eventData.EquippedSkills.ToArray();
 
-        currentOwnedSkills = eventData.OwnedSkills == null
-            ? System.Array.Empty<UIPauseSkillInfoData>()
-            : eventData.OwnedSkills.ToArray();
+        RestoreOwnedSkillSlots(eventData.OwnedSkills, eventData.OwnedSkillOrder);
 
         ResetSkillCooldowns();
         PublishCurrentPauseData();
+    }
+
+    private void RestoreOwnedSkillSlots(UIPauseSkillInfoData[] restoredOwnedSkills, int[] ownedSkillOrder)
+    {
+        HashSet<int> unlockedSkillIds = new HashSet<int>();
+
+        if (restoredOwnedSkills != null)
+        {
+            foreach (UIPauseSkillInfoData skill in restoredOwnedSkills)
+            {
+                if (skill.SkillId >= 0 && skill.IsUnlocked)
+                {
+                    unlockedSkillIds.Add(skill.SkillId);
+                }
+            }
+        }
+
+        currentOwnedSkills = new UIPauseSkillInfoData[OwnedSkillSlotCount];
+
+        for (int i = 0; i < OwnedSkillSlotCount; i++)
+        {
+            int skillId = ownedSkillOrder != null && i < ownedSkillOrder.Length
+                            ? ownedSkillOrder[i]
+                            : -1;
+
+            ActiveSkillData skillData = FindCatalogSkillData(skillId);
+
+            if (skillData == null)
+            {
+                currentOwnedSkills[i] = CreateEmptySkillData();
+                continue;
+            }
+
+            bool isUnlocked = unlockedSkillIds.Contains(skillId);
+
+            currentOwnedSkills[i] = new UIPauseSkillInfoData(
+                skillData.Icon,
+                skillData.SkillName,
+                1,
+                skillData.Desc,
+                false,
+                skillData.Id,
+                isUnlocked);
+        }
     }
 
     private void PublishCurrentPlayerSkillSlots()
@@ -480,17 +484,115 @@ public class PrototypeTestScene : MonoBehaviour
         currentOwnedSkills = nextOwnedSkills;
     }
 
-    private void BuildOwnedSkillSlots(PrototypeProgressSnapshot snapshot, int[] ownedSkillOrder)
+    private void BuildEquippedSkills(PrototypeProgressSnapshot snapshot)
+    {
+        currentActiveSkills = new UIPauseSkillInfoData[EquippedSkillSlotCount];
+
+        for (int i = 0; i < EquippedSkillSlotCount; i++)
+        {
+            currentActiveSkills[i] = CreateEmptySkillData();
+        }
+
+        PrototypeSkillState[] skillStates = snapshot.Skills ?? System.Array.Empty<PrototypeSkillState>();
+
+        foreach (PrototypeSkillState state in skillStates)
+        {
+            if (state.SlotIndex < 0 || state.SlotIndex >= EquippedSkillSlotCount) continue;
+
+            ActiveSkillData skillData = FindCatalogSkillData(state.SkillId);
+
+            if (skillData == null) continue;
+
+            currentActiveSkills[state.SlotIndex] =
+                new UIPauseSkillInfoData(
+                    skillData.Icon,
+                    skillData.SkillName,
+                    Mathf.Max(1, state.Level),
+                    skillData.Desc,
+                    true,
+                    skillData.Id,
+                    true);
+        }
+    }
+
+    private ActiveSkillData FindCatalogSkillData(int skillId)
+    {
+        if (activeSkillCatalog == null) return null;
+
+        foreach (ActiveSkillData skillData in activeSkillCatalog)
+        {
+            if (skillData != null && skillData.Id == skillId) return skillData;
+        }
+
+        return null;
+    }
+
+    private UIPauseSkillInfoData CreateOwnedSlotData(PrototypeProgressSnapshot snapshot, int skillId)
+    {
+        if (skillId < 0)
+        {
+            return new UIPauseSkillInfoData(
+                null,
+                string.Empty,
+                0,
+                string.Empty,
+                false,
+                -1,
+                false);
+        }
+
+        ActiveSkillData skillData = FindCatalogSkillData(skillId);
+
+        if (skillData == null)
+        {
+            return new UIPauseSkillInfoData(
+                null,
+                string.Empty,
+                0,
+                string.Empty,
+                false,
+                -1,
+                false);
+        }
+
+        PrototypeSkillState[] skillStates = snapshot.Skills ?? System.Array.Empty<PrototypeSkillState>();
+
+        PrototypeSkillState? unlockedState = null;
+
+        foreach (PrototypeSkillState state in skillStates)
+        {
+            if (state.SkillId == skillId)
+            {
+                unlockedState = state;
+                break;
+            }
+        }
+
+        bool isUnlocked = unlockedState.HasValue;
+
+        return new UIPauseSkillInfoData(
+            skillData.Icon,
+            skillData.SkillName,
+            isUnlocked
+                ? Mathf.Max(1, unlockedState.Value.Level)
+                : 1,
+            skillData.Desc,
+            false,
+            skillData.Id,
+            isUnlocked);
+    }
+
+    private void BuildOwnedSkillSlots(PrototypeProgressSnapshot snapshot)
     {
         currentOwnedSkills = new UIPauseSkillInfoData[OwnedSkillSlotCount];
 
+        int[] order = snapshot.OwnedSkillOrder;
+
         for (int i = 0; i < OwnedSkillSlotCount; i++)
         {
-            int skillId = ownedSkillOrder != null && i < ownedSkillOrder.Length
-                ? ownedSkillOrder[i]
-                : -1;
+            int skillId = order != null && i < order.Length ? order[i] : -1;
 
-            //currentOwnedSkills[i] = CreateOwnedSlotData(snapshot, skillId);
+            currentOwnedSkills[i] = CreateOwnedSlotData(snapshot, skillId);
         }
     }
 
@@ -502,7 +604,8 @@ public class PrototypeTestScene : MonoBehaviour
             skillData.Level,
             skillData.Description,
             isEquipped,
-            skillData.SkillId);
+            skillData.SkillId,
+            skillData.IsUnlocked);
     }
 
     private UIPauseSkillInfoData CreateEmptySkillData()

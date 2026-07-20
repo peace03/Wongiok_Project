@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.VisualScripting;
 
 // 일시정지 메뉴의 스킬 페이지 담당
 // 스킬 데이터를 화면에 표시
@@ -243,23 +242,6 @@ public class PauseSkillPageView : MonoBehaviour
 
             if (binding.RootObject == null) continue;
 
-            if (!isOwnedSkillListUnlocked)
-            {
-                binding.RootObject.SetActive(false);
-
-                if (binding.HoverView != null)
-                {
-                    binding.HoverView.Clear();
-                }
-
-                if (binding.DragView != null)
-                {
-                    binding.DragView.ClearDragData();
-                }
-
-                continue;
-            }
-
             binding.RootObject.SetActive(true);
 
             UIPauseSkillInfoData skillData =
@@ -268,6 +250,7 @@ public class PauseSkillPageView : MonoBehaviour
                 : CreateLockedPlaceholderData();
 
             bool canInteract =
+                isOwnedSkillListUnlocked &&
                 skillData.SkillId >= 0 &&
                 skillData.IsUnlocked;
 
@@ -292,10 +275,10 @@ public class PauseSkillPageView : MonoBehaviour
                     dragPreviewRoot,
                     dragPreviewIconImage);
 
-                //binding.DragView.SetupOwnedSkill(
-                //    skillData.SkillId,
-                //    i,
-                //    canInteract);
+                binding.DragView.SetupOwnedSkill(
+                    skillData.SkillId,
+                    i,
+                    canInteract);
             }
         }
     }
@@ -305,27 +288,6 @@ public class PauseSkillPageView : MonoBehaviour
         return new UIPauseSkillInfoData(
             null, string.Empty, 0, string.Empty, false, -1, false);
     }
-
-    //private void ClearOwnedSkillItems()
-    //{
-    //    for (int i = 0; i < activeOwnedSkillObjects.Count; i++)
-    //    {
-    //        GameObject itemObject = activeOwnedSkillObjects[i];
-
-    //        if (itemObject.TryGetComponent(out PauseSkillInfoView infoView))
-    //            infoView.Clear();
-
-    //        if (itemObject.TryGetComponent(out PauseSkillHoverPreviewView hoverView))
-    //            hoverView.Clear();
-
-    //        if (itemObject.TryGetComponent(out PauseSkillDragView dragView))
-    //            dragView.ClearDragData();
-
-    //        ownedSkillPool.Release(itemObject);
-    //    }
-
-    //    activeOwnedSkillObjects.Clear();
-    //}
 
     // 선택된 스킬 상세 정보 영역 갱신
     private void RefreshSelectedSkillDetail()
