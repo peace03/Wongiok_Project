@@ -5,6 +5,8 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     [Header("스킬 소유자")]
     [Tooltip("플레이어, 몬스터, NPC 등등")]
     [SerializeField] private GameObject owner;                      // 소유자
+    [Header("스킬 실행기")]
+    [SerializeField] private ActiveSkillExecuter executer;          // 실행기
     [Header("스킬 시스템")]
     [SerializeField] private SkillSystemPresenter presenter;        // 프레젠터
 
@@ -19,7 +21,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     }
 
     // 임시 초기화
-    //private void Awake() => Init();
+    private void Awake() => Init();
 
     private void Update()
     {
@@ -82,6 +84,16 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         {
             // 프레젠터 생성
             presenter = new(owner);
+
+            // 실행기가 있고 따라다니는 대상이 소유자가 아니라면
+            if(executer != null && executer.transform.parent != owner.transform)
+            {
+                // 실행기의 위치, 각도를 소유자로 설정
+                executer.transform.SetPositionAndRotation(owner.transform.position, owner.transform.rotation);
+                // 실행기의 따라다니는 대상을 소유자로 설정
+                executer.transform.SetParent(owner.transform, true);
+            }
+
             Debug.Log($"[Skill] 스킬 시스템 초기화", this);
         }
         // 소유자가 없다면
