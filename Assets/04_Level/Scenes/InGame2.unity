@@ -27460,7 +27460,7 @@ MonoBehaviour:
     AngularDampingMode: 0
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
-  FollowOffset: {x: 0, y: 1.3, z: -7.5}
+  FollowOffset: {x: 3, y: 1.3, z: -7.5}
 --- !u!1001 &797591541
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -54480,7 +54480,15 @@ PrefabInstance:
       objectReference: {fileID: 670110985}
     - target: {fileID: 5661125939663609720, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5661125939663609720, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5661125939663609720, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6934747222265855720, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
       propertyPath: m_Name
