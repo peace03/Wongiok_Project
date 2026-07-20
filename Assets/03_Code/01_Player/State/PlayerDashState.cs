@@ -21,6 +21,7 @@ public class PlayerDashState : PlayerBaseState
     public override bool CanParry => false;
     public override bool CanUseHealItem => false;
     public override bool CanTakeDamage => false;
+    public override bool CanDashPiercing => true;
 
     #endregion
 
@@ -39,6 +40,7 @@ public class PlayerDashState : PlayerBaseState
         dashTimer = controller.Movement.DashDuration;
         dashDirection = GetDashDirection();
 
+        controller.Movement.SetDashPiercing(CanDashPiercing);
         controller.Movement.ConsumeDash();
         controller.Movement.ResetVerticalVelocity();
     }
@@ -62,6 +64,7 @@ public class PlayerDashState : PlayerBaseState
 
     public override void ExitState()
     {
+        controller.Movement.SetDashPiercing(false);
         Debug.Log("Dash Exit");
     }
 
