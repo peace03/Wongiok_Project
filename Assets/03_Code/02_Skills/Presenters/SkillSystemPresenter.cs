@@ -19,7 +19,7 @@ public class SkillSystemPresenter
     /// <summary>
     /// 생성자
     /// </summary>
-    public SkillSystemPresenter(GameObject owner)
+    public SkillSystemPresenter(GameObject owner, ActiveSkillExecuter executer)
     {
         // 스킬 데이터를 담을 리스트
         List<BaseSkillData> skillDatas = new();
@@ -30,7 +30,7 @@ public class SkillSystemPresenter
         if (skillDatas.Count != 0)
         {
             // 스킬 모델 생성하기
-            model = new(owner, skillDatas);
+            model = new(owner, executer, skillDatas);
             model.OnActiveSkillsChanged += RefreshActiveSkills;
         }
         // 스킬 데이터가 없다면

@@ -30,7 +30,7 @@ public abstract class BaseSkillData : ScriptableObject
     public ActiveSkillData AsActiveSkillData => this as ActiveSkillData;
 
     // 객체 생성 함수
-    public abstract SkillInstance CreateInstance(GameObject owner);
+    public abstract SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer);
 
     // 스킬 실행 함수
     public abstract void ExecuteSkill(GameObject owner, int level);

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class WeaponVisualManager : MonoBehaviour
 {
@@ -52,7 +52,6 @@ public class WeaponVisualManager : MonoBehaviour
                 weapons[skill.id] = Instantiate(skill.weapon, transform);
                 // 무기 비활성화
                 weapons[skill.id].SetActive(false);
-                Debug.Log($"[Weapon] 무기 외형 저장 완료 => 입력 - 스킬 ID : {skill.id}", transform);
             }
         }
     }

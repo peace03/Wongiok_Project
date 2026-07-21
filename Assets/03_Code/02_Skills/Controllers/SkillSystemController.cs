@@ -21,7 +21,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     }
 
     // 임시 초기화
-    private void Awake() => Init();
+    //private void Awake() => Init();
 
     private void Update()
     {
@@ -79,14 +79,14 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         // 스킬 데이터베이스 초기화
         SkillDatabase.Init();
 
-        // 소유자가 있다면
-        if (owner != null)
+        // 소유자가 있고 실행기가 있다면
+        if (owner != null && executer != null)
         {
             // 프레젠터 생성
-            presenter = new(owner);
+            presenter = new(owner, executer);
 
-            // 실행기가 있고 따라다니는 대상이 소유자가 아니라면
-            if(executer != null && executer.transform.parent != owner.transform)
+            // 실행기의 따라다니는 대상이 소유자가 아니라면
+            if(executer.transform.parent != owner.transform)
             {
                 // 실행기의 위치, 각도를 소유자로 설정
                 executer.transform.SetPositionAndRotation(owner.transform.position, owner.transform.rotation);
@@ -94,7 +94,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
                 executer.transform.SetParent(owner.transform, true);
             }
 
-            Debug.Log($"[Skill] 스킬 시스템 초기화", this);
+            //Debug.Log($"[Skill] 스킬 시스템 초기화", this);
         }
         // 소유자가 없다면
         else
@@ -130,8 +130,8 @@ public class SkillSystemController : MonoBehaviour, IInitializable
                 break;
             // 그 외라면
             default:
-                Debug.LogWarning($"[Skill] 스킬 실행 실패 => " +
-                                    $"입력 - 슬롯 : {type.type.ToKoreanString()}", this);
+                Debug.Log($"[Skill] 스킬 실행 실패 => " +
+                            $"입력 - 슬롯 : {type.type.ToKoreanString()}", this);
                 break;
         }
     }
@@ -165,8 +165,8 @@ public class SkillSystemController : MonoBehaviour, IInitializable
                 break;
             // 그 외라면
             default:
-                Debug.LogWarning($"[Skill] 스킬 취소 실패 => " +
-                                    $"입력 - 슬롯 : {type.type.ToKoreanString()}", this);
+                Debug.Log($"[Skill] 스킬 취소 실패 => " +
+                            $"입력 - 슬롯 : {type.type.ToKoreanString()}", this);
                 break;
         }
     }

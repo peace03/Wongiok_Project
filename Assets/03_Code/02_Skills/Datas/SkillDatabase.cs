@@ -47,7 +47,7 @@ public static class SkillDatabase
 
         // 초기화됨
         isInit = true;
-        Debug.Log($"[Skill] 데이터베이스 초기화 완료");
+        //Debug.Log($"[Skill] 데이터베이스 초기화 완료");
     }
 
     /// <summary>

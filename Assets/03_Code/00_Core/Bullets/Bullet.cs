@@ -22,12 +22,24 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private bool startFire = false;                         // 사격 시작 여부
     private bool isReturnedToPool;                          // 풀 반환 완료 여부
+    private float cameraShakeValue;                         // 카메라 흔들림 값
 
     private void Update()
     {
         // 사격이 시작되지 않았다면
         if (!startFire)
             return;
+
+        // 전방에 부딪힐 물체가 있다면
+        if(Physics.Raycast(transform.position, transform.forward, out RaycastHit hit,
+                                                                bulletSpeed * Time.deltaTime))
+        {
+            // 총알의 위치를 충돌 지점으로 이동
+            transform.position = hit.point;
+            // 콜라이더 충돌 처리 시작
+            EnterColliderProcess(hit.collider);
+            return;
+        }
 
         // 전방으로 총알 발사
         transform.position += bulletSpeed * Time.deltaTime * transform.forward;
@@ -39,6 +51,28 @@ public class Bullet : MonoBehaviour, IPoolable
         if (!startFire || isReturnedToPool)
             return;
 
+        // 콜라이더 충돌 처리 시작
+        EnterColliderProcess(other);
+    }
+
+    private void OnDisable()
+    {
+        // 타이머 코루틴이 비어있지 않다면
+        if (timerCoroutine != null)
+        {
+            // 타이머 중지
+            StopCoroutine(timerCoroutine);
+            // 타이머 코루틴 초기화
+            timerCoroutine = null;
+        }
+    }
+
+    /// <summary>
+    /// 콜라이더 충돌 시 호출되는 함수
+    /// </summary>
+    /// <param name="other"></param>
+    private void EnterColliderProcess(Collider other)
+    {
         // 부딪힌 대상의 최상위로 이동 후 하위 오브젝트 중, 데미지를 입을 수 있는 물체가 있는지 받아오기
         var target = other.transform.root.GetComponentInChildren<IDamageable>();
 
@@ -57,6 +91,11 @@ public class Bullet : MonoBehaviour, IPoolable
         // 부딪힌 대상에게 데미지 전달하기
         target.TakeDamage(damage);
 
+        // 카메라 흔들림 값이 있다면
+        if (cameraShakeValue > 0f)
+            // 카메라 흔들림 이벤트 발행
+            EventBus<CameraShakeEvent>.Publish(new CameraShakeEvent(cameraShakeValue));
+
         // 무한 관통이 아니라면
         if (penetrationCount != -1)
         {
@@ -67,18 +106,6 @@ public class Bullet : MonoBehaviour, IPoolable
             if (penetrationCount <= -1)
                 // 총알 반납
                 ReturnToPool();
-        }
-    }
-
-    private void OnDisable()
-    {
-        // 타이머 코루틴이 비어있지 않다면
-        if (timerCoroutine != null)
-        {
-            // 타이머 중지
-            StopCoroutine(timerCoroutine);
-            // 타이머 코루틴 초기화
-            timerCoroutine = null;
         }
     }
 
@@ -142,8 +169,9 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <param name="damage">데미지</param>
     /// <param name="penetrationCount">관통 횟수(생략 가능, 기본값 : 0)</param>
     /// <param name="speed">총알 속도(생략 가능, 기본값 : 10f)</param>
+    /// <param name="cameraShakeValue">카메라 흔들림 값(생략 가능, 기본값 : 0f)</param>
     public void StartFire(Transform spawnPoint, LayerMask ownerLayer, float damage,
-                                            int penetrationCount = 0, float speed = 10f)
+                            int penetrationCount = 0, float speed = 10f, float cameraShakeValue = 0f)
     {
         // 타이머 코루틴이 비어있지 않다면
         if (timerCoroutine != null)
@@ -157,7 +185,7 @@ public class Bullet : MonoBehaviour, IPoolable
         // 총알의 위치, 각도 설정
         transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
         // 총알 정보 설정
-        SetInfo(ownerLayer, damage, penetrationCount, speed);
+        SetInfo(ownerLayer, damage, penetrationCount, speed, cameraShakeValue);
         // 사격 시작
         startFire = true;
         // 풀 반환 완료 여부 초기화
@@ -171,14 +199,17 @@ public class Bullet : MonoBehaviour, IPoolable
     }
 
     /// <summary>
-    /// 사격 시작 함수(위치+각도 설정이 필요가 없거나, 이미 위치+각도 설정을 했음)
+    /// 사격 시작 함수
+    /// (위치/각도 설정이 필요가 없거나, 이미 위치/각도 설정을 했음)
     /// </summary>
     /// <param name="ownerLayer">소유자 레이어</param>
     /// <param name="damage">데미지</param>
     /// <param name="penetrationCount">관통 횟수(생략 가능, 기본값 : 0)</param>
     /// <param name="speed">총알 속도(생략 가능, 기본값 : 10f)</param>
-    public void StartFire(LayerMask ownerLayer, float damage, int penetrationCount = 0, float speed = 10f)
-                    => StartFire(transform, ownerLayer, damage, penetrationCount, speed);
+    /// <param name="cameraShakeValue">카메라 흔들림 값(생략 가능, 기본값 : 0f)</param>
+    public void StartFire(LayerMask ownerLayer, float damage, int penetrationCount = 0,
+                                                    float speed = 10f, float cameraShakeValue = 0f)
+                    => StartFire(transform, ownerLayer, damage, penetrationCount, speed, cameraShakeValue);
 
     /// <summary>
     /// 총알 정보 설정 함수
@@ -187,7 +218,7 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <param name="amount">데미지</param>
     /// <param name="count">관통 횟수</param>
     /// <param name="speed">총알 속도</param>
-    private void SetInfo(LayerMask layer, float amount, int count, float speed)
+    private void SetInfo(LayerMask layer, float amount, int count, float speed, float shakeValue)
     {
         // 소유자 레이어 설정
         ownerLayer = layer;
@@ -197,6 +228,8 @@ public class Bullet : MonoBehaviour, IPoolable
         penetrationCount = count;
         // 총알 속도 설정
         bulletSpeed = speed;
+        // 카메라 흔들림 값 설정
+        cameraShakeValue = shakeValue;
     }
 
     /// <summary>
