@@ -131,12 +131,6 @@ public static class PrototypeGameSession
         checkpointSnapshot = snapshot?.Clone();
     }
 
-    public static bool TryGetCheckpoint(out PrototypeProgressSnapshot snapshot)
-    {
-        snapshot = checkpointSnapshot?.Clone();
-        return snapshot != null;
-    }
-
     public static void ClearCheckpoint()
     {
         checkpointSnapshot = null;

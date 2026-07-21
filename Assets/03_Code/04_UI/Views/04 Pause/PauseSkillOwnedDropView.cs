@@ -19,9 +19,6 @@ public class PauseSkillOwnedDropView : MonoBehaviour, IDropHandler, IPointerEnte
             return;
 
         SetHighlight(false);
-
-        EventBus<UIPauseSkillUnequipRequestedEvent>.Publish(
-            new UIPauseSkillUnequipRequestedEvent(dragItem.SourceSlotIndex));
     }
 
     public void OnPointerEnter(PointerEventData eventData)

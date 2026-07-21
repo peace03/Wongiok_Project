@@ -399,11 +399,6 @@ public class TestModule : MonoBehaviour
         Debug.Log("저장 완료");
     }
 
-    private void HandlePlayerDeath()
-    {
-        ShowGameOver();
-    }
-
     private void HandleRefreshUI(RefreshUIEventT eventData)
     {
         cachedEquippedActiveSkills = CloneSkills(eventData.EquippedActiveSkills);
@@ -692,11 +687,6 @@ public class TestModule : MonoBehaviour
     private string FormatSeconds(float value)
     {
         return $"{FormatNumber(value)}초";
-    }
-
-    private string FormatPenetration(int value)
-    {
-        return value < 0 ? "무한" : value.ToString();
     }
 }
 

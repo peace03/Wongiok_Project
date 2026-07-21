@@ -101,7 +101,7 @@ public class TitleView : UIViewBase
     {
         if (newGameButton != null)
         {
-            newGameButton.Setup("New Story", HandleNewGameClicked, isTitleInputReady);
+            newGameButton.Setup("New", HandleNewGameClicked, isTitleInputReady);
         }
 
         if (continueButton != null)

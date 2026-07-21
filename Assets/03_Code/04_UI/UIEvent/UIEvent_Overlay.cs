@@ -191,19 +191,6 @@ public struct UISetPauseSkillPageEvent
     }
 }
 
-// 일시정지 - 스킬 페이지에서 특정 스킬 선택 요청 시 사용할 이벤트
-public struct UIPauseSkillSelectedEvent
-{
-    public int SkillIndex { get; private set; }
-    public bool IsEquippedSkill { get; private set; }
-
-    public UIPauseSkillSelectedEvent(int skillIndex, bool isEquippedSkill)
-    {
-        SkillIndex = skillIndex;
-        IsEquippedSkill = isEquippedSkill;
-    }
-}
-
 // 레벨업 스킬 선택 카드
 public struct UILevelUpSkillOptionData
 {
@@ -273,17 +260,6 @@ public struct UIPauseSkillEquipRequestedEvent
         SkillId = skillId;
         TargetSlotIndex = targetSlotIndex;
         SourceOwnedSlotIndex = sourceOwnedSlotIndex;
-    }
-}
-
-// 장착 슬롯의 스킬을 해제
-public struct UIPauseSkillUnequipRequestedEvent
-{
-    public int SourceSlotIndex { get; private set; }
-
-    public UIPauseSkillUnequipRequestedEvent(int sourceSlotIndex)
-    {
-        SourceSlotIndex = sourceSlotIndex;
     }
 }
 

@@ -30,19 +30,6 @@ public struct UITitleExitRequestedEvent
 
 }
 
-// 로딩 화면의 진행 및 메시지 갱신 이벤트
-public struct UISetLoadingProgressEvent
-{
-    public float Progress { get; private set; }
-    public string Message { get; private set; }
-
-    public UISetLoadingProgressEvent(float progress, string message = null)
-    {
-        Progress = progress;
-        Message = message;
-    }
-}
-
 // 챕터 선택 화면에서 챕터 입장 요청 시 발행 이벤트
 // 실제 챕터 로딩, 저장 처리, 썸네일 화면 이동 x
 public struct UIChapterEnterRequestedEvent

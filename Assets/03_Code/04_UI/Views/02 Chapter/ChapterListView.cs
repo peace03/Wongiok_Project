@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using Unity.VisualScripting;
 
 // 챕터 선택 화면에서 반복 사용할 개별 챕터 항목 View
 // 직접 EventBus 발행 X, 부모인 ChapterSelectView에 선택 콜백만 전달
@@ -36,7 +35,6 @@ public class ChapterListView : MonoBehaviour
 
     [Header("텍스트 사용x")]
     [SerializeField] private Text ChapterNumberText;
-    [SerializeField] private Text ChapterNameText;
     [SerializeField] private Text stateText;
 
     private int chapterID;
@@ -166,15 +164,6 @@ public class ChapterListView : MonoBehaviour
         {
             button.onClick.RemoveListener(HandleClicked);
         }    
-    }
-
-    // 텍스트 설정 메서드
-    private void SetText(Text targetText, string value)
-    {
-        if (targetText == null)
-            return;
-
-        targetText.text = value;
     }
 
     private void SetImage(Image targetImage, Sprite sprite)
