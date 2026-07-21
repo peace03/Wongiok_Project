@@ -55,6 +55,7 @@ MonoBehaviour:
     view: {fileID: 0}
   - state: 5
     view: {fileID: 0}
+  initialScreenState: 2
   overlayBindings:
   - state: 3
     view: {fileID: 0}
@@ -104,6 +105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiManager: {fileID: 1807891895283037689}
+  _input: {fileID: 0}
 --- !u!114 &9096931607055580299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,9 +118,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51b50f315a1d10e4f8e6b0439380ad4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireIcon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  iceIcon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  dashIcon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  powerUpIcon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   mainMenuSceneName: Lobby
-  testSkillCooldownDuration: 3
+  activeSkillCatalog:
+  - {fileID: 11400000, guid: 53d5a0b7bc175cb40a6ba7e8b9e462d1, type: 2}
+  - {fileID: 11400000, guid: b393f864d0929e744a3704af994c7fa7, type: 2}
+  - {fileID: 11400000, guid: b379997a0d9ec414abe23af0a254000b, type: 2}
+  - {fileID: 11400000, guid: 04ee4858cccf5234088dfad1694b8760, type: 2}
+  - {fileID: 11400000, guid: faa1e2a2482b8064d8f7af02e0ec7374, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

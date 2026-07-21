@@ -5,15 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/04_Level/Scenes/Lobby.unity
     guid: 33e86e881169ee64fa70d21e1c39b430
-  - enabled: 0
-    path: Assets/04_Level/Scenes/InGame.unity
-    guid: 4c371923e36c0ff4c98bd816acaac08a
   - enabled: 1
-    path: Assets/04_Level/Scenes/Boss/CinderellaBossScene_Y.unity
-    guid: 8684e91c6e49fc242a20dc8c12d17bde
+    path: Assets/04_Level/Scenes/InGame2.unity
+    guid: 946550c78dc1edc429fa73aa7b5d8145
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

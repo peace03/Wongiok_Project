@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,18 +12,38 @@ public class PauseSkillInfoView : MonoBehaviour
 
     [SerializeField] private Sprite fallbackIcon;
 
+    [SerializeField] private Image lockImage;
+    [SerializeField] private Color unlockedIconColor = Color.white;
+    [SerializeField] private Color lockedIconColor = new Color(0.35f, 0.35f, 0.35f, 1f);
+
     // 스킬 요약 설정
     public void Setup(UIPauseSkillInfoData data)
     {
+        bool isLocked = !data.IsUnlocked || data.SkillId < 0;
+
         SetIcon(data.Icon);
-        SetText(nameText, data.SkillName);
-        SetText(levelText, $"Lv.{data.Level}");
+
+        if (iconImage != null)
+        {
+            iconImage.color = isLocked
+                ? lockedIconColor
+                : unlockedIconColor;
+        }
+
+        SetText(nameText, isLocked ? string.Empty : data.SkillName);
+        SetText(levelText, isLocked ? string.Empty : $"Lv.{data.Level}");
         SetText(descriptionText, data.Description);
+
+        if (lockImage != null)
+        {
+            lockImage.gameObject.SetActive(isLocked);
+        }
 
         if (equippedMarkObject != null)
         {
             equippedMarkObject.SetActive(data.IsEquipped);
         }
+
     }
 
     // 초기화
@@ -36,6 +57,16 @@ public class PauseSkillInfoView : MonoBehaviour
         if (equippedMarkObject != null)
         {
             equippedMarkObject.SetActive(false);
+        }
+
+        if (iconImage != null)
+        {
+            iconImage.color = unlockedIconColor;
+        }
+
+        if (lockImage != null)
+        {
+            lockImage.gameObject.SetActive(false);
         }
     }
 

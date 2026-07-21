@@ -30,7 +30,8 @@ public class PauseSkillSlotDropView : MonoBehaviour, IDropHandler, IPointerEnter
             EventBus<UIPauseSkillEquipRequestedEvent>.Publish(
                 new UIPauseSkillEquipRequestedEvent(
                     dragItem.SkillId,
-                    slotIndex));
+                    slotIndex,
+                    dragItem.SourceOwnedSlotIndex));
 
             return;
         }

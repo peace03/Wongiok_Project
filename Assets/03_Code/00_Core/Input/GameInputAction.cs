@@ -616,6 +616,15 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""F11"",
+                    ""type"": ""Button"",
+                    ""id"": ""e5bcecff-e5af-4016-9d1c-a02c114d612c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -728,6 +737,17 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
                     ""action"": ""F10"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0daa1c9e-a3a5-42c2-bf0d-711188fb4d8d"",
+                    ""path"": ""<Keyboard>/f11"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""F11"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -766,6 +786,7 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
         m_Test_F8 = m_Test.FindAction("F8", throwIfNotFound: true);
         m_Test_F9 = m_Test.FindAction("F9", throwIfNotFound: true);
         m_Test_F10 = m_Test.FindAction("F10", throwIfNotFound: true);
+        m_Test_F11 = m_Test.FindAction("F11", throwIfNotFound: true);
     }
 
     ~@GameInputAction()
@@ -1204,6 +1225,7 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_Test_F8;
     private readonly InputAction m_Test_F9;
     private readonly InputAction m_Test_F10;
+    private readonly InputAction m_Test_F11;
     /// <summary>
     /// Provides access to input actions defined in input action map "Test".
     /// </summary>
@@ -1255,6 +1277,10 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Test/F10".
         /// </summary>
         public InputAction @F10 => m_Wrapper.m_Test_F10;
+        /// <summary>
+        /// Provides access to the underlying input action "Test/F11".
+        /// </summary>
+        public InputAction @F11 => m_Wrapper.m_Test_F11;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1311,6 +1337,9 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
             @F10.started += instance.OnF10;
             @F10.performed += instance.OnF10;
             @F10.canceled += instance.OnF10;
+            @F11.started += instance.OnF11;
+            @F11.performed += instance.OnF11;
+            @F11.canceled += instance.OnF11;
         }
 
         /// <summary>
@@ -1352,6 +1381,9 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
             @F10.started -= instance.OnF10;
             @F10.performed -= instance.OnF10;
             @F10.canceled -= instance.OnF10;
+            @F11.started -= instance.OnF11;
+            @F11.performed -= instance.OnF11;
+            @F11.canceled -= instance.OnF11;
         }
 
         /// <summary>
@@ -1590,5 +1622,12 @@ public partial class @GameInputAction: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnF10(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "F11" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnF11(InputAction.CallbackContext context);
     }
 }

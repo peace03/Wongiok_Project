@@ -35,6 +35,7 @@ public class GameInputReader : MonoBehaviour
     public bool TestF8Pressed => _input.Test.F8.WasPressedThisFrame();
     public bool TestF9Pressed => _input.Test.F9.WasPressedThisFrame();
     public bool TestF10Pressed => _input.Test.F10.WasPressedThisFrame();
+    public bool TestF11Pressed => _input.Test.F11.WasPressedThisFrame();
     #endregion
 
     #region Skill Input

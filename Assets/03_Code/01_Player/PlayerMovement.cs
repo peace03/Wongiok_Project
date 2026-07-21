@@ -22,6 +22,10 @@ public class PlayerMovement : MonoBehaviour
     // 다음 대쉬를 다시 사용할 수 있기까지의 대기 시간입니다.
     [SerializeField] private float dashCooldown = 2f;
 
+    [SerializeField] private LayerMask dashPierceLayers;
+
+    private LayerMask defaultExcludedLayers;
+
     // 현재까지 사용한 점프 횟수입니다. 착지하면 0으로 초기화됩니다.
     private int jumpCount;
 
@@ -59,9 +63,24 @@ public class PlayerMovement : MonoBehaviour
         // 이동 계산에 필요한 컨트롤러와 스탯 참조를 초기화합니다.
         cc = GetComponent<CharacterController>();
         playerStatus = status != null ? status : GetComponent<PlayerStatus>();
+        defaultExcludedLayers = cc.excludeLayers;
 
         // 시작 시점의 바닥 상태를 저장해 첫 중력 처리에서 착지 판정이 꼬이지 않게 합니다.
         wasGrounded = cc.isGrounded;
+    }
+
+    public void SetDashPiercing(bool enabled)
+    {
+        if (cc == null) return;
+
+        cc.excludeLayers = enabled
+            ? defaultExcludedLayers.value | dashPierceLayers.value
+            : defaultExcludedLayers.value;
+    }
+
+    private void OnDisable()
+    {
+        SetDashPiercing(false);
     }
 
     public void Move(Vector2 input)

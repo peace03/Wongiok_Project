@@ -112,6 +112,30 @@ public struct UIChapterTitleCardInputContinueRequestedEvent
 
 }
 
+public struct UIChapterTitleCardLoadingReadyEvent
+{
+    public int ChapterId { get; private set; }
+
+    public UIChapterTitleCardLoadingReadyEvent(int chapterId)
+    {
+        ChapterId = chapterId;
+    }
+}
+
+public struct UIChapterTitleCardInputSkipRequestedEvent
+{
+}
+
+public struct UIChapterTitleCardActivateSceneRequestedEvent
+{
+    public int ChapterId { get; private set; }
+
+    public UIChapterTitleCardActivateSceneRequestedEvent(int chapterId)
+    {
+        ChapterId = chapterId;
+    }
+}
+
 // 챕터 타이틀 카드 화면에서 뒤로가기 진행을 요청하는 이벤트
 public struct UIChapterTitleCardBackRequestedEvent
 {

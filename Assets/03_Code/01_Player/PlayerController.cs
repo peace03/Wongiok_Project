@@ -3,6 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(GameInputReader))]
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private Transform visualRoot;
+
     #region 플레이어 관련 변수, 상태, 참조등
     // 현재 실행 중인 플레이어 상태입니다.
     private PlayerBaseState _currentState;
@@ -107,6 +109,7 @@ public class PlayerController : MonoBehaviour
         _attack = attack != null ? attack : GetComponent<PlayerAttack>();
         _parry = parry != null ? parry : GetComponent<PlayerParry>();
         _healItemInventory = healItemInventory != null ? healItemInventory : GetComponent<PlayerHealItemInventory>();
+        UpdateVisualFacing();
 
         PlayerIdleState = new PlayerIdleState(this);
         PlayerMoveState = new PlayerMoveState(this);
@@ -141,6 +144,7 @@ public class PlayerController : MonoBehaviour
         if (!isInitialized) return;
 
         PlayerInput();
+        _attack?.SetMoving(MoveInput.sqrMagnitude > 0.01f);
         UpdateFacingDirection();
 
         if (_currentState != null && _currentState.CanParry)
@@ -272,6 +276,14 @@ public class PlayerController : MonoBehaviour
             return;
 
         _isFacingRight = isFacingRight;
+        UpdateVisualFacing();
+    }
+
+    private void UpdateVisualFacing()
+    {
+        if (visualRoot == null) return;
+
+        visualRoot.localRotation = Quaternion.Euler(0f, _isFacingRight ? 0f : 180f, 0f);
     }
 
     private void HandleAttackInput()

@@ -530,6 +530,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "F11",
+                    "type": "Button",
+                    "id": "e5bcecff-e5af-4016-9d1c-a02c114d612c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -640,6 +649,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "F10",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0daa1c9e-a3a5-42c2-bf0d-711188fb4d8d",
+                    "path": "<Keyboard>/f11",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "F11",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
