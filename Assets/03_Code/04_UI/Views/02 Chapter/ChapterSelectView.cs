@@ -30,14 +30,19 @@ public class ChapterSelectView : UIViewBase
         [TextArea] public string bossJob;
     }
 
-    [Header("Chapter")]
+    [Header("챕터")]
     [SerializeField] private List<ChapterBinding> chapterBindings = new();
+
+    [Header("챕터 리스트 스크롤")]
+    [SerializeField] private ScrollRect chapterListScrollRect;
+
+    private bool preserveListPositionOnNextShow;
 
     [Header("Info")]
     [SerializeField] private Text chapterTitleText;
     [SerializeField] private Text chapterDescriptionText;
 
-    [Header("Buttons")]
+    [Header("버튼")]
     [SerializeField] private CommonButtonView enterButton;
     [SerializeField] private CommonButtonView backButton;
 
@@ -55,17 +60,20 @@ public class ChapterSelectView : UIViewBase
     {
         base.Awake();
         EventBus<UISetChapterProgressEvent>.action += HandleSetChapterProgress;
+        EventBus<UIChapterSelectScrollPreserveRequestedEvent>.action += HandleChapterSelectScrollPreserveRequested;
     }
 
     private void OnDestroy()
     {
         EventBus<UISetChapterProgressEvent>.action -= HandleSetChapterProgress;
+        EventBus<UIChapterSelectScrollPreserveRequestedEvent>.action -= HandleChapterSelectScrollPreserveRequested;
     }
 
     protected override void OnShow()
     {
         ClearSelection();
         RefreshChapterList();
+        ResetChapterListScrollIfNeeded();
         RefreshEnterButton();
         SetupBackButton();
     }
@@ -101,6 +109,27 @@ public class ChapterSelectView : UIViewBase
                 binding.state,
                 HandleChapterSelected);
         }
+    }
+
+    private void ResetChapterListScrollIfNeeded()
+    {
+        if (preserveListPositionOnNextShow)
+        {
+            preserveListPositionOnNextShow = false;
+            return;
+        }
+
+        if (chapterListScrollRect == null) return;
+
+        Canvas.ForceUpdateCanvases();
+
+        chapterListScrollRect.StopMovement();
+        chapterListScrollRect.verticalNormalizedPosition = 1f;
+    }
+
+    private void HandleChapterSelectScrollPreserveRequested(UIChapterSelectScrollPreserveRequestedEvent eventData)
+    {
+        preserveListPositionOnNextShow = true;
     }
 
     private void HandleChapterSelected(int chapterId)

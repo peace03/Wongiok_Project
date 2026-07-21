@@ -142,6 +142,11 @@ public struct UIChapterTitleCardBackRequestedEvent
 
 }
 
+// 챕터 리스트 드래그 상태 유지
+public readonly struct UIChapterSelectScrollPreserveRequestedEvent
+{
+}
+
 // UI 화면 변경 이벤트입니다.
 // 외부 시스템이 타이틀, 로딩, 인게임 같은 기본 Screen 전환을 요청할 때 발행합니다.
 public struct UIChangeScreenEvent
