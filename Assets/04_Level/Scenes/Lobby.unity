@@ -652,6 +652,10 @@ PrefabInstance:
       propertyPath: titleStartVideoClip
       value: 
       objectReference: {fileID: 32900000, guid: 05288fa0c49c1b64089627e6f9f30138, type: 3}
+    - target: {fileID: 4144447257398262626, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+      propertyPath: titleWaitingVideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: 458a4943856fe9a47b6cc81cd4b1d791, type: 3}
     - target: {fileID: 4681934044652478162, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_Sprite
       value: 
