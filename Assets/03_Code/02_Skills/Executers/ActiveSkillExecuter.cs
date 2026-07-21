@@ -14,7 +14,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private readonly List<Transform> executePlaces = new();                         // 실행 위치들
     private readonly List<GameObject> effectPrefabs = new();                        // 이펙트 프리팹들
 
-    private readonly WaitForSeconds effectPauseTime = new(0.3f);                    // 이펙트 일시정지 시간
     private WaitForSeconds projectileDelayTime;                                     // 발사체 스킬 딜레이 시간
     private WaitForSeconds areaDelayTime;                                           // 범위 스킬 딜레이 시간
 
@@ -75,7 +74,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     {
         // 스킬 ID로 스킬 정보 찾기
         var data = SkillDatabase.FindDataById(id);
-
         // 총구 이펙트에 해당하는 이펙트 프리팹 받아오기
         data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, effectPrefabs);
 
@@ -140,6 +138,12 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 yield return projectileDelayTime;
             }
         }
+
+        // 발사체 스킬 딜레이 시간량이 있다면(지속 시간이 있었다면)
+        if (projectileDelayTimeValue > 0f)
+            // 스킬 종료 히트 스탑 이벤트 발행
+            EventBus<HitStopEvent>.Publish(new HitStopEvent(45, TimeEffectSource.Skill,
+                                                TimeEffectPriority.Medium, TimeEffectGroups.CombatFeel));
 
         // 실행 위치들 초기화
         ResetExecutePositions();

@@ -215,6 +215,11 @@ public class SkillInstance
                 return;
             }
 
+            // 차징 시간이 있는 스킬이라면 ? 히트 스탑 프레임을 45프레임 : 즉발 스킬이라면 30프레임
+            int hitStopFrame = data.GetMaxChargingTime(curLevel) > 0f ? 45 : 30;
+            // 스킬 시작 히트 스탑 이벤트 발행
+            EventBus<HitStopEvent>.Publish(new HitStopEvent(hitStopFrame, TimeEffectSource.Skill,
+                                                TimeEffectPriority.Medium, TimeEffectGroups.CombatFeel));
             // 현재 지속 시간 초기화
             curDuration = 0f;
             // 스킬 실행
@@ -230,7 +235,7 @@ public class SkillInstance
             Transform target = GetLastTarget(owner.transform, 25f);
 
             // 마지막 적을 찾았다면
-            if(target != null)
+            if (target != null)
                 // 타겟 이펙트 실행
                 ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Target, target.position, target.rotation);
 
