@@ -191,11 +191,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         EventBus<CameraShakeEvent>.Publish(new CameraShakeEvent(cameraShakeIntensity));
 
         // 패링 성공 피드백은 UI의 불릿타임 연출보다 높은 우선순위(High)를 가집니다.
-        EventBus<HitStopEvent>.Publish(new HitStopEvent(
-            HitStopFrame,
-            TimeEffectSource.Parry,
-            TimeEffectPriority.High,
-            TimeEffectGroups.CombatFeel));
+        EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
     }
 
     // 사전신호의 종류별 시작 처리를 자식 클래스에 위임한다.
@@ -351,13 +347,13 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     /// <summary>
     /// [오브젝트 풀링(Pooling) 기반 파티클 최적화]: 이펙트를 매번 Instantiate/Destroy 하지 않고, 메모리에 있는 캐싱 객체의 위치만 옮겨 재사용(GC 발생 0%)합니다.
     /// </summary>
-    public void PlayEffect(ParticleSystem excuteEffect, float x, float y, float z)
-    {
-        if (excuteEffect == null) return;
-        Vector3 effectPos = new Vector3(x, y, z);
-        excuteEffect.transform.position = effectPos;
-        excuteEffect.Play();
-    }
+    //public void PlayEffect(ParticleSystem excuteEffect, float x, float y, float z)
+    //{
+    //    if (excuteEffect == null) return;
+    //    Vector3 effectPos = new Vector3(x, y, z);
+    //    excuteEffect.transform.position = effectPos;
+    //    excuteEffect.Play();
+    //}
 
     // 현재 유니티 애니메이터가 공격 관련 모션을 재생 중인지 확인합니다. (트랜지션 중 방어용)
     public bool IsAttacking()

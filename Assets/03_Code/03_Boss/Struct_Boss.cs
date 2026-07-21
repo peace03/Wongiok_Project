@@ -27,6 +27,20 @@ public struct ColliderToggleEvent
     }
 }
 
+//애니메이션 타이밍에 맞춰 재생할 보스 VFX 종류
+public enum BossEffectCue { KickImpact}
+//보스 VFX 재생 요청 이벤트
+public struct BossEffectEvent
+{
+    public BossEffectCue Cue { get; private set; }
+    public string AttackId { get; private set; }
+    public BossEffectEvent(BossEffectCue cue, string attackId)
+    {
+        Cue = cue;
+        AttackId = attackId;
+    }
+}
+
 //보스의 시점 방향에 따라 콜라이더 위치 변경
 public struct BossFacingChangeEvent
 {

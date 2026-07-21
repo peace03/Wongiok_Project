@@ -40,4 +40,18 @@ public class BossAnimationKeyReceiver : MonoBehaviour, IInitializable
         EventBus<ColliderToggleEvent>.
             Publish(new ColliderToggleEvent(bossPatternLogic.GetAttackId(), false));
     }
+
+    //Attack A의 타격 프레임에 호출
+    //패링 등으로 이미 취소된 공격이면 VFX를 재생하지 않음
+    public void PlayKickImpact()
+    {
+        if (bossPatternLogic == null) return;
+        if (bossPatternLogic.IsParryed) return;
+        if (!bossPatternLogic.IsAttacking()) return;
+
+        EventBus<BossEffectEvent>.Publish(
+            new BossEffectEvent(
+                BossEffectCue.KickImpact,
+                bossPatternLogic.GetAttackId()));
+    }
 }
