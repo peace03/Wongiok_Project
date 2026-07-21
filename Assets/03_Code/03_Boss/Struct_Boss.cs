@@ -3,9 +3,14 @@ using UnityEngine;
 //패링 가능, 불가능 이벤트
 public struct CanParryEvent 
 {
+    // 어느 공격의 패링 창인지 알려준다. 같은 보스라도 공격마다 다른 콜라이더를 찾아야 한다.
+    public string AttackId { get; private set; }
+    // true면 패링 시간 시작, false면 패링 시간 종료를 뜻한다.
     public bool CanParry { get; private set; }
-    public CanParryEvent(bool canParry)
+
+    public CanParryEvent(string attackId, bool canParry)
     {
+        AttackId = attackId;
         CanParry = canParry;
     }
 }
@@ -19,6 +24,20 @@ public struct ColliderToggleEvent
     {
         this.attackId = attackId;
         this.state = state;
+    }
+}
+
+//애니메이션 타이밍에 맞춰 재생할 보스 VFX 종류
+public enum BossEffectCue { KickImpact}
+//보스 VFX 재생 요청 이벤트
+public struct BossEffectEvent
+{
+    public BossEffectCue Cue { get; private set; }
+    public string AttackId { get; private set; }
+    public BossEffectEvent(BossEffectCue cue, string attackId)
+    {
+        Cue = cue;
+        AttackId = attackId;
     }
 }
 

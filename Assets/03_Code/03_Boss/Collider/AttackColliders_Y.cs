@@ -46,16 +46,34 @@ public class AttackColliders_Y : MonoBehaviour
         RebuildBindings();
 
         // [디커플링]: 보스 로직(Cinderella_Patterns 등)을 몰라도, 전역 이벤트만 듣고 스스로 작동합니다.
+        // CanParryEvent는 거리 확인 시작, ColliderToggleEvent는 실제 피해 시작/종료를 담당한다.
+        EventBus<CanParryEvent>.action += HandleCanParry;
         EventBus<ColliderToggleEvent>.action += ToggleCollider;
         EventBus<BossFacingChangeEvent>.action += ChangeColliderPos;
         EventBus<ParryKeyDown>.action += OffCollider;
+        EventBus<AttackFinishEvent>.action += HandleAttackFinished;
     }
 
     private void OnDisable()
     {
+        EventBus<CanParryEvent>.action -= HandleCanParry;
         EventBus<ColliderToggleEvent>.action -= ToggleCollider;
         EventBus<BossFacingChangeEvent>.action -= ChangeColliderPos;
         EventBus<ParryKeyDown>.action -= OffCollider;
+        EventBus<AttackFinishEvent>.action -= HandleAttackFinished;
+        DisableAllColliders();
+    }
+
+    private void HandleCanParry(CanParryEvent data)
+    {
+        // false는 시간 창만 닫는다. DisableParry와 EnableAttack 사이에도 범위 안 플레이어를 기억해야 한다.
+        if (!data.CanParry) return;
+        if (!TryGetCollider(data.AttackId, out BoxCollider targetCollider)) return;
+
+        // 패링 가능 프레임에는 콜라이더를 거리 확인용으로만 켠다. 이 시점에는 피해가 없다.
+        BossHitBox hitBox = targetCollider.GetComponent<BossHitBox>();
+        hitBox?.BeginRangeCheck();
+        targetCollider.enabled = true;
     }
 
     /// <summary>
@@ -65,13 +83,18 @@ public class AttackColliders_Y : MonoBehaviour
     {
         if (!data.state)
         {
+            // 공격 종료, 패링 성공 등 어떤 종료 경로든 같은 정리 함수를 사용한다.
             DisableAllColliders();
             return;
         }
 
         // Dictionary를 통한 O(1) 고속 검색으로 프레임 드랍 방지
-        if (TryGetCollider(data.attackId, out BoxCollider targetCollider))
-            targetCollider.enabled = true;
+        if (!TryGetCollider(data.attackId, out BoxCollider targetCollider)) return;
+
+        // RangeCheck에서 기억한 플레이어가 있으면 즉시, 없으면 OnTriggerEnter에서 피해를 준다.
+        BossHitBox hitBox = targetCollider.GetComponent<BossHitBox>();
+        hitBox?.EnterDamagePhase();
+        targetCollider.enabled = true;
     }
 
     /// <summary>
@@ -79,6 +102,12 @@ public class AttackColliders_Y : MonoBehaviour
     /// </summary>
     public void OffCollider(ParryKeyDown data)
     {
+        DisableAllColliders();
+    }
+
+    private void HandleAttackFinished(AttackFinishEvent data)
+    {
+        // 공격 단위가 끝나면 활성 콜라이더와 플레이어 범위 정보를 모두 정리한다.
         DisableAllColliders();
     }
 
@@ -164,7 +193,7 @@ public class AttackColliders_Y : MonoBehaviour
             foreach (AttackColliderBinding binding in attackColliderBindings)
             {
                 if (binding?.attackCollider != null)
-                    binding.attackCollider.enabled = false;
+                    DisableCollider(binding.attackCollider);
             }
             return;
         }
@@ -173,8 +202,17 @@ public class AttackColliders_Y : MonoBehaviour
         foreach (BoxCollider attackCollider in attackColliders)
         {
             if (attackCollider != null)
-                attackCollider.enabled = false;
+                DisableCollider(attackCollider);
         }
+    }
+
+    private void DisableCollider(BoxCollider attackCollider)
+    {
+        if (attackCollider == null) return;
+
+        // Collider.enabled = false만으로는 OnTriggerExit가 보장되지 않으므로 상태를 먼저 직접 정리한다.
+        attackCollider.GetComponent<BossHitBox>()?.ClearRangeState();
+        attackCollider.enabled = false;
     }
 
     /// <summary>
