@@ -20,12 +20,17 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private LayerMask skillLayer;                                                   // 스킬 레이어
 
     private float projectileDelayTimeValue;                                         // 발사체 스킬 딜레이 시간량
+    private int curFps;                                                             // 현재 프레임
+
+    public IReadOnlyList<Transform> ExecutePlaces => executePlaces;
 
     // 액티브 스킬 실행 위치들 변경 이벤트 구독
     private void OnEnable() => EventBus<ChangeActiveSkillExecutePositions>.action += SetExecutePositions;
 
     private void Awake()
     {
+        // 현재 프레임 구하기
+        curFps = Mathf.RoundToInt(1f / Time.deltaTime);
         // 스킬 레이어 초기화(실행 위치의 레이어로 설정)
         skillLayer = 1 << defaultExecutePos.gameObject.layer;
         // 실행 위치들 초기화
@@ -94,7 +99,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(skillData.ProjectileCount, skillData.GetDamage(),
-                                                                        skillData.PenetrationCount));
+                                            skillData.PenetrationCount, skillData.MaxChargingTime > 0f));
     }
 
     /// <summary>
@@ -103,7 +108,9 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// <param name="bulletCount">발사체 개수</param>
     /// <param name="damage">데미지</param>
     /// <param name="penetrationCount">관통 횟수</param>
-    private IEnumerator ProjectileRoutine(int bulletCount, float damage, int penetrationCount)
+    /// <param name="isCharging">차징 여부</param>
+    private IEnumerator ProjectileRoutine(int bulletCount, float damage, int penetrationCount,
+                                                                                    bool isCharging)
     {
         // 현재 발사체 개수만큼
         for (int count = 0; count < bulletCount; count += executePlaces.Count)
@@ -120,9 +127,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 foreach (var prefab in effectPrefabs)
                 {
                     // 이펙트 실행 및 실행한 이펙트 받아오기
-                    var effect = EffectManager.Instance.PlayEffect(prefab,
-                                                                place.position + new Vector3(0, 0, -0.5f),
-                                                                    place.rotation, parent: bullet.transform);
+                    var effect =
+                        EffectManager.Instance.PlayEffect(prefab,
+                                                            place.position + new Vector3(0, 0, -0.5f),
+                                                                place.rotation, parent: bullet.transform);
+
                     // 나선 이펙트라면
                     if (effect.TryGetComponent<IWaveEffect>(out var wave))
                         // 나선 이펙트 정보 설정하기
@@ -131,9 +140,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
                 // 총알 속도 구하기
                 float bulletSpeed = 50f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
-                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수, 총알 속도)
-                bullet.StartFire(skillLayer, damage, penetrationCount, Mathf.Clamp(bulletSpeed, 10f, 50f));
-                
+                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수, 총알 속도, 카메라 흔들림 값)
+                bullet.StartFire(skillLayer, damage, penetrationCount, Mathf.Clamp(bulletSpeed, 10f, 50f),
+                                            projectileDelayTimeValue > 0f ? 0.1f : (!isCharging ? 1f : 0.5f));
+
                 // 발사체 스킬 딜레이 시간만큼 대기하기
                 yield return projectileDelayTime;
             }
@@ -141,8 +151,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 발사체 스킬 딜레이 시간량이 있다면(지속 시간이 있었다면)
         if (projectileDelayTimeValue > 0f)
-            // 스킬 종료 히트 스탑 이벤트 발행
-            EventBus<HitStopEvent>.Publish(new HitStopEvent(45, TimeEffectSource.Skill,
+            // 스킬 종료 히트 스탑 이벤트 발행(현재 프레임의 3/4)
+            EventBus<HitStopEvent>.Publish(new HitStopEvent((curFps / 4) * 3, TimeEffectSource.Skill,
                                                 TimeEffectPriority.Medium, TimeEffectGroups.CombatFeel));
 
         // 실행 위치들 초기화
@@ -157,7 +167,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 실행할 스킬 단계가 없다면
         if (skillData.Stages.Count == 0)
         {
-            Debug.Log($"[Skill] 범위 액티브 스킬 실행 실패 => 입력 - 스킬 ID : {id} / 스킬 단계 : 없음");
+            //Debug.Log($"[Skill] 범위 액티브 스킬 실행 실패 => 입력 - 스킬 ID : {id} / 스킬 단계 : 없음");
             return;
         }
 

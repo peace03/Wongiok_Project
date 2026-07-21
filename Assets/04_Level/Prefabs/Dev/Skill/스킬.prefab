@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 6290620784482516515}
   - component: {fileID: 5576464309022185790}
   m_Layer: 0
-  m_Name: "\uC2E4\uD589\uAE30"
+  m_Name: "\uC561\uD2F0\uBE0C \uC2A4\uD0AC \uC2E4\uD589\uAE30"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -161,7 +161,7 @@ Transform:
   m_GameObject: {fileID: 5811576131321529442}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.07, z: 0}
+  m_LocalPosition: {x: 0.415, y: 0.987, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 4368374001870562497}
   - component: {fileID: 3638139924767686964}
   m_Layer: 0
-  m_Name: "\uBB34\uAE30"
+  m_Name: "\uBB34\uAE30 \uC678\uD615"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

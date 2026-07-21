@@ -32,12 +32,12 @@ public class SkillSystemModel
     /// <summary>
     /// 생성자
     /// </summary>
-    public SkillSystemModel(GameObject owner, List<BaseSkillData> skillDatas)
+    public SkillSystemModel(GameObject owner, ActiveSkillExecuter executer, List<BaseSkillData> skillDatas)
     {
         // 스킬 데이터가 없다면
         if(skillDatas == null)
         {
-            Debug.Log($"[Error | Skill] 스킬 객체 생성 실패 => 데이터 : 없음");
+            //Debug.Log($"[Error | Skill] 스킬 객체 생성 실패 => 데이터 : 없음");
             return;
         }
 
@@ -48,7 +48,7 @@ public class SkillSystemModel
             if(!allSkillDictionary.ContainsKey(data.Id))
             {
                 // 스킬 객체 생성 및 저장
-                allSkillDictionary[data.Id] = data.CreateInstance(owner);
+                allSkillDictionary[data.Id] = data.CreateInstance(owner, executer);
                 allSkillList.Add(allSkillDictionary[data.Id]);
                 // 장착한 액티브 스킬들과 패시브 스킬들 리스트 연결
                 allSkillDictionary[data.Id].SetEquippedSkills(equippedActives, equippedPassives);
@@ -58,7 +58,7 @@ public class SkillSystemModel
                     // 미장착한 액티브 스킬 리스트에 추가
                     unequippedActives.Add(allSkillDictionary[data.Id]);
 
-                Debug.Log($"[Skill] 스킬 추가 => {owner.name} : {data.SkillName}", owner);
+                //Debug.Log($"[Skill] 스킬 추가 => {owner.name} : {data.SkillName}", owner);
             }
             // 해당 스킬이 있다면
             else
@@ -114,7 +114,7 @@ public class SkillSystemModel
         // 장착할 액티브 슬롯이 남았다면
         if (equippedActives.Count < maxActiveCount)
         {
-            Debug.Log($"[Active | Skill] 빈 슬롯 => {maxActiveCount - equippedActives.Count}개");
+            //Debug.Log($"[Active | Skill] 빈 슬롯 => {maxActiveCount - equippedActives.Count}개");
 
             // 남은 액티브 슬롯 칸 수만큼
             for (int i = equippedActives.Count; i < maxActiveCount; i++)
@@ -125,7 +125,7 @@ public class SkillSystemModel
         // 장착할 패시브 슬롯이 남았다면
         if (equippedPassives.Count < maxPassiveCount)
         {
-            Debug.Log($"[Passive | Skill] 빈 슬롯 => {maxPassiveCount - equippedPassives.Count}개");
+            //Debug.Log($"[Passive | Skill] 빈 슬롯 => {maxPassiveCount - equippedPassives.Count}개");
 
             // 남은 패시브 슬롯 칸 수만큼
             for (int i = equippedPassives.Count; i < maxPassiveCount; i++)
@@ -163,7 +163,7 @@ public class SkillSystemModel
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.Log($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            //Debug.Log($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -184,7 +184,7 @@ public class SkillSystemModel
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.Log($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            //Debug.Log($"[Error | Skill] 장착한 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -205,7 +205,7 @@ public class SkillSystemModel
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.Log($"[Error | Skill] 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            //Debug.Log($"[Error | Skill] 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -226,7 +226,7 @@ public class SkillSystemModel
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.Log($"[Error | Skill] 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            //Debug.Log($"[Error | Skill] 액티브 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -249,7 +249,7 @@ public class SkillSystemModel
         // 결과를 담을 리스트가 없다면
         if (results == null)
         {
-            Debug.Log($"[Error | Skill] 강화 가능한 스킬들 반환 실패 => 입력 - 리스트 : 없음");
+            //Debug.Log($"[Error | Skill] 강화 가능한 스킬들 반환 실패 => 입력 - 리스트 : 없음");
             return;
         }
 
@@ -272,7 +272,7 @@ public class SkillSystemModel
         // 해당 슬롯이 비어있다면
         if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
         {
-            Debug.Log($"[Skill] 실행할 액티브 스킬 없음 => 입력 - 슬롯 : {slot.ToKoreanString()}");
+            //Debug.Log($"[Skill] 실행할 액티브 스킬 없음 => 입력 - 슬롯 : {slot.ToKoreanString()}");
             return;
         }
 
@@ -288,7 +288,7 @@ public class SkillSystemModel
         // 해당 슬롯이 비어있다면
         if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
         {
-            Debug.Log($"[Skill] 취소할 액티브 스킬 없음 => 입력 - 슬롯 : {slot.ToKoreanString()}");
+            //Debug.Log($"[Skill] 취소할 액티브 스킬 없음 => 입력 - 슬롯 : {slot.ToKoreanString()}");
             return;
         }
 

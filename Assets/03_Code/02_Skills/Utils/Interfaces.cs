@@ -25,17 +25,6 @@ public interface IAreaSkill
 }
 
 /// <summary>
-/// 오브젝트 풀 인터페이스
-/// </summary>
-public interface IPoolable
-{
-    /// <summary>
-    /// 오브젝트 풀 주소 설정 함수
-    /// </summary>
-    public void SetPoolRef(IObjectPool<GameObject> poolRef);
-}
-
-/// <summary>
 /// 총구 소유 인터페이스
 /// </summary>
 public interface IHaveFirePoint
