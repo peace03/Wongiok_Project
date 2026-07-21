@@ -1520,9 +1520,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bb70dc853d0ebc4298a8a7749793bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointHealSystem
-  playerStatus: {fileID: 919054763}
-  lifeTracker: {fileID: 0}
-  healItemInventory: {fileID: 0}
 --- !u!114 &919054765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1535,6 +1532,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61fe390158b94084a96f804ab5530f31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInitializer
+--- !u!114 &919054769 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1102723354271703662, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
+  m_PrefabInstance: {fileID: 919054759}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919054761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f6db590c61a4f5894a70ce9758d3b21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameInputReader
+--- !u!114 &919054770 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8650343130422386955, guid: bfecf4716cbf1e741b25e05276daec68, type: 3}
+  m_PrefabInstance: {fileID: 919054759}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919054761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1f05b45a7e4eaf981976c9835a7e02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerExperienceTracker
 --- !u!1 &933172878
 GameObject:
   m_ObjectHideFlags: 0
@@ -1927,9 +1946,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 1465482409}
     m_Modifications:
     - target: {fileID: 2513981832059749341, guid: 319f39f80f90a0144b4696e1b3b447dd, type: 3}
+      propertyPath: _input
+      value: 
+      objectReference: {fileID: 919054769}
+    - target: {fileID: 2513981832059749341, guid: 319f39f80f90a0144b4696e1b3b447dd, type: 3}
       propertyPath: playerStatus
       value: 
       objectReference: {fileID: 919054763}
+    - target: {fileID: 2513981832059749341, guid: 319f39f80f90a0144b4696e1b3b447dd, type: 3}
+      propertyPath: playerExperienceTracker
+      value: 
+      objectReference: {fileID: 919054770}
     - target: {fileID: 7462819837501313438, guid: 319f39f80f90a0144b4696e1b3b447dd, type: 3}
       propertyPath: m_LocalPosition.x
       value: -45.773937
@@ -2494,6 +2521,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1465482409}
     m_Modifications:
+    - target: {fileID: 1365247517992309161, guid: 9105fa292d6caaa4b9db00f0ffc08b0e, type: 3}
+      propertyPath: _input
+      value: 
+      objectReference: {fileID: 919054769}
     - target: {fileID: 1807891895283037689, guid: 9105fa292d6caaa4b9db00f0ffc08b0e, type: 3}
       propertyPath: bossHudView
       value: 
