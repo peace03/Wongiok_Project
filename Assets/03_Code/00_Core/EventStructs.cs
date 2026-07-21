@@ -46,7 +46,7 @@ public struct SlowMoEvent
 }
 
 // 시간 연출 요청이 어디서 왔는지 구분한다. 충돌 정책을 사람이 읽기 쉽게 만들기 위한 태그다.
-public enum TimeEffectSource { None, Telegraph, Parry, Impact } //Impact는 또다른 연출 사용시
+public enum TimeEffectSource { None, Telegraph, Parry, Impact, Skill } //Impact는 또다른 연출 사용시
 
 // 같은 순간 여러 시간 연출이 들어왔을 때 어떤 연출을 남길지 결정하는 우선순위다.
 public enum TimeEffectPriority { Low = 10, Medium = 50, High = 100 }

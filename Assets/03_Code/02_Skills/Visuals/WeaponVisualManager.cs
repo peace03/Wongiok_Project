@@ -1,11 +1,11 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class WeaponVisualManager : MonoBehaviour
 {
-    [Header("무기 컨테이너")]
-    [Tooltip("무기 모와두는 곳")]
-    [SerializeField] private Transform weaponContainer;                 // 무기 컨테이너
+    [Header("무기 소유자")]
+    [Tooltip("플레이어, 몬스터, NPC 등등")]
+    [SerializeField] private Transform owner;                           // 소유자
 
     private readonly Dictionary<int, GameObject> weapons = new();       // 모든 무기 딕셔너리
 
@@ -15,6 +15,18 @@ public class WeaponVisualManager : MonoBehaviour
         EventBus<WeaponVisualAddData>.action += AddWeapon;
         // 무기 외형 상태 변경 이벤트 구독
         EventBus<ChangeWeaponState>.action += ChangeWeapon;
+    }
+
+    private void Awake()
+    {
+        // 소유자가 있고 따라다니는 대상이 소유자가 아니라면
+        if(owner != null && transform.parent != owner)
+        {
+            // 위치와 각도를 소유자로 설정
+            transform.SetPositionAndRotation(owner.position, owner.rotation);
+            // 따라다니는 대상을 소유자로 설정
+            transform.SetParent(owner, true);
+        }
     }
 
     private void OnDisable()
@@ -37,10 +49,9 @@ public class WeaponVisualManager : MonoBehaviour
             if(skill.weapon != null)
             {
                 // 무기 오브젝트 생성 후 딕셔너리에 저장
-                weapons[skill.id] = Instantiate(skill.weapon, weaponContainer);
+                weapons[skill.id] = Instantiate(skill.weapon, transform);
                 // 무기 비활성화
                 weapons[skill.id].SetActive(false);
-                Debug.Log($"[Weapon] 무기 외형 저장 완료 => 입력 - 스킬 ID : {skill.id}", weaponContainer);
             }
         }
     }

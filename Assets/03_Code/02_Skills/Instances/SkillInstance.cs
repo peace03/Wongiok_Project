@@ -1,6 +1,7 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 
 [Serializable]
 public class SkillInstance
@@ -34,6 +35,9 @@ public class SkillInstance
     private readonly List<GameObject> effectPrefabs = new();            // 이펙트 프리팹들
 
     [NonSerialized] private readonly GameObject owner;                  // 스킬 소유자
+    [NonSerialized] private readonly ActiveSkillExecuter executer;      // 액티브 스킬 실행기
+
+    private readonly int curFps;                                        // 현재 프레임
     #endregion
 
     #region 프로퍼티
@@ -100,10 +104,13 @@ public class SkillInstance
     /// <summary>
     /// 생성자
     /// </summary>
-    public SkillInstance(GameObject owner, BaseSkillData data)
+    public SkillInstance(GameObject owner, ActiveSkillExecuter executer, BaseSkillData data)
     {
         this.owner = owner;
+        this.executer = executer;
         this.data = data;
+        // 현재 프레임 구하기
+        curFps = Mathf.RoundToInt(1f / Time.deltaTime);
         // 이펙트 종류마다 실행 중인 이펙트들 초기화
         InitActiveEffects();
     }
@@ -159,7 +166,7 @@ public class SkillInstance
             return;
         }
 
-        Debug.Log($"[Skill] 사용 시작 => {data.SkillName}");
+        //Debug.Log($"[Skill] 사용 시작 => {data.SkillName}");
         // 무기 외형 착용 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id));
 
@@ -210,11 +217,16 @@ public class SkillInstance
             // 소유자가 없다면
             if (owner == null)
             {
-                Debug.Log($"[Error | Skill] 사용 불가 => " +
-                            $"입력 - {data.SkillName} : Lv.{curLevel} / 소유자(Owner) : 없음");
+                //Debug.Log($"[Error | Skill] 사용 불가 => " +
+                //            $"입력 - {data.SkillName} : Lv.{curLevel} / 소유자(Owner) : 없음");
                 return;
             }
 
+            // 차징 시간이 있는 스킬이라면 ? 히트 스탑 프레임을 현재 프레임의 3/4 : 즉발 스킬이라면 현재 프레임의 절반
+            int hitStopFrame = data.GetMaxChargingTime(curLevel) > 0f ? (curFps / 4) * 3 : curFps / 2;
+            // 스킬 시작 히트 스탑 이벤트 발행
+            EventBus<HitStopEvent>.Publish(new HitStopEvent(hitStopFrame, TimeEffectSource.Skill,
+                                                TimeEffectPriority.Medium, TimeEffectGroups.CombatFeel));
             // 현재 지속 시간 초기화
             curDuration = 0f;
             // 스킬 실행
@@ -223,16 +235,19 @@ public class SkillInstance
         // 바꾼 상태가 차징 상태라면
         else if (IsCharging)
         {
-            // 차징 이펙트 실행
-            ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Charging, owner.transform.position,
-                                                                    owner.transform.rotation);
-            // 마지막 적 찾기
-            Transform target = GetLastTarget(owner.transform, 25f);
+            // 실행 위치들의 수만큼
+            foreach (var place in executer.ExecutePlaces)
+            {
+                // 차징 이펙트 실행
+                ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Charging, place);
+                // 타겟 찾기
+                Transform target = GetLastTarget(place, 30f);
 
-            // 마지막 적을 찾았다면
-            if(target != null)
-                // 타겟 이펙트 실행
-                ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Target, target.position, target.rotation);
+                // 타겟을 찾았다면
+                if (target != null)
+                    // 타겟 이펙트 실행
+                    ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Target, target);
+            }
 
             // 현재 차징 시간 초기화
             curChargingTime = 0f;
@@ -243,9 +258,8 @@ public class SkillInstance
     /// 이펙트 종류별 이펙트들 실행 함수
     /// </summary>
     /// <param name="type">이펙트 종류</param>
-    /// <param name="pos">위치</param>
-    /// <param name="rot">각도</param>
-    private void ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE type, Vector3 pos, Quaternion rot)
+    /// <param name="place">실행 위치</param>
+    private void ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE type, Transform place)
     {
         // 이펙트 종류에 맞는 이펙트 프리팹 받아오기
         data.AsActiveSkillData.GetEffectsByEffectType(type, effectPrefabs);
@@ -258,13 +272,14 @@ public class SkillInstance
         foreach (var prefab in effectPrefabs)
         {
             // 이펙트 실행 후 받아오기
-            var effect = EffectManager.Instance.PlayEffect(prefab, pos, rot);
+            var effect = EffectManager.Instance.PlayEffect(prefab, place.position, place.rotation,
+                                                                                        parent : place);
 
             // 실행 중인 이펙트들에 이펙트 종류가 없다면
             if (!activeEffects.ContainsKey(type))
             {
-                Debug.Log($"[Skill] 이펙트 종류[{type.ToKoreanString()}] 추가 => " +
-                            $"입력 - 스킬 ID : {data.Id} / 스킬 이름 : {data.SkillName}");
+                //Debug.Log($"[Skill] 이펙트 종류[{type.ToKoreanString()}] 추가 => " +
+                //            $"입력 - 스킬 ID : {data.Id} / 스킬 이름 : {data.SkillName}");
                 activeEffects[type] = new List<Effect>();
             }
 
@@ -283,7 +298,7 @@ public class SkillInstance
         // 이펙트 종류에 해당하는 이펙트들이 없다면
         if(!activeEffects.TryGetValue(type, out var effects))
         {
-            Debug.Log($"[Skill] 이펙트 종료 실패 => 입력 - {type.ToKoreanString()}");
+            //Debug.Log($"[Skill] 이펙트 종료 실패 => 입력 - {type.ToKoreanString()}");
             return;
         }
 
@@ -320,15 +335,15 @@ public class SkillInstance
         int index;
 
         // 데미지를 입을 수 없는 물체의 인덱스를 찾는 데에 실패했다면(전부 데미지를 입을 수 있는 물체들이라면)
-        if ((index = Array.FindIndex(hits, hit
-                                            => !hit.transform.TryGetComponent<IDamageable>(out _))) == -1)
+        if ((index = Array.FindIndex(hits,
+                            hit => hit.transform.root.GetComponentInChildren<IDamageable>() == null)) == -1)
         {
             // 부딪힌 물체들의 수만큼
             foreach(var hit in hits)
             {
                 // 데미지를 입을 수 있고 소유자와 같은 레이어를 가지고 있지 않다면
-                if (hit.transform.TryGetComponent<IDamageable>(out _)
-                        && hit.transform.gameObject.layer != owner.layer)
+                if (hit.transform.root.GetComponentInChildren<IDamageable>() != null
+                                        && hit.transform.gameObject.layer != owner.layer)
                     // 위치 반환
                     return hit.transform;
             }
@@ -340,8 +355,8 @@ public class SkillInstance
         for(int i = index - 1; i >= 0; i--)
         {
             // 데미지를 입을 수 있고 소유자와 같은 레이어를 가지고 있지 않다면
-            if (hits[i].transform.TryGetComponent<IDamageable>(out _)
-                    && hits[i].transform.gameObject.layer != owner.layer)
+            if (hits[i].transform.root.GetComponentInChildren<IDamageable>() != null
+                                    && hits[i].transform.gameObject.layer != owner.layer)
                 // 위치 반환
                 return hits[i].transform;
         }
@@ -365,7 +380,7 @@ public class SkillInstance
         // 차징이 끝나지 않았다면
         else
         {
-            Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
+            //Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
             // 무기 외형 착용 해제 이벤트 발행
             EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
             // 사용 가능 상태로 변경
@@ -391,7 +406,8 @@ public class SkillInstance
 
             // 차징이 끝났다면
             if (curChargingTime >= Math.Max(0f, data.GetMaxChargingTime(curLevel)))
-                Debug.Log($"[Skill] 차징 완료 => {data.SkillName}");
+                // 사용 상태로 변경
+                SwitchState(SKILL_STATE.Executing);
         }
         // 실행 상태라면
         else if(IsExecuting)
