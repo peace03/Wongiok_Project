@@ -59,7 +59,8 @@ public class TimeControlManager : MonoBehaviour, IInitializable
         StopActiveEffect();
 
         // 히트스탑 직후 들어오는 사전신호 슬로모는 손맛을 흐릴 수 있어 짧게 무시한다.
-        if (data.source == TimeEffectSource.Parry || data.source == TimeEffectSource.Impact)
+        if (data.source == TimeEffectSource.Parry || data.source == TimeEffectSource.Impact
+                                                    || data.source == TimeEffectSource.Skill)
             suppressTelegraphSlowMoUntilRealtime = Time.realtimeSinceStartup + telegraphSlowMoSuppressAfterHitStop;
 
         BeginEffect(ActiveTimeEffectType.HitStop, data.priority, data.exclusiveGroup);

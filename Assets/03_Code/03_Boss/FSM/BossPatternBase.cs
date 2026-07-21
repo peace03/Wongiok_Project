@@ -189,11 +189,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         EventBus<CameraShakeEvent>.Publish(new CameraShakeEvent(cameraShakeIntensity));
 
         // 패링 성공 피드백은 UI의 불릿타임 연출보다 높은 우선순위(High)를 가집니다.
-        EventBus<HitStopEvent>.Publish(new HitStopEvent(
-            HitStopFrame,
-            TimeEffectSource.Parry,
-            TimeEffectPriority.High,
-            TimeEffectGroups.CombatFeel));
+        EventBus<HitStopEvent>.Publish(new HitStopEvent(HitStopFrame));
     }
 
     // 사전신호의 종류별 시작 처리를 자식 클래스에 위임한다.
