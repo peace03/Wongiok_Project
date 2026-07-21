@@ -88,6 +88,7 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
             {
                 // 타이머 시간 중 최대 이펙트 시간을 제외한 나머지 시간 대기하기
                 yield return new WaitForSeconds(time - maxEffectTime);
+                // 일시정지 기능을 쓴다고 하면, 파티클 일시정지 중인지 확인하고 파티클 재생해줘야함
                 // 파티클 종료
                 particle.Stop();
                 // 최대 이펙트 시간만큼 대기하기
@@ -98,6 +99,7 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
             {
                 // 파티클이 재생될 수 있게 잠시 대기하기
                 yield return new WaitForSeconds(0.1f);
+                // 일시정지 기능을 쓴다고 하면, 파티클 일시정지 중인지 확인하고 파티클 재생해줘야함
                 // 파티클 종료
                 particle.Stop();
                 // 나머지 타이머 시간만큼 대기하기
@@ -119,6 +121,32 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
 
         // 오브젝트 비활성화
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// 이펙트 일시정지 함수
+    /// </summary>
+    public void PauseEffect()
+    {
+        // 하위 오브젝트가 있다면
+        if (transform.childCount > 0)
+        {
+            // 하위 오브젝트의 파티클들 받아오기
+            var particles = transform.GetComponentsInChildren<ParticleSystem>();
+
+            // 파티클들이 없거나, 비어있다면
+            if (particles == null || particles.Length == 0)
+                return;
+
+            // 파티클들의 수만큼
+            for (int i = 0; i < particles.Length; i++)
+                // 파티클 일시정지
+                particles[i].Pause();
+        }
+        // 파티클이 있다면
+        else if (particle != null)
+            // 파티클 일시정지
+            particle.Pause();
     }
 
     /// <summary>

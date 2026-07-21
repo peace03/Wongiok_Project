@@ -35,6 +35,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         HandleEscapeInput();
         HandlePauseTabInput();
         HandleSpaceInput();
+        HandleChapterLoadingSkipInput();
     }
 
     private void HandlePrologueSkipInput()
@@ -50,7 +51,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
 
     private void HandleEscapeInput()
     {
-        if (!Input.GetKeyDown(KeyCode.Escape))
+        if (!_input.MenuPressed)
             return;
 
         if (uiManager.CurrentOverlayState == UIOverlayState.Cutscene)
@@ -85,14 +86,14 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         if (uiManager.CurrentOverlayState != UIOverlayState.Pause)
             return;
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (_input.PreviousPauseTabPressed)
         {
             EventBus<UIPauseTabMoveRequestedEvent>.Publish(
                 new UIPauseTabMoveRequestedEvent(-1));
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (_input.NextPauseTabPressed)
         {
             EventBus<UIPauseTabMoveRequestedEvent>.Publish(
                 new UIPauseTabMoveRequestedEvent(1));
@@ -101,13 +102,21 @@ public class UIInputBridge : MonoBehaviour, IInitializable
 
     private void HandleSpaceInput()
     {
-        if (!Input.GetKeyDown(KeyCode.Space))
-            return;
+        if (uiManager.CurrentScreenState != UIScreenState.ChapterTitleCard) return;
 
-        if (uiManager.CurrentScreenState != UIScreenState.ChapterTitleCard)
-            return;
+        if (!_input.SubmitPressed) return;
 
         EventBus<UIChapterTitleCardInputContinueRequestedEvent>.Publish(
             new UIChapterTitleCardInputContinueRequestedEvent());
+    }
+
+    private void HandleChapterLoadingSkipInput()
+    {
+        if (uiManager.CurrentScreenState != UIScreenState.ChapterTitleCard) return;
+
+        if (!_input.TitleStartPressed) return;
+
+        EventBus<UIChapterTitleCardInputSkipRequestedEvent>.Publish(
+            new UIChapterTitleCardInputSkipRequestedEvent());
     }
 }

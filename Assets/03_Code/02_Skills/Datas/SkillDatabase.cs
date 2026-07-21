@@ -18,10 +18,7 @@ public static class SkillDatabase
     {
         // 초기화가 됐다면
         if(isInit)
-        {
-            Debug.Log($"[Skill] 데이터 베이스 초기화 실패 => 입력 - 1회만 가능");
             return;
-        }
 
         // ID 오름차순으로 스킬 정보들 가져오기
         var datas = Resources.LoadAll<BaseSkillData>("Datas/Skills/").OrderBy(data => data.Id);

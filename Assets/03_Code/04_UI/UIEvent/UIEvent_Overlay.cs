@@ -96,6 +96,7 @@ public struct UIPauseSkillInfoData
     public int Level { get; private set; }
     public string Description { get; private set; }
     public bool IsEquipped { get; private set; }
+    public bool IsUnlocked { get; private set;  }
 
     public UIPauseSkillInfoData(
         Sprite icon,
@@ -103,7 +104,8 @@ public struct UIPauseSkillInfoData
         int level,
         string description,
         bool isEquipped,
-        int skillId = -1)
+        int skillId = -1,
+        bool isUnlocked = true)
     {
         SkillId = skillId;
         Icon = icon;
@@ -111,6 +113,7 @@ public struct UIPauseSkillInfoData
         Level = level;
         Description = description;
         IsEquipped = isEquipped;
+        IsUnlocked = isUnlocked;
     }
 }
 
@@ -154,11 +157,13 @@ public struct RefreshUIEventT
 {
     public UIPauseSkillInfoData[] EquippedActiveSkills { get; private set; }
     public UIPauseSkillInfoData[] OwnedSkills { get; private set; }
+    public int[] OwnedSkillOrder { get; private set;  }
 
-    public RefreshUIEventT(UIPauseSkillInfoData[] equippedActiveSkills, UIPauseSkillInfoData[] ownedSkills)
+    public RefreshUIEventT(UIPauseSkillInfoData[] equippedActiveSkills, UIPauseSkillInfoData[] ownedSkills, int[] ownedSkillOrder = null)
     {
         EquippedActiveSkills = equippedActiveSkills;
         OwnedSkills = ownedSkills;
+        OwnedSkillOrder = ownedSkillOrder ?? System.Array.Empty<int>();
     }
 }
 
@@ -261,11 +266,13 @@ public struct UIPauseSkillEquipRequestedEvent
 {
     public int SkillId { get; private set; }
     public int TargetSlotIndex { get; private set; }
+    public int SourceOwnedSlotIndex { get; private set; }
 
-    public UIPauseSkillEquipRequestedEvent(int skillId, int targetSlotIndex)
+    public UIPauseSkillEquipRequestedEvent(int skillId, int targetSlotIndex, int sourceOwnedSlotIndex)
     {
         SkillId = skillId;
         TargetSlotIndex = targetSlotIndex;
+        SourceOwnedSlotIndex = sourceOwnedSlotIndex;
     }
 }
 

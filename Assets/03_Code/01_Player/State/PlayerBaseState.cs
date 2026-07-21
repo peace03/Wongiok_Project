@@ -27,6 +27,9 @@ public abstract class PlayerBaseState
     // 현재 상태에서 데미지를 받을 수 있는지 판단합니다.
     public virtual bool CanTakeDamage => true;
 
+    // 현재 상태에서 플레이어가 몹을 관통할 수 있는지 판단합니다.
+    public virtual bool CanDashPiercing => false;
+
     #endregion
 
     #region 생성자

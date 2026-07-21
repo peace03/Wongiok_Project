@@ -2,12 +2,19 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
+    private static readonly int ShootTrigger = Animator.StringToHash("Shoot");
+    private static readonly int IsMoving = Animator.StringToHash("IsMoving");
+
     [Header("References")]
     // 총알을 발사할 기준 위치입니다.
     [SerializeField] private Transform firePoint;
 
+    [SerializeField] private Transform muzzlePivot;
+
     // 씬에 배치된 BulletFactory를 연결해 플레이어 총알을 가져옵니다.
     [SerializeField] private BulletFactory bulletFactory;
+
+    [SerializeField] private Animator animator;
 
     // Bullet 원본이 자기 소유자 레이어 충돌을 무시할 때 사용하는 레이어입니다.
     [SerializeField] private LayerMask ownerLayer;
@@ -44,12 +51,16 @@ public class PlayerAttack : MonoBehaviour
         float damage = playerStatus.GetAttackPower();
 
         // Bullet은 origin.forward로 이동하므로 firePoint의 forward를 공격 방향에 맞춥니다.
-        firePoint.rotation = Quaternion.FromToRotation(Vector3.forward, attackDirection.normalized);
+        UpdateMuzzleDirection(attackDirection);
 
         Bullet bullet = bulletFactory.GetBullet();
         if (bullet == null) return;
 
         // 풀에서 꺼낸 Bullet에 발사 기준점, 소유자 레이어, 데미지, 관통 횟수를 넘깁니다.
+        if (animator != null && animator.runtimeAnimatorController != null)
+        {
+            animator.SetTrigger(ShootTrigger);
+        }
         bullet.StartFire(firePoint, ownerLayer, damage, penetrationCount);
 
         // 발사 후처리 사운드나 이펙트가 반응할 수 있게 이벤트를 발행합니다.
@@ -62,6 +73,19 @@ public class PlayerAttack : MonoBehaviour
         );
     }
 
+    public void SetMoving(bool isMoving)
+    {
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+
+        animator.SetBool(IsMoving, isMoving);
+    }
+
+    private void UpdateMuzzleDirection(Vector3 attackDirection)
+    {
+        Transform pivot = muzzlePivot != null ? muzzlePivot : firePoint;
+        pivot.rotation = Quaternion.FromToRotation(Vector3.forward, attackDirection.normalized);
+    }
+
     private Vector3 GetAttackDirection(Vector2 aimInput, bool isFacingRight, bool isGrounded)
     {
         float x = aimInput.x;
@@ -69,30 +93,25 @@ public class PlayerAttack : MonoBehaviour
 
         // 지상에서 아래 입력만 들어오면 아래로 쏘지 않고 바라보는 반대 방향으로 공격합니다.
         // 바닥을 향해 바로 발사하는 어색한 상황을 막기 위한 예외 처리입니다.
-        if (isGrounded && Mathf.Approximately(x, 0f) && y < 0f)
-        {
-            return isFacingRight ? Vector3.left : Vector3.right;
-        }
-
         // 방향 입력이 없으면 마지막으로 바라보는 방향으로 공격합니다.
         if (Mathf.Approximately(x, 0f) && Mathf.Approximately(y, 0f))
         {
-            return isFacingRight ? Vector3.left : Vector3.right;
+            return isFacingRight ? Vector3.right : Vector3.left;
         }
 
         // 수평 입력 없이 위아래 입력만 있으면 수직 방향으로 공격합니다.
         if (Mathf.Approximately(x, 0f))
         {
-            return y > 0f ? Vector3.up : Vector3.down;
+            return new Vector3(isFacingRight ? 1f : -1f, Mathf.Sign(y), 0f).normalized;
         }
 
         // 좌하단/우하단 입력은 대각선 아래 공격으로 쓰지 않고 수평 공격으로 보정합니다.
         if (y < 0f)
         {
-            return new Vector3(-Mathf.Sign(x), 0f, 0f);
+            return new Vector3(Mathf.Sign(x), -1f, 0f).normalized;
         }
 
-        Vector3 direction = new Vector3(-x, y, 0f);
+        Vector3 direction = new Vector3(x, y, 0f);
         return direction.normalized;
     }
     #region 플레이어 경고 문구 ( 특정 오브젝트 or 스크립트 존재의 확인 )

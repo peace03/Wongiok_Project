@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/04_Level/Prefabs/Dev/Skill/Effects/_ExternalAssets/(임시) 스나이퍼 이펙트.prefab.meta
 guid: 6b235e51b019a9f478b3da92c24ccfd5
+========
+guid: babab969cb2bf9147bf9d8d08f47671e
+>>>>>>>> Skill_For_Merge:Assets/04_Level/Prefabs/Dev/Skill/Effects/_ExternalAssets/(임시) 매그넘 이펙트.prefab.meta
 PrefabImporter:
   externalObjects: {}
   userData: 

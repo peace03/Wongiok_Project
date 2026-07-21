@@ -28,6 +28,15 @@ public class ChapterTitleCardView : UIViewBase
     [SerializeField, Min(1f)] private float titleCardZoomEndScale = 1.35f;
     [SerializeField] private Vector2 titleCardZoomEndPosition = Vector2.zero;
 
+    [Header("로딩 세션 페이드")]
+    [SerializeField] private float zoomFadeOutDuration = 0.5f;
+    [SerializeField] private float loadingVideoFadeInDuration = 0.5f;
+    [SerializeField] private float videoEndFadeOutDuration = 0.5f;
+
+    [Header("로딩 안내")]
+    [SerializeField] private GameObject loadingSkipGuideObject;
+    [SerializeField] private GameObject proceedGuideObject;
+
     private VideoClip currentLoadingVideoClip;
     private bool isTransitioning;
     private bool isLoadingVisualActive;
@@ -44,28 +53,68 @@ public class ChapterTitleCardView : UIViewBase
     private Sprite currentThumbnail;
     private Sprite currentBackground;
 
+    private bool isKeyboardInputReady;
+    private Coroutine keyboardInputReadyCoroutine;
+
+    private enum LoadingTransitionState
+    {
+        Idle,
+        ZoomingOut,
+        VideoPlaying,
+        WaitingForProceed
+    }
+
+    private LoadingTransitionState loadingTransitionState;
+    private bool isLoadingReady;
+    private bool isVideoFinished;
+    private bool isFinishingVideo;
+
     protected override void Awake()
     {
         base.Awake();
 
         CaptureInitialVisualState();
         SubscribeEvents();
+
+        if (loadingVideoPlayer != null)
+            loadingVideoPlayer.loopPointReached += HandleLoadingVideoFinished;
     }
 
     private void OnDestroy()
     {
         UnsubscribeEvents();
+
+        if (loadingVideoPlayer != null)
+            loadingVideoPlayer.loopPointReached -= HandleLoadingVideoFinished;
     }
 
     protected override void OnShow()
     {
         ResetLoadingVisual();
+
+        isKeyboardInputReady = false;
+
+        if (keyboardInputReadyCoroutine != null)
+        {
+            StopCoroutine(keyboardInputReadyCoroutine);
+        }
+
+        keyboardInputReadyCoroutine = StartCoroutine(EnableKeyboardInputNextFrame());
+
         RefreshContinueButton();
         SetupBackButton();
     }
 
     protected override void OnHide()
     {
+        isKeyboardInputReady = false;
+
+        if (keyboardInputReadyCoroutine != null)
+        {
+            StopCoroutine(keyboardInputReadyCoroutine);
+            keyboardInputReadyCoroutine = null;
+        }
+
         ResetLoadingVisual();
         currentLoadingVideoClip = null;
         Clear();
@@ -128,12 +177,24 @@ public class ChapterTitleCardView : UIViewBase
     {
         EventBus<UISetChapterTitleCardEvent>.action += HandleSetChapterTitleCard;
         EventBus<UIChapterTitleCardInputContinueRequestedEvent>.action += HandleInputContinueRequested;
+        EventBus<UIChapterTitleCardLoadingReadyEvent>.action += HandleLoadingReady;
+        EventBus<UIChapterTitleCardInputSkipRequestedEvent>.action += HandleSkipRequested;
     }
 
     private void UnsubscribeEvents()
     {
         EventBus<UISetChapterTitleCardEvent>.action -= HandleSetChapterTitleCard;
         EventBus<UIChapterTitleCardInputContinueRequestedEvent>.action -= HandleInputContinueRequested;
+        EventBus<UIChapterTitleCardLoadingReadyEvent>.action -= HandleLoadingReady;
+        EventBus<UIChapterTitleCardInputSkipRequestedEvent>.action -= HandleSkipRequested;
+    }
+
+    private IEnumerator EnableKeyboardInputNextFrame()
+    {
+        yield return null;
+
+        isKeyboardInputReady = true;
+        keyboardInputReadyCoroutine = null;
     }
 
     private void HandleSetChapterTitleCard(UISetChapterTitleCardEvent eventData)
@@ -150,10 +211,20 @@ public class ChapterTitleCardView : UIViewBase
 
     private void HandleInputContinueRequested(UIChapterTitleCardInputContinueRequestedEvent eventData)
     {
-        if (!IsVisible)
-            return;
+        if (!IsVisible) return;
 
-        HandleContinueClicked();
+        if (!isKeyboardInputReady) return;
+
+        if (loadingTransitionState == LoadingTransitionState.Idle)
+        {
+            HandleContinueClicked();
+            return;
+        }
+
+        if (loadingTransitionState == LoadingTransitionState.WaitingForProceed)
+        {
+            HandleProceedRequested();
+        }
     }
 
     private void HandleBackClicked()
@@ -179,9 +250,10 @@ public class ChapterTitleCardView : UIViewBase
 
     private void HandleContinueClicked()
     {
-        if (currentChapterId < 0 || isTransitioning) return;
+        if (currentChapterId < 0 || isTransitioning || loadingTransitionState != LoadingTransitionState.Idle) return;
 
         isTransitioning = true;
+        loadingTransitionState = LoadingTransitionState.ZoomingOut;
 
         if (continueButton != null)
             continueButton.SetInteractable(false);
@@ -195,6 +267,15 @@ public class ChapterTitleCardView : UIViewBase
     private IEnumerator PlayLoadingTransition()
     {
         RectTransform titleCardRect = thumbnailImage.rectTransform;
+
+        bool fadeOutCompleted = false;
+
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                0f,
+                1f,
+                zoomFadeOutDuration,
+                () => fadeOutCompleted = true));
 
         Vector2 startPosition = titleCardRect.anchoredPosition;
         Vector3 startScale = titleCardRect.localScale;
@@ -234,18 +315,41 @@ public class ChapterTitleCardView : UIViewBase
         titleCardRect.anchoredPosition = targetPosition;
         titleCardRect.localScale = targetScale;
 
+        while (!fadeOutCompleted)
+        {
+            yield return null;
+        }
+
         SetCardDetailObjectsActive(false);
 
         yield return StartCoroutine(StartLoadingVisualAfterVideoStarts());
 
+        loadingTransitionState = LoadingTransitionState.VideoPlaying;
+
         EventBus<UIChapterTitleCardContinueRequestedEvent>.Publish(
             new UIChapterTitleCardContinueRequestedEvent(currentChapterId));
+
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                1f,
+                0f,
+                loadingVideoFadeInDuration));
 
         transitionCoroutine = null;
     }
 
     private IEnumerator StartLoadingVisualAfterVideoStarts()
     {
+        isLoadingReady = false;
+        isVideoFinished = false;
+        isFinishingVideo = false;
+
+        if (loadingSkipGuideObject != null)
+            loadingSkipGuideObject.SetActive(false);
+
+        if (proceedGuideObject != null)
+            proceedGuideObject.SetActive(false);
+
         isLoadingVisualActive = true;
 
         if (loadingSpinner != null)
@@ -256,6 +360,7 @@ public class ChapterTitleCardView : UIViewBase
 
         if (currentLoadingVideoClip == null || loadingVideoPlayer == null || loadingVideoImage == null)
         {
+            isVideoFinished = true;
             yield break;
         }
 
@@ -263,7 +368,7 @@ public class ChapterTitleCardView : UIViewBase
 
         loadingVideoPlayer.Stop();
         loadingVideoPlayer.clip = currentLoadingVideoClip;
-        loadingVideoPlayer.isLooping = true;
+        loadingVideoPlayer.isLooping = false;
         loadingVideoPlayer.Prepare();
 
         while (!loadingVideoPlayer.isPrepared)
@@ -341,6 +446,17 @@ public class ChapterTitleCardView : UIViewBase
         }
 
         RestoreCardDetailObjects();
+
+        loadingTransitionState = LoadingTransitionState.Idle;
+        isLoadingReady = false;
+        isVideoFinished = false;
+        isFinishingVideo = false;
+
+        if (loadingSkipGuideObject != null)
+            loadingSkipGuideObject.SetActive(false);
+
+        if (proceedGuideObject != null)
+            proceedGuideObject.SetActive(false);
     }
 
     private void SetCardDetailObjectsActive(bool isActive)
@@ -361,6 +477,99 @@ public class ChapterTitleCardView : UIViewBase
                 cardDetailObjects[i].SetActive(initialDetailActiveStates[i]);
             }
         }
+    }
+
+    private void HandleLoadingVideoFinished(VideoPlayer source)
+    {
+        isVideoFinished = true;
+        TryFinishVideoStage();
+    }
+
+    private void HandleLoadingReady(UIChapterTitleCardLoadingReadyEvent eventData)
+    {
+        if (eventData.ChapterId != currentChapterId || loadingTransitionState != LoadingTransitionState.VideoPlaying) return;
+
+        isLoadingReady = true;
+
+        if (!isVideoFinished && loadingSkipGuideObject != null)
+        {
+            loadingSkipGuideObject.SetActive(true);
+        }
+
+        TryFinishVideoStage();
+    }
+
+    private void HandleSkipRequested(UIChapterTitleCardInputSkipRequestedEvent eventData)
+    {
+        if (loadingTransitionState != LoadingTransitionState.VideoPlaying || !isLoadingReady || isVideoFinished) return;
+
+        if (loadingVideoPlayer != null)
+        {
+            loadingVideoPlayer.Pause();
+        }
+
+        isVideoFinished = true;
+        TryFinishVideoStage();
+    }
+
+    private void TryFinishVideoStage()
+    {
+        if (!isVideoFinished || !isLoadingReady || isFinishingVideo) return;
+
+        StartCoroutine(FinishVideoStage());
+    }
+
+    private IEnumerator FinishVideoStage()
+    {
+        isFinishingVideo = true;
+
+        if (loadingSkipGuideObject != null)
+            loadingSkipGuideObject.SetActive(false);
+
+        bool fadeOutCompleted = false;
+
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                0f,
+                1f,
+                videoEndFadeOutDuration,
+                () => fadeOutCompleted = true));
+
+        while (!fadeOutCompleted)
+        {
+            yield return null;
+        }
+
+        isLoadingVisualActive = false;
+
+        if (loadingVideoPlayer != null)
+            loadingVideoPlayer.Stop();
+
+        if (loadingVideoImage != null)
+            loadingVideoImage.gameObject.SetActive(false);
+
+        if (loadingSpinner != null)
+        {
+            loadingSpinner.localRotation = Quaternion.identity;
+            loadingSpinner.gameObject.SetActive(false);
+        }
+
+        if (proceedGuideObject != null)
+            proceedGuideObject.SetActive(true);
+
+        loadingTransitionState = LoadingTransitionState.WaitingForProceed;
+        isFinishingVideo = false;
+    }
+
+    private void HandleProceedRequested()
+    {
+        if (loadingTransitionState != LoadingTransitionState.WaitingForProceed) return;
+
+        if (proceedGuideObject != null)
+            proceedGuideObject.SetActive(false);
+
+        EventBus<UIChapterTitleCardActivateSceneRequestedEvent>.Publish(
+            new UIChapterTitleCardActivateSceneRequestedEvent(currentChapterId));
     }
 
     private void SetText(Text targetText, string value)
