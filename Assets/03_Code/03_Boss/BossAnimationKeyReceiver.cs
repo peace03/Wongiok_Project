@@ -54,4 +54,28 @@ public class BossAnimationKeyReceiver : MonoBehaviour, IInitializable
                 BossEffectCue.KickImpact,
                 bossPatternLogic.GetAttackId()));
     }
+
+    public void PlaySpinImpact()
+    {
+        if (bossPatternLogic == null) return;
+        if (bossPatternLogic.IsParryed) return;
+        if (!bossPatternLogic.IsAttacking()) return;
+
+        EventBus<BossEffectEvent>.Publish(
+            new BossEffectEvent(
+                BossEffectCue.SpinImpact,
+                bossPatternLogic.GetAttackId()));
+    }
+
+    public void PlaySlamImpact()
+    {
+        if (bossPatternLogic == null) return;
+        if (bossPatternLogic.IsParryed) return;
+        if (!bossPatternLogic.IsAttacking()) return;
+
+        EventBus<BossEffectEvent>.Publish(
+            new BossEffectEvent(
+                BossEffectCue.SlamImpact,
+                bossPatternLogic.GetAttackId()));
+    }
 }
