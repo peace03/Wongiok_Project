@@ -550,7 +550,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 452930126422982396, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -300
+      value: -336
       objectReference: {fileID: 0}
     - target: {fileID: 954141477838998032, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_Name
@@ -642,7 +642,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3881884473409420717, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -440
+      value: -476
       objectReference: {fileID: 0}
     - target: {fileID: 4144447257398262626, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: titleEnterVideoClip
@@ -670,7 +670,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4709698501265509807, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -370
+      value: -406
       objectReference: {fileID: 0}
     - target: {fileID: 5093529826804114869, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -947,6 +947,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 7543733522730979478, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+    - {fileID: 7816360278034482688, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
+    - {fileID: 8660363607677492162, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b16c551a83908cf43a23dec704cd35fb, type: 3}
