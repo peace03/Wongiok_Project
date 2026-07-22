@@ -31,6 +31,7 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
     [SerializeField] private float diveSpeed = 14f;
     [SerializeField] private float explodeDistance = 0.6f;
     [SerializeField] private float maxDiveDuration = 2f;
+    [SerializeField] private bool lockDiveTargetAtWarningStart = true;
 
     [Header("Explosion")]
     [SerializeField] private LayerMask playerHitMask;
@@ -38,6 +39,15 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
     [SerializeField] private float fallbackExplosionDamage = 25f;
     [SerializeField] private GameObject explosionEffectPrefab;
     [SerializeField] private bool killSelfOnExplosion = true;
+
+    [Header("Warning Presentation")]
+    [SerializeField] private GameObject warningIndicator;
+    [SerializeField] private bool placeWarningIndicatorAtDiveTarget = true;
+    [SerializeField] private Vector3 warningIndicatorWorldOffset = new Vector3(0f, 0f, -0.05f);
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip warningClip;
+    [SerializeField] private AudioClip diveClip;
+    [SerializeField] private AudioClip explosionClip;
 
     [Header("Animation")]
     [SerializeField] private Animator animator;
@@ -47,6 +57,7 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
 
     private SelfDestructState currentState = SelfDestructState.Patrol;
     private bool isRunningRoutine;
+    private Vector3 lockedDiveTargetPosition;
 
     protected override bool UsesCharacterMotor
     {
@@ -68,17 +79,54 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
             animator = GetComponentInChildren<Animator>();
         }
 
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
         if (flyingMotor != null)
         {
             flyingMotor.Initialize(FixedZ);
         }
 
         EnsureDefaultPlayerHitMask();
+        SetWarningIndicatorVisible(false);
     }
 
-    // 인스펙터 값 변경 시 기본 레이어 마스크를 보정합니다
+    // 활성화될 때 자폭 상태와 경고 연출을 초기화합니다
+    private void OnEnable()
+    {
+        currentState = SelfDestructState.Patrol;
+        isRunningRoutine = false;
+        SetWarningIndicatorVisible(false);
+    }
+
+    // 비활성화될 때 자폭 루틴과 경고 연출을 정리합니다
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        CleanupSelfDestructPresentation();
+        currentState = SelfDestructState.Patrol;
+        isRunningRoutine = false;
+    }
+
+    // 인스펙터 값을 안전한 범위로 보정합니다
     private void OnValidate()
     {
+        patrolSpeedMultiplier = Mathf.Max(0f, patrolSpeedMultiplier);
+        chaseSpeedMultiplier = Mathf.Max(0f, chaseSpeedMultiplier);
+        hoverHeightAboveTarget = Mathf.Max(0f, hoverHeightAboveTarget);
+        flyingDetectionVerticalRange = Mathf.Max(0f, flyingDetectionVerticalRange);
+        chaseStopDistance = Mathf.Max(0f, chaseStopDistance);
+        prepareHorizontalRange = Mathf.Max(0f, prepareHorizontalRange);
+        prepareVerticalRange = Mathf.Max(0f, prepareVerticalRange);
+        prepareDuration = Mathf.Max(0f, prepareDuration);
+        diveSpeed = Mathf.Max(0f, diveSpeed);
+        explodeDistance = Mathf.Max(0f, explodeDistance);
+        maxDiveDuration = Mathf.Max(0f, maxDiveDuration);
+        explosionRadius = Mathf.Max(0f, explosionRadius);
+        fallbackExplosionDamage = Mathf.Max(0f, fallbackExplosionDamage);
+
         EnsureDefaultPlayerHitMask();
     }
 
@@ -151,16 +199,17 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         );
     }
 
-    // 자폭 준비 후 플레이어를 향해 돌진하고 폭발합니다
+    // 자폭 경고 후 고정되거나 추적되는 목표 지점으로 돌진합니다
     private IEnumerator SelfDestructRoutine()
     {
         isRunningRoutine = true;
         currentState = SelfDestructState.Warning;
+        lockedDiveTargetPosition = GetDiveTargetPosition();
 
-        if (animator != null && !string.IsNullOrEmpty(prepareTriggerName))
-        {
-            animator.SetTrigger(prepareTriggerName);
-        }
+        PlayAnimatorTrigger(prepareTriggerName);
+        PlayAudioClip(warningClip);
+        PositionWarningIndicator(lockedDiveTargetPosition);
+        SetWarningIndicatorVisible(true);
 
         Vector3 preparePosition = transform.position;
         flyingMotor.BeginShake();
@@ -182,12 +231,11 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         }
 
         flyingMotor.EndShake();
+        SetWarningIndicatorVisible(false);
         currentState = SelfDestructState.Dive;
 
-        if (animator != null && !string.IsNullOrEmpty(diveTriggerName))
-        {
-            animator.SetTrigger(diveTriggerName);
-        }
+        PlayAnimatorTrigger(diveTriggerName);
+        PlayAudioClip(diveClip);
 
         float diveElapsed = 0f;
 
@@ -200,9 +248,10 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
             }
 
             diveElapsed += Time.deltaTime;
-            FaceTarget();
 
-            Vector3 targetPosition = GetDiveTargetPosition();
+            Vector3 targetPosition = GetCurrentDiveTargetPosition();
+            FaceWorldPosition(targetPosition);
+
             bool reached = flyingMotor.MoveTowardPosition(
                 targetPosition,
                 diveSpeed,
@@ -225,8 +274,19 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
     // 자폭 루틴을 중단하고 이동 연출 상태를 정리합니다
     private void StopSelfDestructRoutine()
     {
-        flyingMotor.EndShake();
+        CleanupSelfDestructPresentation();
         isRunningRoutine = false;
+    }
+
+    // 돌진 중 사용할 현재 목표 위치를 반환합니다
+    private Vector3 GetCurrentDiveTargetPosition()
+    {
+        if (lockDiveTargetAtWarningStart)
+        {
+            return lockedDiveTargetPosition;
+        }
+
+        return GetDiveTargetPosition();
     }
 
     // 돌진 목표 위치를 계산합니다
@@ -240,6 +300,19 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         return FixDepthVector(GetTargetAimPosition());
     }
 
+    // 지정한 월드 위치를 향하도록 바라보는 방향을 설정합니다
+    private void FaceWorldPosition(Vector3 worldPosition)
+    {
+        if (worldPosition.x > transform.position.x)
+        {
+            SetFacingDirection(true);
+        }
+        else if (worldPosition.x < transform.position.x)
+        {
+            SetFacingDirection(false);
+        }
+    }
+
     // 폭발 이펙트와 범위 피해와 자폭 사망을 처리합니다
     private void Explode()
     {
@@ -250,13 +323,10 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
 
         currentState = SelfDestructState.Exploded;
         isRunningRoutine = false;
-        flyingMotor.EndShake();
+        CleanupSelfDestructPresentation();
 
-        if (animator != null && !string.IsNullOrEmpty(explodeTriggerName))
-        {
-            animator.SetTrigger(explodeTriggerName);
-        }
-
+        PlayAnimatorTrigger(explodeTriggerName);
+        PlayAudioClip(explosionClip);
         SpawnExplosionEffect();
         ApplyExplosionDamage();
 
@@ -327,7 +397,13 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         float damage = GetAttackPower(fallbackExplosionDamage);
 
         damageable.TakeDamage(damage);
-        PublishDamageHitEvent(GetDamageableGameObject(hitCollider, damageable), hitCollider, hitPoint, hitDirection, damage);
+        PublishDamageHitEvent(
+            GetDamageableGameObject(hitCollider, damageable),
+            hitCollider,
+            hitPoint,
+            hitDirection,
+            damage
+        );
     }
 
     // 폭발 중심에서 대상 방향으로 향하는 피격 방향을 계산합니다
@@ -376,7 +452,12 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
     }
 
     // 데미지 적용 사실을 이벤트 버스로 알립니다
-    private void PublishDamageHitEvent(GameObject targetObject, Collider hitCollider, Vector3 hitPoint, Vector3 hitDirection, float damage)
+    private void PublishDamageHitEvent(
+        GameObject targetObject,
+        Collider hitCollider,
+        Vector3 hitPoint,
+        Vector3 hitDirection,
+        float damage)
     {
         DamageHitEvent hitEvent = new DamageHitEvent(
             targetObject,
@@ -402,6 +483,66 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         SelfHealth.Kill();
     }
 
+    // 애니메이터 트리거를 안전하게 실행합니다
+    private void PlayAnimatorTrigger(string triggerName)
+    {
+        if (animator == null || string.IsNullOrEmpty(triggerName))
+        {
+            return;
+        }
+
+        animator.SetTrigger(triggerName);
+    }
+
+    // 지정한 오디오 클립을 안전하게 재생합니다
+    private void PlayAudioClip(AudioClip clip)
+    {
+        if (audioSource == null || clip == null)
+        {
+            return;
+        }
+
+        audioSource.PlayOneShot(clip);
+    }
+
+    // 경고 오브젝트를 돌진 목표 위치에 배치합니다
+    private void PositionWarningIndicator(Vector3 targetPosition)
+    {
+        if (warningIndicator == null || !placeWarningIndicatorAtDiveTarget)
+        {
+            return;
+        }
+
+        warningIndicator.transform.position = targetPosition + warningIndicatorWorldOffset;
+    }
+
+    // 경고 오브젝트의 표시 상태를 설정합니다
+    private void SetWarningIndicatorVisible(bool visible)
+    {
+        if (warningIndicator == null)
+        {
+            return;
+        }
+
+        if (warningIndicator.activeSelf == visible)
+        {
+            return;
+        }
+
+        warningIndicator.SetActive(visible);
+    }
+
+    // 떨림과 경고 표시를 함께 정리합니다
+    private void CleanupSelfDestructPresentation()
+    {
+        if (flyingMotor != null)
+        {
+            flyingMotor.EndShake();
+        }
+
+        SetWarningIndicatorVisible(false);
+    }
+
     // 기본 Player 레이어 마스크를 설정합니다
     private void EnsureDefaultPlayerHitMask()
     {
@@ -420,17 +561,14 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         playerHitMask = playerMask;
     }
 
-    // 사망 상태에 들어갈 때 자폭 루틴과 떨림 연출을 정리합니다
+    // 사망 상태에 들어갈 때 자폭 루틴과 경고 연출을 정리합니다
     protected override void OnDeadStateEntered()
     {
-        if (flyingMotor != null)
-        {
-            flyingMotor.EndShake();
-        }
-
+        StopAllCoroutines();
+        CleanupSelfDestructPresentation();
         currentState = SelfDestructState.Exploded;
         isRunningRoutine = false;
-        SetCharacterControllerEnabled(false);
+        base.OnDeadStateEntered();
     }
 
     // Scene 뷰에서 감지 범위와 자폭 준비 범위와 폭발 범위를 표시합니다
