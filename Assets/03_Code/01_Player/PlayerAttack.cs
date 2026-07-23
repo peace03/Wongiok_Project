@@ -11,6 +11,8 @@ public class PlayerAttack : MonoBehaviour
 
     [SerializeField] private Transform muzzlePivot;
 
+    [SerializeField] private GameObject shootingEffectPrefab;
+
     // 씬에 배치된 BulletFactory를 연결해 플레이어 총알을 가져옵니다.
     [SerializeField] private BulletFactory bulletFactory;
 
@@ -62,6 +64,7 @@ public class PlayerAttack : MonoBehaviour
             animator.SetTrigger(ShootTrigger);
         }
         bullet.StartFire(firePoint, ownerLayer, damage, penetrationCount);
+        PlayShootingEffect();
 
         // 발사 후처리 사운드나 이펙트가 반응할 수 있게 이벤트를 발행합니다.
         EventBus<PlayerAttackFiredEvent>.Publish(
@@ -84,6 +87,17 @@ public class PlayerAttack : MonoBehaviour
     {
         Transform pivot = muzzlePivot != null ? muzzlePivot : firePoint;
         pivot.rotation = Quaternion.FromToRotation(Vector3.forward, attackDirection.normalized);
+    }
+
+    private void PlayShootingEffect()
+    {
+        if (shootingEffectPrefab == null) return;
+
+        EventBus<EffectPlayData>.Publish(new EffectPlayData(
+            shootingEffectPrefab,
+            firePoint.position,
+            firePoint.rotation,
+            parent: firePoint));
     }
 
     private Vector3 GetAttackDirection(Vector2 aimInput, bool isFacingRight, bool isGrounded)

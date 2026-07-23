@@ -306,6 +306,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
   firePoint: {fileID: 5946435359066999164}
   muzzlePivot: {fileID: 7091615050073211964}
+  shootingEffectPrefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
   bulletFactory: {fileID: 0}
   animator: {fileID: 3024179795968737012}
   ownerLayer:

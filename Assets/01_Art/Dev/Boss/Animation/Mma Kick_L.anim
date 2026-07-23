@@ -74211,14 +74211,21 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.7
-    functionName: OnCollider
+    functionName: EnableAttack
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.7
+    functionName: PlayKickImpact
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.8333333
-    functionName: OffCollider
+    functionName: DisableAttack
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

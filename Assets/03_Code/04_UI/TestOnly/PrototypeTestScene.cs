@@ -456,34 +456,6 @@ public class PrototypeTestScene : MonoBehaviour
         return -1;
     }
 
-    private void AddOwnedSkill(UIPauseSkillInfoData skillData)
-    {
-        if (currentOwnedSkills == null)
-        {
-            currentOwnedSkills = new UIPauseSkillInfoData[] { skillData };
-            return;
-        }
-
-        for (int i = 0; i < currentOwnedSkills.Length; i++)
-        {
-            if (currentOwnedSkills[i].SkillId < 0)
-            {
-                currentOwnedSkills[i] = skillData;
-                return;
-            }
-        }
-
-        UIPauseSkillInfoData[] nextOwnedSkills = new UIPauseSkillInfoData[currentOwnedSkills.Length + 1];
-
-        for (int i = 0; i < currentOwnedSkills.Length; i++)
-        {
-            nextOwnedSkills[i] = currentOwnedSkills[i];
-        }
-
-        nextOwnedSkills[nextOwnedSkills.Length - 1] = skillData;
-        currentOwnedSkills = nextOwnedSkills;
-    }
-
     private void BuildEquippedSkills(PrototypeProgressSnapshot snapshot)
     {
         currentActiveSkills = new UIPauseSkillInfoData[EquippedSkillSlotCount];

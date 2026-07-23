@@ -75,11 +75,6 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         RestoreOriginalVisual();
     }
 
-    // 현재 유효하지 않은 위치에 드롭하면 취소 처리하므로 기존 DropView 호출 구조와의 호환을 위해 빈 메서드로 유지
-    public void MarkDroppedOnSlot()
-    {
-    }
-
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (!CanStartDrag())
@@ -104,14 +99,6 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         HideDragPreview();
         RestoreOriginalVisual();
-
-        /*
-        if (sourceType == PauseSkillDragSourceType.EquippedSlot && !droppedOnSlot)
-        {
-            EventBus<UIPauseSkillUnequipRequestedEvent>.Publish(
-                new UIPauseSkillUnequipRequestedEvent(sourceSlotIndex));
-        }
-        */
     }
 
     private bool CanStartDrag()

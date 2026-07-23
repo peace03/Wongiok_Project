@@ -229,6 +229,7 @@ public class ChapterTitleCardView : UIViewBase
 
     private void HandleBackClicked()
     {
+        EventBus<UIChapterSelectScrollPreserveRequestedEvent>.Publish(default);
         EventBus<UIChapterTitleCardBackRequestedEvent>.Publish(default);
     }
 

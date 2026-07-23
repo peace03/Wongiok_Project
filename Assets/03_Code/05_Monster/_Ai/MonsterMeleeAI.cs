@@ -17,20 +17,66 @@ public class MonsterMeleeAI : MonsterBase
     [SerializeField] private float attackRecovery = 0.35f;
     [SerializeField] private Vector3 attackBoxSize = new Vector3(1.2f, 1.2f, 1.2f);
     [SerializeField] private Vector3 attackBoxOffset = new Vector3(0.8f, 0f, 0f);
+    [SerializeField] private bool requireTargetInRangeAtImpact = true;
+    [SerializeField] private float impactRangeGrace = 0.25f;
+
+    [Header("Attack Presentation")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private string attackTriggerName = "Attack";
+    [SerializeField] private GameObject attackWarningIndicator;
+    [SerializeField] private AudioSource attackAudioSource;
+    [SerializeField] private AudioClip attackWarningClip;
 
     private float lastAttackEndTime = -999f;
     private bool isAttacking;
 
-    // 컴포넌트 초기화 후 기본 레이어 마스크를 보정합니다
+    // 공통 컴포넌트와 공격 연출 참조를 준비합니다
     protected override void Awake()
     {
         base.Awake();
+
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+        }
+
+        if (attackAudioSource == null)
+        {
+            attackAudioSource = GetComponent<AudioSource>();
+        }
+
         EnsureDefaultPlayerHitMask();
+        SetAttackWarningVisible(false);
     }
 
-    // 인스펙터 값 변경 시 기본 레이어 마스크를 보정합니다
+    // 활성화될 때 공격 상태를 초기화합니다
+    private void OnEnable()
+    {
+        lastAttackEndTime = -999f;
+        isAttacking = false;
+        SetAttackWarningVisible(false);
+    }
+
+    // 비활성화될 때 공격 루틴과 경고 연출을 정리합니다
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        ResetAttackState();
+    }
+
+    // 인스펙터 값을 안전한 범위로 보정합니다
     private void OnValidate()
     {
+        attackRange = Mathf.Max(0f, attackRange);
+        fallbackAttackDamage = Mathf.Max(0f, fallbackAttackDamage);
+        attackCooldown = Mathf.Max(0f, attackCooldown);
+        attackWindup = Mathf.Max(0f, attackWindup);
+        attackRecovery = Mathf.Max(0f, attackRecovery);
+        attackBoxSize.x = Mathf.Max(0f, attackBoxSize.x);
+        attackBoxSize.y = Mathf.Max(0f, attackBoxSize.y);
+        attackBoxSize.z = Mathf.Max(0f, attackBoxSize.z);
+        impactRangeGrace = Mathf.Max(0f, impactRangeGrace);
+
         EnsureDefaultPlayerHitMask();
     }
 
@@ -72,23 +118,109 @@ public class MonsterMeleeAI : MonsterBase
         StartCoroutine(AttackRoutine());
     }
 
-    // 공격 선딜 후 피격 판정을 실행합니다
+    // 공격 전조와 타격 판정과 후딜을 순서대로 처리합니다
     private IEnumerator AttackRoutine()
     {
         isAttacking = true;
         StopHorizontalMovement();
+        PlayAttackPresentation();
+        SetAttackWarningVisible(true);
 
-        yield return new WaitForSeconds(attackWindup);
+        float windupElapsed = 0f;
 
-        if (!IsDead)
+        while (windupElapsed < attackWindup)
+        {
+            if (IsDead)
+            {
+                ResetAttackState();
+                yield break;
+            }
+
+            FaceTarget();
+            windupElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        SetAttackWarningVisible(false);
+
+        if (!IsDead && CanApplyAttackAtImpact())
         {
             DoAttackHitCheck();
         }
 
-        yield return new WaitForSeconds(attackRecovery);
+        float recoveryElapsed = 0f;
+
+        while (recoveryElapsed < attackRecovery)
+        {
+            if (IsDead)
+            {
+                ResetAttackState();
+                yield break;
+            }
+
+            recoveryElapsed += Time.deltaTime;
+            yield return null;
+        }
 
         lastAttackEndTime = Time.time;
         isAttacking = false;
+    }
+
+    // 공격 애니메이션과 경고음을 실행합니다
+    private void PlayAttackPresentation()
+    {
+        if (animator != null && !string.IsNullOrEmpty(attackTriggerName))
+        {
+            animator.SetTrigger(attackTriggerName);
+        }
+
+        if (attackAudioSource != null && attackWarningClip != null)
+        {
+            attackAudioSource.PlayOneShot(attackWarningClip);
+        }
+    }
+
+    // 타격 순간에 대상이 유효한 범위 안에 남아 있는지 확인합니다
+    private bool CanApplyAttackAtImpact()
+    {
+        if (!requireTargetInRangeAtImpact)
+        {
+            return true;
+        }
+
+        if (Target == null)
+        {
+            return false;
+        }
+
+        return IsTargetInRange(
+            attackRange + impactRangeGrace,
+            VerticalTolerance + impactRangeGrace
+        );
+    }
+
+    // 공격 경고 오브젝트의 표시 상태를 설정합니다
+    private void SetAttackWarningVisible(bool visible)
+    {
+        if (attackWarningIndicator == null)
+        {
+            return;
+        }
+
+        if (attackWarningIndicator.activeSelf == visible)
+        {
+            return;
+        }
+
+        attackWarningIndicator.SetActive(visible);
+    }
+
+    // 공격 상태와 이동과 경고 연출을 초기화합니다
+    private void ResetAttackState()
+    {
+        isAttacking = false;
+        StopHorizontalMovement();
+        SetAttackWarningVisible(false);
     }
 
     // 공격 판정 박스 안의 IDamageable 대상에게 데미지를 줍니다
@@ -145,7 +277,13 @@ public class MonsterMeleeAI : MonsterBase
         float damage = GetAttackPower(fallbackAttackDamage);
 
         damageable.TakeDamage(damage);
-        PublishDamageHitEvent(GetDamageableGameObject(hitCollider, damageable), hitCollider, hitPoint, hitDirection, damage);
+        PublishDamageHitEvent(
+            GetDamageableGameObject(hitCollider, damageable),
+            hitCollider,
+            hitPoint,
+            hitDirection,
+            damage
+        );
     }
 
     // 중복 데미지 방지에 사용할 대상을 반환합니다
@@ -180,7 +318,12 @@ public class MonsterMeleeAI : MonsterBase
     }
 
     // 데미지 적용 사실을 이벤트 버스로 알립니다
-    private void PublishDamageHitEvent(GameObject targetObject, Collider hitCollider, Vector3 hitPoint, Vector3 hitDirection, float damage)
+    private void PublishDamageHitEvent(
+        GameObject targetObject,
+        Collider hitCollider,
+        Vector3 hitPoint,
+        Vector3 hitDirection,
+        float damage)
     {
         DamageHitEvent hitEvent = new DamageHitEvent(
             targetObject,
@@ -219,6 +362,14 @@ public class MonsterMeleeAI : MonsterBase
         playerHitMask = playerMask;
     }
 
+    // 사망 상태에 들어갈 때 공격 루틴과 경고 연출을 정리합니다
+    protected override void OnDeadStateEntered()
+    {
+        StopAllCoroutines();
+        ResetAttackState();
+        base.OnDeadStateEntered();
+    }
+
     // Scene 뷰에서 감지 범위와 공격 판정 범위를 표시합니다
     private void OnDrawGizmosSelected()
     {
@@ -232,7 +383,11 @@ public class MonsterMeleeAI : MonsterBase
     private Vector3 GetAttackBoxCenterForGizmo()
     {
         float direction = transform.localScale.x >= 0f ? 1f : -1f;
-        Vector3 offset = new Vector3(attackBoxOffset.x * direction, attackBoxOffset.y, attackBoxOffset.z);
+        Vector3 offset = new Vector3(
+            attackBoxOffset.x * direction,
+            attackBoxOffset.y,
+            attackBoxOffset.z
+        );
 
         return transform.position + offset;
     }

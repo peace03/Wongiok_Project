@@ -145,7 +145,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2132647017251550477}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: "\uAE30\uBCF8 \uC2E4\uD589 \uC704\uCE58"
   m_TagString: Untagged
   m_Icon: {fileID: 0}

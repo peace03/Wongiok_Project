@@ -22,7 +22,6 @@ public class PauseSkillSlotDropView : MonoBehaviour, IDropHandler, IPointerEnter
         if (dragItem.SkillId < 0)
             return;
 
-        dragItem.MarkDroppedOnSlot();
         SetHighlight(false);
 
         if (dragItem.SourceType == PauseSkillDragSourceType.OwnedSkill)

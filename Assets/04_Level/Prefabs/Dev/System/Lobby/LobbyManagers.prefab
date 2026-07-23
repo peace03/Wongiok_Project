@@ -108,8 +108,8 @@ MonoBehaviour:
     description: .
     thumbnail: {fileID: -1256117620, guid: 434af5df1e657cd4bb5ee18f243add6d, type: 3}
     background: {fileID: 21300000, guid: 17c44fd13c0cdef4e95e52839de45d6d, type: 3}
-    loadingVideoClip: {fileID: 32900000, guid: 81bd06e78e2b1e14ea245a432351c9ea, type: 3}
-  inGameSceneName: InGame
+    loadingVideoClip: {fileID: 32900000, guid: 9d48b2fde72e6c4489ed2250edf9c015, type: 3}
+  inGameSceneName: InGame2
   testMinimumLoadingPreviewTime: 3
   prologueVideoClip: {fileID: 32900000, guid: 9b1b18f31c316d0489bd80089bfa2dcb, type: 3}
 --- !u!114 &6342794808984572233
@@ -125,3 +125,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIInputBridge
   uiManager: {fileID: 8247197954084837672}
+  _input: {fileID: 0}

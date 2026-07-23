@@ -141,7 +141,9 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     {
         EventBus<ParryKeyDown>.action -= ParryKeyDown;
         telegraphDrawer?.StopSignal(); // 비활성화 뒤에도 남을 수 있는 사전신호와 연출 코루틴을 정리
-        EventBus<CanParryEvent>.Publish(new CanParryEvent(false)); // PlayerParry의 보스 패링 창을 강제로 닫음
+        // 비활성화되는 보스가 열어 둔 패링 창만 닫도록 현재 attackId를 함께 보낸다.
+        EventBus<CanParryEvent>.Publish(
+            new CanParryEvent(attackId, false)); // PlayerParry의 보스 패링 창을 강제로 닫음
     }
     #endregion
 
@@ -205,7 +207,9 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         telegraphExcuted = false;
         isParryed = false;
         isParryCanceled = true; // 공격 캔슬 플래그 발동
-        EventBus<CanParryEvent>.Publish(new CanParryEvent(false));
+        // 패링 성공으로 공격이 취소됐으므로 이 공격의 패링 시간과 콜라이더를 모두 닫는다.
+        EventBus<CanParryEvent>.Publish(
+            new CanParryEvent(attackId, false));
         EventBus<ColliderToggleEvent>.Publish(new ColliderToggleEvent(attackId, false));
     }
 
@@ -343,13 +347,13 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     /// <summary>
     /// [오브젝트 풀링(Pooling) 기반 파티클 최적화]: 이펙트를 매번 Instantiate/Destroy 하지 않고, 메모리에 있는 캐싱 객체의 위치만 옮겨 재사용(GC 발생 0%)합니다.
     /// </summary>
-    public void PlayEffect(ParticleSystem excuteEffect, float x, float y, float z)
-    {
-        if (excuteEffect == null) return;
-        Vector3 effectPos = new Vector3(x, y, z);
-        excuteEffect.transform.position = effectPos;
-        excuteEffect.Play();
-    }
+    //public void PlayEffect(ParticleSystem excuteEffect, float x, float y, float z)
+    //{
+    //    if (excuteEffect == null) return;
+    //    Vector3 effectPos = new Vector3(x, y, z);
+    //    excuteEffect.transform.position = effectPos;
+    //    excuteEffect.Play();
+    //}
 
     // 현재 유니티 애니메이터가 공격 관련 모션을 재생 중인지 확인합니다. (트랜지션 중 방어용)
     public bool IsAttacking()

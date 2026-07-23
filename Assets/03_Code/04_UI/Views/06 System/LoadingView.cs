@@ -20,12 +20,10 @@ public class LoadingView : UIViewBase
     protected override void Awake()
     {
         base.Awake();
-        SubscribeEvents();
     }
 
     private void OnDestroy()
     {
-        UnsubscribeEvents();
     }
 
     private void Update()
@@ -81,25 +79,5 @@ public class LoadingView : UIViewBase
         {
             spinningIcon.localRotation = Quaternion.identity;
         }
-    }
-
-    private void SubscribeEvents()
-    {
-        EventBus<UISetLoadingProgressEvent>.action += HandleSetLoadingProgress;
-    }
-
-    private void UnsubscribeEvents()
-    {
-        EventBus<UISetLoadingProgressEvent>.action -= HandleSetLoadingProgress;
-    }
-
-    private void HandleSetLoadingProgress(UISetLoadingProgressEvent eventData)
-    {
-        if (!string.IsNullOrEmpty(eventData.Message))
-        {
-            SetMessage(eventData.Message);
-        }
-
-        SetProgress(eventData.Progress);
     }
 }
