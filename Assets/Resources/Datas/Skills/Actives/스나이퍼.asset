@@ -34,7 +34,7 @@ MonoBehaviour:
     prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
   - type: 3
     priority: 0
-    prefab: {fileID: 6628276393031643956, guid: 1b2284c47b6a8b94db0758a854be7e90, type: 3}
+    prefab: {fileID: 6628276393031643956, guid: 6b235e51b019a9f478b3da92c24ccfd5, type: 3}
   - type: 4
     priority: 0
     prefab: {fileID: 6561904271629179525, guid: 2cdd3bb1227ee9348b2be96e207b9731, type: 3}
