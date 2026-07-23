@@ -78,4 +78,17 @@ public class BossAnimationKeyReceiver : MonoBehaviour, IInitializable
                 BossEffectCue.SlamImpact,
                 bossPatternLogic.GetAttackId()));
     }
+
+    public void PlayUltimateImpact(int comboIndex)
+    {
+        if (bossPatternLogic == null) return;
+        if (bossPatternLogic.IsParryed) return;
+        if (!bossPatternLogic.IsAttacking()) return;
+
+        EventBus<BossEffectEvent>.Publish(
+            new BossEffectEvent(
+                BossEffectCue.UltimateImpact,
+                bossPatternLogic.GetAttackId(),
+                comboIndex));
+    }
 }
