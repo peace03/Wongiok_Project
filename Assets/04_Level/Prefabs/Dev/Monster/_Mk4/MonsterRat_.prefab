@@ -337,7 +337,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   deadTriggerName: Dead
   destroyAfterDeath: 1
-  destroyDelay: 1.5
+  destroyDelay: 0.3
   disableCharacterControllerOnDeath: 1
 --- !u!114 &7744435740442770626
 MonoBehaviour:
