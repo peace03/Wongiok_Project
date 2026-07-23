@@ -335,15 +335,15 @@ public class SkillInstance
         int index;
 
         // 데미지를 입을 수 없는 물체의 인덱스를 찾는 데에 실패했다면(전부 데미지를 입을 수 있는 물체들이라면)
-        if ((index = Array.FindIndex(hits,
-                            hit => hit.transform.root.GetComponentInChildren<IDamageable>() == null)) == -1)
+        if ((index = Array.FindIndex(hits, hit => !hit.collider.isTrigger
+                                            && hit.transform.GetComponent<IDamageable>() == null)) == -1)
         {
             // 부딪힌 물체들의 수만큼
             foreach(var hit in hits)
             {
                 // 데미지를 입을 수 있고 소유자와 같은 레이어를 가지고 있지 않다면
-                if (hit.transform.root.GetComponentInChildren<IDamageable>() != null
-                                        && hit.transform.gameObject.layer != owner.layer)
+                if (hit.transform.GetComponent<IDamageable>() != null
+                        && hit.transform.root.gameObject.layer != owner.layer)
                     // 위치 반환
                     return hit.transform;
             }
@@ -355,8 +355,8 @@ public class SkillInstance
         for(int i = index - 1; i >= 0; i--)
         {
             // 데미지를 입을 수 있고 소유자와 같은 레이어를 가지고 있지 않다면
-            if (hits[i].transform.root.GetComponentInChildren<IDamageable>() != null
-                                    && hits[i].transform.gameObject.layer != owner.layer)
+            if (hits[i].transform.GetComponent<IDamageable>() != null
+                    && hits[i].transform.root.gameObject.layer != owner.layer)
                 // 위치 반환
                 return hits[i].transform;
         }

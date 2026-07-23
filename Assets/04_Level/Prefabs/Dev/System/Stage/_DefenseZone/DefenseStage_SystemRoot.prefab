@@ -1,5 +1,67 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &579951497771935809
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3352428263139919219}
+  m_Layer: 0
+  m_Name: Rally_03_Flight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3352428263139919219
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579951497771935809}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.18, y: -10.03, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2867604042857577818}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1033314514524812264
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1850820377963053751}
+  m_Layer: 0
+  m_Name: Rally_02_EnterArena
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1850820377963053751
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033314514524812264}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -23.43, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4365505202814810193}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2003059641918142588
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,7 +73,7 @@ GameObject:
   - component: {fileID: 4365505202814810193}
   - component: {fileID: 5130047375584818730}
   m_Layer: 0
-  m_Name: SpawnPoint_Right
+  m_Name: SpawnPoint_Rat_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,10 +88,12 @@ Transform:
   m_GameObject: {fileID: 2003059641918142588}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.91, y: -6.5, z: 0}
+  m_LocalPosition: {x: 29.31, y: -9.49, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1685103156721269027}
+  - {fileID: 1850820377963053751}
   m_Father: {fileID: 6158871898351583988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5130047375584818730
@@ -46,6 +110,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DefenseEnemySpawnPoint
   drawGizmo: 1
   gizmoRadius: 0.35
+  rallyPoints:
+  - {fileID: 1685103156721269027}
+  - {fileID: 1850820377963053751}
+  rallyMovementMode: 1
+  rallyMoveSpeed: 20
+  rallyArrivalDistance: 0.15
+  waitAtEachRallyPoint: 0
+  disableCombatAIUntilRallyComplete: 1
+  disableCharacterControllerDuringDirectMove: 1
+--- !u!1 &2185812585320685968
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1685103156721269027}
+  m_Layer: 0
+  m_Name: Rally_01_HoleExit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1685103156721269027
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2185812585320685968}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -10.67, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4365505202814810193}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2458676385758624827
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,7 +208,7 @@ GameObject:
   - component: {fileID: 1211742421099937731}
   - component: {fileID: 2284164535663318647}
   m_Layer: 0
-  m_Name: SpawnPoint_Left
+  m_Name: SpawnPoint_Rat_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -119,10 +223,12 @@ Transform:
   m_GameObject: {fileID: 3457934182826798660}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.79, y: -6.5, z: 0}
+  m_LocalPosition: {x: -26.03, y: -0.38, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 449496991741912417}
+  - {fileID: 4057220873775306846}
   m_Father: {fileID: 6158871898351583988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2284164535663318647
@@ -139,6 +245,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DefenseEnemySpawnPoint
   drawGizmo: 1
   gizmoRadius: 0.35
+  rallyPoints:
+  - {fileID: 449496991741912417}
+  - {fileID: 4057220873775306846}
+  rallyMovementMode: 1
+  rallyMoveSpeed: 20
+  rallyArrivalDistance: 0.15
+  waitAtEachRallyPoint: 0
+  disableCombatAIUntilRallyComplete: 1
+  disableCharacterControllerDuringDirectMove: 1
 --- !u!1 &3957507225118461773
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,7 +315,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -15, y: 0, z: -0}
-  m_LocalScale: {x: 3, y: 20, z: 0.8}
+  m_LocalScale: {x: 3, y: 20, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1924974615467157579}
@@ -215,10 +330,10 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 655424
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 268498871
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -253,7 +368,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 15, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 20, z: 0.8}
+  m_LocalScale: {x: 3, y: 20, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1924974615467157579}
@@ -268,10 +383,10 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 655424
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 268498871
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -340,31 +455,15 @@ MonoBehaviour:
   - waveName: First_Wave
     startDelay: 1
     entries:
-    - enemyPrefab: {fileID: 2119555654188945350, guid: 98beb77137f7b3d42bef959ee9bf809e, type: 3}
+    - enemyPrefab: {fileID: 3764868410852666932, guid: fb576be45b57eca4eb38e483be7752d1, type: 3}
       spawnPoint: {fileID: 2284164535663318647}
-      count: 1
+      count: 2
       spawnInterval: 1
-    - enemyPrefab: {fileID: 2119555654188945350, guid: 98beb77137f7b3d42bef959ee9bf809e, type: 3}
+    - enemyPrefab: {fileID: 3764868410852666932, guid: fb576be45b57eca4eb38e483be7752d1, type: 3}
       spawnPoint: {fileID: 5130047375584818730}
-      count: 1
+      count: 2
       spawnInterval: 1
-    - enemyPrefab: {fileID: 4896867435566877034, guid: 5851a91613f032641913a160717bbd01, type: 3}
-      spawnPoint: {fileID: 5840226849850585283}
-      count: 3
-      spawnInterval: 1
-    afterClearDelay: 2
-  - waveName: Second_Wave
-    startDelay: 1
-    entries:
-    - enemyPrefab: {fileID: 2951947735607830848, guid: efad85a9cd0ae0142b22709c5bbd5afe, type: 3}
-      spawnPoint: {fileID: 2284164535663318647}
-      count: 1
-      spawnInterval: 1
-    - enemyPrefab: {fileID: 2951947735607830848, guid: efad85a9cd0ae0142b22709c5bbd5afe, type: 3}
-      spawnPoint: {fileID: 5130047375584818730}
-      count: 1
-      spawnInterval: 1
-    - enemyPrefab: {fileID: 4896867435566877034, guid: 5851a91613f032641913a160717bbd01, type: 3}
+    - enemyPrefab: {fileID: 161236733381727142, guid: c1da29205b20447429853ea82c156677, type: 3}
       spawnPoint: {fileID: 5840226849850585283}
       count: 3
       spawnInterval: 1
@@ -376,6 +475,37 @@ MonoBehaviour:
   onStageCleared:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &6911505930648136094
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4057220873775306846}
+  m_Layer: 0
+  m_Name: Rally_02_EnterArena
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4057220873775306846
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6911505930648136094}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 15.84, y: -8.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1211742421099937731}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6914859935342041006
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,6 +539,99 @@ Transform:
   - {fileID: 6209214821684600954}
   m_Father: {fileID: 8752373367679938971}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7115386969885655765
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 449496991741912417}
+  m_Layer: 0
+  m_Name: Rally_01_HoleExit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &449496991741912417
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7115386969885655765}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.7, y: -8.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1211742421099937731}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7399985259670953534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5863557288126840690}
+  m_Layer: 0
+  m_Name: Rally_02_Flight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5863557288126840690
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7399985259670953534}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.73, y: -6.32, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2867604042857577818}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7571836794762678339
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6305596723135810684}
+  m_Layer: 0
+  m_Name: Rally_01_Flight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6305596723135810684
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7571836794762678339}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.25, y: -4.66, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2867604042857577818}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8110316569104320405
 GameObject:
   m_ObjectHideFlags: 0
@@ -436,7 +659,7 @@ Transform:
   m_GameObject: {fileID: 8110316569104320405}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.3, y: 0, z: 0}
+  m_LocalPosition: {x: -5.58, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 20, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -504,10 +727,13 @@ Transform:
   m_GameObject: {fileID: 8769708689889594113}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.5, z: 0}
+  m_LocalPosition: {x: 2.17, y: 4.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6305596723135810684}
+  - {fileID: 5863557288126840690}
+  - {fileID: 3352428263139919219}
   m_Father: {fileID: 6158871898351583988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5840226849850585283
@@ -524,6 +750,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DefenseEnemySpawnPoint
   drawGizmo: 1
   gizmoRadius: 0.35
+  rallyPoints:
+  - {fileID: 6305596723135810684}
+  - {fileID: 5863557288126840690}
+  - {fileID: 3352428263139919219}
+  rallyMovementMode: 2
+  rallyMoveSpeed: 8
+  rallyArrivalDistance: 0.15
+  waitAtEachRallyPoint: 0
+  disableCombatAIUntilRallyComplete: 1
+  disableCharacterControllerDuringDirectMove: 1
 --- !u!1 &9144972363040222086
 GameObject:
   m_ObjectHideFlags: 0
@@ -548,10 +784,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9144972363040222086}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: 33, y: -2, z: 26}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -5, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8752373367679938971}
-  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -10,19 +11,23 @@ public class Bullet : MonoBehaviour, IPoolable
     [Header("최대 유지 시간")]
     [SerializeField] private float maxLifeTime = 5f;        // 최대 유지 시간
 
-    private LayerMask ownerLayer;                           // 소유자 레이어
-    private float damage;                                   // 데미지
-    private int penetrationCount;                           // 관통 횟수
-    private float bulletSpeed;                              // 총알 속도
+    private List<Collider> enteredColliders = new();        // 충돌 처리한 콜라이더들 리스트
 
     private IObjectPool<GameObject> returnRef;              // 반납 오브젝트 풀 주소
 
     private Coroutine timerCoroutine;                       // 타이머 코루틴
     private WaitForSeconds returnTime;                      // 반납 시간
 
+    private LayerMask ownerLayer;                           // 소유자 레이어
+
     private bool startFire = false;                         // 사격 시작 여부
     private bool isReturnedToPool;                          // 풀 반환 완료 여부
+
+    private float bulletSpeed;                              // 총알 속도
+    private float damage;                                   // 데미지
     private float cameraShakeValue;                         // 카메라 흔들림 값
+    
+    private int penetrationCount;                           // 관통 횟수
 
     private void Update()
     {
@@ -32,14 +37,9 @@ public class Bullet : MonoBehaviour, IPoolable
 
         // 전방에 부딪힐 물체가 있다면
         if(Physics.Raycast(transform.position, transform.forward, out RaycastHit hit,
-                                                                bulletSpeed * Time.deltaTime))
-        {
-            // 총알의 위치를 충돌 지점으로 이동
-            transform.position = hit.point;
+                                                    bulletSpeed * Time.deltaTime, ~ownerLayer))
             // 콜라이더 충돌 처리 시작
             EnterColliderProcess(hit.collider);
-            return;
-        }
 
         // 전방으로 총알 발사
         transform.position += bulletSpeed * Time.deltaTime * transform.forward;
@@ -65,20 +65,54 @@ public class Bullet : MonoBehaviour, IPoolable
             // 타이머 코루틴 초기화
             timerCoroutine = null;
         }
+
+        // 하위 오브젝트가 있다면
+        if (transform.childCount > 0)
+        {
+            // 하위 오브젝트들의 이펙트 실행기 인터페이스들 받아오기
+            var executers = transform.GetComponentsInChildren<IEffectExecuter>();
+
+            // 이펙트 실행기들의 수만큼
+            foreach (var executer in executers)
+                // 이펙트 종료 및 반납
+                executer.StopEffect();
+        }
+
+        // 충돌 처리한 콜라이더들이 있다면
+        if (enteredColliders.Count > 0)
+            // 리스트 초기화
+            enteredColliders.Clear();
     }
 
     /// <summary>
     /// 콜라이더 충돌 시 호출되는 함수
     /// </summary>
-    /// <param name="other"></param>
-    private void EnterColliderProcess(Collider other)
+    /// <param name="other">충돌한 콜라이더</param>
+    /// <param name="pos">충돌한 위치</param>
+    private void EnterColliderProcess(Collider other, Vector3? pos = null)
     {
+        // 충돌 처리한 콜라이더라면
+        if (enteredColliders.Contains(other))
+            return;
+
+        // 충돌 처리한 콜라이더들 리스트에 추가
+        enteredColliders.Add(other);
+
+        // 통과할 수 있는 물체라면
+        if (other.isTrigger)
+            return;
+
         // 부딪힌 대상의 최상위로 이동 후 하위 오브젝트 중, 데미지를 입을 수 있는 물체가 있는지 받아오기
         var target = other.transform.root.GetComponentInChildren<IDamageable>();
 
         // 데미지를 입을 수 없는 물체라면
         if (target == null)
         {
+            // 부딪힌 위치가 비어있지 않다면
+            if (pos != null)
+                // 총알 위치를 부딪힌 위치로 수정
+                transform.position = (Vector3)pos;
+
             // 총알 반납
             ReturnToPool();
             return;
@@ -104,8 +138,15 @@ public class Bullet : MonoBehaviour, IPoolable
 
             // 관통 횟수가 남아있지 않다면
             if (penetrationCount <= -1)
+            {
+                // 부딪힌 위치가 비어있지 않다면
+                if (pos != null)
+                    // 총알 위치를 부딪힌 위치로 수정
+                    transform.position = (Vector3)pos;
+
                 // 총알 반납
                 ReturnToPool();
+            }
         }
     }
 
@@ -136,13 +177,18 @@ public class Bullet : MonoBehaviour, IPoolable
         if (transform.childCount > 0)
         {
             // 하위 오브젝트들의 이펙트 실행기 인터페이스들 받아오기
-            var executers = transform.GetComponentsInChildren<IEffectExecuter>(true);
+            var executers = transform.GetComponentsInChildren<IEffectExecuter>();
 
             // 이펙트 실행기들의 수만큼
             foreach (var executer in executers)
                 // 이펙트 종료 및 반납
                 executer.StopEffect();
         }
+
+        // 충돌 처리한 콜라이더들이 있다면
+        if (enteredColliders.Count > 0)
+            // 리스트 초기화
+            enteredColliders.Clear();
 
         // 총알 반납하기
         returnRef.Release(gameObject);

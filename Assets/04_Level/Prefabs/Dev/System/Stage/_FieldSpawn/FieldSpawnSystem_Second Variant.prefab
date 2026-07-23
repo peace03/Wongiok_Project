@@ -1,0 +1,398 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &881320021448824545
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4686223578937125102}
+  - component: {fileID: 7272118319582155255}
+  m_Layer: 0
+  m_Name: SpawnLane_Ground_03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4686223578937125102
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 881320021448824545}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 35.36, y: -5.13, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6082028733429300131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7272118319582155255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 881320021448824545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97633a3eb56e0b245a7c4e8ca3d93927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FieldSpawnLane
+  laneType: 0
+  size: {x: 8, y: 4}
+  useTransformZ: 1
+  fixedZ: 0
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundSpawnOffset: 0.05
+  extraGroundRaycastDistance: 2
+  gizmoColor: {r: 0.2, g: 0.8, b: 1, a: 0.25}
+--- !u!1 &1458472444465139332
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4995577312758053869}
+  - component: {fileID: 6806036239832116930}
+  m_Layer: 0
+  m_Name: SpawnLane_Ground_04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4995577312758053869
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458472444465139332}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 43.55, y: -10.87, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6082028733429300131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6806036239832116930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458472444465139332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97633a3eb56e0b245a7c4e8ca3d93927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FieldSpawnLane
+  laneType: 0
+  size: {x: 6, y: 4}
+  useTransformZ: 1
+  fixedZ: 0
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundSpawnOffset: 0.05
+  extraGroundRaycastDistance: 2
+  gizmoColor: {r: 0.2, g: 0.8, b: 1, a: 0.25}
+--- !u!1 &2603825526795856778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2446015150375947528}
+  - component: {fileID: 7556570872812305670}
+  m_Layer: 0
+  m_Name: SpawnLane_Ground_02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2446015150375947528
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2603825526795856778}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 27.48, y: -10.87, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6082028733429300131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7556570872812305670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2603825526795856778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97633a3eb56e0b245a7c4e8ca3d93927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FieldSpawnLane
+  laneType: 0
+  size: {x: 6, y: 4}
+  useTransformZ: 1
+  fixedZ: 0
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundSpawnOffset: 0.05
+  extraGroundRaycastDistance: 2
+  gizmoColor: {r: 0.2, g: 0.8, b: 1, a: 0.25}
+--- !u!1 &2949990504834896028
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4785102921719757232}
+  - component: {fileID: 2149503784568098843}
+  m_Layer: 0
+  m_Name: SpawnLane_Ground_05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4785102921719757232
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949990504834896028}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 61.63, y: -5.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6082028733429300131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2149503784568098843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949990504834896028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97633a3eb56e0b245a7c4e8ca3d93927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FieldSpawnLane
+  laneType: 0
+  size: {x: 27, y: 4}
+  useTransformZ: 1
+  fixedZ: 0
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundSpawnOffset: 0.05
+  extraGroundRaycastDistance: 2
+  gizmoColor: {r: 0.2, g: 0.8, b: 1, a: 0.25}
+--- !u!1 &8586226893072850074
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 629748983848740152}
+  - component: {fileID: 852626801606445539}
+  m_Layer: 0
+  m_Name: SpawnLane_Flying_01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &629748983848740152
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8586226893072850074}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 42.27, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6082028733429300131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &852626801606445539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8586226893072850074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97633a3eb56e0b245a7c4e8ca3d93927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FieldSpawnLane
+  laneType: 1
+  size: {x: 65, y: 6}
+  useTransformZ: 1
+  fixedZ: 0
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundSpawnOffset: 0.05
+  extraGroundRaycastDistance: 2
+  gizmoColor: {r: 0.2, g: 0.8, b: 1, a: 0.25}
+--- !u!1001 &8203267302715307309
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 113
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 684294430630124614, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3775330130980446012, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 3775330130980446012, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: maxTotalSpawns
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: maxAliveMonsters
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: spawnLanes.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: 'spawnLanes.Array.data[1]'
+      value: 
+      objectReference: {fileID: 7556570872812305670}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: 'spawnLanes.Array.data[2]'
+      value: 
+      objectReference: {fileID: 7272118319582155255}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: 'spawnLanes.Array.data[3]'
+      value: 
+      objectReference: {fileID: 6806036239832116930}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: 'spawnLanes.Array.data[4]'
+      value: 
+      objectReference: {fileID: 2149503784568098843}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: 'spawnLanes.Array.data[5]'
+      value: 
+      objectReference: {fileID: 852626801606445539}
+    - target: {fileID: 4701232538638862632, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: 'spawnLanes.Array.data[7]'
+      value: 
+      objectReference: {fileID: 852626801606445539}
+    - target: {fileID: 5150678710697638406, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: size.x
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8174448035169261413, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      propertyPath: m_Name
+      value: FieldSpawnSystem_Second Variant
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: 7417196064681483675, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2715785811930484366, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2446015150375947528}
+    - targetCorrespondingSourceObject: {fileID: 2715785811930484366, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4686223578937125102}
+    - targetCorrespondingSourceObject: {fileID: 2715785811930484366, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4995577312758053869}
+    - targetCorrespondingSourceObject: {fileID: 2715785811930484366, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4785102921719757232}
+    - targetCorrespondingSourceObject: {fileID: 2715785811930484366, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 629748983848740152}
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+--- !u!4 &6082028733429300131 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2715785811930484366, guid: 95598822e992fce4297d46b5530e0815, type: 3}
+  m_PrefabInstance: {fileID: 8203267302715307309}
+  m_PrefabAsset: {fileID: 0}
