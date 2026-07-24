@@ -456,6 +456,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2041438938}
     m_Modifications:
+    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: status.maxHP.BaseValue
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1694174912881658797, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 16.3
+      objectReference: {fileID: 0}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: ground
       value: 
@@ -684,6 +692,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3187099092208369772, guid: 67908368695eefd41882919494b66490, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8870100778169416492, guid: 67908368695eefd41882919494b66490, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1460,6 +1472,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bb70dc853d0ebc4298a8a7749793bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointHealSystem
+  playerStatus: {fileID: 0}
+  lifeTracker: {fileID: 0}
+  healItemInventory: {fileID: 0}
 --- !u!114 &919054765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1693,6 +1708,10 @@ PrefabInstance:
       propertyPath: Target.TrackingTarget
       value: 
       objectReference: {fileID: 919054760}
+    - target: {fileID: 5715345019704869880, guid: f24c29667c863a4478b649cff22eb4ba, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.300001
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

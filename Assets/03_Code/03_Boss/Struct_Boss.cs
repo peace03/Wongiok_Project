@@ -28,16 +28,18 @@ public struct ColliderToggleEvent
 }
 
 //애니메이션 타이밍에 맞춰 재생할 보스 VFX 종류
-public enum BossEffectCue { KickImpact, SpinImpact, SlamImpact }
+public enum BossEffectCue { KickImpact, SpinImpact, SlamImpact, UltimateImpact }
 //보스 VFX 재생 요청 이벤트
 public struct BossEffectEvent
 {
     public BossEffectCue Cue { get; private set; }
     public string AttackId { get; private set; }
-    public BossEffectEvent(BossEffectCue cue, string attackId)
+    public int Variant { get; private set; }
+    public BossEffectEvent(BossEffectCue cue, string attackId, int variant = 0)
     {
         Cue = cue;
         AttackId = attackId;
+        Variant = variant;
     }
 }
 

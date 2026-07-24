@@ -11,6 +11,15 @@ public class CinderellaAttackEffectController : MonoBehaviour
     [SerializeField] private GameObject spinImpactPrefab;
     [SerializeField] private Transform spinImpactPoint;
     [SerializeField, Min(0.1f)] private float spinImpactDuration = 0.5f;
+    [Header("Attack C - Slam Impact")]
+    [SerializeField] private GameObject slamImpactPrefab;
+    [SerializeField] private Transform slamImpactPoint;
+    [SerializeField, Min(0.1f)] private float slamImpactDuration = 0.5f;
+    [Header("Attack Ultimate - Slam Impact")]
+    [SerializeField] private GameObject ultimateImpactPrefab;
+    [SerializeField] private Transform ultimateCenterImpactPoint;
+    [SerializeField] private Transform ultimateChestImpactPoint;
+    [SerializeField, Min(0.1f)] private float ultimateImpactDuration = 0.5f;
 
     private Facing currentFacing = Facing.Left;
 
@@ -29,16 +38,32 @@ public class CinderellaAttackEffectController : MonoBehaviour
     private void HandleFacingChanged(BossFacingChangeEvent data) { currentFacing = data.dir; }
 
     //방향값 설정
-    private Quaternion GetImpactRotation(BossEffectCue cue)
+    private Quaternion GetImpactRotation(BossEffectCue cue, int comboIndex = 0)
     {
         if(cue == BossEffectCue.KickImpact) //패턴 A일 때 공격 회전도
         {
             if (currentFacing == Facing.Left) return Quaternion.Euler(20f, 180f, 20f);
             else return Quaternion.Euler(160f, 0f, -20f);
         }
-        if(cue == BossEffectCue.SpinImpact)
+        if(cue == BossEffectCue.SpinImpact) //패턴 B일 때 공격 회전도
         {
             return Quaternion.Euler(-10f, 0f, 0f);
+        }
+        //패턴C 이펙트는 각도가 필요없어서 그냥 재생해줌
+        if(cue == BossEffectCue.UltimateImpact) //궁극기일 때 공격 회전도
+        {
+            switch (comboIndex)
+            {
+                case 1:
+                    if (currentFacing == Facing.Left) return Quaternion.Euler(8f, 180f, 0f);
+                    else return Quaternion.Euler(170f, -8f, 0f);
+                case 2:
+                    if (currentFacing == Facing.Left) return Quaternion.Euler(7f, 180f, 19f);
+                    else return Quaternion.Euler(-22f, 50f, 9f);
+                case 3:
+                    if (currentFacing == Facing.Left) return Quaternion.Euler(12f, 180f, 20f);
+                    else return Quaternion.Euler(-188f, 0f, -21f);
+            }
         }
         return default;
     }
@@ -47,7 +72,7 @@ public class CinderellaAttackEffectController : MonoBehaviour
     //애니메이션 이벤트가 발행한 보스 VFX 요청 처리
     private void HandleBossEffect(BossEffectEvent effectEvent)
     {
-        if (effectEvent.Cue == BossEffectCue.KickImpact)
+        if (effectEvent.Cue == BossEffectCue.KickImpact) //패턴A 이펙트 재생
         {
             EffectManager.Instance.PlayEffect(
                 kickImpactPrefab,
@@ -55,14 +80,30 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 GetImpactRotation(effectEvent.Cue),
                 kickImpactDuration);
         }
-        if (effectEvent.Cue == BossEffectCue.SpinImpact)
+        if (effectEvent.Cue == BossEffectCue.SpinImpact) //패턴B 이펙트 재생
         {
-            Debug.Log("SpinImpact");
             EffectManager.Instance.PlayEffect(
                 spinImpactPrefab,
                 spinImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue),
                 spinImpactDuration);
+        }
+        if (effectEvent.Cue == BossEffectCue.SlamImpact) //패턴C 이펙트 재생
+        {
+            EffectManager.Instance.PlayEffect(
+                slamImpactPrefab,
+                slamImpactPoint.position,
+                GetImpactRotation(effectEvent.Cue),
+                slamImpactDuration);
+        }
+        if(effectEvent.Cue == BossEffectCue.UltimateImpact) //궁극기 이펙트 재생
+        {
+            EffectManager.Instance.PlayEffect(
+                ultimateImpactPrefab,
+                //궁극기 첫 공격이면 가슴 위치에서 이펙트 재생
+                effectEvent.Variant == 1 ? ultimateChestImpactPoint.position : ultimateCenterImpactPoint.position,
+                GetImpactRotation(effectEvent.Cue, effectEvent.Variant),
+                ultimateImpactDuration);
         }
     }
 }
