@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 [Serializable]
@@ -206,8 +205,6 @@ public class SkillInstance
         // 바꾼 상태가 쿨타임이라면
         else if (IsOnCoolTime)
         {
-            // 무기 외형 착용 해제 이벤트 발행
-            EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
             // 현재 쿨타임 초기화
             curCoolTime = 0f;
         }
@@ -235,13 +232,17 @@ public class SkillInstance
         // 바꾼 상태가 차징 상태라면
         else if (IsCharging)
         {
+            var ownerCollider = owner.transform.GetComponent<Collider>();
+
             // 실행 위치들의 수만큼
             foreach (var place in executer.ExecutePlaces)
             {
                 // 차징 이펙트 실행
                 ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Charging, place);
                 // 타겟 찾기
-                Transform target = GetLastTarget(place, 30f);
+                var target = GetLastTarget(ownerCollider != null ? ownerCollider.bounds.center
+                                                                            : owner.transform.position,
+                                                                                        place.forward, 30f);
 
                 // 타겟을 찾았다면
                 if (target != null)
@@ -320,10 +321,13 @@ public class SkillInstance
     /// <summary>
     /// 마지막 타겟 반환 함수
     /// </summary>
-    private Transform GetLastTarget(Transform origin, float distance)
+    /// <param name="position">시작 위치</param>
+    /// <param name="direction">탐색 방향</param>
+    /// <param name="distance">탐색 사거리</param>
+    private Transform GetLastTarget(Vector3 position, Vector3 direction, float distance)
     {
-        // 원하는 위치에서 전방으로 사거리만큼 보이지 않는 레이저를 쏴서 부딪힌 물체 받아오기
-        var hits = Physics.RaycastAll(origin.position, origin.forward, distance);
+        // 특정 위치에서, 특정 방향으로 사거리만큼 보이지 않는 레이저를 쏴서 부딪힌 물체 받아오기
+        var hits = Physics.RaycastAll(position, direction, distance);
 
         // 부딪힌 물체가 없다면
         if (hits.Length == 0)
