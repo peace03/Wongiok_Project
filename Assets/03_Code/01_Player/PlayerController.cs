@@ -144,7 +144,9 @@ public class PlayerController : MonoBehaviour
         if (!isInitialized) return;
 
         PlayerInput();
-        _attack?.SetMoving(MoveInput.sqrMagnitude > 0.01f);
+        bool isHorizontalMove = Mathf.Abs(MoveInput.x) > 0.1f
+            && Mathf.Abs(MoveInput.y) <= 0.1f;
+        _attack?.SetMoving(isHorizontalMove);
         UpdateFacingDirection();
 
         if (_currentState != null && _currentState.CanParry)
@@ -283,7 +285,11 @@ public class PlayerController : MonoBehaviour
     {
         if (visualRoot == null) return;
 
-        visualRoot.localRotation = Quaternion.Euler(0f, _isFacingRight ? 0f : 180f, 0f);
+        visualRoot.localRotation = Quaternion.identity;
+
+        Vector3 localScale = visualRoot.localScale;
+        localScale.x = Mathf.Abs(localScale.x) * (_isFacingRight ? 1f : -1f);
+        visualRoot.localScale = localScale;
     }
 
     private void HandleAttackInput()

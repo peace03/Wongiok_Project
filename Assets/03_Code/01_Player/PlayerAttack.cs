@@ -33,6 +33,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void Awake()
     {
+        ResolveAnimator();
         // 실제 참조 캐싱은 PlayerInitializer에서 순서를 보장해 처리합니다.
     }
 
@@ -78,9 +79,17 @@ public class PlayerAttack : MonoBehaviour
 
     public void SetMoving(bool isMoving)
     {
+        ResolveAnimator();
         if (animator == null || animator.runtimeAnimatorController == null) return;
 
         animator.SetBool(IsMoving, isMoving);
+    }
+
+    private void ResolveAnimator()
+    {
+        if (animator != null && animator.gameObject.activeInHierarchy) return;
+
+        animator = GetComponentInChildren<Animator>(true);
     }
 
     private void UpdateMuzzleDirection(Vector3 attackDirection)
