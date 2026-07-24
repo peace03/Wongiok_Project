@@ -476,6 +476,38 @@ PrefabInstance:
       propertyPath: worldZPos
       value: 
       objectReference: {fileID: 1816822191}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: excuteAttackType_InGame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3467774806118743601, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_Size.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3467774806118743601, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_Size.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3467774806118743601, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_Size.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3467774806118743601, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_Center.x
+      value: -1.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3469476197187486684, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_Size.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3469476197187486684, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_Size.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3469476197187486684, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: m_Center.x
+      value: -1.9
+      objectReference: {fileID: 0}
     - target: {fileID: 4456096972685270820, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -516,10 +548,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: spinImpactPrefab
+      value: 
+      objectReference: {fileID: 1161130507}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: kickImpactDuration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: spinImpactDuration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: ultimateImpactDuration
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6223549514262989571, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 5d418e08e8554c0459eab28b54fe9e97, type: 2}
+    - target: {fileID: 7138899002605568159, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: useSlowMo
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9183643652835930706, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_Name
       value: CinderellaBoss
@@ -1476,6 +1528,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bb70dc853d0ebc4298a8a7749793bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointHealSystem
+  playerStatus: {fileID: 0}
+  lifeTracker: {fileID: 0}
+  healItemInventory: {fileID: 0}
 --- !u!114 &919054765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1598,6 +1653,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35ee84db9bef3f34f8cfe6f1b3e5c215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+--- !u!1 &1161130507 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3716170479167962960, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+  m_PrefabInstance: {fileID: 160793948}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1225416758
 GameObject:
   m_ObjectHideFlags: 0

@@ -10184,15 +10184,15 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.45
-    functionName: PlaySpinImpact
+  - time: 0.5
+    functionName: EnableAttack
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.5
-    functionName: EnableAttack
+    functionName: PlaySpinImpact
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
