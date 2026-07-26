@@ -285,10 +285,12 @@ public class PlayerController : MonoBehaviour
     {
         if (visualRoot == null) return;
 
-        visualRoot.localRotation = Quaternion.identity;
+        visualRoot.localRotation = _isFacingRight
+            ? Quaternion.identity
+            : Quaternion.Euler(0f, 180f, 0f);
 
         Vector3 localScale = visualRoot.localScale;
-        localScale.x = Mathf.Abs(localScale.x) * (_isFacingRight ? 1f : -1f);
+        localScale.x = Mathf.Abs(localScale.x);
         visualRoot.localScale = localScale;
     }
 

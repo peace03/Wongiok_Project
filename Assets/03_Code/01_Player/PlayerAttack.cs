@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerAttack : MonoBehaviour
 {
     private static readonly int ShootTrigger = Animator.StringToHash("Shoot");
+    private static readonly int HitTrigger = Animator.StringToHash("Hit");
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
     [Header("References")]
@@ -83,6 +84,14 @@ public class PlayerAttack : MonoBehaviour
         if (animator == null || animator.runtimeAnimatorController == null) return;
 
         animator.SetBool(IsMoving, isMoving);
+    }
+
+    public void PlayHitAnimation()
+    {
+        ResolveAnimator();
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+
+        animator.SetTrigger(HitTrigger);
     }
 
     private void ResolveAnimator()
