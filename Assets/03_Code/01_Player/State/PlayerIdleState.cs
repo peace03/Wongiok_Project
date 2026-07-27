@@ -13,6 +13,7 @@ public class PlayerIdleState : PlayerBaseState
 
     public override void EnterState()
     {
+        controller.SetLocomotionAnimation(false);
         Debug.Log("Idle Enter");
     }
 

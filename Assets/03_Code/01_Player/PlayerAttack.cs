@@ -2,10 +2,6 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    private static readonly int ShootTrigger = Animator.StringToHash("Shoot");
-    private static readonly int HitTrigger = Animator.StringToHash("Hit");
-    private static readonly int IsMoving = Animator.StringToHash("IsMoving");
-
     [Header("References")]
     // 총알을 발사할 기준 위치입니다.
     [SerializeField] private Transform firePoint;
@@ -61,10 +57,6 @@ public class PlayerAttack : MonoBehaviour
         if (bullet == null) return;
 
         // 풀에서 꺼낸 Bullet에 발사 기준점, 소유자 레이어, 데미지, 관통 횟수를 넘깁니다.
-        if (animator != null && animator.runtimeAnimatorController != null)
-        {
-            animator.SetTrigger(ShootTrigger);
-        }
         bullet.StartFire(firePoint, ownerLayer, damage, penetrationCount);
         PlayShootingEffect();
 
@@ -76,22 +68,6 @@ public class PlayerAttack : MonoBehaviour
                 damage
             )
         );
-    }
-
-    public void SetMoving(bool isMoving)
-    {
-        ResolveAnimator();
-        if (animator == null || animator.runtimeAnimatorController == null) return;
-
-        animator.SetBool(IsMoving, isMoving);
-    }
-
-    public void PlayHitAnimation()
-    {
-        ResolveAnimator();
-        if (animator == null || animator.runtimeAnimatorController == null) return;
-
-        animator.SetTrigger(HitTrigger);
     }
 
     private void ResolveAnimator()
