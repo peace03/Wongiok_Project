@@ -122,16 +122,22 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             foreach (var place in executePlaces)
             {
                 // 총알 가져오기
-                var bullet = bulletFactory.GetBullet();
+                //var bullet = bulletFactory.GetBullet();
+                var bullet = bulletFactory.GetBullet(false);
                 // 총알 위치와 각도 설정하기
                 bullet.transform.SetPositionAndRotation(place.position, place.rotation);
-                
+
                 // 총알 이펙트들의 수만큼
-                foreach (var prefab in effectPrefabs)
+                for(int i = 0; i < effectPrefabs.Count; i++)
                 {
+                    // 첫번째(중요도가 가장 높은) 총알 이펙트라면
+                    if (i == 0)
+                        // 총알의 콜라이더 크기를 총알 이펙트 크기로 설정
+                        bullet.SetColliderSize(effectPrefabs[i].transform.localScale);
+
                     // 이펙트 실행 및 실행한 이펙트 받아오기
                     var effect =
-                        EffectManager.Instance.PlayEffect(prefab,
+                        EffectManager.Instance.PlayEffect(effectPrefabs[i],
                                                             place.position + new Vector3(0, 0, -0.5f),
                                                                 place.rotation, parent: bullet.transform);
 

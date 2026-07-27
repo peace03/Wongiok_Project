@@ -55,7 +55,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.15, y: 0.15, z: 0.375}
-  m_Center: {x: 0, y: 0, z: 0.18}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &-4488491299326556326
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -111,6 +111,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 45ACP Bullet
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
       propertyPath: m_LocalScale.x
       value: 15
@@ -133,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.18
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
       propertyPath: m_LocalRotation.w
@@ -162,6 +166,14 @@ PrefabInstance:
     - target: {fileID: 400000, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300004, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

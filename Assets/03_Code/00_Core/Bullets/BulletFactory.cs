@@ -59,7 +59,8 @@ public class BulletFactory : MonoBehaviour, IInitializable
     /// <summary>
     /// 총알 가져오는 함수
     /// </summary>
-    public Bullet GetBullet()
+    /// <param name="isVisible">총알 외형의 활성화 여부(생략 가능, 기본값 : 활성화)</param>
+    public Bullet GetBullet(bool isVisible = true)
     {
         // 총알 오브젝트 풀에서 받아오기
         var prefab = bullets.Get();
@@ -81,6 +82,21 @@ public class BulletFactory : MonoBehaviour, IInitializable
         {
             // 반납 주소 설정
             bullet.SetPoolRef(bullets);
+
+            // 총알 외형을 비활성화 해야한다면
+            if(!isVisible)
+            {
+                // 총알 외형을 그려주는 렌더러들 받아오기
+                var renderers = bullet.GetComponentsInChildren<Renderer>();
+
+                // 렌더러들이 있고 비어있지 않다면
+                if (renderers != null && renderers.Length > 0)
+                    // 렌더러들의 수만큼
+                    foreach (var renderer in renderers)
+                        // 렌더러 비활성화
+                        renderer.enabled = false;
+            }
+
             return bullet;
         }
     }

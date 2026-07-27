@@ -18,12 +18,15 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private IObjectPool<GameObject> returnRef;                      // 반납 오브젝트 풀 주소
 
-    private List<GameObject> executeHitEffects;                     // 실행할 타격/피격 이펙트 프리팹들
+    private List<GameObject> executeHitEffects;                     // 실행할 타격/피격 이펙트 프리팹들 리스트
+    private Renderer[] bulletRenderers;                             // 총알 외형 렌더러들 배열
 
+    private BoxCollider bulletCollider;                             // 총알 콜라이더
     private Coroutine timerCoroutine;                               // 타이머 코루틴
     private WaitForSeconds returnTime;                              // 반납 시간
 
     private LayerMask ownerLayer;                                   // 소유자 레이어
+    private Vector3 bulletSize;                                     // 총알 크기
 
     private bool startFire = false;                                 // 사격 시작 여부
     private bool isReturnedToPool;                                  // 풀 반환 완료 여부
@@ -36,6 +39,26 @@ public class Bullet : MonoBehaviour, IPoolable
     #endregion
 
     public IReadOnlyList<GameObject> HitEffects => hitEffects;
+
+    private void Awake()
+    {
+        // 총알 외형을 그려주는 렌더러들 받아오기
+        bulletRenderers = GetComponentsInChildren<Renderer>();
+        // 총알 콜라이더 받아오기
+        bulletCollider = transform.GetComponent<BoxCollider>();
+
+        // 총알 콜라이더가 없다면
+        if (bulletCollider == null)
+        {
+            // 총알 콜라이더 추가
+            bulletCollider = gameObject.AddComponent<BoxCollider>();
+            // 총알 콜라이더 크기 조절
+            bulletCollider.size = new Vector3(0.15f, 0.15f, 0.375f);
+        }
+
+        // 총알 콜라이더 크기 받아오기
+        bulletSize = bulletCollider.size;
+    }
 
     private void Update()
     {
@@ -96,6 +119,18 @@ public class Bullet : MonoBehaviour, IPoolable
         if (enteredColliders.Count > 0)
             // 리스트 초기화
             enteredColliders.Clear();
+
+        // 렌더러들이 있고 비어있지 않다면
+        if (bulletRenderers != null && bulletRenderers.Length > 0)
+            // 렌더러들의 수만큼
+            foreach (var renderer in bulletRenderers)
+                // 렌더러가 비활성화 되어있다면
+                if(!renderer.enabled)
+                    // 렌더러 활성화
+                    renderer.enabled = true;
+
+        // 콜라이더 크기 설정
+        SetColliderSize();
     }
 
     /// <summary>
@@ -188,14 +223,35 @@ public class Bullet : MonoBehaviour, IPoolable
     /// 레이어 비교 함수(레이어가 같으면 true 반환)
     /// </summary>
     /// <param name="hit">부딪힌 오브젝트</param>
-    private bool EqualsToOwnerLayer(Collider hit)
-        => ((1 << hit.gameObject.layer) & ownerLayer.value) != 0;
+    private bool EqualsToOwnerLayer(Collider hit) => ((1 << hit.gameObject.layer) & ownerLayer.value) != 0;
 
     /// <summary>
     /// 오브젝트 풀 주소 설정 함수
     /// </summary>
     /// <param name="poolRef">반환 주소</param>
     public void SetPoolRef(IObjectPool<GameObject> poolRef) => returnRef = poolRef;
+
+    /// <summary>
+    /// 콜라이더 크기 설정 함수
+    /// </summary>
+    /// <param name="size">콜라이더 크기(생략 가능, 기본값 : 총알 크기)</param>
+    public void SetColliderSize(Vector3? size = null)
+    {
+        // 콜라이더 크기가 비어있고 콜라이더 크기가 총알 크기가 아니라면
+        if (size == null && bulletCollider.size != bulletSize)
+            // 콜라이더 크기를 총알 크기로 설정
+            bulletCollider.size = bulletSize;
+        // 콜라이더 크기가 있다면
+        else if(size != null)
+        {
+            // 콜라이더 크기 받아오기
+            Vector3 newSize = (Vector3)size;
+            // 콜라이더 크기 설정(총알 크기보다 작을 경우, 총알 크기로)
+            bulletCollider.size = new Vector3(newSize.x >= bulletSize.x ? newSize.x : bulletSize.x,
+                                                newSize.y >= bulletSize.y ? newSize.y : bulletSize.y,
+                                                    newSize.z >= bulletSize.z ? newSize.z : bulletSize.z);
+        }
+    }
 
     /// <summary>
     /// 사격 시작 함수
