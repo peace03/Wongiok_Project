@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointDefinition
   checkpointId: CH_01_002
   displayNumber: 2
-  sceneAsset: {fileID: 102900000, guid: 2b0676dc112095b46a80b7746e237d76, type: 3}
-  scenePath: Assets/_ExternalAssets/_External_Scene/InGame2_External.unity
+  sceneAsset: {fileID: 102900000, guid: 946550c78dc1edc429fa73aa7b5d8145, type: 3}
+  scenePath: Assets/04_Level/Scenes/InGame2.unity
   respawnPosition: {x: 128.9, y: -3, z: 1}
   respawnEulerAngles: {x: -0, y: 0, z: 0}
   restoreHealth: 1
