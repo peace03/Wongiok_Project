@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9a72d7c8813746e46bc1bd32b35a8640
+guid: da058e22c9cec51429f391f5fd8a8e15
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
@@ -11,5 +11,5 @@ AssetOrigin:
   productId: 225078
   packageName: Stylized VFX URP
   packageVersion: 1.0.2026.1
-  assetPath: Assets/Vefects/Stylized VFX URP/Stylized VFX Shuriken/Shared/Materials/M_VFX_Radial_03.mat
+  assetPath: Assets/Vefects/Stylized VFX URP/Stylized VFX Shuriken/Skills/Magic Attacks/Void/Materials/M_VFX_Void_Magic_Ring.mat
   uploadId: 913848

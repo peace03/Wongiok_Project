@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9a72d7c8813746e46bc1bd32b35a8640
+guid: 605ee72aad12f83468a41774c646f7a8
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
@@ -11,5 +11,5 @@ AssetOrigin:
   productId: 225078
   packageName: Stylized VFX URP
   packageVersion: 1.0.2026.1
-  assetPath: Assets/Vefects/Stylized VFX URP/Stylized VFX Shuriken/Shared/Materials/M_VFX_Radial_03.mat
+  assetPath: Assets/Vefects/Stylized VFX URP/Stylized VFX Shuriken/Shared/Materials/M_VFX_Distortion_02.mat
   uploadId: 913848

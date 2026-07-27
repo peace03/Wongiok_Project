@@ -516,6 +516,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6223549514262989571, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5d418e08e8554c0459eab28b54fe9e97, type: 2}
     - target: {fileID: 9183643652835930706, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_Name
       value: CinderellaBoss
@@ -1472,9 +1476,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bb70dc853d0ebc4298a8a7749793bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointHealSystem
-  playerStatus: {fileID: 0}
-  lifeTracker: {fileID: 0}
-  healItemInventory: {fileID: 0}
 --- !u!114 &919054765
 MonoBehaviour:
   m_ObjectHideFlags: 0
