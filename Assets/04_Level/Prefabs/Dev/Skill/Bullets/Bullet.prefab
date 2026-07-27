@@ -55,7 +55,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.15, y: 0.15, z: 0.375}
-  m_Center: {x: 0, y: 0, z: -0.18}
+  m_Center: {x: 0, y: 0, z: 0.18}
 --- !u!54 &-4488491299326556326
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -95,6 +95,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39f869b35cd0f31469ce619af0d04600, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
+  hitEffects:
+  - {fileID: 5391362108584089359, guid: 732476d94485c044b93ffcfc9d9d2c64, type: 3}
   maxRange: 30
   maxLifeTime: 5
 --- !u!1001 &7799408514624354263

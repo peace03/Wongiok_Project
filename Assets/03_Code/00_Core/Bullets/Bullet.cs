@@ -6,28 +6,36 @@ using UnityEngine.Pool;
 
 public class Bullet : MonoBehaviour, IPoolable
 {
+    #region 변수
+    [Header("타격/피격 이펙트 프리팹들")]
+    [SerializeField] private List<GameObject> hitEffects;           // 타격/피격 이펙트 프리팹들
     [Header("최대 사거리")]
-    [SerializeField] private float maxRange = 30f;          // 최대 사거리
+    [SerializeField] private float maxRange = 30f;                  // 최대 사거리
     [Header("최대 유지 시간")]
-    [SerializeField] private float maxLifeTime = 5f;        // 최대 유지 시간
+    [SerializeField] private float maxLifeTime = 5f;                // 최대 유지 시간
 
-    private List<Collider> enteredColliders = new();        // 충돌 처리한 콜라이더들 리스트
+    private readonly List<Collider> enteredColliders = new();       // 충돌 처리한 콜라이더들 리스트
 
-    private IObjectPool<GameObject> returnRef;              // 반납 오브젝트 풀 주소
+    private IObjectPool<GameObject> returnRef;                      // 반납 오브젝트 풀 주소
 
-    private Coroutine timerCoroutine;                       // 타이머 코루틴
-    private WaitForSeconds returnTime;                      // 반납 시간
+    private List<GameObject> executeHitEffects;                     // 실행할 타격/피격 이펙트 프리팹들
 
-    private LayerMask ownerLayer;                           // 소유자 레이어
+    private Coroutine timerCoroutine;                               // 타이머 코루틴
+    private WaitForSeconds returnTime;                              // 반납 시간
 
-    private bool startFire = false;                         // 사격 시작 여부
-    private bool isReturnedToPool;                          // 풀 반환 완료 여부
+    private LayerMask ownerLayer;                                   // 소유자 레이어
 
-    private float bulletSpeed;                              // 총알 속도
-    private float damage;                                   // 데미지
-    private float cameraShakeValue;                         // 카메라 흔들림 값
+    private bool startFire = false;                                 // 사격 시작 여부
+    private bool isReturnedToPool;                                  // 풀 반환 완료 여부
+
+    private float bulletSpeed;                                      // 총알 속도
+    private float damage;                                           // 데미지
+    private float cameraShakeValue;                                 // 카메라 흔들림 값
     
-    private int penetrationCount;                           // 관통 횟수
+    private int penetrationCount;                                   // 관통 횟수
+    #endregion
+
+    public IReadOnlyList<GameObject> HitEffects => hitEffects;
 
     private void Update()
     {
@@ -39,7 +47,7 @@ public class Bullet : MonoBehaviour, IPoolable
         if(Physics.Raycast(transform.position, transform.forward, out RaycastHit hit,
                                                     bulletSpeed * Time.deltaTime, ~ownerLayer))
             // 콜라이더 충돌 처리 시작
-            EnterColliderProcess(hit.collider);
+            EnterColliderProcess(hit.collider, hit.point);
 
         // 전방으로 총알 발사
         transform.position += bulletSpeed * Time.deltaTime * transform.forward;
@@ -52,10 +60,16 @@ public class Bullet : MonoBehaviour, IPoolable
             return;
 
         // 콜라이더 충돌 처리 시작
-        EnterColliderProcess(other);
+        EnterColliderProcess(other, other.ClosestPoint(transform.position));
     }
 
-    private void OnDisable()
+    // 총알 초기화
+    private void OnDisable() => ResetBullet();
+
+    /// <summary>
+    /// 총알 초기화 함수
+    /// </summary>
+    private void ResetBullet()
     {
         // 타이머 코루틴이 비어있지 않다면
         if (timerCoroutine != null)
@@ -89,7 +103,7 @@ public class Bullet : MonoBehaviour, IPoolable
     /// </summary>
     /// <param name="other">충돌한 콜라이더</param>
     /// <param name="pos">충돌한 위치</param>
-    private void EnterColliderProcess(Collider other, Vector3? pos = null)
+    private void EnterColliderProcess(Collider other, Vector3 pos)
     {
         // 충돌 처리한 콜라이더라면
         if (enteredColliders.Contains(other))
@@ -102,17 +116,14 @@ public class Bullet : MonoBehaviour, IPoolable
         if (other.isTrigger)
             return;
 
-        // 부딪힌 대상의 최상위로 이동 후 하위 오브젝트 중, 데미지를 입을 수 있는 물체가 있는지 받아오기
-        var target = other.transform.root.GetComponentInChildren<IDamageable>();
+        // 부딪힌 콜라이더를 포함한 상위 오브젝트에서, 데미지를 입을 수 있는 대상인지 받아오기
+        var target = other.GetComponentInParent<IDamageable>();
 
         // 데미지를 입을 수 없는 물체라면
         if (target == null)
         {
-            // 부딪힌 위치가 비어있지 않다면
-            if (pos != null)
-                // 총알 위치를 부딪힌 위치로 수정
-                transform.position = (Vector3)pos;
-
+            // 총알 위치를 부딪힌 위치로 수정
+            transform.position = pos;
             // 총알 반납
             ReturnToPool();
             return;
@@ -124,6 +135,13 @@ public class Bullet : MonoBehaviour, IPoolable
 
         // 부딪힌 대상에게 데미지 전달하기
         target.TakeDamage(damage);
+
+        // 실행할 타격/피격 이펙트의 수만큼
+        foreach(var effect in executeHitEffects)
+            // 타격/피격 이펙트 실행하기
+            EventBus<EffectPlayData>.Publish(new EffectPlayData(effect, pos,
+                                                            Quaternion.LookRotation(-transform.forward),
+                                                                                parent: other.transform));
 
         // 카메라 흔들림 값이 있다면
         if (cameraShakeValue > 0f)
@@ -139,11 +157,8 @@ public class Bullet : MonoBehaviour, IPoolable
             // 관통 횟수가 남아있지 않다면
             if (penetrationCount <= -1)
             {
-                // 부딪힌 위치가 비어있지 않다면
-                if (pos != null)
-                    // 총알 위치를 부딪힌 위치로 수정
-                    transform.position = (Vector3)pos;
-
+                // 총알 위치를 부딪힌 위치로 수정
+                transform.position = pos;
                 // 총알 반납
                 ReturnToPool();
             }
@@ -163,33 +178,8 @@ public class Bullet : MonoBehaviour, IPoolable
         isReturnedToPool = true;
         // 사격 종료
         startFire = false;
-
-        // 타이머 코루틴이 비어있지 않다면
-        if (timerCoroutine != null)
-        {
-            // 타이머 코루틴 중지
-            StopCoroutine(timerCoroutine);
-            // 타이머 코루틴 초기화
-            timerCoroutine = null;
-        }
-
-        // 하위 오브젝트가 있다면
-        if (transform.childCount > 0)
-        {
-            // 하위 오브젝트들의 이펙트 실행기 인터페이스들 받아오기
-            var executers = transform.GetComponentsInChildren<IEffectExecuter>();
-
-            // 이펙트 실행기들의 수만큼
-            foreach (var executer in executers)
-                // 이펙트 종료 및 반납
-                executer.StopEffect();
-        }
-
-        // 충돌 처리한 콜라이더들이 있다면
-        if (enteredColliders.Count > 0)
-            // 리스트 초기화
-            enteredColliders.Clear();
-
+        // 총알 초기화
+        ResetBullet();
         // 총알 반납하기
         returnRef.Release(gameObject);
     }
@@ -216,8 +206,10 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <param name="penetrationCount">관통 횟수(생략 가능, 기본값 : 0)</param>
     /// <param name="speed">총알 속도(생략 가능, 기본값 : 10f)</param>
     /// <param name="cameraShakeValue">카메라 흔들림 값(생략 가능, 기본값 : 0f)</param>
+    /// <param name="effectPrefabs">실행할 타격/피격 이펙트 프리팹들(생략 가능, 기본값 : 총알에 설정된 이펙트)</param>
     public void StartFire(Transform spawnPoint, LayerMask ownerLayer, float damage,
-                            int penetrationCount = 0, float speed = 10f, float cameraShakeValue = 0f)
+                            int penetrationCount = 0, float speed = 10f, float cameraShakeValue = 0f,
+                                                                    List<GameObject> effectPrefabs = null)
     {
         // 타이머 코루틴이 비어있지 않다면
         if (timerCoroutine != null)
@@ -231,15 +223,11 @@ public class Bullet : MonoBehaviour, IPoolable
         // 총알의 위치, 각도 설정
         transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
         // 총알 정보 설정
-        SetInfo(ownerLayer, damage, penetrationCount, speed, cameraShakeValue);
+        SetInfo(ownerLayer, damage, penetrationCount, speed, cameraShakeValue, effectPrefabs);
         // 사격 시작
         startFire = true;
         // 풀 반환 완료 여부 초기화
         isReturnedToPool = false;
-        // 최대 유지 시간 설정
-        maxLifeTime = maxRange / speed;
-        // 반납 시간 초기화
-        returnTime = new WaitForSeconds(maxLifeTime);
         // 타이머 시작
         timerCoroutine = StartCoroutine(ReturnRoutine());
     }
@@ -253,9 +241,12 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <param name="penetrationCount">관통 횟수(생략 가능, 기본값 : 0)</param>
     /// <param name="speed">총알 속도(생략 가능, 기본값 : 10f)</param>
     /// <param name="cameraShakeValue">카메라 흔들림 값(생략 가능, 기본값 : 0f)</param>
-    public void StartFire(LayerMask ownerLayer, float damage, int penetrationCount = 0,
-                                                    float speed = 10f, float cameraShakeValue = 0f)
-                    => StartFire(transform, ownerLayer, damage, penetrationCount, speed, cameraShakeValue);
+    /// <param name="effectPrefabs">실행할 타격/피격 이펙트 프리팹들(생략 가능, 기본값 : 총알에 설정된 이펙트)</param>
+    public void StartFire(LayerMask ownerLayer, float damage,
+                            int penetrationCount = 0, float speed = 10f, float cameraShakeValue = 0f,
+                                                                    List<GameObject> effectPrefabs = null)
+                    => StartFire(transform, ownerLayer, damage, penetrationCount, speed,
+                                                            cameraShakeValue, effectPrefabs);
 
     /// <summary>
     /// 총알 정보 설정 함수
@@ -264,7 +255,9 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <param name="amount">데미지</param>
     /// <param name="count">관통 횟수</param>
     /// <param name="speed">총알 속도</param>
-    private void SetInfo(LayerMask layer, float amount, int count, float speed, float shakeValue)
+    /// <param name="effectPrefabs">실행할 타격/피격 이펙트 프리팹들</param>
+    private void SetInfo(LayerMask layer, float amount, int count, float speed, float shakeValue,
+                                                                            List<GameObject> effectPrefabs)
     {
         // 소유자 레이어 설정
         ownerLayer = layer;
@@ -274,8 +267,21 @@ public class Bullet : MonoBehaviour, IPoolable
         penetrationCount = count;
         // 총알 속도 설정
         bulletSpeed = speed;
+        // 최대 유지 시간 설정
+        maxLifeTime = maxRange / bulletSpeed;
+        // 반납 시간 설정
+        returnTime = new WaitForSeconds(maxLifeTime);
         // 카메라 흔들림 값 설정
         cameraShakeValue = shakeValue;
+
+        // 실행할 타격/피격 이펙트 프리팹들이 없거나, 비어있다면
+        if (effectPrefabs == null || effectPrefabs.Count == 0)
+            // 실행할 이펙트들을 총알의 타격/피격 이펙트로 설정
+            executeHitEffects = hitEffects;
+        // 실행할 타격/피격 이펙트 프리팹이 있다면
+        else
+            // 실행할 이펙트들 설정
+            executeHitEffects = effectPrefabs;
     }
 
     /// <summary>

@@ -88,7 +88,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         foreach (var prefab in effectPrefabs)
             // 실행 위치들의 수만큼
             foreach (var place in executePlaces)
-                // 청구 이펙트 실행하기(지속 시간이 있다면 ? 지속 시간만큼, 아니라면 이펙트 시간만큼)
+                // 총구 이펙트 실행하기(지속 시간이 있다면 ? 지속 시간만큼, 아니라면 이펙트 시간만큼)
                 EventBus<EffectPlayData>.Publish(new EffectPlayData(prefab, place.position,
                             place.rotation, levelData.MaxDuration > 0f ? levelData.MaxDuration : null));
 
@@ -100,19 +100,19 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 발사체 스킬 딜레이 저장하기
         projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
         // 발사체 스킬 실행
-        StartCoroutine(ProjectileRoutine(skillId, levelData.ProjectileCount, levelData.GetDamage(),
+        StartCoroutine(ProjectileRoutine(data, levelData.ProjectileCount, levelData.GetDamage(),
                                             levelData.PenetrationCount, levelData.MaxChargingTime > 0f));
     }
 
     /// <summary>
     /// 발사체 스킬 코루틴 함수
     /// </summary>
-    /// <param name="skillId">스킬 ID</param>
+    /// <param name="data">스킬 데이터</param>
     /// <param name="bulletCount">발사체 개수</param>
     /// <param name="damage">데미지</param>
     /// <param name="penetrationCount">관통 횟수</param>
     /// <param name="isCharging">차징 여부</param>
-    private IEnumerator ProjectileRoutine(int skillId, int bulletCount, float damage, int penetrationCount,
+    private IEnumerator ProjectileRoutine(BaseSkillData data, int bulletCount, float damage, int penetrationCount,
                                                                                         bool isCharging)
     {
         // 현재 발사체 개수만큼
@@ -143,9 +143,14 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
                 // 총알 속도 구하기
                 float bulletSpeed = 50f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
-                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수, 총알 속도, 카메라 흔들림 값)
-                bullet.StartFire(skillLayer, damage, penetrationCount, Mathf.Clamp(bulletSpeed, 10f, 50f),
-                                            projectileDelayTimeValue > 0f ? 0.1f : (!isCharging ? 1f : 0.5f));
+                // 타격/피격 이펙트에 해당하는 이펙트 프리팹 받아오기
+                data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Hit, effectPrefabs);
+                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수,
+                //                  총알 속도, 카메라 흔들림 값, 타격/피격 이펙트들)
+                bullet.StartFire(skillLayer, damage, penetrationCount,
+                                    Mathf.Clamp(bulletSpeed, 10f, 50f),
+                                    projectileDelayTimeValue > 0f ? 0.1f : (!isCharging ? 1f : 0.5f),
+                                                                                            effectPrefabs);
 
                 // 발사체 스킬 딜레이 시간만큼 대기하기
                 yield return projectileDelayTime;
@@ -163,7 +168,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             yield return new WaitForSeconds(0.5f);
 
         // 무기 외형 착용 해제 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(skillId, false));
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
         // 실행 위치들 초기화
         ResetExecutePositions();
     }

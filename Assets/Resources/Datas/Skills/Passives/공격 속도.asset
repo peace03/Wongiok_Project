@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dcb207ffbd561c45836575befd363a5, type: 3}
   m_Name: "\uACF5\uACA9 \uC18D\uB3C4"
   m_EditorClassIdentifier: Assembly-CSharp::PassiveSkillData
-  id: 2003
+  id: 2004
   icon: {fileID: 0}
-  skillName: "\uC774\uB3D9\uC18D\uB3C4"
+  skillName: "\uACF5\uACA9 \uC18D\uB3C4"
   type: 0
   unlockChapter: 0
   maxLevel: 3
-  desc: "\uC774\uB3D9\uC18D\uB3C4\uAC00 \uC99D\uAC00\uD55C\uB2E4."
+  desc: "\uACF5\uACA9 \uC18D\uB3C4\uAC00 \uC99D\uAC00\uD55C\uB2E4."
   levelDatas:
   - rid: 1008828851650560161
   references:

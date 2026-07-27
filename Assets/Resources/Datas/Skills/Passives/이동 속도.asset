@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PassiveSkillData
   id: 2003
   icon: {fileID: 0}
-  skillName: "\uC774\uB3D9\uC18D\uB3C4"
+  skillName: "\uC774\uB3D9 \uC18D\uB3C4"
   type: 0
   unlockChapter: 0
   maxLevel: 3
-  desc: "\uC774\uB3D9\uC18D\uB3C4\uAC00 \uC99D\uAC00\uD55C\uB2E4."
+  desc: "\uC774\uB3D9 \uC18D\uB3C4\uAC00 \uC99D\uAC00\uD55C\uB2E4."
   levelDatas:
   - rid: 1008828851650560161
   references:
