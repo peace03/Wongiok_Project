@@ -481,6 +481,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1816822191}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: idleDurationTime
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: excuteAttackType_InGame
       value: 3
       objectReference: {fileID: 0}
