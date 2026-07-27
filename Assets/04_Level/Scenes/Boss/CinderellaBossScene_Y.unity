@@ -457,6 +457,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 2041438938}
     m_Modifications:
     - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: playerMaxHP
+      value: 
+      objectReference: {fileID: 919054763}
+    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: status.maxHP.BaseValue
       value: 100
       objectReference: {fileID: 0}
@@ -478,7 +482,7 @@ PrefabInstance:
       objectReference: {fileID: 1816822191}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: excuteAttackType_InGame
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3467774806118743601, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_Size.x
@@ -508,6 +512,10 @@ PrefabInstance:
       propertyPath: m_Center.x
       value: -1.9
       objectReference: {fileID: 0}
+    - target: {fileID: 3853862931612266623, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9a72d7c8813746e46bc1bd32b35a8640, type: 2}
     - target: {fileID: 4456096972685270820, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -548,6 +556,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4510220228692464522, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9a72d7c8813746e46bc1bd32b35a8640, type: 2}
     - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: spinImpactPrefab
       value: 

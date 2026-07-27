@@ -1,8 +1,9 @@
 fileFormatVersion: 2
-guid: f8a568571f48e414a80171663828a971
-NativeFormatImporter:
+guid: 11ae2973b39f68f4b8d40bc0ad362595
+ShaderImporter:
   externalObjects: {}
-  mainObjectFileID: 2100000
+  defaultTextures: []
+  nonModifiableTextures: []
   userData: 
   assetBundleName: 
   assetBundleVariant: 
@@ -11,5 +12,5 @@ AssetOrigin:
   productId: 225078
   packageName: Stylized VFX URP
   packageVersion: 1.0.2026.1
-  assetPath: Assets/Vefects/Stylized VFX URP/Stylized VFX Shuriken/Shared/Materials/M_VFX_Radial_03.mat
+  assetPath: Assets/Vefects/Stylized VFX URP/Stylized VFX Shuriken/Shared/Shaders/SH_VFX_Vefects_Add_DoubleSided_URP_New.shader
   uploadId: 913848
