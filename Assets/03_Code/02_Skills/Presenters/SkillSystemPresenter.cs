@@ -7,18 +7,17 @@ public class SkillSystemPresenter
 {
     [Header("(임시)현재 챕터")]
     [SerializeField] private CHAPTER_TYPE curChapter = CHAPTER_TYPE.First;      // 현재 챕터
-    [SerializeField] private SkillSystemModel model;                            // 스킬 모델(인스펙터에서 보는 용도)
-    //private readonly SkillSystemModel model;                                    // 스킬 모델
+    [SerializeField] private SkillSystemModel model;                            // 스킬 모델
 
-    private List<SkillInstance> modelResults = new();                           // 스킬 모델 결과들
-    private List<SkillInstance> modelResults2 = new();                           // 스킬 모델 결과들
-    private List<UIPlayerSkillSlotData> uiEventDatas = new();                   // 스킬 뷰 이벤트 데이터들
-    private List<UIPauseSkillInfoData> uiEventDatas2 = new();                   // 스킬 뷰 이벤트 데이터들
-    private List<UIPauseSkillInfoData> uiEventDatas3 = new();                   // 스킬 뷰 이벤트 데이터들
+    private List<SkillInstance> modelResults = new();                           // 스킬 모델 결과들 리스트
+    private List<UIPauseSkillInfoData> equippedSkillUIDatas = new();            // 장착한 스킬 UI 데이터들 리스트
+    private List<UIPauseSkillInfoData> unequippedSkillUIDatas = new();          // 미장착한 스킬 UI 데이터들 리스트
 
     /// <summary>
     /// 생성자
     /// </summary>
+    /// <param name="owner">스킬 소유자</param>
+    /// <param name="executer">액티브 스킬 실행기</param>
     public SkillSystemPresenter(GameObject owner, ActiveSkillExecuter executer)
     {
         // 스킬 데이터를 담을 리스트
@@ -31,12 +30,47 @@ public class SkillSystemPresenter
         {
             // 스킬 모델 생성하기
             model = new(owner, executer, skillDatas);
+            // 액티브 스킬 변경 이벤트 구독
             model.OnActiveSkillsChanged += RefreshActiveSkills;
+            // UI 레벨업 스킬 선택 이벤트 구독
+            EventBus<UILevelUpSkillSelectedEvent>.action += RefreshSelectedSkill;
+            // 패시브 스킬 새로고침
+            RefreshPassiveSkills();
+            // 스킬 스왑(미장착 -> 장착) 이벤트 구독
+            EventBus<UIPauseSkillEquipRequestedEvent>.action += RefreshSelectedSkills;
+            // 스킬 스왑(장착 -> 장착) 이벤트 구독
+            EventBus<UIPauseSkillSwapRequestedEvent>.action += RefreshSelectedSkills;
         }
         // 스킬 데이터가 없다면
         else
             Debug.Log($"[Error | Skill] 스킬 모델 생성 실패 => " +
                         $"입력 - 대상 : {owner.name} / 스킬 데이터 : 없음", owner);
+    }
+
+    /// <summary>
+    /// 프레젠터가 비활성화될 때 호출하는 함수
+    /// </summary>
+    public void DisablePresenter()
+    {
+        // 액티브 스킬 변경 이벤트 구독 해제
+        model.OnActiveSkillsChanged -= RefreshActiveSkills;
+        // UI 레벨업 스킬 선택 이벤트 구독 해제
+        EventBus<UILevelUpSkillSelectedEvent>.action -= RefreshSelectedSkill;
+        // 스킬 스왑(미장착 -> 장착) 이벤트 구독 해제
+        EventBus<UIPauseSkillEquipRequestedEvent>.action -= RefreshSelectedSkills;
+        // 스킬 스왑(장착 -> 장착) 이벤트 구독 해제
+        EventBus<UIPauseSkillSwapRequestedEvent>.action -= RefreshSelectedSkills;
+    }
+
+    /// <summary>
+    /// 모든 스킬 새로고침 함수
+    /// </summary>
+    public void RefreshAllSkills()
+    {
+        // 액티브 스킬 새로고침
+        RefreshActiveSkills();
+        // 패시브 스킬 새로고침
+        RefreshPassiveSkills();
     }
 
     /// <summary>
@@ -53,80 +87,153 @@ public class SkillSystemPresenter
 
         // 장착한 액티브 스킬들 받아오기
         model.GetEquippedActiveSkills(modelResults);
-        // UI용 데이터 리스트 초기화
-        uiEventDatas2.Clear();
-
-        // 스킬이 있다면
-        if (modelResults.Count != 0)
-        {
-            // 장착한 액티브 스킬들의 개수만큼
-            for (int i = 0; i < modelResults.Count; i++)
-                // 액티브 스킬 최대 장착 개수까지
-                if (i < model.MaxActiveCount)
-                    // UI용 데이터 리스트에 추가
-                    uiEventDatas2.Add(ChangeToUIData2(modelResults[i]));
-        }
-        // 스킬이 없다면
-        else
-            Debug.Log($"[Skill] UI용 데이터 리스트 추가 실패 => 장착한 액티브 스킬 : 없음");
-
+        // 받아온 결과들을 일시정지 UI 데이터들로 변환하기
+        ChangePauseUIDatas(equippedSkillUIDatas);
         // 미장착한 액티브 스킬들 받아오기
-        model.GetUnequippedActiveSkills(modelResults2);
-        // UI용 데이터 리스트 초기화
-        uiEventDatas3.Clear();
-
-        // 스킬이 있다면
-        if (modelResults2.Count != 0)
-            // 장착한 액티브 스킬들의 개수만큼
-            for (int i = 0; i < modelResults2.Count; i++)
-                // UI용 데이터 리스트에 추가
-                uiEventDatas3.Add(ChangeToUIData2(modelResults2[i]));
-        // 스킬이 없다면
-        else
-            Debug.Log($"[Skill] UI용 데이터 리스트 추가 실패 => 장착한 액티브 스킬 : 없음");
-
-        // 액티브 스킬 이벤트 발행
-        EventBus<RefreshUIEventT>.Publish(new RefreshUIEventT(uiEventDatas2.ToArray(), uiEventDatas3.ToArray()));
+        model.GetUnequippedActiveSkills(modelResults);
+        // 받아올 결과들을 일시정지 UI 데이터들로 변환하기
+        ChangePauseUIDatas(unequippedSkillUIDatas);
+        // 액티브 스킬 새로고침 이벤트 발행
+        EventBus<RefreshUIEvent>.Publish(new RefreshUIEvent(equippedSkillUIDatas.ToArray(),
+                                                                unequippedSkillUIDatas.ToArray()));
     }
 
     /// <summary>
-    /// UI용 데이터로 변환해서 반환하는 함수
+    /// 일시정지 UI 데이터들로 변환하는 함수
     /// </summary>
-    private UIPlayerSkillSlotData ChangeToUIData(ACTIVE_SKILL_SLOT_TYPE slot, SkillInstance skill = null)
+    /// <param name="datas">데이터들을 저장할 리스트</param>
+    private void ChangePauseUIDatas(List<UIPauseSkillInfoData> datas)
     {
-        // 슬롯 범위가 액티브 스킬 최대 장착 개수를 넘어갔다면
-        if ((int)slot >= model.MaxActiveCount)
+        // 스킬 모델의 결과들이 없거나, 비어있다면
+        if (modelResults == null || modelResults.Count == 0)
+            return;
+
+        // 데이터들을 저장할 리스트 초기화
+        datas.Clear();
+
+        // 스킬 모델의 결과들의 수만큼
+        foreach(var modelResult in modelResults)
+            // 일시정지 UI 데이터 추가하기
+            AddPauseUIData(datas, modelResult);
+    }
+
+    /// <summary>
+    /// 일시정지 UI 데이터로 변환 후, 데이터들 리스트에 추가하는 함수
+    /// </summary>
+    /// <param name="datas">데이터들을 저장할 리스트</param>
+    /// <param name="skill">일시정지 UI 데이터로 변환할 스킬 객체(생략 가능, 기본값 : 비어있음)</param>
+    private void AddPauseUIData(List<UIPauseSkillInfoData> datas, SkillInstance skill = null)
+    {
+        // 데이터들을 저장할 리스트가 없다면
+        if (datas == null)
+            return;
+
+        // 스킬 객체가 있고 데이터가 있다면
+        if (skill != null && skill.BaseData != null)
+            // 일시정지 UI 데이터로 변환 후, 데이터들 리스트에 저장
+            datas.Add(new UIPauseSkillInfoData(skill.BaseData.Icon, skill.BaseData.SkillName,
+                                skill.CurLevel, skill.BaseData.Desc, skill.IsEquipped, skill.BaseData.Id));
+        // 스킬이 없다면
+        else
+            // 일시정지 UI 데이터의 기본값을 데이터들 리스트에 저장
+            datas.Add(new UIPauseSkillInfoData(null, "", 0, "", false));
+    }
+
+    /// <summary>
+    /// 패시브 스킬 새로고침 함수
+    /// </summary>
+    public void RefreshPassiveSkills()
+    {
+        // 모델이 없다면
+        if (model == null)
         {
-            Debug.Log($"[Error | Skill] UI용 데이터 변환 실패 => " +
-                        $"입력 - {slot.ToKoreanString()} / 최대 장착 개수 : {model.MaxActiveCount} / " +
-                        $"스킬 : {(skill == null ? "없음" : skill.BaseData.SkillName)}");
-            return default;
+            Debug.Log($"[Error | Skill] 패시브 스킬들 새로고침 실패 => 입력 - 스킬 모델 : 없음");
+            return;
         }
 
-        // 스킬이 있다면
-        if (skill != null && skill.BaseData != null)
-            // UI용 데이터로 변환해서 반환하기
-            return new(skill.BaseData.Icon, slot.ToKoreanString(), skill.CurLevel, skill.CoolTimeRatio, skill.IsReady);
-        // 스킬이 없다면
-        else
-            // 스킬 입력 키만 넣어서 반환하기
-            return new(null, slot.ToKoreanString(), 0, 0f, false);
+        // 장착한 패시브 스킬들 받아오기
+        model.GetEquippedPassiveSkills(modelResults);
+        // 받아온 결과들을 일시정지 UI 데이터로 변환하기
+        ChangePauseUIDatas(equippedSkillUIDatas);
+        // 미장착한 스킬 UI 데이터 초기화
+        unequippedSkillUIDatas.Clear();
+        // 패시브 스킬 새로고침 이벤트 발행
+        EventBus<RefreshUIEvent>.Publish(new RefreshUIEvent(equippedSkillUIDatas.ToArray(),
+                                                                unequippedSkillUIDatas.ToArray(),
+                                                                isActiveSkill : false));
     }
 
     /// <summary>
-    /// UI용 데이터로 변환해서 반환하는 함수
+    /// 특정 스킬 새로고침 함수
     /// </summary>
-    private UIPauseSkillInfoData ChangeToUIData2(SkillInstance skill = null)
+    /// <param name="skillUIData">선택한 스킬 UI 데이터</param>
+    public void RefreshSelectedSkill(UILevelUpSkillSelectedEvent skillUIData)
     {
-        // 스킬이 있다면
-        if (skill != null && skill.BaseData != null)
-            // UI용 데이터로 변환해서 반환하기
-            return new(skill.BaseData.Icon, skill.BaseData.SkillName, skill.CurLevel,
-                skill.BaseData.Desc, skill.IsEquipped, skill.BaseData.Id);
-        // 스킬이 없다면
-        else
-            // 스킬 입력 키만 넣어서 반환하기
-            return new(null, "", 0, "", false);
+        // 모델이 없다면
+        if (model == null)
+        {
+            Debug.Log($"[Error | Skill] 스킬 레벨업 실패 => 입력 - 스킬 모델 : 없음");
+            return;
+        }
+        // 레벨업이 불가능한 스킬이라면
+        else if(!model.EnhanceSkill(skillUIData.SkillId))
+        {
+            Debug.Log($"[Error | Skill] 스킬 레벨업 실패 => " +
+                        $"입력 - 스킬 ID : {skillUIData.SkillId} / 레벨업 불가");
+            return;
+        }
+    }
+
+    /// <summary>
+    /// 특정 스킬들 새로고침 함수
+    /// </summary>
+    /// <param name="skillUIData">선택한 스킬 UI 데이터들</param>
+    public void RefreshSelectedSkills(UIPauseSkillEquipRequestedEvent skillUIData)
+    {
+        // 모델이 없다면
+        if (model == null)
+        {
+            Debug.Log($"[Error | Skill] 스킬 스왑 실패 => 입력 - 스킬 모델 : 없음");
+            return;
+        }
+
+        // 슬롯 위치 받아오기
+        ACTIVE_SKILL_SLOT_TYPE slot = (ACTIVE_SKILL_SLOT_TYPE)skillUIData.TargetSlotIndex;
+
+        // 스킬 스왑에 실패했다면
+        if (!model.SwapSkill(slot, skillUIData.SkillId))
+        {
+            Debug.Log($"[Error | Skill] 스킬 스왑 실패 => " +
+                        $"입력 - 스킬 ID : {skillUIData.SkillId} / 변경 위치 : {slot.ToKoreanString()}");
+            return;
+        }
+    }
+
+    /// <summary>
+    /// 특정 스킬들 새로고침 함수
+    /// </summary>
+    /// <param name="skillUIData">선택한 스킬 UI 데이터들</param>
+    public void RefreshSelectedSkills(UIPauseSkillSwapRequestedEvent skillUIData)
+    {
+        // 모델이 없다면
+        if (model == null)
+        {
+            Debug.Log($"[Error | Skill] 스킬 스왑 실패 => 입력 - 스킬 모델 : 없음");
+            return;
+        }
+
+        // 슬롯 위치 받아오기
+        ACTIVE_SKILL_SLOT_TYPE slot = (ACTIVE_SKILL_SLOT_TYPE)skillUIData.TargetSlotIndex;
+        // 변경할 스킬의 ID 받아오기
+        int skillId = model.GetEquippedActiveSkillId(skillUIData.SourceSlotIndex);
+
+        // 스킬 스왑에 실패했다면
+        if (!model.SwapSkill(slot, skillId))
+        {
+            Debug.Log($"[Error | Skill] 스킬 스왑 실패 => " +
+                        $"입력 - 스킬 ID : {skillId} / 변경 위치 : {slot.ToKoreanString()}");
+            return;
+        }
     }
 
     /// <summary>

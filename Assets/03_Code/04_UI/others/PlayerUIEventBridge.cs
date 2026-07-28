@@ -18,6 +18,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
     private bool hasExperienceState;
 
     private UIPauseSkillInfoData[] currentEquippedActiveSkills = System.Array.Empty<UIPauseSkillInfoData>();
+    private UIPauseSkillInfoData[] currentEquippedPassiveSkills = System.Array.Empty<UIPauseSkillInfoData>();
 
     public int Priority => (int)InitOrder.PlayerUIBridge;
 
@@ -45,7 +46,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         EventBus<PlayerExperienceChangedEvent>.action += HandlePlayerExperienceChanged;
         EventBus<PlayerDeadEvent>.action += HandlePlayerDead;
         EventBus<UIChangeScreenEvent>.action += HandleChangeScreen;
-        EventBus<RefreshUIEventT>.action += HandleRefreshUI;
+        EventBus<RefreshUIEvent>.action += HandleRefreshUI;
     }
 
     private void UnsubscribeEvents()
@@ -56,7 +57,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         EventBus<PlayerExperienceChangedEvent>.action -= HandlePlayerExperienceChanged;
         EventBus<PlayerDeadEvent>.action -= HandlePlayerDead;
         EventBus<UIChangeScreenEvent>.action -= HandleChangeScreen;
-        EventBus<RefreshUIEventT>.action -= HandleRefreshUI;
+        EventBus<RefreshUIEvent>.action -= HandleRefreshUI;
     }
 
     private void HandlePlayerHealthChanged(PlayerHealthChangedEvent eventData)
@@ -137,12 +138,18 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         PublishCurrentPlayerHudState();
     }
 
-    private void HandleRefreshUI(RefreshUIEventT eventData)
+    private void HandleRefreshUI(RefreshUIEvent eventData)
     {
-        currentEquippedActiveSkills = eventData.EquippedActiveSkills ?? System.Array.Empty<UIPauseSkillInfoData>();
+        if(eventData.IsActiveSkill)
+            currentEquippedActiveSkills = eventData.EquippedSkills ??
+                                                            System.Array.Empty<UIPauseSkillInfoData>();
+        else
+            currentEquippedPassiveSkills = eventData.EquippedSkills ??
+                                                            System.Array.Empty<UIPauseSkillInfoData>();
 
         PublishPauseStatus();
     }
+
     private void PublishCurrentPlayerHudState()
     {
         if (hasExperienceState)
@@ -188,7 +195,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
                 GetDisplayLifeCount(),
                 GetDisplayMaxLifeCount(),
                 currentEquippedActiveSkills,
-                System.Array.Empty<UIPauseSkillInfoData>()));
+                currentEquippedPassiveSkills));
     }
 
     private int GetDisplayLifeCount()
