@@ -15,12 +15,30 @@ public class PlayerJumpState : PlayerBaseState
     {
         Debug.Log("Jump Enter");
 
+        controller.PlayJumpAnimation();
         controller.Movement.Jump();
-        controller.TransitionTo(controller.PlayerFallState);
     }
 
     public override void UpdateState()
     {
+        controller.Movement.ApplyGravity();
+        controller.Movement.Move(controller.MoveInput);
+
+        if (controller.DashTriggered && controller.Movement.CanDash())
+        {
+            controller.TransitionTo(controller.PlayerDashState);
+            return;
+        }
+
+        if (controller.JumpTriggered && controller.Movement.CanJump())
+        {
+            controller.Movement.Jump();
+            controller.PlayJumpAnimation();
+            return;
+        }
+
+        if (controller.Movement.IsFalling)
+            controller.TransitionTo(controller.PlayerFallState);
     }
 
     public override void FixedUpdateState()

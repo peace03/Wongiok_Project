@@ -3,7 +3,22 @@ using UnityEngine;
 [RequireComponent(typeof(GameInputReader))]
 public class PlayerController : MonoBehaviour
 {
+    private static readonly int IsMoving = Animator.StringToHash("IsMoving");
+    private static readonly int IsFalling = Animator.StringToHash("IsFalling");
+    private static readonly int IdleAnimationState = Animator.StringToHash("Base Layer.Idle");
+    private static readonly int PistolRunAnimationState = Animator.StringToHash("Base Layer.Pistol Run");
+    private static readonly int JumpAnimationState = Animator.StringToHash("Base Layer.Jump");
+    private static readonly int LandingAnimationState = Animator.StringToHash("Base Layer.Landing");
+    private const float LocomotionBlendDuration = 0.05f;
+    private const float LandingBlendDuration = 0.15f;
+
     [SerializeField] private Transform visualRoot;
+    [SerializeField] private Animator animator;
+
+    private Transform animatedModelRoot;
+    private Vector3 animatedModelInitialLocalPosition;
+    private Quaternion animatedModelInitialLocalRotation;
+    private bool hasAnimatedModelAnchor;
 
     #region 플레이어 관련 변수, 상태, 참조등
     // 현재 실행 중인 플레이어 상태입니다.
@@ -109,6 +124,7 @@ public class PlayerController : MonoBehaviour
         _attack = attack != null ? attack : GetComponent<PlayerAttack>();
         _parry = parry != null ? parry : GetComponent<PlayerParry>();
         _healItemInventory = healItemInventory != null ? healItemInventory : GetComponent<PlayerHealItemInventory>();
+        CacheAnimatedModelAnchor();
         UpdateVisualFacing();
 
         PlayerIdleState = new PlayerIdleState(this);
@@ -144,7 +160,6 @@ public class PlayerController : MonoBehaviour
         if (!isInitialized) return;
 
         PlayerInput();
-        _attack?.SetMoving(MoveInput.sqrMagnitude > 0.01f);
         UpdateFacingDirection();
 
         if (_currentState != null && _currentState.CanParry)
@@ -174,6 +189,14 @@ public class PlayerController : MonoBehaviour
         _currentState?.FixedUpdateState();
     }
 
+    private void LateUpdate()
+    {
+        if (!isInitialized || !hasAnimatedModelAnchor) return;
+
+        animatedModelRoot.localPosition = animatedModelInitialLocalPosition;
+        animatedModelRoot.localRotation = animatedModelInitialLocalRotation;
+    }
+
     public void TransitionTo(PlayerBaseState newState)
     {
         // 같은 상태로 다시 전환하려는 경우에는 중복 Enter/Exit 호출을 막습니다.
@@ -183,6 +206,83 @@ public class PlayerController : MonoBehaviour
         _currentState?.ExitState();
         _currentState = newState;
         _currentState.EnterState();
+    }
+
+    public void SetLocomotionAnimation(bool isMoving)
+    {
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+        if (!hasAnimatedModelAnchor)
+            CacheAnimatedModelAnchor();
+
+        animator.SetBool(IsMoving, isMoving);
+        animator.SetBool(IsFalling, false);
+        animator.CrossFadeInFixedTime(
+            isMoving ? PistolRunAnimationState : IdleAnimationState,
+            LocomotionBlendDuration,
+            0);
+    }
+
+    public void PlayJumpAnimation()
+    {
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+        if (!hasAnimatedModelAnchor)
+            CacheAnimatedModelAnchor();
+
+        animator.SetBool(IsFalling, false);
+        animator.CrossFadeInFixedTime(
+            JumpAnimationState,
+            LocomotionBlendDuration,
+            0,
+            0);
+    }
+
+    public void PlayLandingAnimation()
+    {
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+        if (!hasAnimatedModelAnchor)
+            CacheAnimatedModelAnchor();
+
+        animator.SetBool(IsFalling, true);
+
+        AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo nextState = animator.GetNextAnimatorStateInfo(0);
+        bool isJumpState = currentState.fullPathHash == JumpAnimationState
+            || (animator.IsInTransition(0) && nextState.fullPathHash == JumpAnimationState);
+
+        if (isJumpState) return;
+
+        // Jump를 거치지 않고 낭떠러지에서 추락한 경우에도 Landing을 재생합니다.
+        animator.CrossFadeInFixedTime(
+            LandingAnimationState,
+            LandingBlendDuration,
+            0,
+            0);
+    }
+
+    private void CacheAnimatedModelAnchor()
+    {
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+
+        if (animator == null || animator.transform == transform)
+        {
+            hasAnimatedModelAnchor = false;
+            return;
+        }
+
+        animatedModelRoot = animator.transform;
+        animatedModelInitialLocalPosition = animatedModelRoot.localPosition;
+        animatedModelInitialLocalRotation = animatedModelRoot.localRotation;
+        hasAnimatedModelAnchor = true;
     }
 
     public void EnterHitState()
@@ -283,7 +383,13 @@ public class PlayerController : MonoBehaviour
     {
         if (visualRoot == null) return;
 
-        visualRoot.localRotation = Quaternion.Euler(0f, _isFacingRight ? 0f : 180f, 0f);
+        visualRoot.localRotation = _isFacingRight
+            ? Quaternion.identity
+            : Quaternion.Euler(0f, 180f, 0f);
+
+        Vector3 localScale = visualRoot.localScale;
+        localScale.x = Mathf.Abs(localScale.x);
+        visualRoot.localScale = localScale;
     }
 
     private void HandleAttackInput()

@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointRespawnCoordinator
   saveSystem: {fileID: 6721103720386946655}
-  checkpointCatalog: {fileID: 0}
+  checkpointCatalog: {fileID: 11400000, guid: a5d33a85211ea1545b9ebd0f8baa5916, type: 2}
   loadPersistentSaveWhenSessionIsEmpty: 1
   deletePersistentSaveOnNewGame: 1
   playerInitializationTimeout: 10

@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointDefinition
   checkpointId: CH_01_999
   displayNumber: 3
-  sceneAsset: {fileID: 102900000, guid: 147ea8e77f732c84eb67c66ddc4c9b53, type: 3}
-  scenePath: Assets/_ExternalAssets/CopiedScene/InGame_TestingMobs.unity
-  respawnPosition: {x: 0, y: 0, z: 0}
-  respawnEulerAngles: {x: 0, y: 0, z: 0}
+  sceneAsset: {fileID: 102900000, guid: 946550c78dc1edc429fa73aa7b5d8145, type: 3}
+  scenePath: Assets/04_Level/Scenes/InGame2.unity
+  respawnPosition: {x: 199.29001, y: 7, z: 1}
+  respawnEulerAngles: {x: -0, y: 0, z: 0}
   restoreHealth: 1
   restoreLives: 1
   restoreHealItems: 1
