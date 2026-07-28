@@ -25,7 +25,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
 
     private bool isRespawning;
 
-    // 중복 인스턴스를 제거하고 씬 전환 중에도 유지합니다
+    // 중복 인스턴스를 제거하고 씬 전환 중에도 유지합니다.
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -38,29 +38,32 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    // 게임 오버 체크포인트 복귀 요청 이벤트를 구독합니다
+    // 게임 오버 체크포인트 복귀 요청 이벤트를 구독합니다.
     private void OnEnable()
     {
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.action +=
             HandleLoadCheckpointRequested;
+
         EventBus<UITitleNewGameRequestedEvent>.action +=
             HandleNewGameRequested;
     }
 
-    // 게임 오버 체크포인트 복귀 요청 이벤트를 해제합니다
+    // 게임 오버 체크포인트 복귀 요청 이벤트를 해제합니다.
     private void OnDisable()
     {
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.action -=
             HandleLoadCheckpointRequested;
+
         EventBus<UITitleNewGameRequestedEvent>.action -=
             HandleNewGameRequested;
     }
 
-    // 새 게임 요청 시 이전 체크포인트 세션과 선택적 저장 데이터를 제거합니다
+    // 새 게임 요청 시 체크포인트와 디펜스 스테이지 런타임 상태를 제거합니다.
     private void HandleNewGameRequested(
         UITitleNewGameRequestedEvent eventData)
     {
         CheckpointRuntimeSession.ClearAll();
+        DefenseStageRuntimeSession.ClearAll();
 
         if (deletePersistentSaveOnNewGame &&
             saveSystem != null)
@@ -69,7 +72,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         }
     }
 
-    // 체크포인트 복귀 코루틴을 중복 없이 시작합니다
+    // 체크포인트 복귀 코루틴을 중복 없이 시작합니다.
     private void HandleLoadCheckpointRequested(
         UIGameOverLoadCheckpointRequestedEvent eventData)
     {
@@ -81,7 +84,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         StartCoroutine(RespawnAtCheckpointRoutine());
     }
 
-    // 현재 체크포인트 Scene을 다시 불러오고 새 Player를 복원합니다
+    // 현재 체크포인트 Scene을 다시 불러오고 새 Player를 복원합니다.
     private IEnumerator RespawnAtCheckpointRoutine()
     {
         isRespawning = true;
@@ -103,6 +106,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
             Debug.LogWarning(
                 "PlayerLifeTracker가 없어 남은 잔기를 보존할 수 없습니다.",
                 this);
+
             isRespawning = false;
             yield break;
         }
@@ -115,6 +119,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
             Debug.LogWarning(
                 "남은 잔기가 없어 체크포인트에서 부활할 수 없습니다.",
                 this);
+
             isRespawning = false;
             yield break;
         }
@@ -126,6 +131,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
                 $"Build Profile에서 Scene을 찾을 수 없습니다: " +
                 $"{data.ScenePath}",
                 this);
+
             isRespawning = false;
             yield break;
         }
@@ -144,9 +150,14 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
                 $"Scene 로드를 시작하지 못했습니다: " +
                 $"{data.ScenePath}",
                 this);
+
+            CheckpointRuntimeSession.ClearPendingLifeCount();
+
             isRespawning = false;
             yield break;
         }
+
+        DefenseStageRuntimeSession.RestoreCheckpointSnapshot();
 
         while (!loadOperation.isDone)
         {
@@ -173,6 +184,9 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
             Debug.LogError(
                 "Scene 로드 후 초기화된 Player를 찾지 못했습니다.",
                 this);
+
+            CheckpointRuntimeSession.ClearPendingLifeCount();
+
             isRespawning = false;
             yield break;
         }
@@ -204,7 +218,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         isRespawning = false;
     }
 
-    // 런타임 체크포인트가 없으면 선택적으로 영구 저장을 불러옵니다
+    // 런타임 체크포인트가 없으면 선택적으로 영구 저장을 불러옵니다.
     private bool TryPrepareRuntimeCheckpoint()
     {
         if (CheckpointRuntimeSession.HasActiveCheckpoint)
@@ -218,6 +232,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
             Debug.LogWarning(
                 "활성 체크포인트가 없습니다.",
                 this);
+
             return false;
         }
 
@@ -235,7 +250,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         return restored;
     }
 
-    // PlayerInitializer 완료를 공개 상태 값으로 확인합니다
+    // PlayerInitializer 완료를 공개 상태 값으로 확인합니다.
     private bool TryFindInitializedPlayer(
         out PlayerRuntimeReferences references)
     {
@@ -243,10 +258,13 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
 
         PlayerStatus playerStatus =
             FindFirstObjectByType<PlayerStatus>();
+
         PlayerController playerController =
             FindFirstObjectByType<PlayerController>();
+
         PlayerLifeTracker lifeTracker =
             FindFirstObjectByType<PlayerLifeTracker>();
+
         PlayerHealItemInventory healItemInventory =
             FindFirstObjectByType<PlayerHealItemInventory>();
 
@@ -273,7 +291,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         return true;
     }
 
-    // 새 Scene의 Player에 잔기와 아이템 및 부활 위치를 적용합니다
+    // 새 Scene의 Player에 잔기와 아이템 및 부활 위치를 적용합니다.
     private void RestoreLoadedPlayer(
         PlayerRuntimeReferences references,
         CheckpointRuntimeData data,
@@ -299,7 +317,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         public PlayerLifeTracker LifeTracker { get; }
         public PlayerHealItemInventory HealItemInventory { get; }
 
-        // Scene 로드 후 찾은 Player 컴포넌트 참조를 저장합니다
+        // Scene 로드 후 찾은 Player 컴포넌트 참조를 저장합니다.
         public PlayerRuntimeReferences(
             PlayerStatus playerStatus,
             PlayerController playerController,

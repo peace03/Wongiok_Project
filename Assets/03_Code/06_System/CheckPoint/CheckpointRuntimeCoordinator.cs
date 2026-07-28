@@ -31,7 +31,7 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
             HandleCheckpointActivated;
     }
 
-    // 회복과 런타임 저장 및 체크포인트 연출을 처리합니다
+    // 회복과 런타임 저장 및 체크포인트 연출을 처리합니다.
     private void HandleCheckpointActivated(
         StageCheckpointActivatedEvent checkpointEvent)
     {
@@ -61,14 +61,18 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
         CheckpointRuntimeSession.SetActiveCheckpoint(
             runtimeData);
 
+        DefenseStageRuntimeSession.CaptureCheckpointSnapshot();
+
         if (enablePersistentSave && saveSystem != null)
         {
             saveSystem.SaveCheckpoint(runtimeData);
         }
 
         ShowCheckpointUI(definition.DisplayNumber);
+
         PlayCheckpointEffect(
             checkpointEvent.CheckpointObject);
+
         OpenBossPreparationIfNeeded(
             definition.DisplayNumber);
 

@@ -326,19 +326,48 @@ public class PlayerStatus : MonoBehaviour, IDamageable
     public void AddMaxHPValue(float value)
     {
         // 최대 체력이 바뀌면 현재 체력이 새 최대 체력을 넘지 않도록 보정합니다.
+        //status.MaxHP.AddValue(value);
+        //ClampCurrentHP();
+        //PublishHealthChanged();
+
+        float previousMaxHp = status.MaxHP.FinalValue;
+        bool wasFullHealth = Mathf.Approximately(status.CurrentHP, previousMaxHp);
+
         status.MaxHP.AddValue(value);
-        ClampCurrentHP();
-        PublishHealthChanged();
+
+        ApplyCurrentHpAfterMaxHpChange(previousMaxHp, wasFullHealth);
     }
 
     public void AddMaxHPMultiplier(float value)
     {
         // 최대 체력 비율 보정 후 현재 체력 상한도 다시 확인합니다.
+        //status.MaxHP.AddMultiplier(value);
+        //ClampCurrentHP();
+        //PublishHealthChanged();
+
+        float previousMaxHp = status.MaxHP.FinalValue;
+        bool wasFullHealth = Mathf.Approximately(status.CurrentHP, previousMaxHp);
+
         status.MaxHP.AddMultiplier(value);
-        ClampCurrentHP();
+
+        ApplyCurrentHpAfterMaxHpChange(previousMaxHp, wasFullHealth);
+    }
+    private void ApplyCurrentHpAfterMaxHpChange(float previousMaxHp, bool wasFullHealth)
+    {
+        float currentMaxHp = status.MaxHP.FinalValue;
+        // 최대 HP가 증가했고, 변경 전에도 최대 HP였다면 새 최대 HP까지 채웁니다.
+        if (wasFullHealth && currentMaxHp > previousMaxHp)
+        {
+            status.CurrentHP = currentMaxHp;
+        }
+        else
+        {
+            // 최대 HP 감소 또는 이미 피해를 입은 경우에는 기존 HP를 유지하되 상한만 보정합니다.
+            ClampCurrentHP();
+        }
+
         PublishHealthChanged();
     }
-
     public void AddAttackPowerValue(float value)
     {
         status.AttackPower.AddValue(value);
