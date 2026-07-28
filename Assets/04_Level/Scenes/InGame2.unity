@@ -55549,6 +55549,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerPrefabs
       objectReference: {fileID: 0}
+    - target: {fileID: 7091615050073211964, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.142
+      objectReference: {fileID: 0}
+    - target: {fileID: 8074201028985009514, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: baseMoveSpeed
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 9028321581390058926, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

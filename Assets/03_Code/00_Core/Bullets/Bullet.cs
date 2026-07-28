@@ -264,7 +264,7 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <param name="cameraShakeValue">카메라 흔들림 값(생략 가능, 기본값 : 0f)</param>
     /// <param name="effectPrefabs">실행할 타격/피격 이펙트 프리팹들(생략 가능, 기본값 : 총알에 설정된 이펙트)</param>
     public void StartFire(Transform spawnPoint, LayerMask ownerLayer, float damage,
-                            int penetrationCount = 0, float speed = 10f, float cameraShakeValue = 0f,
+                            int penetrationCount = 0, float speed = 30f, float cameraShakeValue = 0f,
                                                                     List<GameObject> effectPrefabs = null)
     {
         // 타이머 코루틴이 비어있지 않다면
