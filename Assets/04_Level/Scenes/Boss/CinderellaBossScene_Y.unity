@@ -1544,9 +1544,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bb70dc853d0ebc4298a8a7749793bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CheckpointHealSystem
-  playerStatus: {fileID: 0}
-  lifeTracker: {fileID: 0}
-  healItemInventory: {fileID: 0}
 --- !u!114 &919054765
 MonoBehaviour:
   m_ObjectHideFlags: 0

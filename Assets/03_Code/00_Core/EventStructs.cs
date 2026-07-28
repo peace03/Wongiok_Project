@@ -1,7 +1,10 @@
-// 패링 키 입력 이벤트
-public struct ParryKeyDown { }
+using UnityEngine;
 
-// 히트스탑 이벤트: 프레임 단위 정지
+#region 패링 키 입력 이벤트
+public struct ParryKeyDown { }
+#endregion
+
+#region 히트스탑 이벤트: 프레임 단위 정지
 public struct HitStopEvent
 {
     public int frames { get; private set; } // 정지할 프레임 수
@@ -21,8 +24,9 @@ public struct HitStopEvent
         this.exclusiveGroup = exclusiveGroup;
     }
 }
+#endregion
 
-// 불릿타임 이벤트: 실시간 duration 동안 전역 시간 배율 변경
+#region 불릿타임 이벤트: 실시간 duration 동안 전역 시간 배율 변경
 public struct SlowMoEvent
 {
     public float targetScale { get; private set; }
@@ -44,7 +48,9 @@ public struct SlowMoEvent
         this.exclusiveGroup = exclusiveGroup;
     }
 }
+#endregion
 
+#region 시간 제어
 // 시간 연출 요청이 어디서 왔는지 구분한다. 충돌 정책을 사람이 읽기 쉽게 만들기 위한 태그다.
 public enum TimeEffectSource { None, Telegraph, Parry, Impact, Skill } //Impact는 또다른 연출 사용시
 
@@ -56,9 +62,47 @@ public static class TimeEffectGroups
 {
     public const string CombatFeel = "CombatFeel";
 }
+#endregion
 
+#region 카메라 쉐이크
 public struct CameraShakeEvent
 {
     public float impulseForce { get; private set; } // 진동 강도
     public CameraShakeEvent(float force) { this.impulseForce = force; }
 }
+#endregion
+
+#region SFX
+//2D 사운드 재생 요청
+public readonly struct Play2DSoundEvent
+{
+    public readonly AudioClip Clip; //재생 오디오 클립
+    public readonly float Volume; //0~1 재생 볼륨
+    public Play2DSoundEvent(AudioClip clip, float volume = 1f)
+    {
+        Clip = clip;
+        Volume = volume;
+    }
+}
+
+//BGM 재생 요청 (페이드 아웃 -> 페이드 인)
+public readonly struct PlayBgmEvent
+{
+    public readonly AudioClip Clip;
+    public readonly float Volume;
+    public readonly float FadeDuration;
+    public PlayBgmEvent(AudioClip clip, float volume = 1f, float fadeDuration = 1f)
+    {
+        Clip = clip;
+        Volume = volume;
+        FadeDuration = fadeDuration;
+    }
+}
+
+//BGM 종료 요청
+public readonly struct StopBgmEvent
+{
+    public readonly float FadeDuration;
+    public StopBgmEvent(float fadeDuration = 1f) { FadeDuration = fadeDuration; }
+}
+#endregion
