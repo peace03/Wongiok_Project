@@ -139,6 +139,7 @@ GameObject:
   - component: {fileID: 7013750113944163693}
   - component: {fileID: 5855927997131145951}
   - component: {fileID: 872180411151741861}
+  - component: {fileID: 1947328650203481723}
   - component: {fileID: 8074201028985009514}
   - component: {fileID: 5307295351705682506}
   - component: {fileID: 6264627927867033529}
@@ -225,7 +226,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dfa4c0509c7d51418edabea7e183f7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  animationDriver: {fileID: 1947328650203481723}
+--- !u!114 &1947328650203481723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934747222265855720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3c62c8c9bc04da6b667bf7ba7ff104e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimatorDriver
   visualRoot: {fileID: 3810258337476680276}
+  animator: {fileID: 3024179795968737012}
 --- !u!114 &8074201028985009514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -308,7 +323,6 @@ MonoBehaviour:
   muzzlePivot: {fileID: 7091615050073211964}
   shootingEffectPrefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
   bulletFactory: {fileID: 0}
-  animator: {fileID: 3024179795968737012}
   ownerLayer:
     serializedVersion: 2
     m_Bits: 64

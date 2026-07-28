@@ -13,8 +13,6 @@ public class PlayerAttack : MonoBehaviour
     // 씬에 배치된 BulletFactory를 연결해 플레이어 총알을 가져옵니다.
     [SerializeField] private BulletFactory bulletFactory;
 
-    [SerializeField] private Animator animator;
-
     // Bullet 원본이 자기 소유자 레이어 충돌을 무시할 때 사용하는 레이어입니다.
     [SerializeField] private LayerMask ownerLayer;
 
@@ -27,12 +25,6 @@ public class PlayerAttack : MonoBehaviour
     private bool hasLoggedMissingBulletFactory;
     private bool hasLoggedMissingPlayerStatus;
     private bool hasLoggedEmptyOwnerLayer;
-
-    private void Awake()
-    {
-        ResolveAnimator();
-        // 실제 참조 캐싱은 PlayerInitializer에서 순서를 보장해 처리합니다.
-    }
 
     public void Initialize(PlayerStatus status)
     {
@@ -68,13 +60,6 @@ public class PlayerAttack : MonoBehaviour
                 damage
             )
         );
-    }
-
-    private void ResolveAnimator()
-    {
-        if (animator != null && animator.gameObject.activeInHierarchy) return;
-
-        animator = GetComponentInChildren<Animator>(true);
     }
 
     private void UpdateMuzzleDirection(Vector3 attackDirection)

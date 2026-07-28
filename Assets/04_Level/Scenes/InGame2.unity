@@ -55533,6 +55533,14 @@ PrefabInstance:
       propertyPath: shootingEffectPrefab
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 5307295351705682506, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: dashDistance
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5307295351705682506, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: dashDuration
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5661125939663609720, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

@@ -13,7 +13,7 @@ public class PlayerMoveState : PlayerBaseState
 
     public override void EnterState()
     {
-        controller.SetLocomotionAnimation(true);
+        controller.Animation.SetLocomotion(true);
         Debug.Log("Move Enter");
     }
 

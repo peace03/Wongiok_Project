@@ -17,10 +17,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float dashDistance = 4f;
 
     // 대쉬가 지속되는 시간입니다.
-    [SerializeField] private float dashDuration = 0.18f;
+    [SerializeField] private float dashDuration = 1f;
 
     // 다음 대쉬를 다시 사용할 수 있기까지의 대기 시간입니다.
-    [SerializeField] private float dashCooldown = 2f;
+    [SerializeField] private float dashCooldown = 4f;
 
     [SerializeField] private LayerMask dashPierceLayers;
 

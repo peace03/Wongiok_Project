@@ -40,6 +40,7 @@ public class PlayerDashState : PlayerBaseState
         dashTimer = controller.Movement.DashDuration;
         dashDirection = GetDashDirection();
 
+        controller.Animation.PlaySliding();
         controller.Movement.SetDashPiercing(CanDashPiercing);
         controller.Movement.ConsumeDash();
         controller.Movement.ResetVerticalVelocity();
