@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dcb207ffbd561c45836575befd363a5, type: 3}
+  m_Name: "\uC774\uB3D9 \uC18D\uB3C4"
+  m_EditorClassIdentifier: Assembly-CSharp::PassiveSkillData
+  id: 2003
+  icon: {fileID: 0}
+  skillName: "\uC774\uB3D9 \uC18D\uB3C4"
+  type: 0
+  unlockChapter: 0
+  maxLevel: 3
+  desc: "\uC774\uB3D9 \uC18D\uB3C4\uAC00 \uC99D\uAC00\uD55C\uB2E4."
+  levelDatas:
+  - rid: 1008828851650560161
+  references:
+    version: 2
+    RefIds:
+    - rid: 1008828851650560161
+      type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        triggerType: 0
+        appliedStats:
+        - stat: 2
+          modify: 0
+          amount: 2

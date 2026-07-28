@@ -106,8 +106,8 @@ public class SkillSystemModel
             {
                 // 패시브 스킬 장착
                 equippedPassives.Add(skill);
-                Debug.Log($"[Passive | Skill] 스킬 장착 => " +
-                            $"위치 : {equippedPassives.Count} / {skill.BaseData.SkillName}");
+                // 패시브 스킬 사용
+                skill.UseSkill();
             }
         }
 
