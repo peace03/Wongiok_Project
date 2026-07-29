@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BuildingMaterialStyleSO
   entries:
   - moduleId: 0
-    baseMaterial: {fileID: 0}
+    baseMaterial: {fileID: 2100000, guid: 28f051cc68dd45148849f1c9edbf3792, type: 2}
     colorPalette: []
     useDirt: 0
     dirtMode: 0
@@ -30,7 +30,7 @@ MonoBehaviour:
     atlasVariantCount: 0
     atlasGrid: {x: 0, y: 0}
   - moduleId: 1
-    baseMaterial: {fileID: 0}
+    baseMaterial: {fileID: 2100000, guid: 28f051cc68dd45148849f1c9edbf3792, type: 2}
     colorPalette: []
     useDirt: 0
     dirtMode: 1
@@ -46,7 +46,7 @@ MonoBehaviour:
     atlasVariantCount: 1
     atlasGrid: {x: 1, y: 1}
   - moduleId: 2
-    baseMaterial: {fileID: 0}
+    baseMaterial: {fileID: 2100000, guid: 28f051cc68dd45148849f1c9edbf3792, type: 2}
     colorPalette: []
     useDirt: 0
     dirtMode: 1
@@ -62,7 +62,7 @@ MonoBehaviour:
     atlasVariantCount: 1
     atlasGrid: {x: 1, y: 1}
   - moduleId: 3
-    baseMaterial: {fileID: 0}
+    baseMaterial: {fileID: 2100000, guid: a4e6f7ba29e4f414db4d02ebd124f647, type: 2}
     colorPalette: []
     useDirt: 0
     dirtMode: 1
@@ -110,7 +110,7 @@ MonoBehaviour:
     atlasVariantCount: 1
     atlasGrid: {x: 1, y: 1}
   - moduleId: 6
-    baseMaterial: {fileID: 0}
+    baseMaterial: {fileID: 2100000, guid: a4e6f7ba29e4f414db4d02ebd124f647, type: 2}
     colorPalette: []
     useDirt: 0
     dirtMode: 1
@@ -254,7 +254,7 @@ MonoBehaviour:
     atlasVariantCount: 1
     atlasGrid: {x: 1, y: 1}
   - moduleId: 15
-    baseMaterial: {fileID: 0}
+    baseMaterial: {fileID: 2100000, guid: ffa7a7658301d3547899bdce082d77a8, type: 2}
     colorPalette: []
     useDirt: 0
     dirtMode: 1
@@ -270,7 +270,7 @@ MonoBehaviour:
     atlasVariantCount: 1
     atlasGrid: {x: 1, y: 1}
   - moduleId: 16
-    baseMaterial: {fileID: 0}
+    baseMaterial: {fileID: 2100000, guid: 9b86f3a789583a04eacb9beee0d77ea2, type: 2}
     colorPalette: []
     useDirt: 0
     dirtMode: 1

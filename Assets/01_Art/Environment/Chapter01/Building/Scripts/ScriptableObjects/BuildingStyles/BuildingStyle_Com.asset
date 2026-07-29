@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70a7c8ab7ca34dd4bac214223ed6caef, type: 3}
-  m_Name: BuildingStyle
+  m_Name: BuildingStyle_Com
   m_EditorClassIdentifier: Assembly-CSharp::BuildingStyleSO
   middlePrefab: {fileID: 8692432729255462727, guid: 80800ad4365aa0f47ad6ed1eea25c631, type: 3}
   roofPrefab: {fileID: 5169801677269543391, guid: 7ec88dab3ef780348a2a1f77af107c57, type: 3}
@@ -27,7 +27,7 @@ MonoBehaviour:
   buildingDepth: 6
   lobbyPrefab: {fileID: 1902763134728345942, guid: 2eb53873fa1d6054c8bae497377b492e, type: 3}
   lobbyHeight: 3.8
-  pillarPrefabResidential: {fileID: 8512157604313333811, guid: 8b33fa0790f5b7e4b9694c9331d821d2, type: 3}
+  pillarPrefabResidential: {fileID: 1842758080983985541, guid: c50392d083086d04d8b3c11bd056afa5, type: 3}
   pillarPrefabShop: {fileID: 1842758080983985541, guid: c50392d083086d04d8b3c11bd056afa5, type: 3}
   middlePillarPrefabResidential: {fileID: 8512157604313333811, guid: 8b33fa0790f5b7e4b9694c9331d821d2, type: 3}
   middlePillarPrefabShop: {fileID: 8512157604313333811, guid: 8b33fa0790f5b7e4b9694c9331d821d2, type: 3}
@@ -60,7 +60,7 @@ MonoBehaviour:
   leftHasWindow: 1
   rightHasWindow: 1
   windowVerticalOffset: -0.3
-  outdoorUnitPrefab: {fileID: 647845861719438864, guid: 20ae34257d2a7d94d8384725e87b71cb, type: 3}
+  outdoorUnitPrefab: {fileID: 1442680402198046686, guid: 993a5010bb5c9e943932d85d052dc868, type: 3}
   outdoorUnitSpawnChance: 0.3
   outdoorUnitOffset: {x: 0.3, y: -0.3}
   materialStyle: {fileID: 11400000, guid: 1279c80af37a7c844a6d8aedf4cefdea, type: 2}
