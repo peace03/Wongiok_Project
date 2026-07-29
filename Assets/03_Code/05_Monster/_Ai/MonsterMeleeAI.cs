@@ -15,20 +15,27 @@ public class MonsterMeleeAI : MonsterBase
     [SerializeField] private float attackCooldown = 1.2f;
     [SerializeField] private float attackWindup = 0.25f;
     [SerializeField] private float attackRecovery = 0.35f;
-    [SerializeField] private Vector3 attackBoxSize = new Vector3(1.2f, 1.2f, 1.2f);
-    [SerializeField] private Vector3 attackBoxOffset = new Vector3(0.8f, 0f, 0f);
+    [SerializeField]
+    private Vector3 attackBoxSize =
+        new Vector3(1.2f, 1.2f, 1.2f);
+    [SerializeField]
+    private Vector3 attackBoxOffset =
+        new Vector3(0.8f, 0f, 0f);
     [SerializeField] private bool requireTargetInRangeAtImpact = true;
     [SerializeField] private float impactRangeGrace = 0.25f;
 
     [Header("Attack Presentation")]
     [SerializeField] private Animator animator;
     [SerializeField] private string attackTriggerName = "Attack";
+    [SerializeField] private string attack2TriggerName = "Attack2";
+    [SerializeField] private bool alternateAttackAnimations = true;
     [SerializeField] private GameObject attackWarningIndicator;
     [SerializeField] private AudioSource attackAudioSource;
     [SerializeField] private AudioClip attackWarningClip;
 
     private float lastAttackEndTime = -999f;
     private bool isAttacking;
+    private bool useSecondAttackAnimationNext;
 
     // 공통 컴포넌트와 공격 연출 참조를 준비합니다
     protected override void Awake()
@@ -54,6 +61,7 @@ public class MonsterMeleeAI : MonsterBase
     {
         lastAttackEndTime = -999f;
         isAttacking = false;
+        useSecondAttackAnimationNext = false;
         SetAttackWarningVisible(false);
     }
 
@@ -90,7 +98,9 @@ public class MonsterMeleeAI : MonsterBase
 
         FaceTarget();
 
-        if (IsTargetInRange(attackRange, VerticalTolerance))
+        if (IsTargetInRange(
+                attackRange,
+                VerticalTolerance))
         {
             TryStartAttack();
             return;
@@ -110,12 +120,26 @@ public class MonsterMeleeAI : MonsterBase
             return;
         }
 
-        if (Time.time < lastAttackEndTime + attackCooldown)
+        if (Time.time <
+            lastAttackEndTime + attackCooldown)
         {
             return;
         }
 
         StartCoroutine(AttackRoutine());
+    }
+
+    // 피격되었을 때 진행 중인 공격을 즉시 중단합니다
+    public void InterruptAttackByHit()
+    {
+        if (!isAttacking)
+        {
+            return;
+        }
+
+        StopAllCoroutines();
+        ResetAttackState();
+        lastAttackEndTime = Time.time;
     }
 
     // 공격 전조와 타격 판정과 후딜을 순서대로 처리합니다
@@ -169,15 +193,48 @@ public class MonsterMeleeAI : MonsterBase
     // 공격 애니메이션과 경고음을 실행합니다
     private void PlayAttackPresentation()
     {
-        if (animator != null && !string.IsNullOrEmpty(attackTriggerName))
+        if (animator != null)
         {
-            animator.SetTrigger(attackTriggerName);
+            string selectedTriggerName =
+                GetNextAttackTriggerName();
+
+            if (!string.IsNullOrEmpty(
+                    selectedTriggerName))
+            {
+                animator.SetTrigger(
+                    selectedTriggerName
+                );
+            }
         }
 
-        if (attackAudioSource != null && attackWarningClip != null)
+        if (attackAudioSource != null &&
+            attackWarningClip != null)
         {
-            attackAudioSource.PlayOneShot(attackWarningClip);
+            attackAudioSource.PlayOneShot(
+                attackWarningClip
+            );
         }
+    }
+
+    // 이번 공격에 사용할 Animator Trigger 이름을 반환합니다
+    private string GetNextAttackTriggerName()
+    {
+        if (!alternateAttackAnimations ||
+            string.IsNullOrEmpty(
+                attack2TriggerName))
+        {
+            return attackTriggerName;
+        }
+
+        string selectedTriggerName =
+            useSecondAttackAnimationNext
+                ? attack2TriggerName
+                : attackTriggerName;
+
+        useSecondAttackAnimationNext =
+            !useSecondAttackAnimationNext;
+
+        return selectedTriggerName;
     }
 
     // 타격 순간에 대상이 유효한 범위 안에 남아 있는지 확인합니다
@@ -200,19 +257,23 @@ public class MonsterMeleeAI : MonsterBase
     }
 
     // 공격 경고 오브젝트의 표시 상태를 설정합니다
-    private void SetAttackWarningVisible(bool visible)
+    private void SetAttackWarningVisible(
+        bool visible)
     {
         if (attackWarningIndicator == null)
         {
             return;
         }
 
-        if (attackWarningIndicator.activeSelf == visible)
+        if (attackWarningIndicator.activeSelf ==
+            visible)
         {
             return;
         }
 
-        attackWarningIndicator.SetActive(visible);
+        attackWarningIndicator.SetActive(
+            visible
+        );
     }
 
     // 공격 상태와 이동과 경고 연출을 초기화합니다
@@ -226,8 +287,11 @@ public class MonsterMeleeAI : MonsterBase
     // 공격 판정 박스 안의 IDamageable 대상에게 데미지를 줍니다
     private void DoAttackHitCheck()
     {
-        Vector3 center = GetAttackBoxCenter();
-        Vector3 halfSize = attackBoxSize * 0.5f;
+        Vector3 center =
+            GetAttackBoxCenter();
+
+        Vector3 halfSize =
+            attackBoxSize * 0.5f;
 
         Collider[] hits = Physics.OverlapBox(
             center,
@@ -237,20 +301,29 @@ public class MonsterMeleeAI : MonsterBase
             QueryTriggerInteraction.Ignore
         );
 
-        HashSet<Object> damagedTargets = new HashSet<Object>();
+        HashSet<Object> damagedTargets =
+            new HashSet<Object>();
 
         for (int i = 0; i < hits.Length; i++)
         {
-            IDamageable damageable = hits[i].GetComponentInParent<IDamageable>();
+            IDamageable damageable =
+                hits[i].GetComponentInParent<
+                    IDamageable>();
 
             if (damageable == null)
             {
                 continue;
             }
 
-            Object damageTargetKey = GetDamageTargetKey(hits[i], damageable);
+            Object damageTargetKey =
+                GetDamageTargetKey(
+                    hits[i],
+                    damageable
+                );
 
-            if (damageTargetKey != null && damagedTargets.Contains(damageTargetKey))
+            if (damageTargetKey != null &&
+                damagedTargets.Contains(
+                    damageTargetKey))
             {
                 continue;
             }
@@ -262,23 +335,43 @@ public class MonsterMeleeAI : MonsterBase
 
             if (damageTargetKey != null)
             {
-                damagedTargets.Add(damageTargetKey);
+                damagedTargets.Add(
+                    damageTargetKey
+                );
             }
 
-            ApplyDamageToTarget(damageable, hits[i]);
+            ApplyDamageToTarget(
+                damageable,
+                hits[i]
+            );
         }
     }
 
     // IDamageable에 데미지만 전달하고 피격 정보는 이벤트로 알립니다
-    private void ApplyDamageToTarget(IDamageable damageable, Collider hitCollider)
+    private void ApplyDamageToTarget(
+        IDamageable damageable,
+        Collider hitCollider)
     {
-        Vector3 hitPoint = hitCollider.ClosestPoint(transform.position);
-        Vector3 hitDirection = GetFacingDirectionVector();
-        float damage = GetAttackPower(fallbackAttackDamage);
+        Vector3 hitPoint =
+            hitCollider.ClosestPoint(
+                transform.position
+            );
+
+        Vector3 hitDirection =
+            GetFacingDirectionVector();
+
+        float damage =
+            GetAttackPower(
+                fallbackAttackDamage
+            );
 
         damageable.TakeDamage(damage);
+
         PublishDamageHitEvent(
-            GetDamageableGameObject(hitCollider, damageable),
+            GetDamageableGameObject(
+                hitCollider,
+                damageable
+            ),
             hitCollider,
             hitPoint,
             hitDirection,
@@ -287,16 +380,20 @@ public class MonsterMeleeAI : MonsterBase
     }
 
     // 중복 데미지 방지에 사용할 대상을 반환합니다
-    private Object GetDamageTargetKey(Collider hitCollider, IDamageable damageable)
+    private Object GetDamageTargetKey(
+        Collider hitCollider,
+        IDamageable damageable)
     {
-        Object damageableObject = damageable as Object;
+        Object damageableObject =
+            damageable as Object;
 
         if (damageableObject != null)
         {
             return damageableObject;
         }
 
-        if (hitCollider.attachedRigidbody != null)
+        if (hitCollider.attachedRigidbody !=
+            null)
         {
             return hitCollider.attachedRigidbody;
         }
@@ -305,9 +402,12 @@ public class MonsterMeleeAI : MonsterBase
     }
 
     // 피격 이벤트에 사용할 대상 오브젝트를 반환합니다
-    private GameObject GetDamageableGameObject(Collider hitCollider, IDamageable damageable)
+    private GameObject GetDamageableGameObject(
+        Collider hitCollider,
+        IDamageable damageable)
     {
-        Component damageableComponent = damageable as Component;
+        Component damageableComponent =
+            damageable as Component;
 
         if (damageableComponent != null)
         {
@@ -325,34 +425,45 @@ public class MonsterMeleeAI : MonsterBase
         Vector3 hitDirection,
         float damage)
     {
-        DamageHitEvent hitEvent = new DamageHitEvent(
-            targetObject,
-            gameObject,
-            hitCollider,
-            hitPoint,
-            hitDirection,
-            damage
-        );
+        DamageHitEvent hitEvent =
+            new DamageHitEvent(
+                targetObject,
+                gameObject,
+                hitCollider,
+                hitPoint,
+                hitDirection,
+                damage
+            );
 
-        EventBus<DamageHitEvent>.Publish(hitEvent);
+        EventBus<DamageHitEvent>.Publish(
+            hitEvent
+        );
     }
 
     // 현재 바라보는 방향 기준으로 공격 판정 박스 중심을 계산합니다
     private Vector3 GetAttackBoxCenter()
     {
-        Vector3 offset = GetFacingOffset(attackBoxOffset);
+        Vector3 offset =
+            GetFacingOffset(
+                attackBoxOffset
+            );
+
         return transform.position + offset;
     }
 
     // 기본 Player 레이어 마스크를 설정합니다
     private void EnsureDefaultPlayerHitMask()
     {
-        if (playerHitMask.value != 0 && playerHitMask.value != ~0)
+        if (playerHitMask.value != 0 &&
+            playerHitMask.value != ~0)
         {
             return;
         }
 
-        int playerMask = LayerMask.GetMask(DefaultPlayerLayerName);
+        int playerMask =
+            LayerMask.GetMask(
+                DefaultPlayerLayerName
+            );
 
         if (playerMask == 0)
         {
@@ -376,13 +487,21 @@ public class MonsterMeleeAI : MonsterBase
         DrawDetectionGizmo();
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(GetAttackBoxCenterForGizmo(), attackBoxSize);
+
+        Gizmos.DrawWireCube(
+            GetAttackBoxCenterForGizmo(),
+            attackBoxSize
+        );
     }
 
     // Gizmo 표시용 공격 판정 박스 중심을 계산합니다
     private Vector3 GetAttackBoxCenterForGizmo()
     {
-        float direction = transform.localScale.x >= 0f ? 1f : -1f;
+        float direction =
+            transform.localScale.x >= 0f
+                ? 1f
+                : -1f;
+
         Vector3 offset = new Vector3(
             attackBoxOffset.x * direction,
             attackBoxOffset.y,
