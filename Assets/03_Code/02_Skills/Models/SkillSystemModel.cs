@@ -7,14 +7,14 @@ public class SkillSystemModel
 {
     [Header("장착한 액티브 스킬들")]
     [Tooltip("액티브 스킬의 장착 가능한 최대 개수")]
-    [SerializeField] private int maxActiveCount = 3;                            // 액티브 스킬 최대 장착 개수
+    [SerializeField] private int maxEquippedActiveCount = 3;                    // 액티브 스킬 최대 장착 개수
     [Tooltip("장착한 액티브 스킬들")]
     [SerializeField] private List<SkillInstance> equippedActives = new();       // 장착한 액티브 스킬들
     [Header("장착하지 않은 액티브 스킬들")]
     [SerializeField] private List<SkillInstance> unequippedActives = new();     // 장착하지 않은 액티브 스킬들
     [Header("장착한 패시브 스킬들")]
     [Tooltip("패시브 스킬의 장착 가능한 최대 개수")]
-    [SerializeField] private int maxPassiveCount = 4;                           // 패시브 스킬 최대 장착 개수
+    [SerializeField] private int maxEquippedPassiveCount = 4;                   // 패시브 스킬 최대 장착 개수
     [Tooltip("장착한 패시브 스킬들")]
     [SerializeField] private List<SkillInstance> equippedPassives = new();      // 장착한 패시브 스킬들
     [Header("모든 스킬들")]
@@ -27,7 +27,7 @@ public class SkillSystemModel
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
     public event Action<SkillInstance> OnSkillEnhanced;                         // 스킬 강화 이벤트 변수
 
-    public int MaxActiveCount => maxActiveCount;
+    public int MaxEquippedActiveCount => maxEquippedActiveCount;
 
     /// <summary>
     /// 생성자
@@ -79,12 +79,12 @@ public class SkillSystemModel
         {
             // 챕터 1의 스킬이 아니거나, 장착할 액티브 슬롯이 없거나, 장착할 패시브 슬롯이 없다면
             if (skill.BaseData.UnlockChapter != CHAPTER_TYPE.First ||
-                (skill.IsActiveSkill && equippedActives.Count >= maxActiveCount) ||
-                (!skill.IsActiveSkill && equippedPassives.Count >= maxPassiveCount))
+                (skill.IsActiveSkill && equippedActives.Count >= maxEquippedActiveCount) ||
+                (!skill.IsActiveSkill && equippedPassives.Count >= maxEquippedPassiveCount))
                 continue;
 
             // 액티브 스킬이고 장착할 액티브 슬롯이 있다면
-            if (skill.IsActiveSkill && equippedActives.Count < maxActiveCount)
+            if (skill.IsActiveSkill && equippedActives.Count < maxEquippedActiveCount)
             {
                 // 액티브 스킬 장착
                 equippedActives.Add(skill);
@@ -102,7 +102,7 @@ public class SkillSystemModel
                             $" / {skill.BaseData.SkillName}");
             }
             // 장착할 패시브 슬롯이 있다면
-            else if (!skill.IsActiveSkill && equippedPassives.Count < maxPassiveCount)
+            else if (!skill.IsActiveSkill && equippedPassives.Count < maxEquippedPassiveCount)
             {
                 // 패시브 스킬 장착
                 equippedPassives.Add(skill);
@@ -112,23 +112,23 @@ public class SkillSystemModel
         }
 
         // 장착할 액티브 슬롯이 남았다면
-        if (equippedActives.Count < maxActiveCount)
+        if (equippedActives.Count < maxEquippedActiveCount)
         {
             //Debug.Log($"[Active | Skill] 빈 슬롯 => {maxActiveCount - equippedActives.Count}개");
 
             // 남은 액티브 슬롯 칸 수만큼
-            for (int i = equippedActives.Count; i < maxActiveCount; i++)
+            for (int i = equippedActives.Count; i < maxEquippedActiveCount; i++)
                 // 빈 칸 생성
                 equippedActives.Add(null);
         }
 
         // 장착할 패시브 슬롯이 남았다면
-        if (equippedPassives.Count < maxPassiveCount)
+        if (equippedPassives.Count < maxEquippedPassiveCount)
         {
             //Debug.Log($"[Passive | Skill] 빈 슬롯 => {maxPassiveCount - equippedPassives.Count}개");
 
             // 남은 패시브 슬롯 칸 수만큼
-            for (int i = equippedPassives.Count; i < maxPassiveCount; i++)
+            for (int i = equippedPassives.Count; i < maxEquippedPassiveCount; i++)
                 // 빈 칸 생성
                 equippedPassives.Add(null);
         }
@@ -153,6 +153,23 @@ public class SkillSystemModel
             if (effects[i].prefab != null)
                 // 스킬 이펙트 정보 리스트에 추가
                 effectDatas.Add(new EffectAddData(effects[i].prefab));
+    }
+
+    /// <summary>
+    /// 특정 위치에 장착한 액티브 스킬의 ID 반환 함수
+    /// </summary>
+    /// <param name="index">장착 위치</param>
+    public int GetEquippedActiveSkillId(int index)
+    {
+        // 장착 위치가 최대 장착 개수 범위 밖이라면
+        if (index < 0 || index > maxEquippedActiveCount)
+            return -1;
+        // 해당 슬롯이 비어있거나, 데이터가 없다면
+        else if (equippedActives[index] == null || equippedActives[index].BaseData == null)
+            return -1;
+
+        // 슬롯에 장착된 스킬 ID 반환
+        return equippedActives[index].BaseData.Id;
     }
 
     /// <summary>
@@ -219,9 +236,9 @@ public class SkillSystemModel
     }
 
     /// <summary>
-    /// 액티브 스킬들 반환 함수
+    /// 모든 액티브 스킬들 반환 함수
     /// </summary>
-    public void GetActiveSkills(List<SkillInstance> results)
+    public void GetAllActiveSkills(List<SkillInstance> results)
     {
         // 결과를 담을 리스트가 없다면
         if (results == null)
@@ -302,7 +319,7 @@ public class SkillSystemModel
     public void TickActiveSkills(float time)
     {
         // 장착한 액티브 스킬들의 수만큼
-        for(int i = 0; i < maxActiveCount; i++)
+        for(int i = 0; i < maxEquippedActiveCount; i++)
         {
             // 장착된 액티브 스킬이 없거나, 스킬 정보가 비어있다면
             if (equippedActives[i] == null || equippedActives[i].BaseData == null)
@@ -334,9 +351,9 @@ public class SkillSystemModel
         else if (!allSkillDictionary.TryGetValue((int)id, out var skill))
             Debug.Log($"[Error | Skill] 해당 스킬 없음 => 입력 - ID : {id}");
         // 슬롯 종류가 액티브 스킬 최대 장착 개수를 넘어간다면
-        else if ((int)slot >= maxActiveCount)
+        else if ((int)slot >= maxEquippedActiveCount)
             Debug.Log($"[Error | Skill] 액티브 최대 장착 개수 오버 => " +
-                        $"입력 - {slot.ToKoreanString()} / 최대 장착 개수 :{maxActiveCount}");
+                        $"입력 - {slot.ToKoreanString()} / 최대 장착 개수 :{maxEquippedActiveCount}");
         // 패시브 스킬이라면
         else if (!skill.IsActiveSkill)
             Debug.Log($"[Error | Skill] 패시브 스킬 => 입력 - ID :{id} / {skill.BaseData.SkillName}");
@@ -393,11 +410,37 @@ public class SkillSystemModel
 
         // 변경된 스킬이 있다면
         if (result)
+        {
+            //// 장착한 액티브 스킬들 로그 출력
+            //ShowLogEquippedSkills();
             // 액티브 스킬 변경 이벤트 발행
             OnActiveSkillsChanged?.Invoke();
+        }
 
         // 결과 반환
         return result;
+    }
+
+    /// <summary>
+    /// 장착한 액티브 스킬들 로그 출력 함수
+    /// </summary>
+    private void ShowLogEquippedSkills()
+    {
+        // 장착 위치를 저장할 변수
+        ACTIVE_SKILL_SLOT_TYPE slot;
+
+        // 액티브 스킬 최대 개수만큼
+        for (int i = 0; i < maxEquippedActiveCount; i++)
+        {
+            // 장착된 스킬이 없거나, 데이터가 없다면
+            if (equippedActives[i] == null || equippedActives[i].BaseData == null)
+                continue;
+
+            // 장착 위치 저장
+            slot = (ACTIVE_SKILL_SLOT_TYPE)i;
+            Debug.Log($"[Active | Skill] 스킬 장착 => " +
+                        $"위치 : {slot.ToKoreanString()} / {equippedActives[i].BaseData.SkillName}");
+        }
     }
 
     /// <summary>

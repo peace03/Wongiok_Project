@@ -67,6 +67,8 @@ public class SkillSystemController : MonoBehaviour, IInitializable
 
     private void OnDisable()
     {
+        // 프레젠터 비활성화 함수 호출
+        presenter.DisablePresenter();
         // 액티브 스킬 슬롯 누름 이벤트 구독 해제
         EventBus<StartedPressSkillSlot>.action -= ExecuteSkill;
         // 액티브 스킬 슬롯 키 뗌 이벤트 구독 해제

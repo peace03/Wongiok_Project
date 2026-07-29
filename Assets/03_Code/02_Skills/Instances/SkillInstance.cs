@@ -168,6 +168,8 @@ public class SkillInstance
         //Debug.Log($"[Skill] 사용 시작 => {data.SkillName}");
         // 무기 외형 착용 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id));
+        // 현재 쿨타임 초기화
+        curCoolTime = 0f;
 
         // 차징 시간이 없다면
         if (data.GetMaxChargingTime(curLevel) <= 0f)
@@ -202,12 +204,6 @@ public class SkillInstance
         // 바꾼 상태가 사용 가능이라면
         if (IsReady)
             Debug.Log("스킬 슬롯 UI에 반짝거리는 이펙트가 필요하다면 이벤트 보내기");
-        // 바꾼 상태가 쿨타임이라면
-        else if (IsOnCoolTime)
-        {
-            // 현재 쿨타임 초기화
-            curCoolTime = 0f;
-        }
         // 바꾼 상태가 실행이라면
         else if (IsExecuting)
         {
@@ -387,8 +383,8 @@ public class SkillInstance
             //Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
             // 무기 외형 착용 해제 이벤트 발행
             EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
-            // 사용 가능 상태로 변경
-            SwitchState(SKILL_STATE.Ready);
+            // 쿨타임 상태로 변경
+            SwitchState(SKILL_STATE.CoolTime);
         }
     }
 
@@ -401,8 +397,11 @@ public class SkillInstance
         if (!IsActiveSkill || IsReady)
             return;
 
+        // 쿨타임 진행
+        curCoolTime = Math.Clamp(curCoolTime + time, 0f, Math.Max(0f, data.GetMaxCoolTime(curLevel)));
+
         // 차징 상태라면
-        if(IsCharging)
+        if (IsCharging)
         {
             // 차징 시간 진행
             curChargingTime = Math.Clamp(curChargingTime + time, 0f,
@@ -421,20 +420,23 @@ public class SkillInstance
 
             // 실행이 끝났다면
             if (curDuration >= Math.Max(0f, data.GetMaxDuration(curLevel)))
-                // 쿨타임 상태로 변경
-                SwitchState(SKILL_STATE.CoolTime);
+            {
+                // 쿨타임이 끝났다면
+                if (curCoolTime >= Math.Max(0f, data.GetMaxCoolTime(curLevel)))
+                    // 사용 가능 상태로 변경
+                    SwitchState(SKILL_STATE.Ready);
+                // 쿨타임이 남았다면
+                else
+                    // 쿨타임 상태로 변경
+                    SwitchState(SKILL_STATE.CoolTime);
+            }
         }
         // 쿨타임 상태라면
         else if(IsOnCoolTime)
-        {
-            // 쿨타임 진행
-            curCoolTime = Math.Clamp(curCoolTime + time, 0f, Math.Max(0f, data.GetMaxCoolTime(curLevel)));
-
             // 쿨타임이 끝났다면
             if (curCoolTime >= Math.Max(0f, data.GetMaxCoolTime(curLevel)))
                 // 사용 가능 상태로 변경
                 SwitchState(SKILL_STATE.Ready);
-        }
     }
 
     /// <summary>

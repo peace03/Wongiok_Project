@@ -14,7 +14,7 @@ public class PlayerFallState : PlayerBaseState
     public override void EnterState()
     {
         Debug.Log("Fall Enter");
-        controller.PlayLandingAnimation();
+        controller.Animation.PlayLanding();
     }
 
     public override void UpdateState()

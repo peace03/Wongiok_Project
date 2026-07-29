@@ -73,3 +73,15 @@ public interface IWaveEffect
     /// </summary>
     public void SetInfo();
 }
+
+/// <summary>
+/// 타격/피격 이펙트 인터페이스
+/// </summary>
+public interface IHitEffect
+{
+    /// <summary>
+    /// 정보 설정 함수
+    /// </summary>
+    /// <param name="target">따라다닐 대상(생략 가능, 기본값 : 비어있음)</param>
+    public void SetInfo(Transform target = null);
+}

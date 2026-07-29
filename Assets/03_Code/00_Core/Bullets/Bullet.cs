@@ -53,7 +53,7 @@ public class Bullet : MonoBehaviour, IPoolable
             // 총알 콜라이더 추가
             bulletCollider = gameObject.AddComponent<BoxCollider>();
             // 총알 콜라이더 크기 조절
-            bulletCollider.size = new Vector3(0.15f, 0.15f, 0.375f);
+            bulletCollider.size = new Vector3(0.02f, 0.02f, 0.05f);
         }
 
         // 총알 콜라이더 크기 받아오기
@@ -173,10 +173,16 @@ public class Bullet : MonoBehaviour, IPoolable
 
         // 실행할 타격/피격 이펙트의 수만큼
         foreach(var effect in executeHitEffects)
+        {
             // 타격/피격 이펙트 실행하기
             EventBus<EffectPlayData>.Publish(new EffectPlayData(effect, pos,
-                                                            Quaternion.LookRotation(-transform.forward),
-                                                                                parent: other.transform));
+                                                            Quaternion.LookRotation(-transform.forward)));
+
+            // 이펙트가 타격/피격 이펙트 인터페이스를 가지고 있다면
+            if (effect.TryGetComponent<IHitEffect>(out var hitEffect))
+                // 따라다닐 대상 설정하기
+                hitEffect.SetInfo(other.transform);
+        }
 
         // 카메라 흔들림 값이 있다면
         if (cameraShakeValue > 0f)
