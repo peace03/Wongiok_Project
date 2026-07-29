@@ -52,6 +52,9 @@ public class SkillInstance
     /// 패시브 스킬 정보
     /// </summary>
     public PassiveSkillData PassiveData => !IsActiveSkill ? data as PassiveSkillData : null;
+    /// <summary>
+    /// 스킬의 현재 레벨
+    /// </summary>
     public int CurLevel => curLevel;
     /// <summary>
     /// 액티브 스킬 여부
@@ -82,6 +85,7 @@ public class SkillInstance
     /// 스킬 사용 전 차징 여부
     /// </summary>
     public bool IsCharging => state == SKILL_STATE.Charging;
+    /* 사용하고 있지 않은 프로퍼티
     /// <summary>
     /// 쿨타임 비율
     /// </summary>
@@ -98,6 +102,7 @@ public class SkillInstance
     public float ChargingTimeRatio =>
         1f - (data.GetMaxChargingTime(curLevel) <= 0f ?
                                             0f : curChargingTime / data.GetMaxChargingTime(curLevel));
+    */
     #endregion
 
     /// <summary>

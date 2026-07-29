@@ -5,6 +5,7 @@ using System.Collections.Generic;
 [Serializable]
 public class SkillSystemModel
 {
+    #region 변수
     [Header("장착한 액티브 스킬들")]
     [Tooltip("액티브 스킬의 장착 가능한 최대 개수")]
     [SerializeField] private int maxEquippedActiveCount = 3;                    // 액티브 스킬 최대 장착 개수
@@ -24,8 +25,16 @@ public class SkillSystemModel
                                                                     = new();
     private readonly List<EffectAddData> effectDatas = new();                   // 스킬 이펙트 정보 리스트
 
+    private readonly PlayerAnimatorDriver ownerAnimatorDriver;                  // 소유자 애니메이터 시스템
+    private readonly GameInputReader ownerInputReader;                          // 소유자 입력 시스템
+
+    private const int magnumSkillId = 1001;                                     // 매그넘 스킬 ID
+    private const int rifleSkillId = 1002;                                      // 라이플(돌격소총) 스킬 ID
+    private const int sniperSkillId = 1003;                                     // 스나이퍼(저격총) 스킬 ID
+
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
     public event Action<SkillInstance> OnSkillEnhanced;                         // 스킬 강화 이벤트 변수
+    #endregion
 
     public int MaxEquippedActiveCount => maxEquippedActiveCount;
 
@@ -40,6 +49,13 @@ public class SkillSystemModel
             //Debug.Log($"[Error | Skill] 스킬 객체 생성 실패 => 데이터 : 없음");
             return;
         }
+
+        // 소유자 애니메이터 시스템 받아오기
+        ownerAnimatorDriver = owner.GetComponent<PlayerAnimatorDriver>();
+        // 소유자 입력 시스템 받아오기
+        ownerInputReader = owner.GetComponent<GameInputReader>();
+        // 실행기에게 소유자 애니메이터 시스템 전달
+        executer.Initialize(ownerAnimatorDriver);
 
         // 스킬 데이터의 수만큼
         foreach (var data in skillDatas)
@@ -91,7 +107,7 @@ public class SkillSystemModel
                 // 스킬 이펙트 정보 리스트 설정하기
                 SetEffectDatas(skill.ActiveData.Effects);
                 // 추가할 무기 외형 정보 이벤트 발행
-                EventBus<WeaponVisualAddData>.Publish(new WeaponVisualAddData(skill.ActiveData.Id,
+                EventBus<WeaponVisualAddData>.Publish(new WeaponVisualAddData(skill.BaseData.Id,
                                                                                 skill.ActiveData.Weapon));
                 // 추가할 이펙트 정보들 이벤트 발행
                 EventBus<EffectAddDatas>.Publish(new EffectAddDatas(effectDatas));
@@ -293,6 +309,48 @@ public class SkillSystemModel
             return;
         }
 
+        // 소유자 애니메이터 시스템이 있다면
+        if(ownerAnimatorDriver != null)
+        {
+            // 사용하려는 스킬의 ID에 따라서
+            switch(equippedActives[(int)slot].BaseData.Id)
+            {
+                // 매그넘이라면
+                case magnumSkillId:
+                    // 매그넘 스킬 애니메이션 재생에 실패했다면
+                    if (!ownerAnimatorDriver.PlayMagnumSkill())
+                    {
+                        Debug.Log($"[Skill] 매그넘 스킬 사용 실패 => 입력 - 애니메이션 재생 불가");
+                        return;
+                    }
+                    break;
+                // 라이플(돌격소총)이라면
+                case rifleSkillId:
+                    // 라이플 스킬 애니메이션 재생에 실패했다면
+                    if (!ownerAnimatorDriver.PlayRifleSkill())
+                    {
+                        Debug.Log($"[Skill] 돌격소총 스킬 사용 실패 => 입력 - 애니메이션 재생 불가");
+                        return;
+                    }
+                    break;
+                // 스나이퍼(저격총)이라면
+                case sniperSkillId:
+                    // 스나이퍼 스킬 애니메이션 재생에 실패했다면
+                    if (!ownerAnimatorDriver.PlaySniperSkill())
+                    {
+                        Debug.Log($"[Skill] 스나이퍼 스킬 사용 실패 => 입력 - 애니메이션 재생 불가");
+                        return;
+                    }
+                    break;
+                // 그 외
+                default:
+                    Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => " +
+                                $"스킬 ID : {equippedActives[(int)slot].BaseData.Id} / " +
+                                $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName}");
+                    break;
+            }
+        }
+
         // 스킬 실행
         equippedActives[(int)slot].UseSkill();
     }
@@ -422,28 +480,6 @@ public class SkillSystemModel
     }
 
     /// <summary>
-    /// 장착한 액티브 스킬들 로그 출력 함수
-    /// </summary>
-    private void ShowLogEquippedSkills()
-    {
-        // 장착 위치를 저장할 변수
-        ACTIVE_SKILL_SLOT_TYPE slot;
-
-        // 액티브 스킬 최대 개수만큼
-        for (int i = 0; i < maxEquippedActiveCount; i++)
-        {
-            // 장착된 스킬이 없거나, 데이터가 없다면
-            if (equippedActives[i] == null || equippedActives[i].BaseData == null)
-                continue;
-
-            // 장착 위치 저장
-            slot = (ACTIVE_SKILL_SLOT_TYPE)i;
-            Debug.Log($"[Active | Skill] 스킬 장착 => " +
-                        $"위치 : {slot.ToKoreanString()} / {equippedActives[i].BaseData.SkillName}");
-        }
-    }
-
-    /// <summary>
     /// 스킬 강화 함수
     /// </summary>
     public bool EnhanceSkill(int id)
@@ -472,5 +508,27 @@ public class SkillSystemModel
 
         // 결과 반환
         return result;
+    }
+
+    /// <summary>
+    /// 장착한 액티브 스킬들 로그 출력 함수
+    /// </summary>
+    private void ShowLogEquippedSkills()
+    {
+        // 장착 위치를 저장할 변수
+        ACTIVE_SKILL_SLOT_TYPE slot;
+
+        // 액티브 스킬 최대 개수만큼
+        for (int i = 0; i < maxEquippedActiveCount; i++)
+        {
+            // 장착된 스킬이 없거나, 데이터가 없다면
+            if (equippedActives[i] == null || equippedActives[i].BaseData == null)
+                continue;
+
+            // 장착 위치 저장
+            slot = (ACTIVE_SKILL_SLOT_TYPE)i;
+            Debug.Log($"[Active | Skill] 스킬 장착 => " +
+                        $"위치 : {slot.ToKoreanString()} / {equippedActives[i].BaseData.SkillName}");
+        }
     }
 }

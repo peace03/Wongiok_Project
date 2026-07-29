@@ -6,6 +6,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     // 아래 값들은 애니메이션의 시간이나 속도가 아니라 Animator 파라미터와 State를 찾는 식별자입니다.
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
     private static readonly int IsFalling = Animator.StringToHash("IsFalling");
+    private static readonly int IsExecutingSkill = Animator.StringToHash("IsExecutingSkill");
 
     // "Base Layer.상태 이름"처럼 전체 경로를 사용하면 다른 레이어에 같은 이름의 State가 생겨도
     // 원하는 Base Layer의 State를 정확하게 지정할 수 있습니다.
@@ -45,6 +46,9 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private Vector3 animatedModelInitialLocalPosition;
     private Quaternion animatedModelInitialLocalRotation;
     private bool hasAnimatedModelAnchor;
+
+    // 스킬 애니메이션 재생 중 여부
+    private bool playingSkillAnimation = false;
 
     private void Awake()
     {
@@ -100,7 +104,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// </summary>
     public void SetLocomotion(bool isMoving)
     {
-        if (!CanPlay()) return;
+        if (!CanPlay() || playingSkillAnimation) return;
 
         // Animator 창의 기존 전환 조건과 디버깅 표시를 위해 파라미터도 함께 갱신합니다.
         animator.SetBool(IsMoving, isMoving);
@@ -137,7 +141,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// </summary>
     public void PlayLanding()
     {
-        if (!CanPlay()) return;
+        if (!CanPlay() || playingSkillAnimation) return;
 
         // Jump → Landing은 Animator Controller에 연결된 IsFalling 조건 Transition이 담당합니다.
         animator.SetBool(IsFalling, true);
@@ -186,7 +190,9 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// <returns>State가 존재해 재생 요청에 성공하면 true, 아직 준비되지 않았으면 false입니다.</returns>
     public bool PlayMagnumSkill()
     {
-        return TryPlaySkillAnimation(MagnumSkillState, MagnumSkillTrigger, "MagnumSkill");
+        bool result = TryPlaySkillAnimation(MagnumSkillState, MagnumSkillTrigger, "MagnumSkill");
+        playingSkillAnimation = result;
+        return result;
     }
 
     /// <summary>
@@ -197,7 +203,25 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// <returns>State가 존재해 재생 요청에 성공하면 true, 아직 준비되지 않았으면 false입니다.</returns>
     public bool PlayRifleSkill()
     {
-        return TryPlaySkillAnimation(RifleSkillState, RifleSkillTrigger, "RifleSkill");
+        bool result = TryPlaySkillAnimation(RifleSkillState, RifleSkillTrigger, "RifleSkill");
+        playingSkillAnimation = result;
+        animator.SetBool(IsExecutingSkill, result);
+        return result;
+    }
+
+    /// <summary>
+    /// 라이플 스킬 애니메이션 중지 함수
+    /// </summary>
+    public void StopRifleSkill()
+    {
+        // 라이플(돌격소총) 스킬 애니메이션이 재생 중이라면
+        if (playingSkillAnimation)
+        {
+            // 라이플 스킬 애니메이션 끝
+            playingSkillAnimation = false;
+            // 라이플 스킬 애니메이션 끝
+            animator.SetBool(IsExecutingSkill, false);
+        }
     }
 
     /// <summary>
@@ -208,7 +232,20 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// <returns>State가 존재해 재생 요청에 성공하면 true, 아직 준비되지 않았으면 false입니다.</returns>
     public bool PlaySniperSkill()
     {
-        return TryPlaySkillAnimation(SniperSkillState, SniperSkillTrigger, "SniperSkill");
+        bool result = TryPlaySkillAnimation(SniperSkillState, SniperSkillTrigger, "SniperSkill");
+        playingSkillAnimation = result;
+        return result;
+    }
+
+    /// <summary>
+    /// 스킬 애니메이션 중지 함수
+    /// </summary>
+    public void StopSkill()
+    {
+        // 스킬 애니메이션이 재생 중이라면
+        if (playingSkillAnimation)
+            // 스킬 애니메이션 끝
+            playingSkillAnimation = false;
     }
 
     /// <summary>
@@ -217,7 +254,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// </summary>
     private bool TryPlaySkillAnimation(int stateHash, int triggerHash, string stateName)
     {
-        if (!CanPlay()) return false;
+        if (!CanPlay() || playingSkillAnimation) return false;
 
         if (!animator.HasState(BaseLayerIndex, stateHash))
         {
