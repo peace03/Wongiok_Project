@@ -172,16 +172,24 @@ public class Bullet : MonoBehaviour, IPoolable
         target.TakeDamage(damage);
 
         // 실행할 타격/피격 이펙트의 수만큼
-        foreach(var effect in executeHitEffects)
+        foreach(var hitEffect in executeHitEffects)
         {
-            // 타격/피격 이펙트 실행하기
-            EventBus<EffectPlayData>.Publish(new EffectPlayData(effect, pos,
-                                                            Quaternion.LookRotation(-transform.forward)));
+            // 최대 이펙트 시간 저장할 변수
+            float maxEffectTime = 0f;
 
-            // 이펙트가 타격/피격 이펙트 인터페이스를 가지고 있다면
-            if (effect.TryGetComponent<IHitEffect>(out var hitEffect))
+            // 타격/피격 이펙트가 이펙트 스크립트를 가지고 있다면
+            if(hitEffect.TryGetComponent<Effect>(out var effect))
+                // 최대 이펙트 시간 받아오기
+                maxEffectTime = effect.MaxEffectTime;
+
+            // 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
+            var executeEffect = EffectManager.Instance.PlayEffect(hitEffect, pos,
+                                            Quaternion.LookRotation(-transform.forward), maxEffectTime);
+
+            // 실행한 이펙트가 타격/피격 이펙트 인터페이스를 가지고 있다면
+            if (executeEffect.TryGetComponent<IHitEffect>(out var IHitEffect))
                 // 따라다닐 대상 설정하기
-                hitEffect.SetInfo(other.transform);
+                IHitEffect.SetInfo(other.transform);
         }
 
         // 카메라 흔들림 값이 있다면
