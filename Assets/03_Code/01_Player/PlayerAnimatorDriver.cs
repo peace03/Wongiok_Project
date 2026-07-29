@@ -15,6 +15,8 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private static readonly int JumpState = Animator.StringToHash("Base Layer.Jump");
     private static readonly int LandingState = Animator.StringToHash("Base Layer.Landing");
     private static readonly int SlidingState = Animator.StringToHash("Base Layer.Sliding");
+    private static readonly int DeathState = Animator.StringToHash("Base Layer.Death");
+    private static readonly int DeathTrigger = Animator.StringToHash("Death");
 
     // Animator Controller의 Magnum/Rifle/Sniper 상태를 무기별 스킬 진입점으로 사용합니다.
     // 상태 이름과 Trigger 이름을 함께 Hash로 보관해 문자열 오타와 반복 변환을 방지합니다.
@@ -180,6 +182,29 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
             LocomotionBlendDuration,
             0,
             0);
+    }
+
+    /// <summary>
+    /// 사망 상태에 진입할 때 진행 중인 스킬 연출을 정리하고 Death State를 재생합니다.
+    /// Death State는 자동으로 Idle에 복귀하지 않으며, 부활 후 상태 전환이 직접 Idle을 재생합니다.
+    /// </summary>
+    /// <returns>Death State가 존재해 재생 요청에 성공하면 true입니다.</returns>
+    public bool PlayDeath()
+    {
+        if (!CanPlay()) return false;
+
+        if (!animator.HasState(BaseLayerIndex, DeathState))
+        {
+            Debug.LogWarning(
+                "Player Animator에 'Base Layer.Death' State가 없어 사망 애니메이션을 재생하지 않았습니다.",
+                this);
+            return false;
+        }
+
+        playingSkillAnimation = false;
+        animator.SetBool(IsExecutingSkill, false);
+        animator.SetTrigger(DeathTrigger);
+        return true;
     }
 
     /// <summary>
