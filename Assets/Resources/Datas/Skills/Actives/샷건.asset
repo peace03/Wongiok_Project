@@ -34,7 +34,7 @@ MonoBehaviour:
     - rid: 4582174684380397967
       type: {class: AreaSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
-        maxCoolTime: 1
+        maxCoolTime: 12
         maxDuration: 2
         stages:
         - damage: 10
@@ -48,9 +48,17 @@ MonoBehaviour:
     - rid: 4582174684380397968
       type: {class: AreaSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
-        maxCoolTime: 0
-        maxDuration: 0
-        stages: []
+        maxCoolTime: 11
+        maxDuration: 2
+        stages:
+        - damage: 0
+          distance: 0
+          angle: 0
+          tickInterval: 0
+        - damage: 6
+          distance: 0
+          angle: 0
+          tickInterval: 0
     - rid: 4582174684380397969
       type: {class: AreaSkillLevelData, ns: , asm: Assembly-CSharp}
       data:

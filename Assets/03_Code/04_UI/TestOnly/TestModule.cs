@@ -52,7 +52,7 @@ public class TestModule : MonoBehaviour
 
     private void OnEnable()
     {
-        EventBus<RefreshUIEventT>.action += HandleRefreshUI;
+        EventBus<RefreshUIEvent>.action += HandleRefreshUI;
         EventBus<UILevelUpSkillSelectedEvent>.action += HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action += HandlePlayerLevelUp;
         
@@ -67,7 +67,7 @@ public class TestModule : MonoBehaviour
 
     private void OnDisable()
     {
-        EventBus<RefreshUIEventT>.action -= HandleRefreshUI;
+        EventBus<RefreshUIEvent>.action -= HandleRefreshUI;
         EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action -= HandlePlayerLevelUp;
         
@@ -399,9 +399,9 @@ public class TestModule : MonoBehaviour
         Debug.Log("저장 완료");
     }
 
-    private void HandleRefreshUI(RefreshUIEventT eventData)
+    private void HandleRefreshUI(RefreshUIEvent eventData)
     {
-        cachedEquippedActiveSkills = CloneSkills(eventData.EquippedActiveSkills);
+        cachedEquippedActiveSkills = CloneSkills(eventData.EquippedSkills);
         cachedOwnedSkills = CloneSkills(eventData.OwnedSkills);
         cachedOwnedSkillOrder = eventData.OwnedSkillOrder;
     }

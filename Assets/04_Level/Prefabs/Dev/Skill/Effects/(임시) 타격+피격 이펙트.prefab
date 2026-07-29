@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8520824499791270938}
-  - component: {fileID: 8804457491114428565}
   - component: {fileID: 6572111376366582465}
+  - component: {fileID: -4446934767290757515}
   - component: {fileID: 7724100050875816513}
   m_Layer: 0
   m_Name: "(\uC784\uC2DC) \uD0C0\uACA9+\uD53C\uACA9 \uC774\uD399\uD2B8"
@@ -34,18 +34,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8804457491114428565
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5391362108584089359}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fea45514d850f784291a989f5769c1b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Effect
 --- !u!199 &6572111376366582465
 ParticleSystemRenderer:
   serializedVersion: 7
@@ -126,6 +114,19 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &-4446934767290757515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5391362108584089359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49208110b94572e4eac8c0cda67ff7a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitEffect
+  target: {fileID: 0}
 --- !u!198 &7724100050875816513
 ParticleSystem:
   m_ObjectHideFlags: 0
