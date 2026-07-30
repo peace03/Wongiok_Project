@@ -12,6 +12,9 @@ public class SkillSystemPresenter
     private List<SkillInstance> modelResults = new();                           // 스킬 모델 결과들 리스트
     private List<UIPauseSkillInfoData> equippedSkillUIDatas = new();            // 장착한 스킬 UI 데이터들 리스트
     private List<UIPauseSkillInfoData> unequippedSkillUIDatas = new();          // 미장착한 스킬 UI 데이터들 리스트
+    [NonSerialized] private readonly PlayerAnimatorDriver ownerAnimatorDriver;
+
+    private const int sniperSkillId = 1003;
 
     /// <summary>
     /// 생성자
@@ -20,6 +23,8 @@ public class SkillSystemPresenter
     /// <param name="executer">액티브 스킬 실행기</param>
     public SkillSystemPresenter(GameObject owner, ActiveSkillExecuter executer)
     {
+        ownerAnimatorDriver = owner.GetComponent<PlayerAnimatorDriver>();
+
         // 스킬 데이터를 담을 리스트
         List<BaseSkillData> skillDatas = new();
         // 현재 챕터의 스킬 데이터 받아오기
@@ -32,6 +37,8 @@ public class SkillSystemPresenter
             model = new(owner, executer, skillDatas);
             // 액티브 스킬 변경 이벤트 구독
             model.OnActiveSkillsChanged += RefreshActiveSkills;
+            // 실제 스킬 상태에 맞춰 애니메이션을 전환하기 위한 이벤트 구독
+            model.OnSkillStateChanged += HandleSkillStateChanged;
             // UI 레벨업 스킬 선택 이벤트 구독
             EventBus<UILevelUpSkillSelectedEvent>.action += RefreshSelectedSkill;
             // 패시브 스킬 새로고침
@@ -52,8 +59,13 @@ public class SkillSystemPresenter
     /// </summary>
     public void DisablePresenter()
     {
+        if (model == null)
+            return;
+
         // 액티브 스킬 변경 이벤트 구독 해제
         model.OnActiveSkillsChanged -= RefreshActiveSkills;
+        // 스킬 상태 변경 이벤트 구독 해제
+        model.OnSkillStateChanged -= HandleSkillStateChanged;
         // UI 레벨업 스킬 선택 이벤트 구독 해제
         EventBus<UILevelUpSkillSelectedEvent>.action -= RefreshSelectedSkill;
         // 스킬 스왑(미장착 -> 장착) 이벤트 구독 해제
@@ -282,5 +294,30 @@ public class SkillSystemPresenter
 
         // 액티브 스킬 시간 진행
         model.TickActiveSkills(time);
+    }
+
+    private void HandleSkillStateChanged(
+        SkillInstance skill,
+        SKILL_STATE previousState,
+        SKILL_STATE currentState)
+    {
+        if (skill?.BaseData == null ||
+            skill.BaseData.Id != sniperSkillId ||
+            ownerAnimatorDriver == null)
+            return;
+
+        if (currentState == SKILL_STATE.Charging)
+        {
+            ownerAnimatorDriver.PlaySniperSkillStart();
+            return;
+        }
+
+        if (previousState != SKILL_STATE.Charging)
+            return;
+
+        if (currentState == SKILL_STATE.Executing)
+            ownerAnimatorDriver.PlaySniperSkillEnd();
+        else
+            ownerAnimatorDriver.CancelSniperSkill();
     }
 }

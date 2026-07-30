@@ -20,9 +20,12 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
 
     // Animator Controller의 Magnum/Rifle/Sniper 상태를 무기별 스킬 진입점으로 사용합니다.
     // 상태 이름과 Trigger 이름을 함께 Hash로 보관해 문자열 오타와 반복 변환을 방지합니다.
-    private static readonly int MagnumSkillState = Animator.StringToHash("Base Layer.MagnumSkill");
+    private static readonly int MagnumSkillStartState = Animator.StringToHash("Base Layer.MagnumSkillStartState");
+    private static readonly int MagnumSkillEndState = Animator.StringToHash("Base Layer.MagnumSkillEndState");
     private static readonly int RifleSkillState = Animator.StringToHash("Base Layer.RifleSkill");
-    private static readonly int SniperSkillState = Animator.StringToHash("Base Layer.SniperSkill");
+    private static readonly int LegacySniperSkillState = Animator.StringToHash("Base Layer.SniperSkill");
+    private static readonly int SniperSkillStartState = Animator.StringToHash("Base Layer.SniperSkillStartState");
+    private static readonly int SniperSkillEndState = Animator.StringToHash("Base Layer.SniperSkillEndState");
     private static readonly int MagnumSkillTrigger = Animator.StringToHash("MagnumSkill");
     private static readonly int RifleSkillTrigger = Animator.StringToHash("RifleSkill");
     private static readonly int SniperSkillTrigger = Animator.StringToHash("SniperSkill");
@@ -215,9 +218,50 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// <returns>State가 존재해 재생 요청에 성공하면 true, 아직 준비되지 않았으면 false입니다.</returns>
     public bool PlayMagnumSkill()
     {
-        bool result = TryPlaySkillAnimation(MagnumSkillState, MagnumSkillTrigger, "MagnumSkill");
+        return PlayMagnumSkillStart();
+    }
+
+    public bool PlayMagnumSkillStart()
+    {
+        bool result = TryPlaySkillAnimation(
+            MagnumSkillStartState,
+            MagnumSkillTrigger,
+            "MagnumSkillStartState");
         playingSkillAnimation = result;
         return result;
+    }
+
+    public bool PlayMagnumSkillEnd()
+    {
+        if (!CanPlay() || !playingSkillAnimation)
+            return false;
+
+        if (!animator.HasState(BaseLayerIndex, MagnumSkillEndState))
+        {
+            Debug.LogWarning(
+                "Player Animator에 'Base Layer.MagnumSkillEndState' State가 없어 종료 애니메이션을 재생하지 않았습니다.",
+                this);
+            CancelMagnumSkill();
+            return false;
+        }
+
+        animator.CrossFadeInFixedTime(
+            MagnumSkillEndState,
+            LocomotionBlendDuration,
+            BaseLayerIndex,
+            0f);
+        return true;
+    }
+
+    public void CancelMagnumSkill()
+    {
+        if (!CanPlay())
+            return;
+
+        playingSkillAnimation = false;
+        animator.SetBool(IsExecutingSkill, false);
+        animator.ResetTrigger(MagnumSkillTrigger);
+        SetLocomotion(animator.GetBool(IsMoving));
     }
 
     /// <summary>
@@ -255,11 +299,54 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// 조준, 관통 판정, 카메라 연출은 이 Driver가 아닌 스킬 로직에서 관리합니다.
     /// </summary>
     /// <returns>State가 존재해 재생 요청에 성공하면 true, 아직 준비되지 않았으면 false입니다.</returns>
-    public bool PlaySniperSkill()
+    public bool PlaySniperSkillStart()
     {
-        bool result = TryPlaySkillAnimation(SniperSkillState, SniperSkillTrigger, "SniperSkill");
+        if (!CanPlay() || playingSkillAnimation)
+            return false;
+
+        int stateHash = animator.HasState(BaseLayerIndex, SniperSkillStartState)
+            ? SniperSkillStartState
+            : LegacySniperSkillState;
+
+        bool result = TryPlaySkillAnimation(
+            stateHash,
+            SniperSkillTrigger,
+            "SniperSkillStartState");
         playingSkillAnimation = result;
         return result;
+    }
+
+    public bool PlaySniperSkillEnd()
+    {
+        if (!CanPlay() || !playingSkillAnimation)
+            return false;
+
+        if (!animator.HasState(BaseLayerIndex, SniperSkillEndState))
+        {
+            Debug.LogWarning(
+                "Player Animator에 'Base Layer.SniperSkillEndState' State가 없어 종료 애니메이션을 재생하지 않았습니다.",
+                this);
+            CancelSniperSkill();
+            return false;
+        }
+
+        animator.CrossFadeInFixedTime(
+            SniperSkillEndState,
+            LocomotionBlendDuration,
+            BaseLayerIndex,
+            0f);
+        return true;
+    }
+
+    public void CancelSniperSkill()
+    {
+        if (!CanPlay())
+            return;
+
+        playingSkillAnimation = false;
+        animator.SetBool(IsExecutingSkill, false);
+        animator.ResetTrigger(SniperSkillTrigger);
+        SetLocomotion(animator.GetBool(IsMoving));
     }
 
     /// <summary>

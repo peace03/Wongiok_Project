@@ -35,8 +35,9 @@ public class SkillInstance
 
     [NonSerialized] private readonly GameObject owner;                  // 스킬 소유자
     [NonSerialized] private readonly ActiveSkillExecuter executer;      // 액티브 스킬 실행기
-
     private readonly int curFps;                                        // 현재 프레임
+
+    public event Action<SkillInstance, SKILL_STATE, SKILL_STATE> OnStateChanged;
     #endregion
 
     #region 프로퍼티
@@ -193,6 +194,8 @@ public class SkillInstance
     /// <param name="effectClear">이펙트 초기화 여부</param>
     private void SwitchState(SKILL_STATE change, bool effectClear = true)
     {
+        SKILL_STATE previousState = state;
+
         // 현재 상태가 차징이였다면
         if(IsCharging)
         {
@@ -205,6 +208,7 @@ public class SkillInstance
         // 현재 상태 바꾸기
         state = change;
         Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
+        OnStateChanged?.Invoke(this, previousState, state);
 
         // 바꾼 상태가 사용 가능이라면
         if (IsReady)

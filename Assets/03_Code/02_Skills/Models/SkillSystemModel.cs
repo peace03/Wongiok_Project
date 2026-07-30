@@ -34,6 +34,7 @@ public class SkillSystemModel
 
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
     public event Action<SkillInstance> OnSkillEnhanced;                         // 스킬 강화 이벤트 변수
+    public event Action<SkillInstance, SKILL_STATE, SKILL_STATE> OnSkillStateChanged;
     #endregion
 
     public int MaxEquippedActiveCount => maxEquippedActiveCount;
@@ -66,6 +67,7 @@ public class SkillSystemModel
                 // 스킬 객체 생성 및 저장
                 allSkillDictionary[data.Id] = data.CreateInstance(owner, executer);
                 allSkillList.Add(allSkillDictionary[data.Id]);
+                allSkillDictionary[data.Id].OnStateChanged += HandleSkillStateChanged;
                 // 장착한 액티브 스킬들과 패시브 스킬들 리스트 연결
                 allSkillDictionary[data.Id].SetEquippedSkills(equippedActives, equippedPassives);
 
@@ -335,12 +337,7 @@ public class SkillSystemModel
                     break;
                 // 스나이퍼(저격총)이라면
                 case sniperSkillId:
-                    // 스나이퍼 스킬 애니메이션 재생에 실패했다면
-                    if (!ownerAnimatorDriver.PlaySniperSkill())
-                    {
-                        Debug.Log($"[Skill] 스나이퍼 스킬 사용 실패 => 입력 - 애니메이션 재생 불가");
-                        return;
-                    }
+                    // 스나이퍼 애니메이션은 실제 스킬 상태 변경을 받은 Presenter가 재생합니다.
                     break;
                 // 그 외
                 default:
@@ -353,6 +350,14 @@ public class SkillSystemModel
 
         // 스킬 실행
         equippedActives[(int)slot].UseSkill();
+    }
+
+    private void HandleSkillStateChanged(
+        SkillInstance skill,
+        SKILL_STATE previousState,
+        SKILL_STATE currentState)
+    {
+        OnSkillStateChanged?.Invoke(skill, previousState, currentState);
     }
 
     /// <summary>
