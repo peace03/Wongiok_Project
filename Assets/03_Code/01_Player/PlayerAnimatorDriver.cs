@@ -15,7 +15,9 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private static readonly int JumpState = Animator.StringToHash("Base Layer.Jump");
     private static readonly int LandingState = Animator.StringToHash("Base Layer.Landing");
     private static readonly int SlidingState = Animator.StringToHash("Base Layer.Sliding");
+    private static readonly int HitState = Animator.StringToHash("Base Layer.Hit");
     private static readonly int DeathState = Animator.StringToHash("Base Layer.Death");
+    private static readonly int HitTrigger = Animator.StringToHash("Hit");
     private static readonly int DeathTrigger = Animator.StringToHash("Death");
 
     // Animator Controller의 Magnum/Rifle/Sniper 상태를 무기별 스킬 진입점으로 사용합니다.
@@ -185,6 +187,32 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
             LocomotionBlendDuration,
             0,
             0);
+    }
+
+    /// <summary>
+    /// 피격 상태에 진입할 때 진행 중인 스킬 연출을 취소하고 Hit State를 재생합니다.
+    /// 실제 경직과 넉백 시간은 PlayerHitState가 담당합니다.
+    /// </summary>
+    /// <returns>Hit State가 존재해 재생 요청에 성공하면 true입니다.</returns>
+    public bool PlayHit()
+    {
+        if (!CanPlay()) return false;
+
+        if (!animator.HasState(BaseLayerIndex, HitState))
+        {
+            Debug.LogWarning(
+                "Player Animator에 'Base Layer.Hit' State가 없어 피격 애니메이션을 재생하지 않았습니다.",
+                this);
+            return false;
+        }
+
+        playingSkillAnimation = false;
+        animator.SetBool(IsExecutingSkill, false);
+        animator.ResetTrigger(MagnumSkillTrigger);
+        animator.ResetTrigger(RifleSkillTrigger);
+        animator.ResetTrigger(SniperSkillTrigger);
+        animator.SetTrigger(HitTrigger);
+        return true;
     }
 
     /// <summary>

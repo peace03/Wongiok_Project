@@ -43,6 +43,7 @@ public class PlayerHitState : PlayerBaseState
     {
         Debug.Log("Hit Enter");
 
+        controller.Animation.PlayHit();
         controller.Movement.ResetVerticalVelocity();
     }
 

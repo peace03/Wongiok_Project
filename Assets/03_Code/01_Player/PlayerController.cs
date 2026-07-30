@@ -2,9 +2,11 @@ using UnityEngine;
 
 [RequireComponent(typeof(GameInputReader))]
 [RequireComponent(typeof(PlayerAnimatorDriver))]
+[RequireComponent(typeof(PlayerAudioController))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private PlayerAnimatorDriver animationDriver;
+    [SerializeField] private PlayerAudioController audioController;
 
     #region 플레이어 관련 변수, 상태, 참조등
     // 현재 실행 중인 플레이어 상태입니다.
@@ -72,6 +74,7 @@ public class PlayerController : MonoBehaviour
     public PlayerParry Parry => _parry;
     public PlayerHealItemInventory HealItemInventory => _healItemInventory;
     public PlayerAnimatorDriver Animation => animationDriver;
+    public PlayerAudioController Audio => audioController;
     public bool IsFacingRight => _isFacingRight;
 
     // 현재 상태가 피해를 받을 수 있는지 Status 컴포넌트에서 확인할 때 사용합니다.
@@ -89,6 +92,7 @@ public class PlayerController : MonoBehaviour
         EnsurePlayerParry();
         _inputReader = GetComponent<GameInputReader>();
         ResolveAnimationDriver();
+        ResolveAudioController();
 
         if (_inputReader == null)
             _inputReader = gameObject.AddComponent<GameInputReader>();
@@ -113,6 +117,7 @@ public class PlayerController : MonoBehaviour
         _parry = parry != null ? parry : GetComponent<PlayerParry>();
         _healItemInventory = healItemInventory != null ? healItemInventory : GetComponent<PlayerHealItemInventory>();
         ResolveAnimationDriver();
+        ResolveAudioController();
         animationDriver.Initialize();
         animationDriver.SetFacing(_isFacingRight);
 
@@ -334,5 +339,14 @@ public class PlayerController : MonoBehaviour
         animationDriver = GetComponent<PlayerAnimatorDriver>();
         if (animationDriver == null)
             animationDriver = gameObject.AddComponent<PlayerAnimatorDriver>();
+    }
+
+    private void ResolveAudioController()
+    {
+        if (audioController != null) return;
+
+        audioController = GetComponent<PlayerAudioController>();
+        if (audioController == null)
+            audioController = gameObject.AddComponent<PlayerAudioController>();
     }
 }

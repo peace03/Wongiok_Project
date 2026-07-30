@@ -54746,6 +54746,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 695165433}
     m_Modifications:
+    - target: {fileID: 2633647105905547187, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: slideSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 02e936e90d2e9df409337ce6a4fde274, type: 3}
+    - target: {fileID: 2633647105905547187, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: footstepSounds.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2633647105905547187, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: 'footstepSounds.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: c2587fa1e00393e48b1c9053e0f2280c, type: 3}
     - target: {fileID: 4700935185223578715, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
       propertyPath: bulletFactory
       value: 

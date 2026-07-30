@@ -5,16 +5,29 @@ public class PlayerAudioController : MonoBehaviour
     [Header("Attack Audio")]
     // 플레이어가 공격을 발사할 때 재생할 사운드입니다.
     [SerializeField] private AudioClip fireSound;
-
-    // 총알이 무언가에 맞았을 때 재생할 사운드입니다.
+        // 총알이 무언가에 맞았을 때 재생할 사운드입니다.
     [SerializeField] private AudioClip bulletHitSound;
 
-    // 이 오브젝트에 붙은 AudioSource입니다. 없으면 위치 기반 재생으로 대체합니다.
+    [Header("Movement Sound")]
+    [SerializeField] private AudioClip[] footstepSounds;
+    [SerializeField] private AudioClip slideSound;
+
+    // 공격음과 이동음이 서로 중단되지 않도록 AudioSource를 분리해서 사용합니다.
     private AudioSource audioSource;
+    private AudioSource movementAudioSource;
 
     private void Awake()
     {
+        PrepareAudioClips();
+
         audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
+        movementAudioSource = gameObject.AddComponent<AudioSource>();
+
+        ConfigureAudioSource(audioSource);
+        ConfigureAudioSource(movementAudioSource);
     }
 
     private void OnEnable()
@@ -29,6 +42,7 @@ public class PlayerAudioController : MonoBehaviour
         // 오브젝트가 꺼질 때 반드시 구독을 해제해 중복 호출과 메모리 참조 문제를 방지합니다.
         EventBus<PlayerAttackFiredEvent>.action -= OnPlayerAttackFired;
         EventBus<PlayerBulletHitEvent>.action -= OnPlayerBulletHit;
+        StopWalkLoop();
     }
 
     private void OnPlayerAttackFired(PlayerAttackFiredEvent eventData)
@@ -55,5 +69,78 @@ public class PlayerAudioController : MonoBehaviour
         else
             // AudioSource가 없더라도 사운드는 들리도록 현재 위치에서 임시 재생합니다.
             AudioSource.PlayClipAtPoint(clip, transform.position);
+    }
+    public void StartWalkLoop()
+    {
+        if (movementAudioSource == null ||
+            footstepSounds == null ||
+            footstepSounds.Length == 0)
+            return;
+
+        int index = Random.Range(0, footstepSounds.Length);
+        AudioClip walkClip = footstepSounds[index];
+        if (walkClip == null)
+            return;
+
+        EnsureAudioDataLoaded(walkClip);
+
+        if (movementAudioSource.isPlaying &&
+            movementAudioSource.loop &&
+            movementAudioSource.clip == walkClip)
+            return;
+
+        movementAudioSource.Stop();
+        movementAudioSource.clip = walkClip;
+        movementAudioSource.loop = true;
+        movementAudioSource.Play();
+    }
+
+    public void StopWalkLoop()
+    {
+        if (movementAudioSource == null || !movementAudioSource.loop)
+            return;
+
+        movementAudioSource.Stop();
+        movementAudioSource.clip = null;
+        movementAudioSource.loop = false;
+    }
+
+    public void PlaySlide()
+    {
+        if (movementAudioSource == null || slideSound == null)
+            return;
+
+        EnsureAudioDataLoaded(slideSound);
+
+        movementAudioSource.Stop();
+        movementAudioSource.clip = null;
+        movementAudioSource.loop = false;
+        movementAudioSource.PlayOneShot(slideSound);
+    }
+
+    private static void ConfigureAudioSource(AudioSource source)
+    {
+        source.playOnAwake = false;
+        source.loop = false;
+        source.mute = false;
+        source.volume = 1f;
+        source.spatialBlend = 0f;
+    }
+
+    private void PrepareAudioClips()
+    {
+        if (footstepSounds != null)
+        {
+            foreach (AudioClip footstepSound in footstepSounds)
+                EnsureAudioDataLoaded(footstepSound);
+        }
+
+        EnsureAudioDataLoaded(slideSound);
+    }
+
+    private static void EnsureAudioDataLoaded(AudioClip clip)
+    {
+        if (clip != null && clip.loadState == AudioDataLoadState.Unloaded)
+            clip.LoadAudioData();
     }
 }
