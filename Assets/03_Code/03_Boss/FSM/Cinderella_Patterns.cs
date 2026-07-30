@@ -299,7 +299,7 @@ public class Cinderella_Patterns : BossPatternBase
                 new Leaf(() =>
                 {
                     Parryed();
-                    bossStatus?.TakeDamage(30); // 기믹: 이 공격을 패링당하면 보스가 스스로 고정 데미지를 입음
+                    //bossStatus?.TakeDamage(30); // 기믹: 이 공격을 패링당하면 보스가 스스로 고정 데미지를 입음
                     SetStateDone(true);
                     return NodeState.Success;
                 })

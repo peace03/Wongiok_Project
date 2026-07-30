@@ -102,7 +102,8 @@ public enum Animation
     Chase,
     Parry,
     Groggy,
-    Walking
+    Walking,
+    Defeated1, Defeated2, Defeated3
 }
 
 /// <summary>

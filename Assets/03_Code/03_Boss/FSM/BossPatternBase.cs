@@ -82,7 +82,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     // 매 프레임 if-else나 switch 문을 쓰지 않고 O(1)의 배열 인덱스 접근 속도로 값을 즉시 가져옵니다.
     protected readonly float[] rotValue =
     {
-        228, -228,               // [0, 1] Idle 상태일 때 좌/우 회전각
+        -90, 90,               // [0, 1] Idle 상태일 때 좌/우 회전각
         -90, 90, -90, 90, -90, 90,  // [2~7] Attack A, B, C 상태일 때 좌/우 회전각
         -90, 90, -90, 90, -90, 90, // [8~13] Ultimate 1, 2, 3 상태일 때 좌/우 회전각
         -90, 90,                 // [14, 15] Chase(추격) 상태일 때 좌/우 회전각

@@ -47,8 +47,8 @@ public class CinderellaAttackEffectController : MonoBehaviour
         }
         if(cue == BossEffectCue.SpinImpact) //패턴 B일 때 공격 회전도
         {
-            if (currentFacing == Facing.Left) return Quaternion.Euler(5f, 180f, 15f);
-            else return Quaternion.Euler(170f, 0f, -15f);
+            if (currentFacing == Facing.Left) return Quaternion.Euler(-5f, 10f, 160f);
+            else return Quaternion.Euler(-6f, 0f, 21f);
         }
         //패턴C 이펙트는 각도가 필요없어서 그냥 재생해줌
         if(cue == BossEffectCue.UltimateImpact) //궁극기일 때 공격 회전도
