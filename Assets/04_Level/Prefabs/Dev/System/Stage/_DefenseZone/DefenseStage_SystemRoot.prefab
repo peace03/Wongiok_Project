@@ -490,11 +490,11 @@ MonoBehaviour:
   - waveName: First_Wave
     startDelay: 1
     entries:
-    - enemyPrefab: {fileID: 3764868410852666932, guid: fb576be45b57eca4eb38e483be7752d1, type: 3}
+    - enemyPrefab: {fileID: 3764868410852666932, guid: ef60423ffa18c11408f57121a7248a2f, type: 3}
       spawnPoint: {fileID: 2284164535663318647}
       count: 2
       spawnInterval: 1
-    - enemyPrefab: {fileID: 3764868410852666932, guid: fb576be45b57eca4eb38e483be7752d1, type: 3}
+    - enemyPrefab: {fileID: 3764868410852666932, guid: ef60423ffa18c11408f57121a7248a2f, type: 3}
       spawnPoint: {fileID: 5130047375584818730}
       count: 2
       spawnInterval: 1

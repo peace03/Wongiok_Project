@@ -389,7 +389,7 @@ Material:
     - _Metallic: 0
     - _Nearest_Distance: 0.5
     - _NormalMapSpace: 0
-    - _NormalScale: 1
+    - _NormalScale: 0.51
     - _OUTLINE: 0
     - _ObjectSpaceUVMapping: 0
     - _OcclusionStrength: 1
@@ -398,7 +398,7 @@ Material:
     - _Offset_Z: 0
     - _OutlineOverridden: 0
     - _OutlineVisible: 1
-    - _OutlineWidth: 1
+    - _OutlineWidth: 0.1
     - _Outline_Width: 0.7
     - _PPDLodThreshold: 5
     - _PPDMaxSamples: 15
@@ -406,14 +406,14 @@ Material:
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _RimIntensity: 1.2
+    - _RimIntensity: 0.6
     - _RimLight: 0
     - _RimLightOverridden: 0
     - _RimLightVisible: 1
     - _RimLight_FeatherOff: 0
     - _RimLight_InsideMask: 0.0001
     - _RimLight_Power: 0.1
-    - _RimPower: 3
+    - _RimPower: 6.62
     - _Rotate_EmissiveUV: 0
     - _Rotate_MatCapUV: 0
     - _Rotate_NormalMapForMatCapUV: 0
@@ -432,8 +432,8 @@ Material:
     - _SmoothnessRemapMax: 1
     - _SmoothnessRemapMin: 0
     - _SmoothnessTextureChannel: 0
-    - _SpecIntensity: 1
-    - _SpecPower: 40
+    - _SpecIntensity: 0
+    - _SpecPower: 1
     - _SpecularAAScreenSpaceVariance: 0.1
     - _SpecularAAThreshold: 0.2
     - _SpecularHighlights: 1
@@ -513,15 +513,15 @@ Material:
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _MatCapColor: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor: {r: 0.049999982, g: 0.03, b: 0.079999976, a: 1}
+    - _OutlineColor: {r: 0.12941177, g: 0.0627451, b: 0.0627451, a: 1}
     - _OutlineMaskColor: {r: 0, g: 0, b: 0, a: 1}
     - _Outline_Color: {r: 0.1509434, g: 0.05339979, b: 0.05339979, a: 1}
-    - _RimColor: {r: 0.7, g: 0.29999998, b: 0.9, a: 1}
+    - _RimColor: {r: 0.6044579, g: 0.3097188, b: 0.754717, a: 1}
     - _RimLightColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimLightMaskColor: {r: 1, g: 0, b: 1, a: 1}
     - _SecondShadeMaskColor: {r: 0, g: 0, b: 1, a: 1}
     - _ShadowColor: {r: 0.54999995, g: 0.5, b: 0.65, a: 1}
-    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}

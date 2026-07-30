@@ -53,7 +53,7 @@ public class Bullet : MonoBehaviour, IPoolable
             // 총알 콜라이더 추가
             bulletCollider = gameObject.AddComponent<BoxCollider>();
             // 총알 콜라이더 크기 조절
-            bulletCollider.size = new Vector3(0.15f, 0.15f, 0.375f);
+            bulletCollider.size = new Vector3(0.02f, 0.02f, 0.05f);
         }
 
         // 총알 콜라이더 크기 받아오기
@@ -172,11 +172,25 @@ public class Bullet : MonoBehaviour, IPoolable
         target.TakeDamage(damage);
 
         // 실행할 타격/피격 이펙트의 수만큼
-        foreach(var effect in executeHitEffects)
-            // 타격/피격 이펙트 실행하기
-            EventBus<EffectPlayData>.Publish(new EffectPlayData(effect, pos,
-                                                            Quaternion.LookRotation(-transform.forward),
-                                                                                parent: other.transform));
+        foreach(var hitEffect in executeHitEffects)
+        {
+            // 최대 이펙트 시간 저장할 변수
+            float maxEffectTime = 0f;
+
+            // 타격/피격 이펙트가 이펙트 스크립트를 가지고 있다면
+            if(hitEffect.TryGetComponent<Effect>(out var effect))
+                // 최대 이펙트 시간 받아오기
+                maxEffectTime = effect.MaxEffectTime;
+
+            // 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
+            var executeEffect = EffectManager.Instance.PlayEffect(hitEffect, pos,
+                                            Quaternion.LookRotation(-transform.forward), maxEffectTime);
+
+            // 실행한 이펙트가 타격/피격 이펙트 인터페이스를 가지고 있다면
+            if (executeEffect.TryGetComponent<IHitEffect>(out var IHitEffect))
+                // 따라다닐 대상 설정하기
+                IHitEffect.SetInfo(other.transform);
+        }
 
         // 카메라 흔들림 값이 있다면
         if (cameraShakeValue > 0f)
@@ -264,7 +278,7 @@ public class Bullet : MonoBehaviour, IPoolable
     /// <param name="cameraShakeValue">카메라 흔들림 값(생략 가능, 기본값 : 0f)</param>
     /// <param name="effectPrefabs">실행할 타격/피격 이펙트 프리팹들(생략 가능, 기본값 : 총알에 설정된 이펙트)</param>
     public void StartFire(Transform spawnPoint, LayerMask ownerLayer, float damage,
-                            int penetrationCount = 0, float speed = 10f, float cameraShakeValue = 0f,
+                            int penetrationCount = 0, float speed = 30f, float cameraShakeValue = 0f,
                                                                     List<GameObject> effectPrefabs = null)
     {
         // 타이머 코루틴이 비어있지 않다면

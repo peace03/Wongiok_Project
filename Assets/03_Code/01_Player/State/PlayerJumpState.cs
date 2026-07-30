@@ -15,7 +15,7 @@ public class PlayerJumpState : PlayerBaseState
     {
         Debug.Log("Jump Enter");
 
-        controller.PlayJumpAnimation();
+        controller.Animation.PlayJump();
         controller.Movement.Jump();
     }
 
@@ -33,7 +33,7 @@ public class PlayerJumpState : PlayerBaseState
         if (controller.JumpTriggered && controller.Movement.CanJump())
         {
             controller.Movement.Jump();
-            controller.PlayJumpAnimation();
+            controller.Animation.PlayJump();
             return;
         }
 

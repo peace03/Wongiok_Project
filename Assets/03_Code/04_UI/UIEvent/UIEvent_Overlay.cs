@@ -153,17 +153,20 @@ public struct UISetPauseStatusEvent
     }
 }
 
-public struct RefreshUIEventT
+public struct RefreshUIEvent
 {
-    public UIPauseSkillInfoData[] EquippedActiveSkills { get; private set; }
+    public UIPauseSkillInfoData[] EquippedSkills { get; private set; }
     public UIPauseSkillInfoData[] OwnedSkills { get; private set; }
-    public int[] OwnedSkillOrder { get; private set;  }
+    public int[] OwnedSkillOrder { get; private set; }
+    public bool IsActiveSkill { get; private set; }
 
-    public RefreshUIEventT(UIPauseSkillInfoData[] equippedActiveSkills, UIPauseSkillInfoData[] ownedSkills, int[] ownedSkillOrder = null)
+    public RefreshUIEvent(UIPauseSkillInfoData[] equippedSkills, UIPauseSkillInfoData[] ownedSkills,
+                                                int[] ownedSkillOrder = null, bool isActiveSkill = true)
     {
-        EquippedActiveSkills = equippedActiveSkills;
+        EquippedSkills = equippedSkills;
         OwnedSkills = ownedSkills;
         OwnedSkillOrder = ownedSkillOrder ?? System.Array.Empty<int>();
+        IsActiveSkill = isActiveSkill;
     }
 }
 

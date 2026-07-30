@@ -94,14 +94,14 @@ public class PauseSkillPageView : MonoBehaviour
     private void SubscribeEvents()
     {
         EventBus<UISetPauseSkillPageEvent>.action += HandleSetPauseSkillPage;
-        EventBus<RefreshUIEventT>.action += HandleRefreshUIEvent;
+        EventBus<RefreshUIEvent>.action += HandleRefreshUIEvent;
         EventBus<UIResetEvent>.action += HandleReset;
     }
 
     private void UnsubscribeEvents()
     {
         EventBus<UISetPauseSkillPageEvent>.action -= HandleSetPauseSkillPage;
-        EventBus<RefreshUIEventT>.action -= HandleRefreshUIEvent;
+        EventBus<RefreshUIEvent>.action -= HandleRefreshUIEvent;
         EventBus<UIResetEvent>.action -= HandleReset;
     }
 
@@ -118,9 +118,9 @@ public class PauseSkillPageView : MonoBehaviour
     }
 
     // 임시 테스트
-    private void HandleRefreshUIEvent(RefreshUIEventT eventData)
+    private void HandleRefreshUIEvent(RefreshUIEvent eventData)
     {
-        currentEquippedActiveSkills = eventData.EquippedActiveSkills;
+        currentEquippedActiveSkills = eventData.EquippedSkills;
         currentOwnedSkills = eventData.OwnedSkills;
         hasSelectedSkill = false;
         currentSelectedSkill = default;

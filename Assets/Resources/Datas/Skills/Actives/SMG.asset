@@ -21,6 +21,8 @@ MonoBehaviour:
   desc: 
   levelDatas:
   - rid: 4582174707458244765
+  - rid: 1008828942589362328
+  - rid: 1008828942589362329
   weapon: {fileID: 4942464512446496594, guid: 0d73448f16ba67d4ca3ca8b836dcd762, type: 3}
   effects:
   - type: 1
@@ -29,6 +31,18 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 1008828942589362328
+      type: {class: AreaSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        maxCoolTime: 0
+        maxDuration: 0
+        stages: []
+    - rid: 1008828942589362329
+      type: {class: AreaSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        maxCoolTime: 0
+        maxDuration: 0
+        stages: []
     - rid: 4582174707458244765
       type: {class: AreaSkillLevelData, ns: , asm: Assembly-CSharp}
       data:

@@ -114,7 +114,7 @@ public class PrototypeTestScene : MonoBehaviour
 
         PrototypeProgressSnapshot snapshot = PrototypeGameSession.GetChapterStart();
 
-        BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
+        //BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
 
         currentActiveSkills = new UIPauseSkillInfoData[3];
 
@@ -135,8 +135,8 @@ public class PrototypeTestScene : MonoBehaviour
                 currentOwnedSkills,
                 isOwnedSkillListUnlocked: PrototypeGameSession.CurrentChapterId >= 2));
 
-        EventBus<RefreshUIEventT>.Publish(
-            new RefreshUIEventT(
+        EventBus<RefreshUIEvent>.Publish(
+            new RefreshUIEvent(
                 currentActiveSkills,
                 currentOwnedSkills,
                 currentOwnedSkills
@@ -158,8 +158,8 @@ public class PrototypeTestScene : MonoBehaviour
 
         if (skill.Level >= maxSkillLevel) return false;
 
-        BaseSkillData skillData = Resources.LoadAll<BaseSkillData>("Datas/Skills").
-            FirstOrDefault(data => data != null && data.Id == skill.SkillId);
+        //BaseSkillData skillData = Resources.LoadAll<BaseSkillData>("Datas/Skills").
+        //    FirstOrDefault(data => data != null && data.Id == skill.SkillId);
 
         int nextLevel = Mathf.Min(skill.Level + 1, maxSkillLevel);
 
@@ -183,9 +183,9 @@ public class PrototypeTestScene : MonoBehaviour
 
         if (skill.SkillId < 0) return 0f;
 
-        BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
-
-        BaseSkillData skillData = skillDatas.FirstOrDefault(data => data != null && data.Id == skill.SkillId);
+        //BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
+        //BaseSkillData skillData = skillDatas.FirstOrDefault(data => data != null && data.Id == skill.SkillId);
+        BaseSkillData skillData = SkillDatabase.FindDataById(skill.SkillId);
 
         if (skillData == null) return 0f;
 
