@@ -324,6 +324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cc9577fa1ebc584a9f013eb65a7505d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterFacing
+  visualPivot: {fileID: 8032831983957406496}
   invertVisualFacing: 0
 --- !u!114 &6673026005292126297
 MonoBehaviour:

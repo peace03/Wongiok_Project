@@ -174,11 +174,30 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         return IsTargetInRange(prepareHorizontalRange, prepareVerticalRange);
     }
 
-    // 초기 위치를 기준으로 공중 순찰을 실행합니다
+    // 초기 위치를 기준으로 공중 순찰하고 실제 이동 방향을 바라보도록 갱신합니다
     private void Patrol()
     {
-        float speed = GetMoveSpeed() * patrolSpeedMultiplier;
+        float speed =
+            GetMoveSpeed() *
+            patrolSpeedMultiplier;
+
+        float previousX =
+            transform.position.x;
+
         flyingMotor.PatrolAroundHome(speed);
+
+        float horizontalMovement =
+            transform.position.x -
+            previousX;
+
+        if (Mathf.Abs(horizontalMovement) <= 0.0001f)
+        {
+            return;
+        }
+
+        SetFacingDirection(
+            horizontalMovement > 0f
+        );
     }
 
     // 플레이어 위쪽의 공중 위치를 향해 이동합니다
@@ -313,7 +332,7 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         }
     }
 
-    // 폭발 이펙트와 범위 피해와 자폭 사망을 처리합니다
+    // 폭발 애니메이션을 시작하고 실제 폭발 프레임을 기다립니다
     private void Explode()
     {
         if (currentState == SelfDestructState.Exploded)
@@ -326,6 +345,26 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
         CleanupSelfDestructPresentation();
 
         PlayAnimatorTrigger(explodeTriggerName);
+    }
+
+    // 폭발 애니메이션의 타격 프레임에서 실제 폭발 판정을 실행합니다
+    public void ExecuteExplosionImpact()
+    {
+        Debug.Log(
+            $"{name}: 실제 폭발 처리 진입",
+            this
+        );
+
+        if (currentState != SelfDestructState.Exploded || IsDead)
+        {
+            Debug.LogWarning(
+                $"{name}: 폭발 상태 조건이 맞지 않아 처리가 중단됐습니다.",
+                this
+            );
+
+            return;
+        }
+
         PlayAudioClip(explosionClip);
         SpawnExplosionEffect();
         ApplyExplosionDamage();
