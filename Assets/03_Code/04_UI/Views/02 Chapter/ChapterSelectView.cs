@@ -179,7 +179,12 @@ public class ChapterSelectView : UIViewBase
         {
             ChapterBinding binding = chapterBindings[i];
 
-            if (binding.chapterId <= eventData.HighestClearedChapterId)
+            // 현재 공개 범위에서는 챕터 1을 클리어 후에도 진행 가능한 상태로 유지한다.
+            if (binding.chapterId == 1)
+            {
+                binding.state = ChapterListState.Playable;
+            }
+            else if (binding.chapterId <= eventData.HighestClearedChapterId)
             {
                 binding.state = ChapterListState.Cleared;
             }
