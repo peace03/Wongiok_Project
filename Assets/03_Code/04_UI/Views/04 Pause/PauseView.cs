@@ -60,17 +60,17 @@ public class PauseView : UIViewBase
     {
         if (statusTabButton != null)
         {
-            statusTabButton.Setup("전체 현황", HandleStatusTabClicked);
+            statusTabButton.Setup("STATUS", HandleStatusTabClicked);
         }
 
         if (skillTabButton != null)
         {
-            skillTabButton.Setup("스킬", HandleSkillTabClicked);
+            skillTabButton.Setup("SKILL", HandleSkillTabClicked);
         }
 
         if (optionTabButton != null)
         {
-            optionTabButton.Setup("옵션", HandleOptionTabClicked);
+            optionTabButton.Setup("OPTION", HandleOptionTabClicked);
         }
 
         if (continueButton != null)

@@ -101,6 +101,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fadeOutDuration: 0.35
   fadeInDuration: 0.35
+  teamSplashObject: {fileID: 0}
+  teamNameObject: {fileID: 0}
+  splashFadeInDuration: 1
+  splashDisplayDuration: 1.5
+  splashFadeOutDuration: 1
   chapterTitleCards:
   - chapterId: 1
     title: .
