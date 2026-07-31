@@ -218,6 +218,7 @@ GameObject:
   - component: {fileID: 4758382481227648288}
   - component: {fileID: 2783848254328767939}
   - component: {fileID: 7495359825448186657}
+  - component: {fileID: 7812345678901234567}
   m_Layer: 14
   m_Name: RougeHood
   m_TagString: Untagged
@@ -309,6 +310,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98c41efc7245f4f4aaf82dcf8e63a2c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossStatus
+  SFX_TakeDamages:
+  - {fileID: 8300000, guid: 283cd03bdcbdbe7438df11543c031306, type: 3}
+  - {fileID: 8300000, guid: 31b018381c907574896f184e6debdf3a, type: 3}
+  - {fileID: 8300000, guid: 0face090c1327b541ab1b9c0f7f024ed, type: 3}
   status:
     maxHP:
       BaseValue: 100
@@ -365,25 +370,31 @@ MonoBehaviour:
   ground: {fileID: 0}
   HitStopFrame: 30
   cameraShakeIntensity: 0.5
-  idleDurationTime: 1.5
+  idleDurationTime: 0.2
   move_idleSpeed: 4
   durationEnranged: 10
   enrangedAtkSpeed_Mul: 1.5
-  groggyDuration: 2
+  groggyDuration: 3
+  groggySfx: {fileID: 8300000, guid: 7e2b8f84a9b84d9459e8d88cda68256f, type: 3}
+  groggySfxFadeOutDuration: 0.1
   excuteAttackType_InGame: 3
-  A_ChaseSpeed: 10
+  SFX_Punishments:
+  - {fileID: 8300000, guid: cb16c56bb35c8cf4c8689b191e1017cc, type: 3}
+  - {fileID: 8300000, guid: 6da6ea2a6289fa641828cc5624b3b2d8, type: 3}
+  - {fileID: 8300000, guid: 684bdbc59d57f8d429a89fcc36fdfd24, type: 3}
+  A_ChaseSpeed: 13.5
   A_ChasePos: {x: 1.5, y: 0, z: 0}
   A_telegraphTime: 1
   A_attackDuration: 1
   A_postAtkDelay: 0.5
   A_parryStunDuration: 0.5
-  B_ChaseSpeed: 10
+  B_ChaseSpeed: 13.5
   B_ChasePos: {x: 1.5, y: 0, z: 0}
   B_telegraphTime: 1
   B_postAtkDelay: 1
   waveEffect: {fileID: 0}
-  C_ChaseSpeed: 10
-  C_ChasePos: {x: 6, y: 0, z: 0}
+  C_ChaseSpeed: 13.5
+  C_ChasePos: {x: 10, y: 0, z: 0}
   C_postAtkDelay: 1.2
   UltimateChaseSpeed: 10
   UltimateChasePos: {x: 1.5, y: 0, z: 0}
@@ -417,6 +428,18 @@ MonoBehaviour:
   - {x: 0, y: -0.75, z: 0}
   - {x: -1, y: 0, z: 0}
   attackColliderBindings: []
+--- !u!114 &7812345678901234567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4349304621768092857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3575b313dbb44214a5db5f97c0857398, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossBodyColliderDisabler
 --- !u!1 &5307325800395510841
 GameObject:
   m_ObjectHideFlags: 0
@@ -699,6 +722,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccbe7fc5f6bcaa4469af095d8153cf91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CinderellaAttackEffectController
+  SFX_PatternA: {fileID: 8300000, guid: 25ba360a5b2de884395a74051337f843, type: 3}
+  SFX_PatternB: {fileID: 8300000, guid: 485626ae960936346ad91e0d42f5d65e, type: 3}
+  SFX_PatternC: {fileID: 8300000, guid: 495cf15e3eea75a4ab09b559c1c7bd7f, type: 3}
   kickImpactPrefab: {fileID: 3716170479167962960}
   kickImpactPoint: {fileID: 4177043900862076547}
   kickImpactDuration: 1
@@ -738,6 +764,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4639655870825251908, guid: 450a783e08a0c3d4f9099339372f5c28, type: 3}
       propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5480632738779585003, guid: 450a783e08a0c3d4f9099339372f5c28, type: 3}
+      propertyPath: m_PlayOnAwake
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5593488384682470063, guid: 450a783e08a0c3d4f9099339372f5c28, type: 3}
@@ -856,6 +886,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4864339765156343263, guid: c94ed7f88c586ef4585efad47fa7413f, type: 3}
       propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5761300332687458995, guid: c94ed7f88c586ef4585efad47fa7413f, type: 3}
+      propertyPath: m_PlayOnAwake
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5909834653645902534, guid: c94ed7f88c586ef4585efad47fa7413f, type: 3}
@@ -1048,6 +1082,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 919863168413146222}
     m_Modifications:
+    - target: {fileID: 4425930546966944691, guid: 423d10d6604e4f648b6d22742d8a1c1f, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 954ff4034be88b34ea78c573da1c21a5, type: 2}
     - target: {fileID: 6973802144877927283, guid: 423d10d6604e4f648b6d22742d8a1c1f, type: 3}
       propertyPath: m_Name
       value: RougeHood_DevModel
@@ -1157,6 +1195,10 @@ PrefabInstance:
     - target: {fileID: 5419247265236760002, guid: f19e1bb7f14ecc14992ed1d2b13fe728, type: 3}
       propertyPath: m_Name
       value: PatternA_Effect
+      objectReference: {fileID: 0}
+    - target: {fileID: 5459697907016512191, guid: f19e1bb7f14ecc14992ed1d2b13fe728, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5544776579107342784, guid: f19e1bb7f14ecc14992ed1d2b13fe728, type: 3}
       propertyPath: playOnAwake
