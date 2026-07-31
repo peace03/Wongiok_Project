@@ -384,10 +384,30 @@ PrefabInstance:
       propertyPath: playerMaxHP
       value: 
       objectReference: {fileID: 1254122276}
+    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: SFX_TakeDamages.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'SFX_TakeDamages.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 283cd03bdcbdbe7438df11543c031306, type: 3}
+    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'SFX_TakeDamages.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 31b018381c907574896f184e6debdf3a, type: 3}
+    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'SFX_TakeDamages.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 0face090c1327b541ab1b9c0f7f024ed, type: 3}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: ground
       value: 
       objectReference: {fileID: 174314907}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: groggySfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 7e2b8f84a9b84d9459e8d88cda68256f, type: 3}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: playerPos
       value: 
@@ -405,8 +425,16 @@ PrefabInstance:
       value: 13.5
       objectReference: {fileID: 0}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: C_ChasePos.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: C_ChaseSpeed
       value: 13.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: groggyDuration
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: idleDurationTime
@@ -416,6 +444,22 @@ PrefabInstance:
       propertyPath: excuteAttackType_InGame
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: SFX_Punishments.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'SFX_Punishments.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: cb16c56bb35c8cf4c8689b191e1017cc, type: 3}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'SFX_Punishments.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 6da6ea2a6289fa641828cc5624b3b2d8, type: 3}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: 'SFX_Punishments.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 684bdbc59d57f8d429a89fcc36fdfd24, type: 3}
     - target: {fileID: 3703027213885601837, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_PlayOnAwake
       value: 0
@@ -460,6 +504,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: SFX_PatternA
+      value: 
+      objectReference: {fileID: 8300000, guid: 25ba360a5b2de884395a74051337f843, type: 3}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: SFX_PatternB
+      value: 
+      objectReference: {fileID: 8300000, guid: 485626ae960936346ad91e0d42f5d65e, type: 3}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: SFX_PatternC
+      value: 
+      objectReference: {fileID: 8300000, guid: 495cf15e3eea75a4ab09b559c1c7bd7f, type: 3}
     - target: {fileID: 4929966866255373803, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_PlayOnAwake
       value: 0
@@ -1488,7 +1544,11 @@ PrefabInstance:
     - target: {fileID: 872180411151741861, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
       propertyPath: animator
       value: 
-      objectReference: {fileID: 1507602843}
+      objectReference: {fileID: 0}
+    - target: {fileID: 2785574166347825105, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: SFX_Parryed
+      value: 
+      objectReference: {fileID: 8300000, guid: 93801e91ef6a4f24ba7699df32814424, type: 3}
     - target: {fileID: 4700935185223578715, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
       propertyPath: bulletFactory
       value: 
@@ -1748,11 +1808,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ca4da99d565445b8b0448f80871fc30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUIEventBridge
---- !u!95 &1507602843 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 3024179795968737012, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
-  m_PrefabInstance: {fileID: 1254122261}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1670160131 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2917862850625936761, guid: dd99076c91a3d784493ee277b7220c0c, type: 3}
@@ -2820,6 +2875,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: SoundManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6881468134665781777, guid: dd99076c91a3d784493ee277b7220c0c, type: 3}
+      propertyPath: controlledSfxPrefab
+      value: 
+      objectReference: {fileID: 5725191860751260982, guid: fd383e281139376459fcc21187648d90, type: 3}
+    - target: {fileID: 6881468134665781777, guid: dd99076c91a3d784493ee277b7220c0c, type: 3}
+      propertyPath: controlledSfxContainer
+      value: 
+      objectReference: {fileID: 1670160131}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

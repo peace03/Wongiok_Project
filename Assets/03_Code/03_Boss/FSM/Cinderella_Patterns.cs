@@ -10,9 +10,16 @@ using Random = UnityEngine.Random;
 /// </summary>
 public class Cinderella_Patterns : BossPatternBase
 {
+
     #region [1. 인스펙터 (기획 데이터 주입부)]
     [Header("Test")]
     [SerializeField] private ExcuteAttackType_InGame excuteAttackType_InGame; // 디버깅 시 특정 패턴(A, B, C)만 강제로 반복하게 만드는 제어 스위치
+
+    [Header("SFX")]
+    [SerializeField] private List<AudioClip> SFX_Punishments;
+
+    // 패링 시 현재 기합음만 식별해 중단하기 위한 보스별 고유 ID입니다.
+    private string punishmentSfxId => $"{GetInstanceID()}_Punishment";
 
     // [데이터 주도적 설계 (Data-Driven Design)]: 
     // 프로그래머의 코드 수정 없이 기획자가 인스펙터에서 보스의 거리, 템포, 딜레이를 직접 조율할 수 있도록 변수를 캡슐화했습니다.
@@ -227,6 +234,7 @@ public class Cinderella_Patterns : BossPatternBase
                 new Leaf(() =>
                 {
                     PublishParryImpact(); // 카메라 흔들림 및 불릿타임/히트스탑 연출
+                    StopPunishmentSfx();  // 패링이 확정된 즉시 현재 공격의 기합음을 중단
                     return NodeState.Success;
                 }),
                 new Leaf(() => PlayAnim_Speed((int)Animation.Parry, A_parryStunDuration)), // 지정된 시간만큼 스턴 모션 재생
@@ -251,7 +259,15 @@ public class Cinderella_Patterns : BossPatternBase
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => telegraphExcuted),
-                    new Leaf(() => PlayTelegraph(TelegraphType.RingDrawer))
+                    new Sequence(new List<Node>
+                    {
+                        new Leaf(() => //기합 소리 재생
+                        {
+                            PlayPunishmentSfx();
+                            return NodeState.Success;
+                        }),
+                        new Leaf(() => PlayTelegraph(TelegraphType.RingDrawer))
+                    })
                 }),
                 // [4. 타격]: 실제 공격 애니메이션을 재생합니다.
                 new Selector(new List<Node>
@@ -293,6 +309,7 @@ public class Cinderella_Patterns : BossPatternBase
                 new Leaf(() =>
                 {
                     PublishParryImpact();
+                    StopPunishmentSfx();
                     return NodeState.Success;
                 }),
                 new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
@@ -314,7 +331,15 @@ public class Cinderella_Patterns : BossPatternBase
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => telegraphExcuted),
-                    new Leaf(() => PlayTelegraph(TelegraphType.RingDrawer))
+                    new Sequence(new List<Node>
+                    {
+                        new Leaf(() => //기합 소리 재생
+                        {
+                            PlayPunishmentSfx();
+                            return NodeState.Success;
+                        }),
+                        new Leaf(() => PlayTelegraph(TelegraphType.RingDrawer))
+                    })
                 }),
                 new Selector(new List<Node>
                 {
@@ -356,7 +381,6 @@ public class Cinderella_Patterns : BossPatternBase
                     new ConditionLeaf(() => chaseDone),
                     new Leaf(() => Chase(C_ChasePos, C_ChaseSpeed, (int)Animation.Chase))
                 }),
-                new Sequence(new List<Node>()),
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => attackDone),
@@ -402,6 +426,7 @@ public class Cinderella_Patterns : BossPatternBase
                 new Leaf(() =>
                 {
                     PublishParryImpact();
+                    StopPunishmentSfx();
                     return NodeState.Success;
                 }),
                 new Leaf(() => PlayAnim_Speed((int)Animation.Parry, 0f)),
@@ -431,7 +456,15 @@ public class Cinderella_Patterns : BossPatternBase
                 new Selector(new List<Node>
                 {
                     new ConditionLeaf(() => telegraphExcuted),
-                    new Leaf(() => PlayTelegraph(TelegraphType.RingDrawer))
+                    new Sequence(new List<Node>
+                    {
+                        new Leaf(() => //기합 소리 재생
+                        {
+                            PlayPunishmentSfx();
+                            return NodeState.Success;
+                        }),
+                        new Leaf(() => PlayTelegraph(TelegraphType.RingDrawer))
+                    })
                 }),
                 new Selector(new List<Node>
                 {
@@ -511,6 +544,7 @@ public class Cinderella_Patterns : BossPatternBase
         {
             UpdateFacing();
             SyncFacingWithAnim(animNum);
+            PlayPunishmentSfx();
 
             jumpStartPos = transform.position;  // 도약 위치 스냅샷 기록
             jumpTargetPos = targetPos;          // 착지해야 할 목표(플레이어) 위치 스냅샷 기록
@@ -580,6 +614,28 @@ public class Cinderella_Patterns : BossPatternBase
 
         // 조립된 최종 좌표를 Transform에 강제 대입 (Rigidbody Bypass)
         transform.position = new Vector3(newX, newY, curZ);
+    }
+    #endregion
+
+    #region SFX 제어
+    // 패턴 시작 시 리스트에서 하나를 선택해 제어형 SFX 채널로 재생합니다.
+    // loop=false여도 SoundManager가 재생 완료를 감지해 풀로 자동 반납합니다.
+    private void PlayPunishmentSfx()
+    {
+        if (SFX_Punishments == null || SFX_Punishments.Count == 0)
+            return;
+
+        AudioClip clip = SFX_Punishments[Random.Range(0, SFX_Punishments.Count)];
+
+        EventBus<StartControlledSfxEvent>.Publish(
+            new StartControlledSfxEvent(punishmentSfxId, clip, loop: false));
+    }
+
+    // 패링 성공 시 같은 ID로 재생 중인 기합음만 즉시 중단합니다.
+    private void StopPunishmentSfx()
+    {
+        EventBus<StopControlledSfxEvent>.Publish(
+            new StopControlledSfxEvent(punishmentSfxId));
     }
     #endregion
 }
