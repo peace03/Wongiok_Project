@@ -6,7 +6,8 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
 
     [SerializeField] private BossStatusData status;
 
-    private float playerMaxHP; //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
+    [Header("플레이어 최대체력 (PlayerStatus.cs)")]
+    [SerializeField] private PlayerStatus playerMaxHP; //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
 
     public Stat BossMaxHP => status.MaxHP;
 
@@ -14,7 +15,6 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
     {
         Debug.Log($"{Priority}번 BossStatus의 Init()호출");
         //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
-        playerMaxHP = 120;
         status.ResetAllModifiers(); //계산식 먼저 초기화
         status.Init();
         TestPrint();
@@ -38,7 +38,7 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
     }
     public float GetAtkPower(AttackType type)
     {
-        return status.GetAtkPower(type, playerMaxHP);
+        return status.GetAtkPower(type, playerMaxHP.GetMaxHP());
     }
 
     public void TestPrint()

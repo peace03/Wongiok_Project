@@ -13,6 +13,8 @@ public class PlayerParry : MonoBehaviour
     [Header("Melee Parry")]
     // 패링 입력 후 근접 공격을 막을 수 있는 시간입니다.
     [SerializeField] private float parryWindowDuration = 0.2f;
+    // 패링 입력을 수락한 뒤 다음 입력을 막는 시간입니다. 성공 여부와 관계없이 연타를 방지합니다.
+    [SerializeField, Min(0f)] private float parryCooldownDuration = 0.5f;
 
     // 이전 원거리 패링 인스펙터 데이터가 남아 있어도 Inspector가 깨지지 않도록 숨겨서 보존합니다.
 #pragma warning disable 0414
@@ -28,6 +30,7 @@ public class PlayerParry : MonoBehaviour
     private bool isInBossAttackRange;
     private float playerParryWindowEndTime;
     private float parrySuccessDamageBlockEndTime;
+    private float parryCooldownEndTime;
 
     // 다른 공격 판정 스크립트가 현재 일반 근접 패링 창이 열려 있는지 확인할 때 사용합니다.
     public bool IsParryWindowOpen => IsPlayerParryWindowValid();
@@ -55,6 +58,7 @@ public class PlayerParry : MonoBehaviour
         isBossParryWindowOpen = false;
         isInBossAttackRange = false;
         parrySuccessDamageBlockEndTime = 0f;
+        parryCooldownEndTime = 0f;
     }
 
     private void Update()
@@ -70,6 +74,7 @@ public class PlayerParry : MonoBehaviour
         // PlayerInitializer가 넘겨준 컨트롤러를 우선 사용하고, 없으면 같은 오브젝트에서 보강합니다.
         playerController = controller != null ? controller : GetComponent<PlayerController>();
         ResetPlayerParryWindow();
+        parryCooldownEndTime = 0f;
         isInitialized = true;
     }
 
@@ -78,13 +83,16 @@ public class PlayerParry : MonoBehaviour
         // 현재 상태가 패링을 허용하지 않으면 패링 창을 열지 않습니다.
         if (!EnsureInitialized()) return false;
         if (!CanUseParry()) return false;
+        if (IsParryCooldownActive()) return false;
+
+        StartParryCooldown();
 
         LastParrySucceeded = false;
         isParryConsumed = false;
         isPlayerParryWindowOpen = true;
         playerParryWindowEndTime = Time.time + Mathf.Max(0f, parryWindowDuration);
 
-        if (isBossParryWindowOpen || isInBossAttackRange)
+        if (isBossParryWindowOpen && isInBossAttackRange)
         {
             // 보스 패턴은 입력 순간 ParryKeyDown을 받아 패링 분기로 넘어가는 구조입니다.
             return CompleteBossParry();
@@ -155,6 +163,16 @@ public class PlayerParry : MonoBehaviour
     private bool CanUseParry()
     {
         return playerController == null || playerController.CanParry;
+    }
+
+    private bool IsParryCooldownActive()
+    {
+        return Time.time < parryCooldownEndTime;
+    }
+
+    private void StartParryCooldown()
+    {
+        parryCooldownEndTime = Time.time + Mathf.Max(0f, parryCooldownDuration);
     }
 
     private bool IsPlayerParryWindowValid()

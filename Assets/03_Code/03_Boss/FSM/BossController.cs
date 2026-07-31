@@ -13,7 +13,7 @@ public class BossController : MonoBehaviour, IInitializable
     private Animator animator;
     private bool isDefeated;
 
-    private const float DefeatPresentationDuration = 2f;
+    private const float DefeatPresentationDuration = 5f;
     public Dictionary<State,BossState> bossState { get; }
         = new Dictionary<State, BossState>(); //상태 Dictionary
     private BossState curState; //현재 상태 패턴
@@ -90,8 +90,10 @@ public class BossController : MonoBehaviour, IInitializable
     //궁극기 발동상태 전환
     public void SetUltimateState(UltimateInvokeEvent data) { ChangeState(State.Ultimate); }
 
+    //보스가 죽을 때 상태 전환
     private void SetDefeatedState(BossDeadEvent data)
     {
+        Debug.Log("죽음!!!!!!!!!!!!!!");
         if (isDefeated)
             return;
 
@@ -108,7 +110,7 @@ public class BossController : MonoBehaviour, IInitializable
             rb.linearVelocity = Vector3.zero;
 
         if (animator != null)
-            animator.SetInteger("Num", (int)Animation.Groggy);
+            animator.SetInteger("Num", Random.Range((int)Animation.Defeated1, (int)Animation.Defeated3 + 1));
 
         StartCoroutine(DefeatPresentation());
     }
