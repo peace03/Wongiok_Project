@@ -498,7 +498,7 @@ MonoBehaviour:
       spawnPoint: {fileID: 5130047375584818730}
       count: 2
       spawnInterval: 1
-    - enemyPrefab: {fileID: 161236733381727142, guid: c1da29205b20447429853ea82c156677, type: 3}
+    - enemyPrefab: {fileID: 161236733381727142, guid: 4d4b900a9dd1ff84999aa8da9d1e0a90, type: 3}
       spawnPoint: {fileID: 5840226849850585283}
       count: 3
       spawnInterval: 1
