@@ -312,42 +312,26 @@ public class SkillSystemModel
         // 소유자 애니메이터 시스템이 있다면
         if(ownerAnimatorDriver != null)
         {
-            // 사용하려는 스킬의 ID에 따라서
-            switch(equippedActives[(int)slot].BaseData.Id)
+            var skillData = equippedActives[(int)slot].BaseData;
+            float skillDuration = skillData.GetMaxDuration(equippedActives[(int)slot].CurLevel);
+
+            // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
+            if (skillData.Id > (int)ACTIVE_SKILL_ID.End - 1 || skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
             {
-                // 매그넘이라면
-                case magnumSkillId:
-                    // 매그넘 스킬 애니메이션 재생에 실패했다면
-                    if (!ownerAnimatorDriver.PlayMagnumSkill())
-                    {
-                        Debug.Log($"[Skill] 매그넘 스킬 사용 실패 => 입력 - 애니메이션 재생 불가");
-                        return;
-                    }
-                    break;
-                // 라이플(돌격소총)이라면
-                case rifleSkillId:
-                    // 라이플 스킬 애니메이션 재생에 실패했다면
-                    if (!ownerAnimatorDriver.PlayRifleSkill())
-                    {
-                        Debug.Log($"[Skill] 돌격소총 스킬 사용 실패 => 입력 - 애니메이션 재생 불가");
-                        return;
-                    }
-                    break;
-                // 스나이퍼(저격총)이라면
-                case sniperSkillId:
-                    // 스나이퍼 스킬 애니메이션 재생에 실패했다면
-                    if (!ownerAnimatorDriver.PlaySniperSkill())
-                    {
-                        Debug.Log($"[Skill] 스나이퍼 스킬 사용 실패 => 입력 - 애니메이션 재생 불가");
-                        return;
-                    }
-                    break;
-                // 그 외
-                default:
-                    Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => " +
-                                $"스킬 ID : {equippedActives[(int)slot].BaseData.Id} / " +
-                                $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName}");
-                    break;
+                Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => 스킬 ID : {skillData.Id} / " +
+                            $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
+                            $"액티브 스킬 ID 범위 : " +
+                            $"{(int)ACTIVE_SKILL_ID.Start} ~ {ACTIVE_SKILL_ID.End}");
+                return;
+            }
+            // 스킬 시작 애니메이션 재생에 실패했다면
+            else if (!ownerAnimatorDriver.PlaySkillStart((ACTIVE_SKILL_ID)skillData.Id, skillDuration))
+            {
+                Debug.Log($"[Skill] 스킬 사용 실패 => " +
+                            $"입력 - 스킬 ID : {equippedActives[(int)slot].BaseData.Id} / " +
+                            $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
+                            $"애니메이션 재생 실패");
+                return;
             }
         }
 
@@ -367,8 +351,28 @@ public class SkillSystemModel
             return;
         }
 
-        // 스킬 취소
-        equippedActives[(int)slot].CancelSkill();
+        // 스킬 취소가 필요 없다면
+        if (!equippedActives[(int)slot].CancelSkill())
+            return;
+
+        // 소유자 애니메이터 시스템이 있다면
+        if (ownerAnimatorDriver != null)
+        {
+            var skillData = equippedActives[(int)slot].BaseData;
+
+            // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
+            if (skillData.Id > (int)ACTIVE_SKILL_ID.End - 1 || skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
+            {
+                Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => 스킬 ID : {skillData.Id} / " +
+                            $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
+                            $"액티브 스킬 ID 범위 : " +
+                            $"{(int)ACTIVE_SKILL_ID.Start} ~ {ACTIVE_SKILL_ID.End}");
+                return;
+            }
+
+            // 스킬 애니메이션 취소
+            ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)skillData.Id);
+        }
     }
 
     /// <summary>
