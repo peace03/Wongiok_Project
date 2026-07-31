@@ -10,6 +10,9 @@ public class PlayerParry : MonoBehaviour
     private const float ParryGizmoRadius = 1.2f;
     private const float ParrySuccessDamageBlockDuration = 0.1f;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip SFX_Parryed;
+
     [Header("Melee Parry")]
     // 패링 입력 후 근접 공격을 막을 수 있는 시간입니다.
     [SerializeField] private float parryWindowDuration = 0.2f;
@@ -147,6 +150,7 @@ public class PlayerParry : MonoBehaviour
         parrySuccessDamageBlockEndTime = Time.time + ParrySuccessDamageBlockDuration;
 
         EventBus<ParryKeyDown>.Publish(default);
+        EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(clip: SFX_Parryed));
         Debug.Log("보스 근접 패링 성공");
         return true;
     }

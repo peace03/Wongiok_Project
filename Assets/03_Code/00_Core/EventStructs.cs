@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 #region 패링 키 입력 이벤트
 public struct ParryKeyDown { }
@@ -77,11 +78,50 @@ public struct CameraShakeEvent
 public readonly struct Play2DSoundEvent
 {
     public readonly AudioClip Clip; //재생 오디오 클립
+    public readonly List<AudioClip> Clips; //여러개 랜덤으로 재생할 오디오 클립
     public readonly float Volume; //0~1 재생 볼륨
-    public Play2DSoundEvent(AudioClip clip, float volume = 1f)
+    public Play2DSoundEvent(AudioClip clip = null, List<AudioClip> clips = null, float volume = 1f)
     {
         Clip = clip;
+        Clips = clips;
         Volume = volume;
+    }
+}
+
+// 재생 중인 특정 SFX를 나중에 중지하거나 페이드 아웃해야 할 때 사용하는 요청입니다.
+// 차징음, 지속 기합음, 장판음처럼 PlayOneShot으로 제어할 수 없는 사운드에 사용합니다.
+public readonly struct StartControlledSfxEvent
+{
+    public readonly string SoundInstanceId;
+    public readonly AudioClip Clip;
+    public readonly float Volume;
+    public readonly bool Loop;
+
+    public StartControlledSfxEvent(
+        string soundInstanceId,
+        AudioClip clip,
+        float volume = 1f,
+        bool loop = true)
+    {
+        SoundInstanceId = soundInstanceId;
+        Clip = clip;
+        Volume = volume;
+        Loop = loop;
+    }
+}
+
+// StartControlledSfxEvent로 시작한 특정 SFX를 종료하는 요청입니다.
+public readonly struct StopControlledSfxEvent
+{
+    public readonly string SoundInstanceId;
+    public readonly float FadeOutDuration;
+
+    public StopControlledSfxEvent(
+        string soundInstanceId,
+        float fadeOutDuration = 0f)
+    {
+        SoundInstanceId = soundInstanceId;
+        FadeOutDuration = fadeOutDuration;
     }
 }
 

@@ -41,6 +41,8 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
 
     [Header("Groggy")]
     [Tooltip("패링 3회 누적 시 보스가 무력화되는 시간")][SerializeField] protected float groggyDuration;
+    [Tooltip("그로기 애니메이션 동안 반복할 SFX")][SerializeField] protected AudioClip groggySfx;
+    [Tooltip("그로기 SFX 종료 시 페이드 아웃 시간")][SerializeField, Min(0f)] protected float groggySfxFadeOutDuration = 0.1f;
     #endregion
 
     #region [2. 상태 및 프로퍼티 (외부 접근용 읽기 전용 통로)]
@@ -103,6 +105,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     protected int parryCount = 0;            // 누적된 패링 횟수 (3회 도달 시 그로기)
     protected int comboStep = 0;             // 다단 히트 공격(예: 궁극기 3연타)의 현재 진행 스텝
     protected bool isGroggyAnimDone = false; // 그로기 쓰러짐 애니메이션이 완료되었는가?
+    protected bool isGroggySfxPlaying = false; // 그로기 루프 SFX가 이미 시작되었는가?
 
     protected bool isEnranged = false;       // 현재 격노 상태 플래그
     protected float curEnrangedTime = 0f;    // 격노 지속 타이머
@@ -525,6 +528,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         comboStep = 0;
         ultimateAttack?.Reset();
         isGroggyAnimDone = false;
+        isGroggySfxPlaying = false;
         ResetPatternState();
     }
 
@@ -541,10 +545,32 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     {
         if (!isGroggyAnimDone)
         {
+            // 애니메이터가 실제 Groggy 상태로 전환되기 전에는 SFX를 시작하지 않습니다.
+            if (!IsAnimationReady(num)) return NodeState.Running;
+
+            // Groggy 애니메이션이 처음 재생되는 시점에만 루프 SFX를 시작합니다.
+            if (!isGroggySfxPlaying && groggySfx != null)
+            {
+                EventBus<StartControlledSfxEvent>.Publish(
+                    new StartControlledSfxEvent($"{GetInstanceID()}_Groggy",groggySfx,loop: true));
+
+                isGroggySfxPlaying = true;
+            }
+
             // 그로기 지정 시간(groggyDuration)동안 무력화 모션 재생
             if (PlayAnim_Time(num, groggyDuration) == NodeState.Success)
             {
                 isGroggyAnimDone = true;
+
+                // Groggy 모션이 끝나고 Idle 기상 모션으로 넘어가기 직전에 루프 SFX를 종료합니다.
+                if (isGroggySfxPlaying)
+                {
+                    EventBus<StopControlledSfxEvent>.Publish(
+                        new StopControlledSfxEvent($"{GetInstanceID()}_Groggy",groggySfxFadeOutDuration));
+
+                    isGroggySfxPlaying = false;
+                }
+
                 bossStatus?.SetGroggyDamageMultiplierActive(false); // 무력화 해제 직전 피격 추가 배율 보너스 종료
                 return NodeState.Running;
             }

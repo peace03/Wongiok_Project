@@ -3,6 +3,10 @@ using UnityEngine;
 //신데렐라 공격별 VFX 재생 담당
 public class CinderellaAttackEffectController : MonoBehaviour
 {
+    [Header("Audio Clip")]
+    [SerializeField] private AudioClip SFX_PatternA;
+    [SerializeField] private AudioClip SFX_PatternB;
+    [SerializeField] private AudioClip SFX_PatternC;
     [Header("Attack A - Kick Impact")]
     [SerializeField] private GameObject kickImpactPrefab;
     [SerializeField] private Transform kickImpactPoint;
@@ -80,6 +84,7 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 kickImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue),
                 kickImpactDuration);
+            EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(SFX_PatternA));
         }
         if (effectEvent.Cue == BossEffectCue.SpinImpact) //패턴B 이펙트 재생
         {
@@ -88,6 +93,7 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 spinImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue),
                 spinImpactDuration);
+            EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(SFX_PatternA));
         }
         if (effectEvent.Cue == BossEffectCue.SlamImpact) //패턴C 이펙트 재생
         {
@@ -96,6 +102,7 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 slamImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue),
                 slamImpactDuration);
+            EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(SFX_PatternC));
         }
         if(effectEvent.Cue == BossEffectCue.UltimateImpact) //궁극기 이펙트 재생
         {
@@ -105,6 +112,7 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 effectEvent.Variant == 1 ? ultimateChestImpactPoint.position : ultimateCenterImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue, effectEvent.Variant),
                 ultimateImpactDuration);
+            EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(SFX_PatternA));
         }
     }
 }

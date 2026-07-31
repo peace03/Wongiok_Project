@@ -1,9 +1,14 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BossStatus : MonoBehaviour, IInitializable, IDamageable
 {
     public int Priority => (int)InitOrder.Boss;
 
+    [Header("SFX")]
+    [SerializeField] private List<AudioClip> SFX_TakeDamages;
+
+    [Header("Stats")]
     [SerializeField] private BossStatusData status;
 
     [Header("플레이어 최대체력 (PlayerStatus.cs)")]
@@ -22,14 +27,10 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
 
     //그로기시 데미지 배율 설정
     public void SetGroggyDamageMultiplierActive(bool state) { status.SetGroggyDamageMultiplierActive(state); }
-    public void TakeDamage(float amount)//, Vector3 hitPoint = default)
+    public void TakeDamage(float amount)
     {
         status.SubCurrentHP(amount);
-        //Debug.Log($"보스 현재 체력: {status.CurrentHP}");
-        //if (hitPoint != default)
-        //{
-        //    이벤트 버스로 이펙트 실행시켜주기
-        //}
+        EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(clips: SFX_TakeDamages));
     }
 
     public float GetBossCurHP()
