@@ -1,10 +1,7 @@
 // Enum 확장 기능
 public static class EnumExtensions
 {
-    /// <summary>
-    /// 스킬 종류 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">스킬 종류</param>
+    // 스킬 종류 한국어 반환 함수
     public static string ToKoreanString(this SKILL_TYPE type)
     {
         return type switch
@@ -15,10 +12,7 @@ public static class EnumExtensions
         };
     }
 
-    /// <summary>
-    /// 챕터 종류 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">챕터 종류</param>
+    // 챕터 종류 한국어 반환 함수
     public static string ToKoreanString(this CHAPTER_TYPE type)
     {
         return type switch
@@ -29,10 +23,6 @@ public static class EnumExtensions
         };
     }
 
-    /// <summary>
-    /// 액티브 스킬 이펙트 종류 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">액티브 스킬 이펙트 종류</param>
     public static string ToKoreanString(this ACTIVE_SKILL_EFFECT_TYPE type)
     {
         return type switch
@@ -47,10 +37,7 @@ public static class EnumExtensions
         };
     }
 
-    /// <summary>
-    /// 패시브 발동 조건 종류 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">패시브 발동 조건 종류</param>
+    // 패시브 발동 조건 종류 한국어 반환 함수
     public static string ToKoreanString(this PASSIVE_TRIGGER_TYPE type)
     {
         return type switch
@@ -61,10 +48,7 @@ public static class EnumExtensions
         };
     }
 
-    /// <summary>
-    /// 스탯 종류 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">스탯 종류</param>
+    // 스탯 종류 한국어 반환 함수
     public static string ToKoreanString(this STAT_TYPE type)
     {
         return type switch
@@ -77,10 +61,7 @@ public static class EnumExtensions
         };
     }
 
-    /// <summary>
-    /// 수식 종류 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">수식 종류</param>
+    // 수식 종류 한국어 반환 함수
     public static string ToKoreanString(this MODIFY_TYPE type)
     {
         return type switch
@@ -91,10 +72,7 @@ public static class EnumExtensions
         };
     }
 
-    /// <summary>
-    /// 액티브 스킬 종류 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">액티브 스킬 종류</param>
+    // 액티브 스킬 종류 한국어 반환 함수
     public static string ToKoreanString(this ACTIVE_SKILL_TYPE type)
     {
         return type switch
@@ -105,10 +83,7 @@ public static class EnumExtensions
         };
     }
 
-    /// <summary>
-    /// 스킬 상태 한국어 반환 함수
-    /// </summary>
-    /// <param name="state">스킬 상태</param>
+    // 스킬 상태 한국어 반환 함수
     public static string ToKoreanString(this SKILL_STATE state)
     {
         return state switch
@@ -121,10 +96,7 @@ public static class EnumExtensions
         };
     }
 
-    /// <summary>
-    /// 액티브 스킬 슬롯 종류 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">액티브 스킬 슬롯 종류</param>
+    // 액티브 스킬 슬롯 종류 한국어 반환 함수
     public static string ToKoreanString(this ACTIVE_SKILL_SLOT_TYPE type)
     {
         return type switch
@@ -132,21 +104,6 @@ public static class EnumExtensions
             ACTIVE_SKILL_SLOT_TYPE.A                => "슬롯 A",
             ACTIVE_SKILL_SLOT_TYPE.S                => "슬롯 S",
             ACTIVE_SKILL_SLOT_TYPE.D                => "슬롯 D",
-            _                                       => ""
-        };
-    }
-
-    /// <summary>
-    /// 액티브 스킬 ID 한국어 반환 함수
-    /// </summary>
-    /// <param name="type">액티브 스킬 ID 종류</param>
-    public static string ToKoreanString(this ACTIVE_SKILL_ID type)
-    {
-        return type switch
-        {
-            ACTIVE_SKILL_ID.Magnum             => "매그넘",
-            ACTIVE_SKILL_ID.Rifle              => "돌격소총",
-            ACTIVE_SKILL_ID.Sniper             => "저격총",
             _                                       => ""
         };
     }

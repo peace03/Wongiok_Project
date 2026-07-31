@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public sealed class PlayerAnimatorDriver : MonoBehaviour
@@ -16,18 +15,12 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private static readonly int JumpState = Animator.StringToHash("Base Layer.Jump");
     private static readonly int LandingState = Animator.StringToHash("Base Layer.Landing");
     private static readonly int SlidingState = Animator.StringToHash("Base Layer.Sliding");
-    private static readonly int HitState = Animator.StringToHash("Base Layer.Hit");
-    private static readonly int DeathState = Animator.StringToHash("Base Layer.Death");
-    private static readonly int HitTrigger = Animator.StringToHash("Hit");
-    private static readonly int DeathTrigger = Animator.StringToHash("Death");
 
     // Animator Controller의 Magnum/Rifle/Sniper 상태를 무기별 스킬 진입점으로 사용합니다.
     // 상태 이름과 Trigger 이름을 함께 Hash로 보관해 문자열 오타와 반복 변환을 방지합니다.
-    private static readonly int MagnumSkillStartState = Animator.StringToHash("Base Layer.MagnumSkillStartState");
-    private static readonly int MagnumSkillEndState = Animator.StringToHash("Base Layer.MagnumSkillEndState");
+    private static readonly int MagnumSkillState = Animator.StringToHash("Base Layer.MagnumSkill");
     private static readonly int RifleSkillState = Animator.StringToHash("Base Layer.RifleSkill");
-    private static readonly int SniperSkillStartState = Animator.StringToHash("Base Layer.SniperSkillStartState");
-    private static readonly int SniperSkillEndState = Animator.StringToHash("Base Layer.SniperSkillEndState");
+    private static readonly int SniperSkillState = Animator.StringToHash("Base Layer.SniperSkill");
     private static readonly int MagnumSkillTrigger = Animator.StringToHash("MagnumSkill");
     private static readonly int RifleSkillTrigger = Animator.StringToHash("RifleSkill");
     private static readonly int SniperSkillTrigger = Animator.StringToHash("SniperSkill");
@@ -54,9 +47,8 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private Quaternion animatedModelInitialLocalRotation;
     private bool hasAnimatedModelAnchor;
 
-    private Coroutine skillCoroutine;
     // 스킬 애니메이션 재생 중 여부
-    //public bool playingSkillAnimation = false;
+    private bool playingSkillAnimation = false;
 
     private void Awake()
     {
@@ -112,7 +104,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// </summary>
     public void SetLocomotion(bool isMoving)
     {
-        if (!CanPlay() || skillCoroutine != null) return;
+        if (!CanPlay() || playingSkillAnimation) return;
 
         // Animator 창의 기존 전환 조건과 디버깅 표시를 위해 파라미터도 함께 갱신합니다.
         animator.SetBool(IsMoving, isMoving);
@@ -149,7 +141,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// </summary>
     public void PlayLanding()
     {
-        if (!CanPlay() || skillCoroutine != null) return;
+        if (!CanPlay() || playingSkillAnimation) return;
 
         // Jump → Landing은 Animator Controller에 연결된 IsFalling 조건 Transition이 담당합니다.
         animator.SetBool(IsFalling, true);
@@ -191,196 +183,16 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     }
 
     /// <summary>
-    /// 피격 상태에 진입할 때 진행 중인 스킬 연출을 취소하고 Hit State를 재생합니다.
-    /// 실제 경직과 넉백 시간은 PlayerHitState가 담당합니다.
-    /// </summary>
-    /// <returns>Hit State가 존재해 재생 요청에 성공하면 true입니다.</returns>
-    public bool PlayHit()
-    {
-        if (!CanPlay()) return false;
-
-        if (!animator.HasState(BaseLayerIndex, HitState))
-        {
-            Debug.LogWarning(
-                "Player Animator에 'Base Layer.Hit' State가 없어 피격 애니메이션을 재생하지 않았습니다.",
-                this);
-            return false;
-        }
-
-        if(skillCoroutine != null)
-        {
-            StopCoroutine(skillCoroutine);
-            skillCoroutine = null;
-        }
-
-        animator.SetBool(IsExecutingSkill, false);
-        animator.ResetTrigger(MagnumSkillTrigger);
-        animator.ResetTrigger(RifleSkillTrigger);
-        animator.ResetTrigger(SniperSkillTrigger);
-        animator.SetTrigger(HitTrigger);
-        return true;
-    }
-
-    /// <summary>
-    /// 사망 상태에 진입할 때 진행 중인 스킬 연출을 정리하고 Death State를 재생합니다.
-    /// Death State는 자동으로 Idle에 복귀하지 않으며, 부활 후 상태 전환이 직접 Idle을 재생합니다.
-    /// </summary>
-    /// <returns>Death State가 존재해 재생 요청에 성공하면 true입니다.</returns>
-    public bool PlayDeath()
-    {
-        if (!CanPlay()) return false;
-
-        if (!animator.HasState(BaseLayerIndex, DeathState))
-        {
-            Debug.LogWarning(
-                "Player Animator에 'Base Layer.Death' State가 없어 사망 애니메이션을 재생하지 않았습니다.",
-                this);
-            return false;
-        }
-
-        if (skillCoroutine != null)
-        {
-            StopCoroutine(skillCoroutine);
-            skillCoroutine = null;
-        }
-
-        animator.SetBool(IsExecutingSkill, false);
-        animator.SetTrigger(DeathTrigger);
-        return true;
-    }
-
-    /// <summary>
-    /// 스킬 시작 애니메이션 재생 함수
-    /// </summary>
-    /// <param name="skillId">액티브 스킬 ID</param>
-    public bool PlaySkillStart(ACTIVE_SKILL_ID skillId, float duration = 0f)
-    {
-        // 스킬 애니메이션이 재생 중이라면
-        if (skillCoroutine != null)
-            return false;
-
-        // 액티브 스킬 ID에 따라서
-        return skillId switch
-        {
-            // 매그넘이라면
-            ACTIVE_SKILL_ID.Magnum      => PlayMagnumSkillStart(skillId, duration),
-            // 라이플(돌격소총)이라면
-            ACTIVE_SKILL_ID.Rifle       => PlayRifleSkill(skillId, duration),
-            // 스나이퍼(저격총)이라면
-            ACTIVE_SKILL_ID.Sniper      => PlaySniperSkillStart(skillId, duration),
-            // 그 외
-            _                           => false
-        };
-    }
-
-    /// <summary>
-    /// 스킬 애니메이션 취소 함수
-    /// </summary>
-    /// <param name="skillId">액티브 스킬 ID</param>
-    public void CancelSkill(ACTIVE_SKILL_ID skillId)
-    {
-        // 스킬 애니메이션이 재생 중이 아니라면
-        if (skillCoroutine == null)
-            return;
-
-        // 액티브 스킬 ID에 따라서
-        switch (skillId)
-        {
-            // 매그넘이라면
-            case ACTIVE_SKILL_ID.Magnum:
-                CancelMagnumSkill();
-                break;
-            // 라이플(돌격소총)이라면
-            case ACTIVE_SKILL_ID.Rifle:
-                StopRifleSkill();
-                break;
-            // 스나이퍼(저격총)이라면
-            case ACTIVE_SKILL_ID.Sniper:
-                CancelSniperSkill();
-                break;
-            // 그 외
-            default:
-                break;
-        }
-    }
-
-    /// <summary>
-    /// 스킬 종료 애니메이션 재생 함수
-    /// </summary>
-    /// <param name="skillId">액티브 스킬 ID</param>
-    private bool PlaySkillEnd(ACTIVE_SKILL_ID skillId)
-    {
-        // 스킬 애니메이션이 재생 중이 아니라면
-        if (skillCoroutine == null)
-            return false;
-
-        // 액티브 스킬 ID에 따라서
-        return skillId switch
-        {
-            // 매그넘이라면
-            ACTIVE_SKILL_ID.Magnum      => PlayMagnumSkillEnd(),
-            // 라이플(돌격소총)이라면
-            ACTIVE_SKILL_ID.Rifle       => StopRifleSkill(),
-            // 스나이퍼(저격총)이라면
-            ACTIVE_SKILL_ID.Sniper      => PlaySniperSkillEnd(),
-            // 그 외
-            _                           => false
-        };
-    }
-
-    /// <summary>
     /// 매그넘 스킬 애니메이션의 임시 진입점입니다.
     /// MagnumSkill Trigger를 통해 Base Layer의 동명 State를 재생합니다.
     /// 스킬의 데미지, 쿨타임, 투사체 생성은 스킬 로직에서 별도로 처리해야 합니다.
     /// </summary>
     /// <returns>State가 존재해 재생 요청에 성공하면 true, 아직 준비되지 않았으면 false입니다.</returns>
-    private bool PlayMagnumSkillStart(ACTIVE_SKILL_ID skillId, float duration)
+    public bool PlayMagnumSkill()
     {
-        if (!TryPlaySkillAnimation(MagnumSkillStartState, MagnumSkillTrigger, "MagnumSkillStartState"))
-            return false;
-
-        if (duration <= 0f)
-        {
-            float animationTime = animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).length;
-            skillCoroutine = StartCoroutine(SkillRoutine(skillId, animationTime));
-        }
-        else
-            skillCoroutine = StartCoroutine(SkillRoutine(skillId, duration));
-
-        return true;
-    }
-
-    private bool PlayMagnumSkillEnd()
-    {
-        if (!CanPlay()) return false;
-
-        if (!animator.HasState(BaseLayerIndex, MagnumSkillEndState))
-        {
-            Debug.LogWarning(
-                "Player Animator에 'Base Layer.MagnumSkillEndState' State가 없어 종료 애니메이션을 재생하지 않았습니다.",
-                this);
-            CancelMagnumSkill();
-            return false;
-        }
-
-        animator.CrossFadeInFixedTime(MagnumSkillEndState, LocomotionBlendDuration, BaseLayerIndex, 0f);
-        animator.Update(0f);
-        return true;
-    }
-
-    private void CancelMagnumSkill()
-    {
-        if (!CanPlay() || skillCoroutine == null)
-            return;
-
-        if (skillCoroutine != null)
-        {
-            StopCoroutine(skillCoroutine);
-            skillCoroutine = null;
-        }
-
-        animator.SetBool(IsExecutingSkill, false);
-        SetLocomotion(animator.GetBool(IsMoving));
+        bool result = TryPlaySkillAnimation(MagnumSkillState, MagnumSkillTrigger, "MagnumSkill");
+        playingSkillAnimation = result;
+        return result;
     }
 
     /// <summary>
@@ -389,34 +201,27 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// 스킬의 연속 발사 횟수와 발사 간격은 이 Driver가 아닌 스킬 로직에서 관리합니다.
     /// </summary>
     /// <returns>State가 존재해 재생 요청에 성공하면 true, 아직 준비되지 않았으면 false입니다.</returns>
-    private bool PlayRifleSkill(ACTIVE_SKILL_ID skillId, float duration)
+    public bool PlayRifleSkill()
     {
-        if (!TryPlaySkillAnimation(RifleSkillState, RifleSkillTrigger, "RifleSkill"))
-            return false;
-
-        if (duration <= 0f)
-        {
-            float animationTime = animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).length;
-            skillCoroutine = StartCoroutine(SkillRoutine(skillId, animationTime));
-        }
-        else
-            skillCoroutine = StartCoroutine(SkillRoutine(skillId, duration));
-
-        return true;
+        bool result = TryPlaySkillAnimation(RifleSkillState, RifleSkillTrigger, "RifleSkill");
+        playingSkillAnimation = result;
+        animator.SetBool(IsExecutingSkill, result);
+        return result;
     }
 
     /// <summary>
-    /// 라이플 스킬 애니메이션 종료 함수
+    /// 라이플 스킬 애니메이션 중지 함수
     /// </summary>
-    private bool StopRifleSkill()
+    public void StopRifleSkill()
     {
-        // 스킬 애니메이션이 재생 중이 아니라면
-        if (skillCoroutine == null)
-            return false;
-
-        // 라이플 스킬 애니메이션 종료
-        animator.SetBool(IsExecutingSkill, false);
-        return true;
+        // 라이플(돌격소총) 스킬 애니메이션이 재생 중이라면
+        if (playingSkillAnimation)
+        {
+            // 라이플 스킬 애니메이션 끝
+            playingSkillAnimation = false;
+            // 라이플 스킬 애니메이션 끝
+            animator.SetBool(IsExecutingSkill, false);
+        }
     }
 
     /// <summary>
@@ -425,53 +230,22 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// 조준, 관통 판정, 카메라 연출은 이 Driver가 아닌 스킬 로직에서 관리합니다.
     /// </summary>
     /// <returns>State가 존재해 재생 요청에 성공하면 true, 아직 준비되지 않았으면 false입니다.</returns>
-    private bool PlaySniperSkillStart(ACTIVE_SKILL_ID skillId, float duration)
+    public bool PlaySniperSkill()
     {
-        if (!TryPlaySkillAnimation(SniperSkillStartState, SniperSkillTrigger, "SniperSkillStartState"))
-            return false;
-
-        if (duration <= 0f)
-        {
-            float animationTime = animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).length;
-            skillCoroutine = StartCoroutine(SkillRoutine(skillId, animationTime));
-        }
-        else
-            skillCoroutine = StartCoroutine(SkillRoutine(skillId, duration));
-
-        return true;
+        bool result = TryPlaySkillAnimation(SniperSkillState, SniperSkillTrigger, "SniperSkill");
+        playingSkillAnimation = result;
+        return result;
     }
 
-    private bool PlaySniperSkillEnd()
+    /// <summary>
+    /// 스킬 애니메이션 중지 함수
+    /// </summary>
+    public void StopSkill()
     {
-        if (!CanPlay()) return false;
-
-        if (!animator.HasState(BaseLayerIndex, SniperSkillEndState))
-        {
-            Debug.LogWarning(
-                "Player Animator에 'Base Layer.SniperSkillEndState' State가 없어 종료 애니메이션을 재생하지 않았습니다.",
-                this);
-            CancelSniperSkill();
-            return false;
-        }
-
-        animator.CrossFadeInFixedTime(SniperSkillEndState, LocomotionBlendDuration, BaseLayerIndex, 0f);
-        animator.Update(0f);
-        return true;
-    }
-
-    private void CancelSniperSkill()
-    {
-        if (!CanPlay() || skillCoroutine == null)
-            return;
-
-        if (skillCoroutine != null)
-        {
-            StopCoroutine(skillCoroutine);
-            skillCoroutine = null;
-        }
-
-        animator.SetBool(IsExecutingSkill, false);
-        SetLocomotion(animator.GetBool(IsMoving));
+        // 스킬 애니메이션이 재생 중이라면
+        if (playingSkillAnimation)
+            // 스킬 애니메이션 끝
+            playingSkillAnimation = false;
     }
 
     /// <summary>
@@ -480,7 +254,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     /// </summary>
     private bool TryPlaySkillAnimation(int stateHash, int triggerHash, string stateName)
     {
-        if (!CanPlay() || skillCoroutine != null) return false;
+        if (!CanPlay() || playingSkillAnimation) return false;
 
         if (!animator.HasState(BaseLayerIndex, stateHash))
         {
@@ -490,27 +264,8 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
             return false;
         }
 
-        animator.CrossFadeInFixedTime(stateHash, 0f, BaseLayerIndex, 0f);
-        animator.Update(0f);
+        animator.SetTrigger(triggerHash);
         return true;
-    }
-
-    private IEnumerator SkillRoutine(ACTIVE_SKILL_ID skillId, float duration)
-    {
-        animator.SetBool(IsExecutingSkill, true);
-        yield return new WaitForSeconds(duration);
-        
-        if (PlaySkillEnd(skillId))
-        {
-            float endDuration = animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).length;
-            yield return new WaitForSeconds(endDuration);
-        }
-
-        skillCoroutine = null;
-        animator.SetBool(IsExecutingSkill, false);
-        // 무기 외형 착용 해제 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState((int)skillId, false));
-        SetLocomotion(animator.GetBool(IsMoving));
     }
 
     /// <summary>

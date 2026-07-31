@@ -87,15 +87,3 @@ public enum ACTIVE_SKILL_SLOT_TYPE
     S,              // 두번째
     D               // 세번째
 }
-
-/// <summary>
-/// 액티브 스킬 ID
-/// </summary>
-public enum ACTIVE_SKILL_ID
-{
-    Start = 1000,   // 시작
-    Magnum,         // 매그넘
-    Rifle,          // 라이플(돌격소총)
-    Sniper,         // 스나이퍼(저격총)
-    End             // 끝
-}

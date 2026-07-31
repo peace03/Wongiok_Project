@@ -172,10 +172,24 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 발사체 스킬 딜레이 시간량이 있다면(지속 시간이 있었다면)
         if (projectileDelayTimeValue > 0f)
+        {
             // 스킬 종료 히트 스탑 이벤트 발행(현재 프레임의 3/4)
             EventBus<HitStopEvent>.Publish(new HitStopEvent((curFps / 4) * 3, TimeEffectSource.Skill,
                                                 TimeEffectPriority.Medium, TimeEffectGroups.CombatFeel));
-        
+            // 라이플 스킬 애니메이션 중지
+            ownerAnimatorDriver.StopRifleSkill();
+        }
+        // 발사체 스킬 딜레이 시간량이 없다면
+        else
+        {
+            // 0.5f 대기하기(무기 외형 보는 용도)
+            yield return new WaitForSeconds(0.5f);
+            // 스킬 애니메이션 중지
+            ownerAnimatorDriver.StopSkill();
+        }
+
+        // 무기 외형 착용 해제 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
         // 실행 위치들 초기화
         ResetExecutePositions();
     }
