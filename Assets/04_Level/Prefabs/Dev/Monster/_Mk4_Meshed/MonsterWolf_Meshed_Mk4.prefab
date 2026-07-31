@@ -324,6 +324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cc9577fa1ebc584a9f013eb65a7505d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterFacing
+  visualPivot: {fileID: 8032831983957406496}
   invertVisualFacing: 0
 --- !u!114 &6673026005292126297
 MonoBehaviour:
@@ -1391,7 +1392,7 @@ PrefabInstance:
     - target: {fileID: 8670832458337961029, guid: ab227103999bb26488b960ea87efb46b, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 8322ea0d21eede840bc89957ac2c7f12, type: 2}
+      objectReference: {fileID: 9100000, guid: 35fbcd6f653e3284ea6d0c61fb35b41e, type: 2}
     - target: {fileID: 8678714344764039155, guid: ab227103999bb26488b960ea87efb46b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -0.0000011480071
