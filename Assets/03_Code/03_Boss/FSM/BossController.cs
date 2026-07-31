@@ -42,15 +42,20 @@ public class BossController : MonoBehaviour, IInitializable
         //Debug.Log("BossController Init()실행 완료");
     }
 
+    // 보스가 활성화되면 전투 상태 전환과 플레이어 사망 이벤트를 구독한다.
     private void OnEnable()
     {
         EventBus<UltimateInvokeEvent>.action += SetUltimateState;
         EventBus<BossDeadEvent>.action += SetDefeatedState;
+        EventBus<PlayerDeadEvent>.action += DeactivateOnPlayerDeath;
     }
+
+    // 보스가 비활성화되면 모든 이벤트 구독을 해제해 중복 콜백을 방지한다.
     private void OnDisable()
     {
         EventBus<UltimateInvokeEvent>.action -= SetUltimateState;
         EventBus<BossDeadEvent>.action -= SetDefeatedState;
+        EventBus<PlayerDeadEvent>.action -= DeactivateOnPlayerDeath;
     }
 
     private void FixedUpdate()
@@ -89,6 +94,12 @@ public class BossController : MonoBehaviour, IInitializable
     }
     //궁극기 발동상태 전환
     public void SetUltimateState(UltimateInvokeEvent data) { ChangeState(State.Ultimate); }
+
+    // 플레이어가 사망하면 진행 중인 보스 전투와 하위 공격 오브젝트를 즉시 종료한다.
+    private void DeactivateOnPlayerDeath(PlayerDeadEvent data)
+    {
+        gameObject.SetActive(false);
+    }
 
     //보스가 죽을 때 상태 전환
     private void SetDefeatedState(BossDeadEvent data)
