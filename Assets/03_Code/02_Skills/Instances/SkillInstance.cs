@@ -372,25 +372,26 @@ public class SkillInstance
     /// <summary>
     /// 스킬 취소 함수
     /// </summary>
-    public void CancelSkill()
+    public bool CancelSkill()
     {
         // 차징 상태가 아니라면
         if (!IsCharging)
-            return;
+            return false;
 
         // 차징이 끝났다면
         if (curChargingTime >= Math.Max(0f, data.GetMaxChargingTime(curLevel)))
+        {
             // 실행 상태로 변경(이펙트 초기화 X)
             SwitchState(SKILL_STATE.Executing, false);
-        // 차징이 끝나지 않았다면
-        else
-        {
-            //Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
-            // 무기 외형 착용 해제 이벤트 발행
-            EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
-            // 쿨타임 상태로 변경
-            SwitchState(SKILL_STATE.CoolTime);
+            return false;
         }
+
+        //Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
+        // 무기 외형 착용 해제 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
+        // 쿨타임 상태로 변경
+        SwitchState(SKILL_STATE.CoolTime);
+        return true;
     }
 
     /// <summary>
