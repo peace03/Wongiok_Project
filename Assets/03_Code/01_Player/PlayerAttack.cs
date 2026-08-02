@@ -21,6 +21,7 @@ public class PlayerAttack : MonoBehaviour
 
     // 공격 데미지를 계산하기 위한 플레이어 스탯 컴포넌트입니다.
     private PlayerStatus playerStatus;
+    private PlayerAnimatorDriver animatorDriver;
     private bool hasLoggedMissingFirePoint;
     private bool hasLoggedMissingBulletFactory;
     private bool hasLoggedMissingPlayerStatus;
@@ -30,6 +31,7 @@ public class PlayerAttack : MonoBehaviour
     {
         // 공격 데미지를 계산할 플레이어 스탯 참조를 초기화합니다.
         playerStatus = status != null ? status : GetComponent<PlayerStatus>();
+        animatorDriver = GetComponent<PlayerAnimatorDriver>();
     }
 
     public void Attack(Vector2 aimInput, bool isFacingRight, bool isGrounded)
@@ -43,13 +45,14 @@ public class PlayerAttack : MonoBehaviour
         float damage = playerStatus.GetAttackPower();
 
         // Bullet은 origin.forward로 이동하므로 firePoint의 forward를 공격 방향에 맞춥니다.
-        UpdateMuzzleDirection(attackDirection);
+        UpdateMuzzleDirection(attackDirection, isFacingRight);
 
         Bullet bullet = bulletFactory.GetBullet();
         if (bullet == null) return;
 
         // 풀에서 꺼낸 Bullet에 발사 기준점, 소유자 레이어, 데미지, 관통 횟수를 넘깁니다.
         bullet.StartFire(firePoint, ownerLayer, damage, penetrationCount);
+        animatorDriver?.PlayPistolShoot();
         PlayShootingEffect();
 
         // 발사 후처리 사운드나 이펙트가 반응할 수 있게 이벤트를 발행합니다.
@@ -62,9 +65,14 @@ public class PlayerAttack : MonoBehaviour
         );
     }
 
-    private void UpdateMuzzleDirection(Vector3 attackDirection)
+    private void UpdateMuzzleDirection(Vector3 attackDirection, bool isFacingRight)
     {
         Transform pivot = muzzlePivot != null ? muzzlePivot : firePoint;
+
+        Vector3 localPosition = pivot.localPosition;
+        localPosition.x = Mathf.Abs(localPosition.x) * (isFacingRight ? 1f : -1f);
+        pivot.localPosition = localPosition;
+
         pivot.rotation = Quaternion.FromToRotation(Vector3.forward, attackDirection.normalized);
     }
 

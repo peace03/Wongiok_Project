@@ -2,58 +2,157 @@ using UnityEngine;
 
 public class PlayerAudioController : MonoBehaviour
 {
-    [Header("Attack Audio")]
-    // 플레이어가 공격을 발사할 때 재생할 사운드입니다.
-    [SerializeField] private AudioClip fireSound;
+    private static readonly int PistolRunState = Animator.StringToHash("Base Layer.Pistol Run");
 
-    // 총알이 무언가에 맞았을 때 재생할 사운드입니다.
+    [Header("Attack Audio")]
+    [SerializeField] private AudioClip fireSound;
     [SerializeField] private AudioClip bulletHitSound;
 
-    // 이 오브젝트에 붙은 AudioSource입니다. 없으면 위치 기반 재생으로 대체합니다.
+    [Header("Movement Audio")]
+    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip landingSound;
+    [SerializeField] private AudioClip slideSound;
+    [SerializeField] private AudioClip walkSound;
+    [SerializeField, Range(0f, 0.49f)] private float firstFootstepNormalizedTime = 0.15f;
+
     private AudioSource audioSource;
+    private Animator animator;
+    private bool isWalking;
+    private int lastFootstepIndex;
+    private float lastWalkNormalizedTime;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
+        audioSource.spatialBlend = 0f;
+        animator = GetComponentInChildren<Animator>(true);
+        ResetWalkTiming();
+    }
+
+    private void Update()
+    {
+        UpdateWalkSound();
     }
 
     private void OnEnable()
     {
-        // 공격 발사와 총알 충돌 이벤트를 구독해 오디오만 분리해서 처리합니다.
         EventBus<PlayerAttackFiredEvent>.action += OnPlayerAttackFired;
         EventBus<PlayerBulletHitEvent>.action += OnPlayerBulletHit;
     }
 
     private void OnDisable()
     {
-        // 오브젝트가 꺼질 때 반드시 구독을 해제해 중복 호출과 메모리 참조 문제를 방지합니다.
         EventBus<PlayerAttackFiredEvent>.action -= OnPlayerAttackFired;
         EventBus<PlayerBulletHitEvent>.action -= OnPlayerBulletHit;
+        StopWalking();
+    }
+
+    public void PlayJump()
+    {
+        PlayOneShot(jumpSound);
+    }
+
+    public void PlayLanding()
+    {
+        PlayOneShot(landingSound);
+    }
+
+    public void PlaySlide()
+    {
+        PlayOneShot(slideSound);
+    }
+
+    public void StartWalking()
+    {
+        isWalking = true;
+        ResetWalkTiming();
+    }
+
+    public void StopWalking()
+    {
+        isWalking = false;
+        ResetWalkTiming();
+    }
+
+    private void UpdateWalkSound()
+    {
+        if (!isWalking || walkSound == null || !TryGetPistolRunNormalizedTime(out float normalizedTime))
+            return;
+
+        if (lastWalkNormalizedTime < 0f || normalizedTime < lastWalkNormalizedTime)
+        {
+            lastWalkNormalizedTime = normalizedTime;
+            lastFootstepIndex = GetFootstepIndex(normalizedTime);
+            return;
+        }
+
+        int footstepIndex = GetFootstepIndex(normalizedTime);
+        if (footstepIndex > lastFootstepIndex)
+        {
+            PlayOneShot(walkSound);
+            lastFootstepIndex = footstepIndex;
+        }
+
+        lastWalkNormalizedTime = normalizedTime;
+    }
+
+    private bool TryGetPistolRunNormalizedTime(out float normalizedTime)
+    {
+        normalizedTime = 0f;
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+        if (animator == null || animator.runtimeAnimatorController == null)
+            return false;
+
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if (animator.IsInTransition(0))
+        {
+            AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(0);
+            if (nextStateInfo.fullPathHash == PistolRunState)
+                stateInfo = nextStateInfo;
+        }
+
+        if (stateInfo.fullPathHash != PistolRunState)
+            return false;
+
+        normalizedTime = stateInfo.normalizedTime;
+        return true;
+    }
+
+    private int GetFootstepIndex(float normalizedTime)
+    {
+        return Mathf.FloorToInt((normalizedTime - firstFootstepNormalizedTime) * 2f);
+    }
+
+    private void ResetWalkTiming()
+    {
+        lastFootstepIndex = -1;
+        lastWalkNormalizedTime = -1f;
     }
 
     private void OnPlayerAttackFired(PlayerAttackFiredEvent eventData)
     {
-        // 발사 사운드는 플레이어 위치의 AudioSource를 우선 사용합니다.
         PlayOneShot(fireSound);
     }
 
     private void OnPlayerBulletHit(PlayerBulletHitEvent eventData)
     {
-        if (bulletHitSound == null) return;
-
-        // 피격 사운드는 충돌 위치에서 재생해 공간감을 줍니다.
-        AudioSource.PlayClipAtPoint(bulletHitSound, eventData.HitPoint);
+        if (bulletHitSound != null)
+            AudioSource.PlayClipAtPoint(bulletHitSound, eventData.HitPoint);
     }
 
     private void PlayOneShot(AudioClip clip)
     {
-        // 클립이 비어 있으면 아무 소리도 재생하지 않습니다.
         if (clip == null) return;
 
         if (audioSource != null)
             audioSource.PlayOneShot(clip);
         else
-            // AudioSource가 없더라도 사운드는 들리도록 현재 위치에서 임시 재생합니다.
             AudioSource.PlayClipAtPoint(clip, transform.position);
     }
 }
