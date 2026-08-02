@@ -384,6 +384,10 @@ PrefabInstance:
       propertyPath: playerMaxHP
       value: 
       objectReference: {fileID: 8074201030222337663}
+    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: takeDamageSfxVolume
+      value: 0.049
+      objectReference: {fileID: 0}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: ground
       value: 
@@ -396,6 +400,10 @@ PrefabInstance:
       propertyPath: worldZPos
       value: 
       objectReference: {fileID: 1816822191}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: punishmentSfxVolume
+      value: 0.128
+      objectReference: {fileID: 0}
     - target: {fileID: 4456096972685270820, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -435,6 +443,26 @@ PrefabInstance:
     - target: {fileID: 4456096972685270820, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: kickImpactSfxVolume
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: slamImpactSfxVolume
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: spinImpactSfxVolume
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: ultimateImpactSfxVolume
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4758382481227648288, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: bossBgmVolume
+      value: 0.232
       objectReference: {fileID: 0}
     - target: {fileID: 9183643652835930706, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_Name

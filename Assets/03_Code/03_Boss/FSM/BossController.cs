@@ -15,6 +15,7 @@ public class BossController : MonoBehaviour, IInitializable
 
     [Header("Boss BGM")]
     [SerializeField] private AudioClip bossBgmClip;
+    [SerializeField, Range(0f, 1f)] private float bossBgmVolume = 0.5f;
 
     private const float DefeatPresentationDuration = 5f;
     public Dictionary<State,BossState> bossState { get; }
@@ -105,8 +106,9 @@ public class BossController : MonoBehaviour, IInitializable
         if (bossBgmClip == null)
             return;
 
-        // 실제 BGM 재생과 페이드 처리는 SoundManager에 위임한다.
-        EventBus<PlayBgmEvent>.Publish(new PlayBgmEvent(bossBgmClip, 0.5f));
+        // 실제 BGM 재생과 페이드 처리는 SoundManager에 위임하고 Inspector 볼륨을 전달한다.
+        EventBus<PlayBgmEvent>.Publish(
+            new PlayBgmEvent(bossBgmClip, volume: bossBgmVolume));
     }
 
     // 플레이어가 사망하면 진행 중인 보스 전투와 하위 공격 오브젝트를 즉시 종료한다.
