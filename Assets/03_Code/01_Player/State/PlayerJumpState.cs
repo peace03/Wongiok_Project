@@ -17,6 +17,7 @@ public class PlayerJumpState : PlayerBaseState
 
         controller.Animation.PlayJump();
         controller.Movement.Jump();
+        controller.Audio?.PlayJump();
     }
 
     public override void UpdateState()
@@ -34,6 +35,7 @@ public class PlayerJumpState : PlayerBaseState
         {
             controller.Movement.Jump();
             controller.Animation.PlayJump();
+            controller.Audio?.PlayJump();
             return;
         }
 

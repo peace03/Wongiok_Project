@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 5748333069346071311}
   - component: {fileID: 955662260059305699}
   - component: {fileID: 1698272306706862428}
+  - component: {fileID: 7419000000000000001}
   m_Layer: 6
   m_Name: PlayerPrefabs
   m_TagString: Player
@@ -441,6 +442,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimatorDriver
   visualRoot: {fileID: 0}
   animator: {fileID: 0}
+--- !u!114 &7419000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6934747222265855720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d03adefe7c27e742ade0d5b435a591e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAudioController
+  fireSound: {fileID: 0}
+  bulletHitSound: {fileID: 0}
+  jumpSound: {fileID: 8300000, guid: ae93eea9cb3159d4684f53e05f5418b2, type: 3}
+  landingSound: {fileID: 8300000, guid: 82d05a6f1d6e8fa4bbf435dcb3557129, type: 3}
+  slideSound: {fileID: 8300000, guid: 4268f77abd1514b4fb7c64195e5b31af, type: 3}
+  walkSound: {fileID: 8300000, guid: 5dd572b904e2d0f4a8877e784a1e4434, type: 3}
+  firstFootstepNormalizedTime: 0.15
 --- !u!1 &7609167236691703215
 GameObject:
   m_ObjectHideFlags: 0

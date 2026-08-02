@@ -8,6 +8,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
     private static readonly int IsFalling = Animator.StringToHash("IsFalling");
     private static readonly int IsExecutingSkill = Animator.StringToHash("IsExecutingSkill");
+    private static readonly int ShootTrigger = Animator.StringToHash("Shoot");
 
     // "Base Layer.상태 이름"처럼 전체 경로를 사용하면 다른 레이어에 같은 이름의 State가 생겨도
     // 원하는 Base Layer의 State를 정확하게 지정할 수 있습니다.
@@ -16,6 +17,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private static readonly int JumpState = Animator.StringToHash("Base Layer.Jump");
     private static readonly int LandingState = Animator.StringToHash("Base Layer.Landing");
     private static readonly int SlidingState = Animator.StringToHash("Base Layer.Sliding");
+    private static readonly int PistolShootState = Animator.StringToHash("Base Layer.Pistol Shoot");
     private static readonly int HitState = Animator.StringToHash("Base Layer.Hit");
     private static readonly int DeathState = Animator.StringToHash("Base Layer.Death");
     private static readonly int HitTrigger = Animator.StringToHash("Hit");
@@ -188,6 +190,21 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
             LocomotionBlendDuration,
             0,
             0);
+    }
+
+    public bool PlayPistolShoot()
+    {
+        if (!CanPlay() || skillCoroutine != null) return false;
+        if (animator.GetBool(IsMoving)) return false;
+
+        if (!animator.HasState(BaseLayerIndex, PistolShootState))
+        {
+            Debug.LogWarning("Player Animator is missing the 'Base Layer.Pistol Shoot' state.", this);
+            return false;
+        }
+
+        animator.SetTrigger(ShootTrigger);
+        return true;
     }
 
     /// <summary>

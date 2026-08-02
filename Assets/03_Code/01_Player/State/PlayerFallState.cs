@@ -66,6 +66,8 @@ public class PlayerFallState : PlayerBaseState
     {
         if (!controller.Movement.IsGrounded || !controller.Movement.IsFalling) return false;
 
+        controller.Audio?.PlayLanding();
+
         if (controller.MoveInput != Vector2.zero)
         {
             controller.TransitionTo(controller.PlayerMoveState);
