@@ -38,7 +38,6 @@ public class Cinderella_Patterns : BossPatternBase
     [Tooltip("후딜 시간")][SerializeField] private float B_postAtkDelay;
 
     [Header("AttackC 상태 (Jump Slam)")]
-    [SerializeField] private ParticleSystem waveEffect; // 바닥을 찍을 때 재사용할 오브젝트 풀링용 파동 이펙트
     [SerializeField] private float C_ChaseSpeed;
     [SerializeField] private Vector3 C_ChasePos;
     [Tooltip("후딜 시간")][SerializeField] private float C_postAtkDelay;

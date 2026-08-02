@@ -384,22 +384,6 @@ PrefabInstance:
       propertyPath: playerMaxHP
       value: 
       objectReference: {fileID: 8074201030222337663}
-    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
-      propertyPath: status.attackAPower.BaseValue
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
-      propertyPath: status.attackBPower.BaseValue
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
-      propertyPath: status.attackCPower.BaseValue
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
-      propertyPath: status.attackC_2Power.BaseValue
-      value: 30
-      objectReference: {fileID: 0}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: ground
       value: 
