@@ -74,6 +74,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1786906064912827653}
   - component: {fileID: 6477311902798429561}
+  - component: {fileID: 7611697203812024522}
   m_Layer: 0
   m_Name: "(\uC784\uC2DC) \uBB34\uAE30(\uB9E4\uADF8\uB118)"
   m_TagString: Untagged
@@ -111,6 +112,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   firePoints:
   - {fileID: 4597303868890103115}
+--- !u!95 &7611697203812024522
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6892485771174561617}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cf1402bb7504c6c49813dcdf31431866, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &8665358673274389816
 PrefabInstance:
   m_ObjectHideFlags: 0

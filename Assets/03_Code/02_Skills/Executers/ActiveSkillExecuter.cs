@@ -91,29 +91,23 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         var data = SkillDatabase.FindDataById(skillId);
         // 총구 이펙트에 해당하는 이펙트 프리팹 받아오기
         data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, effectPrefabs);
-
-        // 총구 이펙트 프리팹들의 수만큼
-        foreach (var prefab in effectPrefabs)
-            // 실행 위치들의 수만큼
-            foreach (var place in executePlaces)
-                // 총구 이펙트 실행하기(지속 시간이 있다면 ? 지속 시간만큼, 아니라면 이펙트 시간만큼)
-                EventBus<EffectPlayData>.Publish(new EffectPlayData(prefab, place.position,
-                            place.rotation, levelData.MaxDuration > 0f ? levelData.MaxDuration : null));
-
-        // 발사체 이펙트에 해당하는 이펙트 프리팹 받아오기
-        data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Main, effectPrefabs);
         // 발사체 스킬 딜레이 시간량 구하기
         projectileDelayTimeValue = levelData.MaxDuration / (levelData.ProjectileCount == 0 ?
                                                                     1 : levelData.ProjectileCount);
         // 발사체 스킬 딜레이 저장하기
         projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
 
-        //if (ownerAnimatorDriver != null)
-        //    startAnimationWaitTime = new WaitForSeconds(ownerAnimatorDriver.SkillStartAnimDuration);
+        if (ownerAnimatorDriver != null)
+        {
+            Debug.Log(ownerAnimatorDriver.SkillStartAnimDuration - levelData.MaxChargingTime);
+            startAnimationWaitTime = new WaitForSeconds(ownerAnimatorDriver.SkillStartAnimDuration
+                                                                            - levelData.MaxChargingTime);
+        }
 
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(data, levelData.ProjectileCount, levelData.GetDamage(),
-                                            levelData.PenetrationCount, levelData.MaxChargingTime > 0f));
+                                                levelData.MaxDuration > 0f ? levelData.MaxDuration : null,
+                                                    levelData.PenetrationCount, levelData.MaxChargingTime > 0f));
     }
 
     /// <summary>
@@ -125,9 +119,20 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// <param name="penetrationCount">관통 횟수</param>
     /// <param name="isCharging">차징 여부</param>
     private IEnumerator ProjectileRoutine(BaseSkillData data, int bulletCount, float damage,
-                                                                        int penetrationCount, bool isCharging)
+                                                        float? maxDuration, int penetrationCount, bool isCharging)
     {
-        //yield return startAnimationWaitTime;
+        yield return startAnimationWaitTime;
+
+        // 총구 이펙트 프리팹들의 수만큼
+        foreach (var prefab in effectPrefabs)
+            // 실행 위치들의 수만큼
+            foreach (var place in executePlaces)
+                // 총구 이펙트 실행하기(지속 시간이 있다면 ? 지속 시간만큼, 아니라면 이펙트 시간만큼)
+                EventBus<EffectPlayData>.Publish(new EffectPlayData(prefab, place.position, place.rotation,
+                                                                                                    maxDuration));
+
+        // 발사체 이펙트에 해당하는 이펙트 프리팹 받아오기
+        data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Main, effectPrefabs);
 
         // 현재 발사체 개수만큼
         for (int count = 0; count < bulletCount; count += executePlaces.Count)

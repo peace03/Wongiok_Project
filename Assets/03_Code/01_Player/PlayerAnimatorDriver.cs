@@ -273,6 +273,8 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         if (skillCoroutine != null)
             return false;
 
+        skillStartAnimDuration = 0f;
+
         // 액티브 스킬 ID에 따라서
         return skillId switch
         {
@@ -408,14 +410,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         if (!TryPlaySkillAnimation(RifleSkillState, "RifleSkill"))
             return false;
 
-        if (duration <= 0f)
-        {
-            skillStartAnimDuration = animator.GetCurrentAnimatorStateInfo(BaseLayerIndex).length;
-            skillCoroutine = StartCoroutine(SkillRoutine(skillId, skillStartAnimDuration));
-        }
-        else
-            skillCoroutine = StartCoroutine(SkillRoutine(skillId, duration));
-
+        skillCoroutine = StartCoroutine(SkillRoutine(skillId, duration));
         return true;
     }
 
