@@ -52,7 +52,8 @@ public class PlayerAttack : MonoBehaviour
 
         // 풀에서 꺼낸 Bullet에 발사 기준점, 소유자 레이어, 데미지, 관통 횟수를 넘깁니다.
         bullet.StartFire(firePoint, ownerLayer, damage, penetrationCount);
-        animatorDriver?.PlayPistolShoot();
+        if (isGrounded)
+            animatorDriver?.PlayPistolShoot();
         PlayShootingEffect();
 
         // 발사 후처리 사운드나 이펙트가 반응할 수 있게 이벤트를 발행합니다.

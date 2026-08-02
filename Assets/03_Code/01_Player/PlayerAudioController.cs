@@ -6,13 +6,19 @@ public class PlayerAudioController : MonoBehaviour
 
     [Header("Attack Audio")]
     [SerializeField] private AudioClip fireSound;
+    [SerializeField, Range(0f, 1f)] private float fireVolume = 1f;
     [SerializeField] private AudioClip bulletHitSound;
+    [SerializeField, Range(0f, 1f)] private float bulletHitVolume = 1f;
 
     [Header("Movement Audio")]
     [SerializeField] private AudioClip jumpSound;
+    [SerializeField, Range(0f, 1f)] private float jumpVolume = 1f;
     [SerializeField] private AudioClip landingSound;
+    [SerializeField, Range(0f, 1f)] private float landingVolume = 1f;
     [SerializeField] private AudioClip slideSound;
+    [SerializeField, Range(0f, 1f)] private float slideVolume = 1f;
     [SerializeField] private AudioClip walkSound;
+    [SerializeField, Range(0f, 1f)] private float walkVolume = 1f;
     [SerializeField, Range(0f, 0.49f)] private float firstFootstepNormalizedTime = 0.15f;
 
     private AudioSource audioSource;
@@ -54,17 +60,17 @@ public class PlayerAudioController : MonoBehaviour
 
     public void PlayJump()
     {
-        PlayOneShot(jumpSound);
+        PlayOneShot(jumpSound, jumpVolume);
     }
 
     public void PlayLanding()
     {
-        PlayOneShot(landingSound);
+        PlayOneShot(landingSound, landingVolume);
     }
 
     public void PlaySlide()
     {
-        PlayOneShot(slideSound);
+        PlayOneShot(slideSound, slideVolume);
     }
 
     public void StartWalking()
@@ -94,7 +100,7 @@ public class PlayerAudioController : MonoBehaviour
         int footstepIndex = GetFootstepIndex(normalizedTime);
         if (footstepIndex > lastFootstepIndex)
         {
-            PlayOneShot(walkSound);
+            PlayOneShot(walkSound, walkVolume);
             lastFootstepIndex = footstepIndex;
         }
 
@@ -137,22 +143,25 @@ public class PlayerAudioController : MonoBehaviour
 
     private void OnPlayerAttackFired(PlayerAttackFiredEvent eventData)
     {
-        PlayOneShot(fireSound);
+        PlayOneShot(fireSound, fireVolume);
     }
 
     private void OnPlayerBulletHit(PlayerBulletHitEvent eventData)
     {
         if (bulletHitSound != null)
-            AudioSource.PlayClipAtPoint(bulletHitSound, eventData.HitPoint);
+            AudioSource.PlayClipAtPoint(
+                bulletHitSound,
+                eventData.HitPoint,
+                bulletHitVolume);
     }
 
-    private void PlayOneShot(AudioClip clip)
+    private void PlayOneShot(AudioClip clip, float volume)
     {
         if (clip == null) return;
 
         if (audioSource != null)
-            audioSource.PlayOneShot(clip);
+            audioSource.PlayOneShot(clip, volume);
         else
-            AudioSource.PlayClipAtPoint(clip, transform.position);
+            AudioSource.PlayClipAtPoint(clip, transform.position, volume);
     }
 }
