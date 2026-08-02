@@ -41,6 +41,7 @@ public class PlayerDashState : PlayerBaseState
         dashDirection = GetDashDirection();
 
         controller.Animation.PlaySliding();
+        controller.Audio?.PlaySlide();
         controller.Movement.SetDashPiercing(CanDashPiercing);
         controller.Movement.ConsumeDash();
         controller.Movement.ResetVerticalVelocity();
