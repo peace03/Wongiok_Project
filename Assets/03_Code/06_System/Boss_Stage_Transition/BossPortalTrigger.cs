@@ -5,7 +5,6 @@ public class BossPortalTrigger : MonoBehaviour
 {
     [Header("Portal")]
     [SerializeField] private GameObject portalVisual;
-    [SerializeField] private BossStageTransitionCoordinator transitionCoordinator;
 
     private Collider portalCollider;
     private bool isUnlocked;
@@ -13,15 +12,14 @@ public class BossPortalTrigger : MonoBehaviour
 
     public bool IsUnlocked => isUnlocked;
 
-    // 포탈 Collider를 Trigger로 설정하고 잠긴 상태를 적용합니다.
     private void Awake()
     {
         portalCollider = GetComponent<Collider>();
         portalCollider.isTrigger = true;
+
         SetUnlocked(false);
     }
 
-    // 포탈의 시각 오브젝트와 Trigger 활성 상태를 변경합니다.
     public void SetUnlocked(bool unlocked)
     {
         isUnlocked = unlocked;
@@ -41,20 +39,23 @@ public class BossPortalTrigger : MonoBehaviour
             portalCollider.enabled = unlocked;
         }
 
+        // 포탈 스크립트가 붙은 자기 자신이 아니라
+        // 별도의 자식 이펙트 오브젝트만 활성화합니다.
         if (portalVisual != null && portalVisual != gameObject)
         {
             portalVisual.SetActive(unlocked);
         }
     }
 
-    // 플레이어가 열린 포탈에 들어오면 보스 스테이지 전환을 요청합니다.
     private void OnTriggerEnter(Collider other)
     {
+        // 아직 잠겨 있거나 이미 사용한 포탈이면 실행하지 않습니다.
         if (!isUnlocked || hasTriggered)
         {
             return;
         }
 
+        // 플레이어 계층에 PlayerStatus가 있는지 확인합니다.
         PlayerStatus playerStatus =
             other.GetComponentInParent<PlayerStatus>();
 
@@ -63,35 +64,14 @@ public class BossPortalTrigger : MonoBehaviour
             return;
         }
 
-        PlayerController playerController =
-            playerStatus.GetComponentInParent<PlayerController>();
-
-        if (playerController == null)
-        {
-            Debug.LogWarning(
-                "포탈에 진입한 플레이어에서 PlayerController를 찾지 못했습니다.",
-                playerStatus);
-            return;
-        }
-
-        if (transitionCoordinator == null)
-        {
-            Debug.LogWarning(
-                "BossStageTransitionCoordinator 참조가 비어 있습니다.",
-                this);
-            return;
-        }
-
-        if (!transitionCoordinator.TryBeginTransition(playerController))
-        {
-            return;
-        }
-
+        // 여러 플레이어 Collider가 동시에 들어와도 한 번만 실행되게 합니다.
         hasTriggered = true;
         portalCollider.enabled = false;
+
+        // UI 시스템에 인트로 재생과 보스 Scene 로드를 요청합니다.
+        EventBus<UIBossEncounterRequestedEvent>.Publish(default);
     }
 
-    // Inspector에서 포탈 시각 오브젝트가 자기 자신으로 지정되지 않았는지 확인합니다.
     private void OnValidate()
     {
         if (portalVisual == gameObject)

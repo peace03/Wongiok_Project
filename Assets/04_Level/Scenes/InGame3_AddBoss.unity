@@ -11516,6 +11516,14 @@ PrefabInstance:
       propertyPath: 'requiredStages.Array.data[1]'
       value: 
       objectReference: {fileID: 78883421}
+    - target: {fileID: 2965007783806483208, guid: 761c94341551b104e9b7c05ee359a42f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3687579155249172010, guid: 761c94341551b104e9b7c05ee359a42f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6063929351495029498, guid: 761c94341551b104e9b7c05ee359a42f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -11557,6 +11565,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6303570751973233410, guid: 761c94341551b104e9b7c05ee359a42f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6303570751973233410, guid: 761c94341551b104e9b7c05ee359a42f, type: 3}
       propertyPath: sideViewCamera
       value: 
       objectReference: {fileID: 185898031}
@@ -11568,6 +11580,10 @@ PrefabInstance:
       propertyPath: bossRoot
       value: 
       objectReference: {fileID: 926096416}
+    - target: {fileID: 8328063448846455293, guid: 761c94341551b104e9b7c05ee359a42f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8328063448846455293, guid: 761c94341551b104e9b7c05ee359a42f, type: 3}
       propertyPath: 'objectsToEnableForBattle.Array.data[0]'
       value: 
@@ -59617,6 +59633,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 695165433}
     m_Modifications:
+    - target: {fileID: 872180411151741861, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+      propertyPath: animationDriver
+      value: 
+      objectReference: {fileID: 1695159868}
     - target: {fileID: 4700935185223578715, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
       propertyPath: bulletFactory
       value: 
@@ -59734,6 +59754,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d48019c9f684d21478bd1e108ce02abf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatus
+--- !u!114 &1695159868 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1698272306706862428, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+  m_PrefabInstance: {fileID: 1695159853}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1695159855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0af85d8ed537bc54e86a2c5151192aca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimatorDriver
 --- !u!1001 &1696998465
 PrefabInstance:
   m_ObjectHideFlags: 0
