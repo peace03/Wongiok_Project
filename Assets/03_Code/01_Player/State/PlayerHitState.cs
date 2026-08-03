@@ -44,6 +44,7 @@ public class PlayerHitState : PlayerBaseState
         Debug.Log("Hit Enter");
 
         controller.Movement.ResetVerticalVelocity();
+        //EventBus<CancelSkill>.Publish(default);
     }
 
     public override void UpdateState()
