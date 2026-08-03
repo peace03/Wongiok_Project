@@ -20,7 +20,9 @@ MonoBehaviour:
   maxLevel: 3
   desc: 
   levelDatas:
-  - rid: 1220162207066882122
+  - rid: 2452172688422338652
+  - rid: 2452172688422338666
+  - rid: 2452172688422338680
   weapon: {fileID: 4942464512446496594, guid: 0d73448f16ba67d4ca3ca8b836dcd762, type: 3}
   effects:
   - type: 1
@@ -29,11 +31,29 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1220162207066882122
+    - rid: 2452172688422338652
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
         maxCoolTime: 8
         maxDuration: 2
+        damage: 0
+        projectileCount: 0
+        penetrationCount: 0
+        maxChargingTime: 0
+    - rid: 2452172688422338666
+      type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        maxCoolTime: 0
+        maxDuration: 0
+        damage: 0
+        projectileCount: 0
+        penetrationCount: 0
+        maxChargingTime: 0
+    - rid: 2452172688422338680
+      type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        maxCoolTime: 0
+        maxDuration: 0
         damage: 0
         projectileCount: 0
         penetrationCount: 0
