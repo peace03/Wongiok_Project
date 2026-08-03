@@ -152,7 +152,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             foreach (var sound in data.AsActiveSkillData.Sounds)
             {
                 if (sound.clip == null)
-                    Debug.Log($"[Skill] 사운드 파일 없음 => 입력 - {data.SkillName}");
+                {
+                    //Debug.Log($"[Skill] 사운드 파일 없음 => 입력 - {data.SkillName}");
+                    continue;
+                }
 
                 EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(sound.clip, volume: sound.volume));
             }

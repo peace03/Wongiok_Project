@@ -18,8 +18,8 @@ MonoBehaviour:
   type: 1
   unlockChapter: 0
   maxLevel: 3
-  desc: "\uC9E7\uC740 \uCC28\uC9D5 \uD6C4 \uC804\uBC29\uC744 \uD5A5\uD55C \uC800\uACA9\uD0C4\uC744
-    \uBC1C\uC0AC\uD568"
+  desc: "\uC9E7\uC740 \uCC28\uC9D5(\uD0A4\uB2E4\uC6B4) \uD6C4 \uC804\uBC29\uC744
+    \uD5A5\uD55C \uC800\uACA9\uD0C4\uC744 \uBC1C\uC0AC\uD568"
   levelDatas:
   - rid: 4582174548851687625
   - rid: 4582174548851687626
