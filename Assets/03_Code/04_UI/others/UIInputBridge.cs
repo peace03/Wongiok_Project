@@ -36,6 +36,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         HandlePauseTabInput();
         HandleSpaceInput();
         HandleChapterLoadingSkipInput();
+        HandleCutsceneBackQuoteInput();
     }
 
     private void HandlePrologueSkipInput()
@@ -46,7 +47,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         if (!_input.TitleStartPressed) return;
 
         EventBus<UICutsceneSkipRequestedEvent>.Publish(
-            new UICutsceneSkipRequestedEvent());
+            new UICutsceneSkipRequestedEvent(CutsceneSkipInput.BackQuote));
     }
 
     private void HandleEscapeInput()
@@ -57,7 +58,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         if (uiManager.CurrentOverlayState == UIOverlayState.Cutscene)
         {
             EventBus<UICutsceneSkipRequestedEvent>.Publish(
-                new UICutsceneSkipRequestedEvent());
+                new UICutsceneSkipRequestedEvent(CutsceneSkipInput.Escape));
             return;
         }
 
@@ -102,6 +103,15 @@ public class UIInputBridge : MonoBehaviour, IInitializable
 
     private void HandleSpaceInput()
     {
+        if (uiManager.CurrentOverlayState == UIOverlayState.Cutscene)
+        {
+            if (!_input.SubmitPressed) return;
+
+            EventBus<UICutsceneProceedRequestedEvent>.Publish(
+                new UICutsceneProceedRequestedEvent());
+            return;
+        }
+
         if (uiManager.CurrentScreenState != UIScreenState.ChapterTitleCard) return;
 
         if (!_input.SubmitPressed) return;
@@ -118,5 +128,15 @@ public class UIInputBridge : MonoBehaviour, IInitializable
 
         EventBus<UIChapterTitleCardInputSkipRequestedEvent>.Publish(
             new UIChapterTitleCardInputSkipRequestedEvent());
+    }
+
+    private void HandleCutsceneBackQuoteInput()
+    {
+        if (uiManager.CurrentOverlayState != UIOverlayState.Cutscene) return;
+
+        if (!_input.TitleStartPressed) return;
+
+        EventBus<UICutsceneSkipRequestedEvent>.Publish(
+            new UICutsceneSkipRequestedEvent(CutsceneSkipInput.BackQuote));
     }
 }

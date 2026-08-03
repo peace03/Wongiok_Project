@@ -63,6 +63,7 @@ public class TestModule : MonoBehaviour
         EventBus<UIChapterClearNextRequestedEvent>.action += HandleChapterClearNextRequested;
         EventBus<UIChapterClearMainMenuRequestedEvent>.action += HandleChapterClearMainMenuRequested;
         EventBus<UIChapterClearQuitGameRequestedEvent>.action += HandleChapterClearQuitGameRequested;
+        EventBus<UIBossClearVideoFinishedEvent>.action += HandleBossClearVideoFinished;
     }
 
     private void OnDisable()
@@ -78,6 +79,7 @@ public class TestModule : MonoBehaviour
         EventBus<UIChapterClearNextRequestedEvent>.action -= HandleChapterClearNextRequested;
         EventBus<UIChapterClearMainMenuRequestedEvent>.action -= HandleChapterClearMainMenuRequested;
         EventBus<UIChapterClearQuitGameRequestedEvent>.action -= HandleChapterClearQuitGameRequested;
+        EventBus<UIBossClearVideoFinishedEvent>.action -= HandleBossClearVideoFinished;
     }
 
     private void Update()
@@ -98,7 +100,8 @@ public class TestModule : MonoBehaviour
             ShowGameOver();
 
         if (_input.TestF6Pressed)
-            SpawnBoss();
+            EventBus<UIBossEncounterRequestedEvent>.Publish(
+                new UIBossEncounterRequestedEvent());
 
         if (_input.TestF7Pressed)
             DamageBoss();
@@ -285,6 +288,12 @@ public class TestModule : MonoBehaviour
 
         EventBus<UIChangeScreenEvent>.Publish(
             new UIChangeScreenEvent(UIScreenState.ChapterClear));
+    }
+
+    // 보스 클리어 영상이 끝난 뒤에만 기존 챕터 클리어 저장과 결과 화면을 실행합니다.
+    private void HandleBossClearVideoFinished(UIBossClearVideoFinishedEvent eventData)
+    {
+        CompleteCurrentChapter();
     }
 
     private void GainExp()

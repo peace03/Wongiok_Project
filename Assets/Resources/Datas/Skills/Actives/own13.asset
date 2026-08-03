@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb75d44f8f5094e41812a082745487fc, type: 3}
+  m_Name: own13
+  m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillData
+  id: 1018
+  icon: {fileID: 2141236720, guid: 46ef0c197487a4d4abc5fd26300b7efc, type: 3}
+  skillName: SMG
+  type: 1
+  unlockChapter: 1
+  maxLevel: 3
+  desc: 
+  levelDatas:
+  - rid: 1220162207066882129
+  weapon: {fileID: 4942464512446496594, guid: 0d73448f16ba67d4ca3ca8b836dcd762, type: 3}
+  effects:
+  - type: 1
+    priority: 0
+    prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1220162207066882129
+      type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        maxCoolTime: 8
+        maxDuration: 2
+        damage: 0
+        projectileCount: 0
+        penetrationCount: 0
+        maxChargingTime: 0
