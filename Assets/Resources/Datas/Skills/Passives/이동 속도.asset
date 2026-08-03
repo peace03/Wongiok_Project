@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\uC774\uB3D9 \uC18D\uB3C4"
   m_EditorClassIdentifier: Assembly-CSharp::PassiveSkillData
   id: 2003
-  icon: {fileID: 0}
+  icon: {fileID: -112994982, guid: a39b960750a4ca546a7d602ff05f9a2b, type: 3}
   skillName: "\uC774\uB3D9 \uC18D\uB3C4"
   type: 0
   unlockChapter: 0
