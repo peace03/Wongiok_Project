@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a93c204950f4ed781257f40a7ab69cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossCutsceneFlowController
-  bossSceneName: CinderellaBossScene_Y
+  bossSceneName: RougeHoodBossScene
   bossEncounterVideoClip: {fileID: 32900000, guid: 46af37f959a133d4089e9884c244f59b, type: 3}
   minimumEncounterLoadingPreviewTime: 3
   encounterFadeOutDuration: 0.5

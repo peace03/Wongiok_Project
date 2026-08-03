@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 8004374141677415159}
   - component: {fileID: 8057687909995680969}
   - component: {fileID: 7856917874265365921}
+  - component: {fileID: -5373912821776756640}
   m_Layer: 8
   m_Name: MonsterBeetle_Meshed_Mk4
   m_TagString: Enemy
@@ -111,6 +112,9 @@ MonoBehaviour:
   destroyAfterDeath: 1
   destroyDelay: 0.15
   disableCharacterControllerOnDeath: 0
+  changeBlockingColliderLayerOnDeath: 1
+  corpseLayerName: Corpse
+  blockingColliders: []
 --- !u!114 &2118504801238032732
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -243,6 +247,19 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0.2, z: 0}
+--- !u!114 &-5373912821776756640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161236733381727142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d5f0949c2c43f496a3efb74168b9df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterExpReward
+  expReward: 10
 --- !u!1 &1322725660097333272
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,14 +6,14 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/04_Level/Scenes/Lobby.unity
+    path: Assets/04_Level/Scenes/Real/Lobby.unity
     guid: 33e86e881169ee64fa70d21e1c39b430
   - enabled: 1
-    path: Assets/04_Level/Scenes/InGame2.unity
-    guid: 946550c78dc1edc429fa73aa7b5d8145
+    path: Assets/04_Level/Scenes/Real/Chapter1Scene.unity
+    guid: 886c57300ec1de64c97c5b95f00d97f9
   - enabled: 1
-    path: Assets/04_Level/Scenes/Boss/CinderellaBossScene_Y.unity
-    guid: 8684e91c6e49fc242a20dc8c12d17bde
+    path: Assets/04_Level/Scenes/Real/RougeHoodBossScene.unity
+    guid: a7d5fe5a88bec4c418f2701d399d2814
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
