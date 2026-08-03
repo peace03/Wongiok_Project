@@ -255,22 +255,6 @@ public class SkillSystemPresenter
     }
 
     /// <summary>
-    /// 액티브 스킬 취소 함수
-    /// </summary>
-    public void CancelActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
-    {
-        // 모델이 없다면
-        if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 액티브 스킬 취소 실패 => 입력 - 스킬 모델 : 없음");
-            return;
-        }
-
-        // 액티브 스킬 취소
-        model.CancelActiveSkill(slot);
-    }
-
-    /// <summary>
     /// 액티브 스킬 시간 진행 함수
     /// </summary>
     public void TickActiveSkills(float time)

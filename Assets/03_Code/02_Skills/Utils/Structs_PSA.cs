@@ -133,19 +133,6 @@ public readonly struct StartedPressSkillSlot
 }
 
 /// <summary>
-/// 눌렀던 스킬 슬롯 정보
-/// </summary>
-public readonly struct CanceledPressSkillSlot
-{
-    public readonly ACTIVE_SKILL_SLOT_TYPE type;                    // 슬롯 종류
-
-    /// <summary>
-    /// 눌렀던 스킬 슬롯 정보 생성자
-    /// </summary>
-    public CanceledPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
-}
-
-/// <summary>
 /// 추가할 이펙트 정보
 /// </summary>
 public readonly struct EffectAddData

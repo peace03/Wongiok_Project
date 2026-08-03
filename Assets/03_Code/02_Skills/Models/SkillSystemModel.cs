@@ -21,6 +21,8 @@ public class SkillSystemModel
     [Header("모든 스킬들")]
     [SerializeField] private List<SkillInstance> allSkillList = new();          // 모든 스킬 리스트
 
+    public int sniperIndex = -1;                                                // 스나이퍼 위치
+
     private readonly Dictionary<int, SkillInstance> allSkillDictionary          // 모든 스킬 딕셔너리
                                                                     = new();
     private readonly List<EffectAddData> effectDatas = new();                   // 스킬 이펙트 정보 리스트
@@ -99,6 +101,9 @@ public class SkillSystemModel
             // 액티브 스킬이고 장착할 액티브 슬롯이 있다면
             if (skill.IsActiveSkill && equippedActives.Count < maxEquippedActiveCount)
             {
+                if (skill.BaseData.Id == (int)ACTIVE_SKILL_ID.Sniper)
+                    sniperIndex = equippedActives.Count;
+
                 // 액티브 스킬 장착
                 equippedActives.Add(skill);
                 // 스킬 이펙트 정보 리스트 설정하기
@@ -347,6 +352,28 @@ public class SkillSystemModel
     }
 
     /// <summary>
+    /// 장착한 액티브 스킬들 시간 진행 함수
+    /// </summary>
+    public void TickActiveSkills(float time)
+    {
+        // 장착한 액티브 스킬들의 수만큼
+        for(int i = 0; i < maxEquippedActiveCount; i++)
+        {
+            // 장착된 액티브 스킬이 없거나, 스킬 정보가 비어있다면
+            if (equippedActives[i] == null || equippedActives[i].BaseData == null)
+                continue;
+            else if (ownerInputReader != null && !ownerInputReader.ReleaseSniperSkill(sniperIndex))
+            {
+                CancelActiveSkill((ACTIVE_SKILL_SLOT_TYPE)sniperIndex);
+                continue;
+            }
+
+            // 시간 진행
+            equippedActives[i].Tick(time);
+        }
+    }
+
+    /// <summary>
     /// 액티브 스킬 취소 함수
     /// </summary>
     public void CancelActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
@@ -382,23 +409,6 @@ public class SkillSystemModel
     }
 
     /// <summary>
-    /// 장착한 액티브 스킬들 시간 진행 함수
-    /// </summary>
-    public void TickActiveSkills(float time)
-    {
-        // 장착한 액티브 스킬들의 수만큼
-        for(int i = 0; i < maxEquippedActiveCount; i++)
-        {
-            // 장착된 액티브 스킬이 없거나, 스킬 정보가 비어있다면
-            if (equippedActives[i] == null || equippedActives[i].BaseData == null)
-                continue;
-
-            // 시간 진행
-            equippedActives[i].Tick(time);
-        }
-    }
-
-    /// <summary>
     /// 스킬 변경 함수
     /// </summary>
     public bool SwapSkill(ACTIVE_SKILL_SLOT_TYPE slot, int? id = null)
@@ -409,6 +419,9 @@ public class SkillSystemModel
         // ID가 비어있다면
         if(id == null)
         {
+            if (sniperIndex == (int)slot)
+                sniperIndex = -1;
+
             // 미장착한 액티브 스킬에 추가
             unequippedActives.Add(equippedActives[(int)slot]);
             // 해당 슬롯 비우기
@@ -431,6 +444,9 @@ public class SkillSystemModel
         // 슬롯이 비어있다면
         else if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
         {
+            if (sniperIndex < 0)
+                    sniperIndex = (int)slot;
+
             // 해당 슬롯에 변경할 스킬 저장
             equippedActives[(int)slot] = skill;
             // 스킬 이펙트 정보 리스트 설정하기
@@ -451,6 +467,12 @@ public class SkillSystemModel
             int swapedIndex = equippedActives.IndexOf(skill);
             // 해당 슬롯에 있는 스킬 저장
             var swapedSkill = equippedActives[(int)slot];
+
+            if (sniperIndex == (int)slot)
+                sniperIndex = swapedIndex;
+            else if(sniperIndex == swapedIndex)
+                sniperIndex = (int)slot;
+
             // 해당 슬롯에 변경할 스킬 저장
             equippedActives[(int)slot] = skill;
             // 변경할 스킬의 장착 위치에, 해당 슬롯에 있던 스킬 저장
@@ -460,6 +482,11 @@ public class SkillSystemModel
         // 장착되지 않은 스킬이라면
         else if (!skill.IsEquipped)
         {
+            if (sniperIndex == (int)slot)
+                sniperIndex = -1;
+            else if (sniperIndex < 0)
+                sniperIndex = (int)slot;
+
             // 미장착한 액티브 스킬 리스트에 추가
             unequippedActives.Add(equippedActives[(int)slot]);
             // 해당 슬롯에 변경할 스킬 저장
