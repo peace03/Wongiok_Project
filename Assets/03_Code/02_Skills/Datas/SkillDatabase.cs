@@ -31,8 +31,12 @@ public static class SkillDatabase
             {
                 // 액티브 스킬 데이터 변환이 가능하다면
                 if(data.AsActiveSkillData != null)
+                {
                     // 이펙트 정렬하기
                     data.AsActiveSkillData.SortEffects();
+                    // 사운드 정렬하기
+                    data.AsActiveSkillData.SortSounds();
+                }
 
                 // 스킬 정보 추가
                 skillDataDictionary[data.Id] = data;

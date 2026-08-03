@@ -17,6 +17,18 @@ public struct ActiveSkillEffect
 }
 
 [Serializable]
+// 액티브 스킬 사운드 정보
+public struct ActiveSkillSound
+{
+    [Header("사운드 중요도")]
+    public int priority;                                            // 사운드 중요도
+    [Header("사운드 파일")]
+    public AudioClip clip;                                          // 사운드 파일
+    [Header("사운드 볼륨 크기")]
+    public float volume;                                            // 사운드 볼륨 크기
+}
+
+[Serializable]
 // 적용할 스탯 정보
 public struct StatAdjustment
 {

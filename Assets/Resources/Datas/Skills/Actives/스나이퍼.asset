@@ -41,6 +41,10 @@ MonoBehaviour:
   - type: 4
     priority: 0
     prefab: {fileID: 6561904271629179525, guid: 2cdd3bb1227ee9348b2be96e207b9731, type: 3}
+  sounds:
+  - priority: 0
+    clip: {fileID: 8300000, guid: c528b04aae6d7364097e0179b61234e5, type: 3}
+    volume: 1
   references:
     version: 2
     RefIds:

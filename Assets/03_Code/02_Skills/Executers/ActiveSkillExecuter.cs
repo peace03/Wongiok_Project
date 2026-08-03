@@ -139,7 +139,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     {
         float waitTimer = startAnimationWaitTime;
 
-        while(waitTimer >= 0f)
+        while(waitTimer > 0f)
         {
             if (!executingSkill)
                 yield break;
@@ -147,6 +147,15 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             waitTimer -= Time.deltaTime;
             yield return null;
         }
+
+        if (data.AsActiveSkillData != null)
+            foreach (var sound in data.AsActiveSkillData.Sounds)
+            {
+                if (sound.clip == null)
+                    Debug.Log($"[Skill] 사운드 파일 없음 => 입력 - {data.SkillName}");
+
+                EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(sound.clip, volume: sound.volume));
+            }
 
         // 총구 이펙트 프리팹들의 수만큼
         foreach (var prefab in effectPrefabs)

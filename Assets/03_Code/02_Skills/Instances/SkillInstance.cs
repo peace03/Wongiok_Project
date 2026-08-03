@@ -341,7 +341,7 @@ public class SkillInstance
         if (hits.Length == 0)
             return null;
 
-        // 부딪힌 물체들을 실행 위치와의 거리를 기준으로 내림차순으로 정렬하기
+        // 부딪힌 물체들을 실행 위치와의 거리를 기준으로 내림차순(큰 -> 작)으로 정렬하기
         Array.Sort(hits, (a, b) => b.distance.CompareTo(a.distance));
         // 인덱스를 저장할 변수
         int index;
