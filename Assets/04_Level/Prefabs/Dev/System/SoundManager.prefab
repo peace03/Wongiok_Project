@@ -44,10 +44,10 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -173,7 +173,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -311,6 +311,9 @@ MonoBehaviour:
   bgmSourceB: {fileID: 6408403575326378121}
   bgmMixerGroup: {fileID: 0}
   defaultBgmFadeDuration: 1
+  controlledSfxPrefab: {fileID: 5725191860751260982, guid: fd383e281139376459fcc21187648d90, type: 3}
+  controlledSfxContainer: {fileID: 2917862850625936761}
+  controlledSfxMaxCount: 4
 --- !u!1 &7639007869883096464
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,10 +358,10 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
