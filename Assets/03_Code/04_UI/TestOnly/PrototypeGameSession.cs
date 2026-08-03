@@ -95,9 +95,9 @@ public static class PrototypeGameSession
             OwnedSkillOrder = new[]
             {
                 1004, 1005, 1006, 1007,
-                -1, -1, -1, -1, -1,
-                -1, -1, -1, -1, -1,
-                -1, -1, -1, -1
+                1008, 1009, 1010, 1011, 1012,
+                1013, 1014, 1015, 1016, 1017,
+                1018, 1019, 1020, 1021
             }
         };
 
@@ -156,8 +156,10 @@ public static class PrototypeGameSession
 
         if (chapterId == 1)
         {
-            AddUnlockedSkill(skills, 1004);
-            AddUnlockedSkill(skills, 1005);
+            for (int skillId = 1004; skillId <= 1021; skillId++)
+            {
+                AddUnlockedSkill(skills, skillId);
+            }
         }
 
         result.Skills = skills.ToArray();

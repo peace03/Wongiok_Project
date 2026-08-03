@@ -31,24 +31,70 @@ public struct UICloseOverlayEvent
 }
 
 // 컷씬 View
+public enum CutscenePlaybackType
+{
+    Standard,
+    BossEncounter,
+    BossClear
+}
+
+public enum CutsceneSkipInput
+{
+    Escape,
+    BackQuote
+}
+
 public struct UISetCutsceneEvent
 {
     public string CutsceneId { get; private set; }
     public VideoClip VideoClip { get; private set; }
     public string SkipSummary { get; private set; }
+    public CutscenePlaybackType PlaybackType { get; private set; }
 
-    public UISetCutsceneEvent(string cutsceneId, VideoClip videoClip, string skipSummary)
+    public UISetCutsceneEvent(
+        string cutsceneId,
+        VideoClip videoClip,
+        string skipSummary,
+        CutscenePlaybackType playbackType = CutscenePlaybackType.Standard)
     {
         CutsceneId = cutsceneId;
         VideoClip = videoClip;
         SkipSummary = skipSummary;
+        PlaybackType = playbackType;
     }
 }
 
 // 컷씬 스킵 요청 이벤트
 public struct UICutsceneSkipRequestedEvent
 {
+    public CutsceneSkipInput Input { get; private set; }
 
+    public UICutsceneSkipRequestedEvent(
+        CutsceneSkipInput input = CutsceneSkipInput.Escape)
+    {
+        Input = input;
+    }
+
+}
+
+public struct UICutsceneProceedRequestedEvent
+{
+}
+
+public struct UIBossEncounterRequestedEvent
+{
+}
+
+public struct UIBossEncounterLoadingReadyEvent
+{
+}
+
+public struct UIBossEncounterActivateSceneRequestedEvent
+{
+}
+
+public struct UIBossClearVideoFinishedEvent
+{
 }
 
 // 컷씬 종료 이벤트

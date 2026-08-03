@@ -9571,6 +9571,11 @@ MonoBehaviour:
   videoImage: {fileID: 9026137905441242128}
   skipGuideObject: {fileID: 392758960680286676}
   skipGuideText: {fileID: 2772881974885281514}
+  loadingSpinner: {fileID: 0}
+  proceedGuideObject: {fileID: 0}
+  bossEncounterFadeOutDuration: 0.5
+  bossClearEndFadeOutDuration: 0.5
+  loadingSpinnerSpeed: 180
 --- !u!328 &4461642548313109259
 VideoPlayer:
   m_ObjectHideFlags: 0

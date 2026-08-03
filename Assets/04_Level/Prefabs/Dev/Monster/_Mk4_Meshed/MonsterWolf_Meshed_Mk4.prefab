@@ -179,6 +179,7 @@ GameObject:
   - component: {fileID: 7744435740442770626}
   - component: {fileID: 4597936433905793832}
   - component: {fileID: 4534020440240090418}
+  - component: {fileID: -4797476009324143295}
   m_Layer: 8
   m_Name: MonsterWolf_Meshed_Mk4
   m_TagString: Enemy
@@ -409,6 +410,19 @@ MonoBehaviour:
   animator: {fileID: 2750208965481489699}
   movingBoolName: IsMoving
   movingSpeedThreshold: 0.05
+--- !u!114 &-4797476009324143295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3764868410852666932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d5f0949c2c43f496a3efb74168b9df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterExpReward
+  expReward: 10
 --- !u!1 &8097245854806106616
 GameObject:
   m_ObjectHideFlags: 0
