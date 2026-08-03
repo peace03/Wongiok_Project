@@ -174,7 +174,7 @@ MonoBehaviour:
   - enemyPrefab: {fileID: 3764868410852666932, guid: ef60423ffa18c11408f57121a7248a2f, type: 3}
     laneType: 0
     weight: 50
-  - enemyPrefab: {fileID: 161236733381727142, guid: c1da29205b20447429853ea82c156677, type: 3}
+  - enemyPrefab: {fileID: 161236733381727142, guid: 4d4b900a9dd1ff84999aa8da9d1e0a90, type: 3}
     laneType: 1
     weight: 50
   spawnOnEnable: 1

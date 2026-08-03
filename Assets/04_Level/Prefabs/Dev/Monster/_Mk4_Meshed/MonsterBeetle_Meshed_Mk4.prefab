@@ -195,7 +195,7 @@ MonoBehaviour:
     m_Bits: 64
   explosionRadius: 10
   fallbackExplosionDamage: 25
-  explosionEffectPrefab: {fileID: 0}
+  explosionEffectPrefab: {fileID: 6624936854607232037, guid: d1e4f7fa443dd82459ba0d362af39297, type: 3}
   killSelfOnExplosion: 1
   warningIndicator: {fileID: 0}
   placeWarningIndicatorAtDiveTarget: 1
