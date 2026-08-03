@@ -98,11 +98,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
 
         if (ownerAnimatorDriver != null)
-        {
-            Debug.Log(ownerAnimatorDriver.SkillStartAnimDuration - levelData.MaxChargingTime);
             startAnimationWaitTime = new WaitForSeconds(ownerAnimatorDriver.SkillStartAnimDuration
                                                                             - levelData.MaxChargingTime);
-        }
 
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(data, levelData.ProjectileCount, levelData.GetDamage(),

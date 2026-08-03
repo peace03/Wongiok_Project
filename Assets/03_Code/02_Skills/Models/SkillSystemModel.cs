@@ -316,12 +316,11 @@ public class SkillSystemModel
             float skillDuration = skillData.GetMaxDuration(equippedActives[(int)slot].CurLevel);
 
             // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
-            if (skillData.Id > (int)ACTIVE_SKILL_ID.End - 1 || skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
+            if (skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
             {
                 Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => 스킬 ID : {skillData.Id} / " +
                             $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
-                            $"액티브 스킬 ID 범위 : " +
-                            $"{(int)ACTIVE_SKILL_ID.Start} ~ {ACTIVE_SKILL_ID.End}");
+                            $"액티브 스킬 ID 범위 : {(int)ACTIVE_SKILL_ID.Start} ~ ");
                 return;
             }
             // 스킬 시작 애니메이션 재생에 실패했다면
@@ -361,12 +360,11 @@ public class SkillSystemModel
             var skillData = equippedActives[(int)slot].BaseData;
 
             // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
-            if (skillData.Id > (int)ACTIVE_SKILL_ID.End - 1 || skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
+            if (skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
             {
                 Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => 스킬 ID : {skillData.Id} / " +
                             $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
-                            $"액티브 스킬 ID 범위 : " +
-                            $"{(int)ACTIVE_SKILL_ID.Start} ~ {ACTIVE_SKILL_ID.End}");
+                            $"액티브 스킬 ID 범위 : {(int)ACTIVE_SKILL_ID.Start} ~ ");
                 return;
             }
 
