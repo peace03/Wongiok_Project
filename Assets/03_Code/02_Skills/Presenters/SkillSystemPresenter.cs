@@ -54,6 +54,8 @@ public class SkillSystemPresenter
     {
         // 액티브 스킬 변경 이벤트 구독 해제
         model.OnActiveSkillsChanged -= RefreshActiveSkills;
+        // 모델 비활성화
+        model.DisableModel();
         // UI 레벨업 스킬 선택 이벤트 구독 해제
         EventBus<UILevelUpSkillSelectedEvent>.action -= RefreshSelectedSkill;
         // 스킬 스왑(미장착 -> 장착) 이벤트 구독 해제

@@ -103,6 +103,11 @@ public readonly struct ChangeActiveSkillExecutePositions
 }
 
 /// <summary>
+/// 취소할 스킬 정보
+/// </summary>
+public readonly struct CancelSkill { }
+
+/// <summary>
 /// 누른 스킬 슬롯 정보
 /// </summary>
 public readonly struct StartedPressSkillSlot

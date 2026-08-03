@@ -20,8 +20,8 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
     /// 스킬 객체 생성 함수
     /// </summary>
     /// <param name="owner">스킬 소유자</param>
-    public override SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer)
-                                        => new(owner, executer, this);
+    public override SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer, int fps)
+                                        => new(owner, executer, this, fps);
 
     /// <summary>
     /// 최대 쿨타임 반환 함수

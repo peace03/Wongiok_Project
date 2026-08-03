@@ -30,10 +30,13 @@ MonoBehaviour:
     priority: 0
     prefab: {fileID: 3601591287173406441, guid: 716fd9840154b4448a616d863f170451, type: 3}
   - type: 1
-    priority: 0
+    priority: 1
     prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
-  - type: 3
+  - type: 1
     priority: 0
+    prefab: {fileID: 2079216311581701338, guid: 37f973e391f65674b9b8c5fb279a3809, type: 3}
+  - type: 3
+    priority: 10
     prefab: {fileID: 6628276393031643956, guid: 6b235e51b019a9f478b3da92c24ccfd5, type: 3}
   - type: 4
     priority: 0

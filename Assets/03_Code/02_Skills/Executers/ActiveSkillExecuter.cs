@@ -15,19 +15,27 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private readonly List<GameObject> effectPrefabs = new();                        // 이펙트 프리팹들
 
     private PlayerAnimatorDriver ownerAnimatorDriver;                               // 소유자 애니메이터 시스템
-    private WaitForSeconds startAnimationWaitTime;                      
+
     private WaitForSeconds projectileDelayTime;                                     // 발사체 스킬 딜레이 시간
     private WaitForSeconds areaDelayTime;                                           // 범위 스킬 딜레이 시간
 
     private LayerMask skillLayer;                                                   // 스킬 레이어
 
     private float projectileDelayTimeValue;                                         // 발사체 스킬 딜레이 시간량
+    private float startAnimationWaitTime = 0;                                       // 시작 애니메이션 대기 시간
+
     private int curFps;                                                             // 현재 프레임
+
+    private bool executingSkill = false;                                            // 스킬 실행 중 여부
 
     public IReadOnlyList<Transform> ExecutePlaces => executePlaces;
 
     // 액티브 스킬 실행 위치들 변경 이벤트 구독
-    private void OnEnable() => EventBus<ChangeActiveSkillExecutePositions>.action += SetExecutePositions;
+    private void OnEnable()
+    {
+        EventBus<ChangeActiveSkillExecutePositions>.action += SetExecutePositions;
+        EventBus<CancelSkill>.action += CancelSkill;
+    }
 
     private void Awake()
     {
@@ -40,7 +48,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     }
 
     // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
-    private void OnDisable() => EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
+    private void OnDisable()
+    {
+        EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
+        EventBus<CancelSkill>.action -= CancelSkill;
+    }
 
     /// <summary>
     /// 초기화 함수
@@ -87,6 +99,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// <param name="levelData">스킬 레벨별 데이터</param>
     public void ExecuteSkill(int skillId, ProjectileSkillLevelData levelData)
     {
+        // 실행 중인 스킬이 있다면
+        if (executingSkill)
+            return;
+
         // 스킬 ID로 스킬 정보 찾기
         var data = SkillDatabase.FindDataById(skillId);
         // 총구 이펙트에 해당하는 이펙트 프리팹 받아오기
@@ -98,8 +114,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
 
         if (ownerAnimatorDriver != null)
-            startAnimationWaitTime = new WaitForSeconds(ownerAnimatorDriver.SkillStartAnimDuration
-                                                                            - levelData.MaxChargingTime);
+        {
+            startAnimationWaitTime = Mathf.Max(0f, ownerAnimatorDriver.SkillStartAnimDuration
+                                                                                    - levelData.MaxChargingTime);
+            executingSkill = startAnimationWaitTime > 0f;
+        }
 
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(data, levelData.ProjectileCount, levelData.GetDamage(),
@@ -118,7 +137,16 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private IEnumerator ProjectileRoutine(BaseSkillData data, int bulletCount, float damage,
                                                         float? maxDuration, int penetrationCount, bool isCharging)
     {
-        yield return startAnimationWaitTime;
+        float waitTimer = startAnimationWaitTime;
+
+        while(waitTimer >= 0f)
+        {
+            if (!executingSkill)
+                yield break;
+
+            waitTimer -= Time.deltaTime;
+            yield return null;
+        }
 
         // 총구 이펙트 프리팹들의 수만큼
         foreach (var prefab in effectPrefabs)
@@ -187,6 +215,18 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         
         // 실행 위치들 초기화
         ResetExecutePositions();
+        // 스킬 실행 끝남
+        executingSkill = false;
+    }
+
+    public void CancelSkill(CancelSkill cancel)
+    {
+        // 실행 중인 스킬이 없다면
+        if (!executingSkill)
+            return;
+
+        // 스킬 실행 중지
+        executingSkill = false;
     }
 
     /// <summary>

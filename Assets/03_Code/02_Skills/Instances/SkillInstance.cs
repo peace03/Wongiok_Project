@@ -108,15 +108,17 @@ public class SkillInstance
     /// <summary>
     /// 생성자
     /// </summary>
-    public SkillInstance(GameObject owner, ActiveSkillExecuter executer, BaseSkillData data)
+    public SkillInstance(GameObject owner, ActiveSkillExecuter executer, BaseSkillData data, int fps)
     {
         this.owner = owner;
         this.executer = executer;
         this.data = data;
         // 현재 프레임 구하기
-        curFps = Mathf.RoundToInt(1f / Time.deltaTime);
+        curFps = fps > 0f ? fps : 60;
         // 이펙트 종류마다 실행 중인 이펙트들 초기화
         InitActiveEffects();
+        // 스킬 취소 이벤트 구독
+        EventBus<CancelSkill>.action += CancelSkill;
     }
 
     /// <summary>
@@ -127,6 +129,11 @@ public class SkillInstance
         activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Charging] = new List<Effect>();
         activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Target] = new List<Effect>();
     }
+
+    /// <summary>
+    /// 스킬 객체가 비활성화될 때 호출하는 함수
+    /// </summary>
+    public void DisableInstance() => EventBus<CancelSkill>.action -= CancelSkill;
 
     /// <summary>
     /// 장착된 스킬 설정 함수
@@ -233,18 +240,14 @@ public class SkillInstance
         // 바꾼 상태가 차징 상태라면
         else if (IsCharging)
         {
-            var ownerCollider = owner.transform.GetComponent<Collider>();
-
             // 실행 위치들의 수만큼
-            foreach (var place in executer.ExecutePlaces)
+            foreach(var place in executer.ExecutePlaces)
             {
                 // 차징 이펙트 실행
-                ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Charging, place);
+                ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE.Charging, owner.transform, Vector3.up);
                 // 타겟 찾기
-                var target = GetLastTarget(ownerCollider != null ? ownerCollider.bounds.center
-                                                                            : owner.transform.position,
-                                                                                        place.forward, 30f);
-
+                var target = GetLastTarget(owner.transform.position + Vector3.up, place.forward, 10.25f);
+                
                 // 타겟을 찾았다면
                 if (target != null)
                     // 타겟 이펙트 실행
@@ -261,7 +264,11 @@ public class SkillInstance
     /// </summary>
     /// <param name="type">이펙트 종류</param>
     /// <param name="place">실행 위치</param>
-    private void ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE type, Transform place)
+    /// <param name="pos">추가 위치(생략 가능, 기본값 : 없음)</param>
+    /// <param name="rot">추가 각도(생략 가능, 기본값 : 없음)</param>
+    /// <param name="target">따라다닐 대상(생략 가능, 기본값 : 없음)</param>
+    private void ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE type, Transform place, Vector3? pos = null,
+                                                                                    Transform target = null)
     {
         // 이펙트 종류에 맞는 이펙트 프리팹 받아오기
         data.AsActiveSkillData.GetEffectsByEffectType(type, effectPrefabs);
@@ -274,9 +281,9 @@ public class SkillInstance
         foreach (var prefab in effectPrefabs)
         {
             // 이펙트 실행 후 받아오기
-            var effect = EffectManager.Instance.PlayEffect(prefab, place.position, place.rotation,
-                                                                                        parent : place);
-
+            var effect = EffectManager.Instance.PlayEffect(prefab, place.position + (pos ?? Vector3.zero),
+                                                        place.rotation, parent : target != null ? target : place);
+            
             // 실행 중인 이펙트들에 이펙트 종류가 없다면
             if (!activeEffects.ContainsKey(type))
             {
@@ -334,24 +341,22 @@ public class SkillInstance
         if (hits.Length == 0)
             return null;
 
-        // 부딪힌 물체들을 실행 위치와의 거리를 기준으로 오름차순으로 정렬하기
-        Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        // 부딪힌 물체들을 실행 위치와의 거리를 기준으로 내림차순으로 정렬하기
+        Array.Sort(hits, (a, b) => b.distance.CompareTo(a.distance));
         // 인덱스를 저장할 변수
         int index;
 
         // 데미지를 입을 수 없는 물체의 인덱스를 찾는 데에 실패했다면(전부 데미지를 입을 수 있는 물체들이라면)
         if ((index = Array.FindIndex(hits, hit => !hit.collider.isTrigger
-                                            && hit.transform.GetComponent<IDamageable>() == null)) == -1)
+                                                    && !hit.transform.TryGetComponent<IDamageable>(out _))) == -1)
         {
             // 부딪힌 물체들의 수만큼
             foreach(var hit in hits)
-            {
                 // 데미지를 입을 수 있고 소유자와 같은 레이어를 가지고 있지 않다면
-                if (hit.transform.GetComponent<IDamageable>() != null
-                        && hit.transform.root.gameObject.layer != owner.layer)
+                if (hit.transform.TryGetComponent<IDamageable>(out _)
+                            && hit.transform.gameObject.layer != owner.layer)
                     // 위치 반환
                     return hit.transform;
-            }
 
             return null;
         }
@@ -360,14 +365,21 @@ public class SkillInstance
         for(int i = index - 1; i >= 0; i--)
         {
             // 데미지를 입을 수 있고 소유자와 같은 레이어를 가지고 있지 않다면
-            if (hits[i].transform.GetComponent<IDamageable>() != null
-                    && hits[i].transform.root.gameObject.layer != owner.layer)
+            if (hits[i].transform.TryGetComponent<IDamageable>(out _)
+                        && hits[i].transform.gameObject.layer != owner.layer)
                 // 위치 반환
                 return hits[i].transform;
         }
 
+        Debug.Log("저긴가");
         return null;
     }
+
+    /// <summary>
+    /// [이벤트] 스킬 취소 함수
+    /// </summary>
+    /// <param name="cancel">취소할 스킬 정보(정보 없음))</param>
+    public void CancelSkill(CancelSkill cancel) => CancelSkill();
 
     /// <summary>
     /// 스킬 취소 함수
