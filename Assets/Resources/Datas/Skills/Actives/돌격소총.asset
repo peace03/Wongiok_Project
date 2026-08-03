@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb75d44f8f5094e41812a082745487fc, type: 3}
-  m_Name: "\uB3CC\uACA9 \uC18C\uCD1D"
+  m_Name: "\uB3CC\uACA9\uC18C\uCD1D"
   m_EditorClassIdentifier: Assembly-CSharp::ActiveSkillData
   id: 1002
   icon: {fileID: 21300000, guid: 0e62760c9fb287f41ba92291dc4d791a, type: 3}
-  skillName: "\uB3CC\uACA9 \uC18C\uCD1D"
+  skillName: "\uB3CC\uACA9\uC18C\uCD1D"
   type: 1
   unlockChapter: 0
   maxLevel: 3
@@ -29,6 +29,10 @@ MonoBehaviour:
   - type: 1
     priority: 0
     prefab: {fileID: 2669777573548968389, guid: 66d37fc98e1c0614bbc34a563414f0f6, type: 3}
+  sounds:
+  - priority: 0
+    clip: {fileID: 8300000, guid: fea28d0f9efc8fb40a45e9bf45d482e2, type: 3}
+    volume: 1
   references:
     version: 2
     RefIds:

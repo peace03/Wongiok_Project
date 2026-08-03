@@ -96,6 +96,5 @@ public enum ACTIVE_SKILL_ID
     Start = 1000,   // 시작
     Magnum,         // 매그넘
     Rifle,          // 라이플(돌격소총)
-    Sniper,         // 스나이퍼(저격총)
-    End             // 끝
+    Sniper          // 스나이퍼(저격총)
 }

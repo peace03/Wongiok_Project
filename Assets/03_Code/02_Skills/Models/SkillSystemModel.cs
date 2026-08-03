@@ -28,10 +28,6 @@ public class SkillSystemModel
     private readonly PlayerAnimatorDriver ownerAnimatorDriver;                  // 소유자 애니메이터 시스템
     private readonly GameInputReader ownerInputReader;                          // 소유자 입력 시스템
 
-    private const int magnumSkillId = 1001;                                     // 매그넘 스킬 ID
-    private const int rifleSkillId = 1002;                                      // 라이플(돌격소총) 스킬 ID
-    private const int sniperSkillId = 1003;                                     // 스나이퍼(저격총) 스킬 ID
-
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
     public event Action<SkillInstance> OnSkillEnhanced;                         // 스킬 강화 이벤트 변수
     #endregion
@@ -64,7 +60,8 @@ public class SkillSystemModel
             if(!allSkillDictionary.ContainsKey(data.Id))
             {
                 // 스킬 객체 생성 및 저장
-                allSkillDictionary[data.Id] = data.CreateInstance(owner, executer);
+                allSkillDictionary[data.Id] = data.CreateInstance(owner, executer,
+                                                                    Mathf.RoundToInt(1f / Time.deltaTime));
                 allSkillList.Add(allSkillDictionary[data.Id]);
                 // 장착한 액티브 스킬들과 패시브 스킬들 리스트 연결
                 allSkillDictionary[data.Id].SetEquippedSkills(equippedActives, equippedPassives);
@@ -148,6 +145,17 @@ public class SkillSystemModel
                 // 빈 칸 생성
                 equippedPassives.Add(null);
         }
+    }
+
+    /// <summary>
+    /// 모델이 비활성화될 때 호출하는 함수
+    /// </summary>
+    public void DisableModel()
+    {
+        // 모든 스킬들의 수만큼
+        foreach (var skill in allSkillList)
+            // 스킬 객체 비활성화
+            skill.DisableInstance();
     }
 
     /// <summary>
@@ -316,12 +324,11 @@ public class SkillSystemModel
             float skillDuration = skillData.GetMaxDuration(equippedActives[(int)slot].CurLevel);
 
             // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
-            if (skillData.Id > (int)ACTIVE_SKILL_ID.End - 1 || skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
+            if (skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
             {
                 Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => 스킬 ID : {skillData.Id} / " +
                             $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
-                            $"액티브 스킬 ID 범위 : " +
-                            $"{(int)ACTIVE_SKILL_ID.Start} ~ {ACTIVE_SKILL_ID.End}");
+                            $"액티브 스킬 ID 범위 : {(int)ACTIVE_SKILL_ID.Start} ~ ");
                 return;
             }
             // 스킬 시작 애니메이션 재생에 실패했다면
@@ -355,24 +362,23 @@ public class SkillSystemModel
         if (!equippedActives[(int)slot].CancelSkill())
             return;
 
-        // 소유자 애니메이터 시스템이 있다면
-        if (ownerAnimatorDriver != null)
+        // 소유자 애니메이터 시스템이 없다면
+        if (ownerAnimatorDriver == null)
+            return;
+
+        var skillData = equippedActives[(int)slot].BaseData;
+
+        // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
+        if (skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
         {
-            var skillData = equippedActives[(int)slot].BaseData;
-
-            // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
-            if (skillData.Id > (int)ACTIVE_SKILL_ID.End - 1 || skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
-            {
-                Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => 스킬 ID : {skillData.Id} / " +
-                            $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
-                            $"액티브 스킬 ID 범위 : " +
-                            $"{(int)ACTIVE_SKILL_ID.Start} ~ {ACTIVE_SKILL_ID.End}");
-                return;
-            }
-
-            // 스킬 애니메이션 취소
-            ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)skillData.Id);
+            Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => 스킬 ID : {skillData.Id} / " +
+                        $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
+                        $"액티브 스킬 ID 범위 : {(int)ACTIVE_SKILL_ID.Start} ~ ");
+            return;
         }
+
+        // 스킬 애니메이션 취소
+        ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)skillData.Id);
     }
 
     /// <summary>
