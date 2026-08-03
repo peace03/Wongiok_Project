@@ -385,20 +385,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8074201030222337663}
     - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
-      propertyPath: status.attackAPower.BaseValue
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
-      propertyPath: status.attackBPower.BaseValue
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
-      propertyPath: status.attackCPower.BaseValue
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 256646380887020209, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
-      propertyPath: status.attackC_2Power.BaseValue
-      value: 30
+      propertyPath: takeDamageSfxVolume
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: ground
@@ -412,6 +400,10 @@ PrefabInstance:
       propertyPath: worldZPos
       value: 
       objectReference: {fileID: 1816822191}
+    - target: {fileID: 2783848254328767939, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: punishmentSfxVolume
+      value: 0.128
+      objectReference: {fileID: 0}
     - target: {fileID: 4456096972685270820, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -451,6 +443,26 @@ PrefabInstance:
     - target: {fileID: 4456096972685270820, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: kickImpactSfxVolume
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: slamImpactSfxVolume
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: spinImpactSfxVolume
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733329839489382315, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: ultimateImpactSfxVolume
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 4758382481227648288, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
+      propertyPath: bossBgmVolume
+      value: 0.232
       objectReference: {fileID: 0}
     - target: {fileID: 9183643652835930706, guid: cec6c6b541f07b5449e9d6a41f546ba9, type: 3}
       propertyPath: m_Name
@@ -2770,6 +2782,10 @@ PrefabInstance:
       propertyPath: bulletFactory
       value: 
       objectReference: {fileID: 428295083}
+    - target: {fileID: 3134708374669211192, guid: bfc26c766e715a34fa2c31be0ac8679e, type: 3}
+      propertyPath: parrySfxVolume
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 4218448538349867710, guid: bfc26c766e715a34fa2c31be0ac8679e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.3
@@ -2813,6 +2829,14 @@ PrefabInstance:
     - target: {fileID: 6384865173436297283, guid: bfc26c766e715a34fa2c31be0ac8679e, type: 3}
       propertyPath: m_Name
       value: PlayerPrefabs_YTest
+      objectReference: {fileID: 0}
+    - target: {fileID: 7984794749187931550, guid: bfc26c766e715a34fa2c31be0ac8679e, type: 3}
+      propertyPath: bossHitSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: abf1338bff5f1724f8f8ce816679247c, type: 3}
+    - target: {fileID: 7984794749187931550, guid: bfc26c766e715a34fa2c31be0ac8679e, type: 3}
+      propertyPath: bossHitSfxVolume
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

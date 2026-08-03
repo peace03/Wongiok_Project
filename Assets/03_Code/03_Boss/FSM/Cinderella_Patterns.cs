@@ -17,6 +17,7 @@ public class Cinderella_Patterns : BossPatternBase
 
     [Header("SFX")]
     [SerializeField] private List<AudioClip> SFX_Punishments;
+    [SerializeField, Range(0f, 1f)] private float punishmentSfxVolume = 1f;
 
     // 패링 시 현재 기합음만 식별해 중단하기 위한 보스별 고유 ID입니다.
     private string punishmentSfxId => $"{GetInstanceID()}_Punishment";
@@ -38,7 +39,6 @@ public class Cinderella_Patterns : BossPatternBase
     [Tooltip("후딜 시간")][SerializeField] private float B_postAtkDelay;
 
     [Header("AttackC 상태 (Jump Slam)")]
-    [SerializeField] private ParticleSystem waveEffect; // 바닥을 찍을 때 재사용할 오브젝트 풀링용 파동 이펙트
     [SerializeField] private float C_ChaseSpeed;
     [SerializeField] private Vector3 C_ChasePos;
     [Tooltip("후딜 시간")][SerializeField] private float C_postAtkDelay;
@@ -627,8 +627,13 @@ public class Cinderella_Patterns : BossPatternBase
 
         AudioClip clip = SFX_Punishments[Random.Range(0, SFX_Punishments.Count)];
 
+        // 패링 실패 기합음에 Inspector에서 설정한 볼륨을 적용한다.
         EventBus<StartControlledSfxEvent>.Publish(
-            new StartControlledSfxEvent(punishmentSfxId, clip, loop: false));
+            new StartControlledSfxEvent(
+                punishmentSfxId,
+                clip,
+                volume: punishmentSfxVolume,
+                loop: false));
     }
 
     // 패링 성공 시 같은 ID로 재생 중인 기합음만 즉시 중단합니다.

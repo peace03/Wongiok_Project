@@ -42,6 +42,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     [Header("Groggy")]
     [Tooltip("패링 3회 누적 시 보스가 무력화되는 시간")][SerializeField] protected float groggyDuration;
     [Tooltip("그로기 애니메이션 동안 반복할 SFX")][SerializeField] protected AudioClip groggySfx;
+    [Tooltip("그로기 반복 SFX의 재생 볼륨")][SerializeField, Range(0f, 1f)] protected float groggySfxVolume = 1f;
     [Tooltip("그로기 SFX 종료 시 페이드 아웃 시간")][SerializeField, Min(0f)] protected float groggySfxFadeOutDuration = 0.1f;
     #endregion
 
@@ -551,8 +552,13 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
             // Groggy 애니메이션이 처음 재생되는 시점에만 루프 SFX를 시작합니다.
             if (!isGroggySfxPlaying && groggySfx != null)
             {
+                // 그로기 반복음에 Inspector에서 설정한 볼륨을 적용한다.
                 EventBus<StartControlledSfxEvent>.Publish(
-                    new StartControlledSfxEvent($"{GetInstanceID()}_Groggy",groggySfx,loop: true));
+                    new StartControlledSfxEvent(
+                        $"{GetInstanceID()}_Groggy",
+                        groggySfx,
+                        volume: groggySfxVolume,
+                        loop: true));
 
                 isGroggySfxPlaying = true;
             }

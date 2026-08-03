@@ -12,6 +12,7 @@ public class PlayerParry : MonoBehaviour
 
     [Header("SFX")]
     [SerializeField] private AudioClip SFX_Parryed;
+    [SerializeField, Range(0f, 1f)] private float parrySfxVolume = 1f;
 
     [Header("Melee Parry")]
     // 패링 입력 후 근접 공격을 막을 수 있는 시간입니다.
@@ -150,7 +151,9 @@ public class PlayerParry : MonoBehaviour
         parrySuccessDamageBlockEndTime = Time.time + ParrySuccessDamageBlockDuration;
 
         EventBus<ParryKeyDown>.Publish(default);
-        EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(clip: SFX_Parryed));
+        // 패링 성공음에 Inspector에서 설정한 볼륨을 적용한다.
+        EventBus<Play2DSoundEvent>.Publish(
+            new Play2DSoundEvent(clip: SFX_Parryed, volume: parrySfxVolume));
         Debug.Log("보스 근접 패링 성공");
         return true;
     }

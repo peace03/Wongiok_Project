@@ -322,13 +322,13 @@ MonoBehaviour:
     telegraphSpeed:
       BaseValue: 0
     attackAPower:
-      BaseValue: 0
+      BaseValue: 15
     attackBPower:
-      BaseValue: 0
+      BaseValue: 20
     attackCPower:
-      BaseValue: 0
+      BaseValue: 5
     attackC_2Power:
-      BaseValue: 0
+      BaseValue: 30
     attackDPower:
       BaseValue: 30
     hpThresholds:
@@ -350,6 +350,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d6f710969f4f04192e66438348cdce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: PeaceScripts::BossController
+  bossBgmClip: {fileID: 8300000, guid: a15fad831a1ec11428d0418b734f65ae, type: 3}
 --- !u!114 &2783848254328767939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,7 +393,6 @@ MonoBehaviour:
   B_ChasePos: {x: 1.5, y: 0, z: 0}
   B_telegraphTime: 1
   B_postAtkDelay: 1
-  waveEffect: {fileID: 0}
   C_ChaseSpeed: 13.5
   C_ChasePos: {x: 10, y: 0, z: 0}
   C_postAtkDelay: 1.2

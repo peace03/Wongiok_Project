@@ -8,6 +8,13 @@ public class PlayerBossHitEffectFeedback : MonoBehaviour
     [SerializeField] private Transform effectSpawnPoint;
     [SerializeField, Min(0.01f)] private float effectDuration = 0.5f;
 
+    [Header("Boss Hit SFX")]
+    // 보스 공격에 피격됐을 때 재생할 SFX입니다.
+    [SerializeField] private AudioClip bossHitSfx;
+
+    // 보스 피격 SFX의 개별 볼륨입니다.
+    [SerializeField, Range(0f, 1f)] private float bossHitSfxVolume = 1f;
+
     // 플레이어가 활성화되면 실제 피해 이벤트 수신을 시작한다.
     private void OnEnable()
     {
@@ -41,5 +48,12 @@ public class PlayerBossHitEffectFeedback : MonoBehaviour
             effectSpawnPoint.position,
             effectSpawnPoint.rotation,
             effectDuration);
+
+        // SFX가 지정된 경우 SoundManager를 통해 개별 볼륨으로 재생한다.
+        if (bossHitSfx != null)
+        {
+            EventBus<Play2DSoundEvent>.Publish(
+                new Play2DSoundEvent(clip: bossHitSfx, volume: bossHitSfxVolume));
+        }
     }
 }

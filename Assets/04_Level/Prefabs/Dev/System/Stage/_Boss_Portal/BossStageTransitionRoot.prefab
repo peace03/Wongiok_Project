@@ -1,0 +1,131 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5098530853906146774
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5565776025612003527}
+  - component: {fileID: 3711228647981965881}
+  - component: {fileID: 8860253350002574835}
+  - component: {fileID: 6781296084785170188}
+  m_Layer: 0
+  m_Name: BossStageTransitionRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5565776025612003527
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5098530853906146774}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3711228647981965881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5098530853906146774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85e9165056638a24c9fb01bbaf55b2d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DefenseStageProgressCoordinator
+  requiredStages:
+  - {fileID: 0}
+  - {fileID: 0}
+  bossPortal: {fileID: 0}
+  onAllDefenseStagesCleared:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &8860253350002574835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5098530853906146774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb22861a02f697b4b86118f3dbd6e427, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossStageTransitionCoordinator
+  playerArrivalPoint: {fileID: 0}
+  sideViewCamera: {fileID: 0}
+  cameraArrivalPoint: {fileID: 0}
+  bossRuntimeActivator: {fileID: 6781296084785170188}
+  playBossIntro: 1
+  bossIntroId: chapter01_boss_intro
+  bossIntroClip: {fileID: 0}
+  bossIntroSkipSummary: 
+  introTimeoutSeconds: 120
+  teleportSettleDelay: 0.1
+  onTransitionStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onPlayerTeleported:
+    m_PersistentCalls:
+      m_Calls: []
+  onBossBattleStarted:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &6781296084785170188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5098530853906146774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08740fe8204bbbf42a9bc1fbbdc4870a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossRuntimeActivator
+  bossRoot: {fileID: 0}
+  objectsToEnableForBattle:
+  - {fileID: 0}
+  - {fileID: 0}
+  objectsToDisableForBattle:
+  - {fileID: 0}
+  onBossActivated:
+    m_PersistentCalls:
+      m_Calls: []

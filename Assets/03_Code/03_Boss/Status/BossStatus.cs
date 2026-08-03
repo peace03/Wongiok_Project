@@ -7,6 +7,7 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
 
     [Header("SFX")]
     [SerializeField] private List<AudioClip> SFX_TakeDamages;
+    [SerializeField, Range(0f, 1f)] private float takeDamageSfxVolume = 1f;
 
     [Header("Stats")]
     [SerializeField] private BossStatusData status;
@@ -30,7 +31,9 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
     public void TakeDamage(float amount)
     {
         status.SubCurrentHP(amount);
-        EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(clips: SFX_TakeDamages));
+        // 랜덤 보스 피격음에 Inspector에서 설정한 볼륨을 적용한다.
+        EventBus<Play2DSoundEvent>.Publish(
+            new Play2DSoundEvent(clips: SFX_TakeDamages, volume: takeDamageSfxVolume));
     }
 
     public float GetBossCurHP()

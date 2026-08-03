@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: zoneId
       value: CH01_DEFENSE_002
       objectReference: {fileID: 0}
+    - target: {fileID: 113025522685600663, guid: 8756567ba36616c41a2b5aaf545fe30f, type: 3}
+      propertyPath: stageId
+      value: CH01_DEFENSE_002
+      objectReference: {fileID: 0}
     - target: {fileID: 449496991741912417, guid: 8756567ba36616c41a2b5aaf545fe30f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.01

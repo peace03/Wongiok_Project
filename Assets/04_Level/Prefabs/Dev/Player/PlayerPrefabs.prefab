@@ -455,11 +455,17 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAudioController
   fireSound: {fileID: 0}
+  fireVolume: 1
   bulletHitSound: {fileID: 0}
+  bulletHitVolume: 1
   jumpSound: {fileID: 8300000, guid: ae93eea9cb3159d4684f53e05f5418b2, type: 3}
+  jumpVolume: 1
   landingSound: {fileID: 8300000, guid: 82d05a6f1d6e8fa4bbf435dcb3557129, type: 3}
+  landingVolume: 1
   slideSound: {fileID: 8300000, guid: 4268f77abd1514b4fb7c64195e5b31af, type: 3}
+  slideVolume: 1
   walkSound: {fileID: 8300000, guid: 5dd572b904e2d0f4a8877e784a1e4434, type: 3}
+  walkVolume: 1
   firstFootstepNormalizedTime: 0.15
 --- !u!1 &7609167236691703215
 GameObject:
@@ -547,7 +553,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 3e0d17de6e6da224eb2b36e6dc76a09e, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 3162f49b0d7c45247b7feb8c6cdd23b1, type: 2}
+      objectReference: {fileID: 9100000, guid: 1c08a27e6a6c4c5d9ce418bd1bd5675f, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
