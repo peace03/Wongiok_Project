@@ -39,7 +39,8 @@ public class PlayerDeathState : PlayerBaseState
         Debug.Log($"Death Enter: {deathInfo.Cause}");
 
         controller.Movement.ResetVerticalVelocity();
-        //EventBus<CancelSkill>.Publish(default);
+        controller.Animation.PlayDeath();
+        EventBus<CancelSkill>.Publish(default);
     }
 
     public override void UpdateState()
