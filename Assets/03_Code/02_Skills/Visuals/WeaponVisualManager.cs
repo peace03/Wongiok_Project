@@ -61,12 +61,12 @@ public class WeaponVisualManager : MonoBehaviour
     /// </summary>
     private void ChangeWeapon(ChangeWeaponState change)
     {
+        Debug.Log("무기 외형 변경 함수 호출");
         // 변경할 무기가 없다면
         if (!weapons.TryGetValue(change.id, out var weaponVisual))
             return;
 
-        // 무기 외형 상태 변경
-        weaponVisual.SetActive(change.isActiveWeapon);
+        Debug.Log($"무기 외형 상태 변경 => {change.isActiveWeapon}");
 
         // 총구 소유 인터페이스가 있다면
         if (weaponVisual.TryGetComponent<IHaveFirePoint>(out var weapon))
@@ -74,13 +74,19 @@ public class WeaponVisualManager : MonoBehaviour
             // 무기가 활성화 상태라면
             if (change.isActiveWeapon)
             {
+                // 무기 외형 상태 변경
+                weaponVisual.SetActive(true);
                 // 액티브 스킬 실행 위치들 변경 이벤트 발행
                 EventBus<ChangeActiveSkillExecutePositions>
                     .Publish(new ChangeActiveSkillExecutePositions(weapon.FirePoints));
                 weapon.PlayAnimation();
             }
             else
+            {
                 weapon.CancelAnimation();
+                // 무기 외형 상태 변경
+                weaponVisual.SetActive(false);
+            }
         }
     }
 }

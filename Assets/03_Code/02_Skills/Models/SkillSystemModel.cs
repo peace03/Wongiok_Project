@@ -323,10 +323,11 @@ public class SkillSystemModel
             return;
         }
 
+        var skillData = equippedActives[(int)slot].BaseData;
+
         // 소유자 애니메이터 시스템이 있다면
-        if(ownerAnimatorDriver != null)
+        if (ownerAnimatorDriver != null)
         {
-            var skillData = equippedActives[(int)slot].BaseData;
             float skillDuration = skillData.GetMaxDuration(equippedActives[(int)slot].CurLevel);
 
             // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
@@ -348,6 +349,8 @@ public class SkillSystemModel
             }
         }
 
+        // 무기 외형 착용 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(skillData.Id));
         // 스킬 실행
         equippedActives[(int)slot].UseSkill();
     }
@@ -363,7 +366,7 @@ public class SkillSystemModel
             // 장착된 액티브 스킬이 없거나, 스킬 정보가 비어있다면
             if (equippedActives[i] == null || equippedActives[i].BaseData == null)
                 continue;
-            else if (ownerInput != null && !ownerInput.ReleaseSniperSkill(sniperIndex))
+            else if (ownerInput != null && i == sniperIndex && !ownerInput.ReleaseSniperSkill(sniperIndex))
             {
                 CancelActiveSkill((ACTIVE_SKILL_SLOT_TYPE)sniperIndex);
                 continue;
@@ -407,6 +410,8 @@ public class SkillSystemModel
 
         // 스킬 애니메이션 취소
         ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)skillData.Id);
+        // 무기 외형 착용 해제 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(skillData.Id, false));
     }
 
     /// <summary>

@@ -318,6 +318,9 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
             default:
                 break;
         }
+
+        // 무기 외형 착용 해제 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState((int)skillId, false));
     }
 
     /// <summary>
@@ -334,11 +337,11 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         return skillId switch
         {
             // 매그넘이라면
-            ACTIVE_SKILL_ID.Magnum      => PlayMagnumSkillEnd(),
+            ACTIVE_SKILL_ID.Magnum      => PlayMagnumSkillEnd(skillId),
             // 라이플(돌격소총)이라면
             ACTIVE_SKILL_ID.Rifle       => StopRifleSkill(),
             // 스나이퍼(저격총)이라면
-            ACTIVE_SKILL_ID.Sniper      => PlaySniperSkillEnd(),
+            ACTIVE_SKILL_ID.Sniper      => PlaySniperSkillEnd(skillId),
             // 그 외
             _                           => false
         };
@@ -366,7 +369,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         return true;
     }
 
-    private bool PlayMagnumSkillEnd()
+    private bool PlayMagnumSkillEnd(ACTIVE_SKILL_ID skillId)
     {
         if (!CanPlay()) return false;
 
@@ -375,7 +378,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
             Debug.LogWarning(
                 "Player Animator에 'Base Layer.MagnumSkillEndState' State가 없어 종료 애니메이션을 재생하지 않았습니다.",
                 this);
-            CancelMagnumSkill();
+            CancelSkill(skillId);
             return false;
         }
 
@@ -450,7 +453,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         return true;
     }
 
-    private bool PlaySniperSkillEnd()
+    private bool PlaySniperSkillEnd(ACTIVE_SKILL_ID skillId)
     {
         if (!CanPlay()) return false;
 
@@ -459,7 +462,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
             Debug.LogWarning(
                 "Player Animator에 'Base Layer.SniperSkillEndState' State가 없어 종료 애니메이션을 재생하지 않았습니다.",
                 this);
-            CancelSniperSkill();
+            CancelSkill(skillId);
             return false;
         }
 

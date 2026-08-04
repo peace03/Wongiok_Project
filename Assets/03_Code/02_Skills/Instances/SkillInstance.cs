@@ -181,8 +181,6 @@ public class SkillInstance
         }
 
         //Debug.Log($"[Skill] 사용 시작 => {data.SkillName}");
-        // 무기 외형 착용 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id));
         // 현재 쿨타임 초기화
         curCoolTime = 0f;
 
@@ -401,8 +399,6 @@ public class SkillInstance
         }
 
         //Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
-        // 무기 외형 착용 해제 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(data.Id, false));
         // 쿨타임 상태로 변경
         SwitchState(SKILL_STATE.CoolTime);
         return true;
