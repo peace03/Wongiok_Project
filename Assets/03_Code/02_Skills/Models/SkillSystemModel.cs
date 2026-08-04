@@ -40,7 +40,7 @@ public class SkillSystemModel
     /// 생성자
     /// </summary>
     public SkillSystemModel(GameObject owner, ActiveSkillExecuter executer, List<BaseSkillData> skillDatas,
-                                                                            GameInputReader ownerInput = null)
+                                                        CHAPTER_TYPE chapter, GameInputReader ownerInput = null)
     {
         // 스킬 데이터가 없다면
         if(skillDatas == null)
@@ -63,7 +63,7 @@ public class SkillSystemModel
             if(!allSkillDictionary.ContainsKey(data.Id))
             {
                 // 스킬 객체 생성 및 저장
-                allSkillDictionary[data.Id] = data.CreateInstance(owner, executer,
+                allSkillDictionary[data.Id] = data.CreateInstance(owner, executer, chapter,
                                                                     Mathf.RoundToInt(1f / Time.deltaTime));
                 allSkillList.Add(allSkillDictionary[data.Id]);
                 // 장착한 액티브 스킬들과 패시브 스킬들 리스트 연결

@@ -36,6 +36,8 @@ public class SkillInstance
     [NonSerialized] private readonly GameObject owner;                  // 스킬 소유자
     [NonSerialized] private readonly ActiveSkillExecuter executer;      // 액티브 스킬 실행기
 
+    private readonly CHAPTER_TYPE curChapter;                           // 현재 챕터
+
     private readonly int curFps;                                        // 현재 프레임
     #endregion
 
@@ -68,7 +70,7 @@ public class SkillInstance
     /// <summary>
     /// 강화 가능 여부
     /// </summary>
-    public bool CanEnhance => curLevel < data.MaxLevel;
+    public bool CanEnhance => curLevel < data.MaxLevel && curChapter <= data.UnlockChapter;
     /// <summary>
     /// 스킬 사용 가능 여부
     /// </summary>
@@ -108,12 +110,13 @@ public class SkillInstance
     /// <summary>
     /// 생성자
     /// </summary>
-    public SkillInstance(GameObject owner, ActiveSkillExecuter executer, BaseSkillData data, int fps)
+    public SkillInstance(GameObject owner, ActiveSkillExecuter executer, BaseSkillData data,
+                                                                            CHAPTER_TYPE chapter, int fps)
     {
         this.owner = owner;
         this.executer = executer;
         this.data = data;
-        // 현재 프레임 구하기
+        curChapter = chapter;
         curFps = fps > 0f ? fps : 60;
         // 이펙트 종류마다 실행 중인 이펙트들 초기화
         InitActiveEffects();
@@ -271,7 +274,7 @@ public class SkillInstance
                                                                                     Transform target = null)
     {
         // 이펙트 종류에 맞는 이펙트 프리팹 받아오기
-        data.AsActiveSkillData.GetEffectsByEffectType(type, effectPrefabs);
+        data.AsActiveData.GetEffectsByEffectType(type, effectPrefabs);
 
         // 받아온 이펙트 프리팹이 없다면
         if (effectPrefabs.Count == 0)
@@ -371,7 +374,6 @@ public class SkillInstance
                 return hits[i].transform;
         }
 
-        Debug.Log("저긴가");
         return null;
     }
 

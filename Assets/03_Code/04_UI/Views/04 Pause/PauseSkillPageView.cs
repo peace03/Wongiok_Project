@@ -421,7 +421,7 @@ public class PauseSkillPageView : MonoBehaviour
 
             string sign = value > 0f ? "+" : string.Empty;
 
-            AddEffectLine(lines, GetStatDisplayName(stat.stat), $"{sign}{FormatEffectNumber(value)}");
+            AddEffectLine(lines, stat.stat.ToKoreanString(), $"{sign}{FormatEffectNumber(value)}");
         }
 
         return string.Join("\n", lines);
@@ -504,18 +504,6 @@ public class PauseSkillPageView : MonoBehaviour
     private string FormatEffectNumber(float value)
     {
         return value.ToString("0.##");
-    }
-
-    private string GetStatDisplayName(STAT_TYPE statType)
-    {
-        return statType switch
-        {
-            STAT_TYPE.Health => "체력",
-            STAT_TYPE.AtkPower => "공격력",
-            STAT_TYPE.MoveSpeed => "이동 속도",
-            STAT_TYPE.AtkSpeed => "공격 속도",
-            _ => statType.ToString()
-        };
     }
 
     private void RefreshEquippedDragItems()

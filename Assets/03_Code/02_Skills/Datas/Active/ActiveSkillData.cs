@@ -23,8 +23,9 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
     /// 스킬 객체 생성 함수
     /// </summary>
     /// <param name="owner">스킬 소유자</param>
-    public override SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer, int fps)
-                                        => new(owner, executer, this, fps);
+    public override SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer,
+                                                                        CHAPTER_TYPE chapter, int fps)
+                                                                => new(owner, executer, this, chapter, fps);
 
     /// <summary>
     /// 최대 쿨타임 반환 함수
@@ -95,7 +96,7 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
     /// </summary>
     /// <param name="level">스킬 레벨</param>
     /// <param name="stage">스킬 단계</param>
-    public float GetDamageByLevel(int level, int stage = 0)
+    public float GetDamage(int level, int stage = 0)
     {
         // 레벨에 맞는 정보 가져오기
         var data = GetLevelData(level);

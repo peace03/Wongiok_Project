@@ -20,11 +20,13 @@ MonoBehaviour:
   maxLevel: 3
   desc: "\uACF5\uACA9\uB825(\uC2A4\uD0AC \uACF5\uACA9\uB825 \uD3EC\uD568)\uC774 \uC99D\uAC00\uD55C\uB2E4."
   levelDatas:
-  - rid: 1008828851650560161
+  - rid: 2620632180129005806
+  - rid: 2620632180129005807
+  - rid: 2620632180129005808
   references:
     version: 2
     RefIds:
-    - rid: 1008828851650560161
+    - rid: 2620632180129005806
       type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
         triggerType: 0
@@ -32,3 +34,19 @@ MonoBehaviour:
         - stat: 1
           modify: 0
           amount: 10
+    - rid: 2620632180129005807
+      type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        triggerType: 0
+        appliedStats:
+        - stat: 1
+          modify: 0
+          amount: 15
+    - rid: 2620632180129005808
+      type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        triggerType: 0
+        appliedStats:
+        - stat: 1
+          modify: 0
+          amount: 20

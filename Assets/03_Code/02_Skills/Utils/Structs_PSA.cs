@@ -120,6 +120,20 @@ public readonly struct ChangeActiveSkillExecutePositions
 public readonly struct CancelSkill { }
 
 /// <summary>
+/// UI용 강화 가능한 스킬 정보들
+/// </summary>
+public readonly struct UICanEnhanceSkills
+{
+    public readonly List<UIPauseSkillInfoData> skills;              // 강화 가능한 스킬 정보들
+
+    /// <summary>
+    /// UI용 강화 가능한 스킬 정보들
+    /// </summary>
+    /// <param name="skills">강화 가능한 스킬 정보들</param>
+    public UICanEnhanceSkills(List<UIPauseSkillInfoData> skills) => this.skills = skills;
+}
+
+/// <summary>
 /// 누른 스킬 슬롯 정보
 /// </summary>
 public readonly struct StartedPressSkillSlot

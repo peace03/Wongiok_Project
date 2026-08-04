@@ -29,6 +29,8 @@ public class TestModule : MonoBehaviour
     [SerializeField] private string titleSceneName = "Lobby";
     [SerializeField] private bool canLoadCheckPoint = true;
 
+    private List<UIPauseSkillInfoData> canEnhanceSkillDatas = new();
+
     private BaseSkillData[] cachedActiveSkillDatas;
     private UIPauseSkillInfoData[] cachedEquippedActiveSkills;
     private UIPauseSkillInfoData[] cachedOwnedSkills;
@@ -55,7 +57,9 @@ public class TestModule : MonoBehaviour
         EventBus<RefreshUIEvent>.action += HandleRefreshUI;
         EventBus<UILevelUpSkillSelectedEvent>.action += HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action += HandlePlayerLevelUp;
-        
+
+        EventBus<UICanEnhanceSkills>.action += GetCanEnhanceSkillDatas;
+
         EventBus<UIGameOverRestartChapterRequestedEvent>.action += HandleGameOverRestartChapterRequested;
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.action += HandleGameOverLoadCheckPointRequested;
         EventBus<UIGameOverMainMenuRequestedEvent>.action += HandleGameOverMainMenuRequested;
@@ -71,7 +75,9 @@ public class TestModule : MonoBehaviour
         EventBus<RefreshUIEvent>.action -= HandleRefreshUI;
         EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action -= HandlePlayerLevelUp;
-        
+
+        EventBus<UICanEnhanceSkills>.action -= GetCanEnhanceSkillDatas;
+
         EventBus<UIGameOverRestartChapterRequestedEvent>.action -= HandleGameOverRestartChapterRequested;
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.action -= HandleGameOverLoadCheckPointRequested;
         EventBus<UIGameOverMainMenuRequestedEvent>.action -= HandleGameOverMainMenuRequested;
@@ -142,7 +148,7 @@ public class TestModule : MonoBehaviour
             {
                 UIPauseSkillInfoData skill = cachedEquippedActiveSkills[i];
 
-                if (skill.SkillId >= 0)
+                if (skill.SkillId > (int)ACTIVE_SKILL_ID.Start)
                     skills.Add(new PrototypeSkillState(skill.SkillId, skill.Level, i));
             }
         }
@@ -151,7 +157,7 @@ public class TestModule : MonoBehaviour
         {
             foreach (UIPauseSkillInfoData skill in cachedOwnedSkills)
             {
-                if (skill.SkillId >= 0 && skill.IsUnlocked)
+                if (skill.SkillId > (int)ACTIVE_SKILL_ID.Start && skill.IsUnlocked)
                     skills.Add(new PrototypeSkillState(skill.SkillId, skill.Level, -1));
             }
         }
@@ -233,7 +239,7 @@ public class TestModule : MonoBehaviour
                     skillData.Id);
 
             if (hasValidSlot &&
-                equippedSkills[skillState.SlotIndex].SkillId < 0)
+                equippedSkills[skillState.SlotIndex].SkillId < (int)ACTIVE_SKILL_ID.Start + 1)
             {
                 equippedSkills[skillState.SlotIndex] = uiData;
             }
@@ -359,8 +365,6 @@ public class TestModule : MonoBehaviour
 
         bossCurrentHp = Mathf.Max(0f, bossCurrentHp - bossDamageAmount);
 
-        
-
         EventBus<UISetBossHudDataEvent>.Publish(
             new UISetBossHudDataEvent(bossName, bossCurrentHp, bossMaxHp));
 
@@ -421,15 +425,18 @@ public class TestModule : MonoBehaviour
         OpenLevelUpOverlay();
     }
 
+    private void GetCanEnhanceSkillDatas(UICanEnhanceSkills eventData)
+                                                            => canEnhanceSkillDatas = eventData.skills;
+
     private void OpenLevelUpOverlay()
     {
         UILevelUpSkillOptionData[] options = CreateLevelUpOptionsFromRealSkills();
 
-        EventBus<UISetLevelUpOptionsEvent>.Publish(
-            new UISetLevelUpOptionsEvent(options));
-
         EventBus<UIOpenOverlayEvent>.Publish(
             new UIOpenOverlayEvent(UIOverlayState.LevelUp));
+
+        EventBus<UISetLevelUpOptionsEvent>.Publish(
+            new UISetLevelUpOptionsEvent(options));
     }
 
     private PlayerExperienceTracker GetPlayerExperienceTracker()
@@ -566,10 +573,10 @@ public class TestModule : MonoBehaviour
         if (cachedActiveSkillDatas != null)
             return cachedActiveSkillDatas;
 
-        cachedActiveSkillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills")
-            .Where(data => data != null)
-            .OrderBy(data => data.Id)
-            .ToArray();
+        List<BaseSkillData> results = new();
+        SkillDatabase.FindDatasByChapter((CHAPTER_TYPE)(currentChapterId - 1), results);
+
+        cachedActiveSkillDatas = results.ToArray();
 
         return cachedActiveSkillDatas;
     }
@@ -578,12 +585,7 @@ public class TestModule : MonoBehaviour
     {
         const int maxSkillLevel = 3;
 
-        IEnumerable<UIPauseSkillInfoData> allOwnedSkills =
-            (cachedEquippedActiveSkills ?? System.Array.Empty<UIPauseSkillInfoData>())
-            .Concat(cachedOwnedSkills ?? System.Array.Empty<UIPauseSkillInfoData>());
-
-        List<UIPauseSkillInfoData> candidates = allOwnedSkills
-            .Where(skill => skill.SkillId >= 0 && skill.Level < maxSkillLevel && skill.SkillId != 1004 && skill.SkillId != 1005)
+        List<UIPauseSkillInfoData> candidates = canEnhanceSkillDatas
             .GroupBy(skill => skill.SkillId)
             .Select(group => group.First())
             .OrderBy(_ => UnityEngine.Random.value)
@@ -598,7 +600,7 @@ public class TestModule : MonoBehaviour
 
             BaseSkillData skillData = LoadSkillDatas().FirstOrDefault(data => data != null && data.Id == skill.SkillId);
 
-            string comparisonText = BuildLevelUpComparison(skillData, skill.Level, Mathf.Min(skill.Level + 1, maxSkillLevel));
+            string comparisonText = BuildLevelUpComparison(skillData, skill.Level, Mathf.Min(skill.Level + 1, skillData.MaxLevel));
 
             options[i] = new UILevelUpSkillOptionData(
                 skill.SkillId,
@@ -660,30 +662,59 @@ public class TestModule : MonoBehaviour
 
     private string BuildLevelUpComparison(BaseSkillData skillData, int currentLevel, int nextLevel)
     {
-        if (skillData is not ActiveSkillData activeSkillData) return string.Empty;
-
-        if (activeSkillData.GetLevelData(currentLevel)
-            is not ProjectileSkillLevelData currentData ||
-            activeSkillData.GetLevelData(nextLevel)
-            is not ProjectileSkillLevelData nextData)
-        {
+        if (skillData == null)
             return string.Empty;
-        }
 
         List<string> lines = new();
 
-        AddComparisonLine(lines, "쿨타임", FormatSeconds(currentData.MaxCoolTime), FormatSeconds(nextData.MaxCoolTime));
+        switch(skillData.Type)
+        {
+            case SKILL_TYPE.Passive:
+                SetPassiveSkillDataText(skillData.AsPassiveData, currentLevel, nextLevel, lines);
+                return string.Join("\n", lines);
+            // 액티브 스킬이라면
+            case SKILL_TYPE.Active:
+                SetActiveSkillDataText(skillData.AsActiveData, currentLevel, nextLevel, lines);
+                return string.Join("\n", lines);
+            // 그 외
+            default:
+                return string.Empty;
+        }
+    }
 
-        AddComparisonLine(lines, "발사 횟수", Mathf.Max(1, currentData.ProjectileCount).ToString(), Mathf.Max(1, nextData.ProjectileCount).ToString());
+    private void SetPassiveSkillDataText(PassiveSkillData data, int curLevel, int nextLevel, List<string> results)
+    {
+        if (results == null)
+            return;
 
-        AddComparisonLine(lines, "차징 시간", FormatSeconds(currentData.MaxChargingTime), FormatSeconds(nextData.MaxChargingTime));
+        results.Clear();
+        var curData = data.GetLevelData(curLevel).GetAppliedStats();
+        var nextData = data.GetLevelData(nextLevel).GetAppliedStats();
 
-        return string.Join("\n", lines);
+        string label;
+
+        // 다음 레벨의 스탯의 수만큼
+        for (int i = 0; i < nextData.Count; i++)
+            // 스탯 종류, 수식 종류, 변화량
+            AddComparisonLine(results, curData[i].stat.ToKoreanString(), FormatNumber(curData[i].amount),
+                                                                            FormatNumber(nextData[i].amount));
+    }
+
+    private void SetActiveSkillDataText(ActiveSkillData data, int curLevel, int nextLevel, List<string> results)
+    {
+        if (results == null)
+            return;
+
+        results.Clear();
+        AddComparisonLine(results, "데미지", FormatNumber(data.GetDamage(curLevel)),
+                                                            FormatNumber(data.GetDamage(nextLevel)));
     }
 
     private void AddComparisonLine(List<string> lines, string label, string currentValue, string nextValue)
     {
         if (currentValue == nextValue) return;
+
+        Debug.Log(label);
 
         lines.Add($"{label}: {currentValue} -> {nextValue}");
     }

@@ -21,6 +21,8 @@ MonoBehaviour:
   desc: "\uC774\uB3D9 \uC18D\uB3C4\uAC00 \uC99D\uAC00\uD55C\uB2E4."
   levelDatas:
   - rid: 1008828851650560161
+  - rid: 2620632180129005728
+  - rid: 2620632180129005729
   references:
     version: 2
     RefIds:
@@ -32,3 +34,19 @@ MonoBehaviour:
         - stat: 2
           modify: 0
           amount: 2
+    - rid: 2620632180129005728
+      type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        triggerType: 0
+        appliedStats:
+        - stat: 2
+          modify: 0
+          amount: 3
+    - rid: 2620632180129005729
+      type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        triggerType: 0
+        appliedStats:
+        - stat: 2
+          modify: 0
+          amount: 4

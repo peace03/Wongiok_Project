@@ -12,6 +12,7 @@ public class SkillSystemPresenter
     private List<SkillInstance> modelResults = new();                           // 스킬 모델 결과들 리스트
     private List<UIPauseSkillInfoData> equippedSkillUIDatas = new();            // 장착한 스킬 UI 데이터들 리스트
     private List<UIPauseSkillInfoData> unequippedSkillUIDatas = new();          // 미장착한 스킬 UI 데이터들 리스트
+    private List<UIPauseSkillInfoData> canEnhanceSkillUIDatas = new();          // 강화 가능 스킬 UI 데이터들 리스트
 
     /// <summary>
     /// 생성자
@@ -30,9 +31,11 @@ public class SkillSystemPresenter
         if (skillDatas.Count != 0)
         {
             // 스킬 모델 생성하기
-            model = new(owner, executer, skillDatas, ownerInput);
+            model = new(owner, executer, skillDatas, curChapter, ownerInput);
             // 액티브 스킬 변경 이벤트 구독
             model.OnActiveSkillsChanged += RefreshActiveSkills;
+            // 스킬 강화 이벤트 구독
+            model.OnSkillEnhanced += RefreshCanEnhanceSkillUIDatas;
             // UI 레벨업 스킬 선택 이벤트 구독
             EventBus<UILevelUpSkillSelectedEvent>.action += RefreshSelectedSkill;
             // 패시브 스킬 새로고침
@@ -41,6 +44,8 @@ public class SkillSystemPresenter
             EventBus<UIPauseSkillEquipRequestedEvent>.action += RefreshSelectedSkills;
             // 스킬 스왑(장착 -> 장착) 이벤트 구독
             EventBus<UIPauseSkillSwapRequestedEvent>.action += RefreshSelectedSkills;
+            // 강화 가능 스킬 데이터 전달
+            GetCanEnhanceSkills();
         }
         // 스킬 데이터가 없다면
         else
@@ -55,6 +60,8 @@ public class SkillSystemPresenter
     {
         // 액티브 스킬 변경 이벤트 구독 해제
         model.OnActiveSkillsChanged -= RefreshActiveSkills;
+        // 스킬 강화 이벤트 구독 해제
+        model.OnSkillEnhanced -= RefreshCanEnhanceSkillUIDatas;
         // 모델 비활성화
         model.DisableModel();
         // UI 레벨업 스킬 선택 이벤트 구독 해제
@@ -164,6 +171,57 @@ public class SkillSystemPresenter
         EventBus<RefreshUIEvent>.Publish(new RefreshUIEvent(equippedSkillUIDatas.ToArray(),
                                                                 unequippedSkillUIDatas.ToArray(),
                                                                 isActiveSkill : false));
+    }
+
+    private void GetCanEnhanceSkills()
+    {
+        if (model == null)
+            return;
+
+        model.GetCanEnhanceSkills(modelResults);
+
+        if (modelResults == null || modelResults.Count == 0)
+            return;
+
+        BaseSkillData data;
+        canEnhanceSkillUIDatas.Clear();
+
+        foreach (var skill in modelResults)
+        {
+            if (skill.BaseData == null)
+                continue;
+
+            data = skill.BaseData;
+            canEnhanceSkillUIDatas.Add(new(data.Icon, data.SkillName, skill.CurLevel, data.Desc,
+                                                                                skill.IsEquipped, data.Id));
+        }
+
+        EventBus<UICanEnhanceSkills>.Publish(new(canEnhanceSkillUIDatas));
+    }
+
+    private void RefreshCanEnhanceSkillUIDatas(SkillInstance skill)
+    {
+        if (model == null)
+            return;
+
+        BaseSkillData data;
+
+        for(int i = 0; i < canEnhanceSkillUIDatas.Count; i++)
+        {
+            if (canEnhanceSkillUIDatas[i].SkillId != skill.BaseData.Id)
+                continue;
+
+            data = skill.BaseData;
+
+            if (!skill.CanEnhance)
+                canEnhanceSkillUIDatas.RemoveAt(i);
+            else
+                canEnhanceSkillUIDatas[i] = new(data.Icon, data.SkillName, skill.CurLevel, data.Desc,
+                                                                                skill.IsEquipped, data.Id);
+        }
+
+        RefreshAllSkills();
+        EventBus<UICanEnhanceSkills>.Publish(new(canEnhanceSkillUIDatas));
     }
 
     /// <summary>

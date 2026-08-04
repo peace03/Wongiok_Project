@@ -37,12 +37,12 @@ public static class EnumExtensions
     {
         return type switch
         {
-            ACTIVE_SKILL_EFFECT_TYPE.Charging => "차징 이펙트",
-            ACTIVE_SKILL_EFFECT_TYPE.Muzzle   => "총구 이펙트",
-            ACTIVE_SKILL_EFFECT_TYPE.Trail    => "궤적 이펙트",
-            ACTIVE_SKILL_EFFECT_TYPE.Main     => "메인 이펙트",
-            ACTIVE_SKILL_EFFECT_TYPE.Target   => "타겟 이펙트",
-            ACTIVE_SKILL_EFFECT_TYPE.Hit      => "타격/피격 이펙트",
+            ACTIVE_SKILL_EFFECT_TYPE.Charging       => "차징 이펙트",
+            ACTIVE_SKILL_EFFECT_TYPE.Muzzle         => "총구 이펙트",
+            ACTIVE_SKILL_EFFECT_TYPE.Trail          => "궤적 이펙트",
+            ACTIVE_SKILL_EFFECT_TYPE.Main           => "메인 이펙트",
+            ACTIVE_SKILL_EFFECT_TYPE.Target         => "타겟 이펙트",
+            ACTIVE_SKILL_EFFECT_TYPE.Hit            => "타격/피격 이펙트",
             _                                       => ""
         };
     }
@@ -73,7 +73,7 @@ public static class EnumExtensions
             STAT_TYPE.AtkPower                      => "공격력",
             STAT_TYPE.MoveSpeed                     => "이동 속도",
             STAT_TYPE.AtkSpeed                      => "공격 속도",
-            _                                       => ""
+            _                                       => type.ToString()
         };
     }
 

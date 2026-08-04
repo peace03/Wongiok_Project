@@ -106,7 +106,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 스킬 ID로 스킬 정보 찾기
         var data = SkillDatabase.FindDataById(skillId);
         // 총구 이펙트에 해당하는 이펙트 프리팹 받아오기
-        data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, effectPrefabs);
+        data.AsActiveData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, effectPrefabs);
         // 발사체 스킬 딜레이 시간량 구하기
         projectileDelayTimeValue = levelData.MaxDuration / (levelData.ProjectileCount == 0 ?
                                                                     1 : levelData.ProjectileCount);
@@ -148,8 +148,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             yield return null;
         }
 
-        if (data.AsActiveSkillData != null)
-            foreach (var sound in data.AsActiveSkillData.Sounds)
+        if (data.AsActiveData != null)
+            foreach (var sound in data.AsActiveData.Sounds)
             {
                 if (sound.clip == null)
                 {
@@ -169,7 +169,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                                                                                                     maxDuration));
 
         // 발사체 이펙트에 해당하는 이펙트 프리팹 받아오기
-        data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Main, effectPrefabs);
+        data.AsActiveData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Main, effectPrefabs);
 
         // 현재 발사체 개수만큼
         for (int count = 0; count < bulletCount; count += executePlaces.Count)
@@ -206,7 +206,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 // 총알 속도 구하기
                 float bulletSpeed = 50f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
                 // 타격/피격 이펙트에 해당하는 이펙트 프리팹 받아오기
-                data.AsActiveSkillData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Hit, effectPrefabs);
+                data.AsActiveData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Hit, effectPrefabs);
                 // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수,
                 //                  총알 속도, 카메라 흔들림 값, 타격/피격 이펙트들)
                 bullet.StartFire(skillLayer, damage, penetrationCount,
