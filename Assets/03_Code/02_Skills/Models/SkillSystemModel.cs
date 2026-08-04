@@ -21,6 +21,8 @@ public class SkillSystemModel
     [Header("모든 스킬들")]
     [SerializeField] private List<SkillInstance> allSkillList = new();          // 모든 스킬 리스트
 
+    private bool cancelAnimation = false;                                       // 애니메이션 취소 여부
+
     private int sniperIndex = -1;                                               // 스나이퍼 위치
 
     private readonly Dictionary<int, SkillInstance> allSkillDictionary          // 모든 스킬 딕셔너리
@@ -413,6 +415,9 @@ public class SkillSystemModel
             }
         }
 
+        if ((int)slot == sniperIndex)
+            cancelAnimation = false;
+
         // 무기 외형 착용 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(skillData.Id));
         // 스킬 실행
@@ -431,10 +436,7 @@ public class SkillSystemModel
             if (equippedActives[i] == null || equippedActives[i].BaseData == null)
                 continue;
             else if (ownerInput != null && i == sniperIndex && !ownerInput.ReleaseSniperSkill(sniperIndex))
-            {
                 CancelActiveSkill((ACTIVE_SKILL_SLOT_TYPE)sniperIndex);
-                continue;
-            }
 
             // 시간 진행
             equippedActives[i].Tick(time);
@@ -446,6 +448,9 @@ public class SkillSystemModel
     /// </summary>
     public void CancelActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
     {
+        if (cancelAnimation)
+            return;
+
         // 해당 슬롯이 비어있다면
         if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
         {
@@ -472,6 +477,7 @@ public class SkillSystemModel
             return;
         }
 
+        cancelAnimation = true;
         // 스킬 애니메이션 취소
         ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)skillData.Id);
         // 무기 외형 착용 해제 이벤트 발행
