@@ -146,4 +146,22 @@ public class PlayerCheckpointTracker : MonoBehaviour
 
         SaveCurrentSnapshot(snapshotPosition);
     }
-} 
+
+    public void RestoreCheckpoint(CheckpointRuntimeData data)
+    {
+        EnsureInitialized();
+
+        if (!data.IsValid)
+            return;
+
+        hasActiveCheckpoint = true;
+        activeCheckpointNumber = data.DisplayNumber;
+        activeRespawnPosition = data.RespawnPosition;
+        savedHP = data.Progress.IsValid
+            ? data.Progress.CurrentHP
+            : data.SavedHP;
+        savedHealItemCount = data.Progress.IsValid
+            ? data.Progress.HealItemCount
+            : data.SavedHealItemCount;
+    }
+}

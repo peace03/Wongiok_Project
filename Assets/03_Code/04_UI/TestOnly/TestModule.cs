@@ -56,8 +56,6 @@ public class TestModule : MonoBehaviour
         EventBus<UILevelUpSkillSelectedEvent>.action += HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action += HandlePlayerLevelUp;
         
-        EventBus<UIGameOverRestartChapterRequestedEvent>.action += HandleGameOverRestartChapterRequested;
-        EventBus<UIGameOverLoadCheckpointRequestedEvent>.action += HandleGameOverLoadCheckPointRequested;
         EventBus<UIGameOverMainMenuRequestedEvent>.action += HandleGameOverMainMenuRequested;
 
         EventBus<UIChapterClearNextRequestedEvent>.action += HandleChapterClearNextRequested;
@@ -72,8 +70,6 @@ public class TestModule : MonoBehaviour
         EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action -= HandlePlayerLevelUp;
         
-        EventBus<UIGameOverRestartChapterRequestedEvent>.action -= HandleGameOverRestartChapterRequested;
-        EventBus<UIGameOverLoadCheckpointRequestedEvent>.action -= HandleGameOverLoadCheckPointRequested;
         EventBus<UIGameOverMainMenuRequestedEvent>.action -= HandleGameOverMainMenuRequested;
 
         EventBus<UIChapterClearNextRequestedEvent>.action -= HandleChapterClearNextRequested;
@@ -261,9 +257,6 @@ public class TestModule : MonoBehaviour
                 CloneSkills(cachedEquippedActiveSkills),
                 CloneSkills(cachedOwnedSkills),
                 snapshot.OwnedSkillOrder));
-
-        EventBus<UISetBossHudVisibleEvent>.Publish(
-            new UISetBossHudVisibleEvent(false));
 
         EventBus<UIChangeScreenEvent>.Publish(
             new UIChangeScreenEvent(UIScreenState.InGame));

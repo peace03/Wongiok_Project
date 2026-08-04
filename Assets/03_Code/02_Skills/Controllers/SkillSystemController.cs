@@ -106,6 +106,19 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     /// <summary>
     /// 스킬 실행 함수
     /// </summary>
+    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
+    {
+        return presenter != null
+            ? presenter.CaptureCheckpointSnapshot()
+            : System.Array.Empty<CheckpointSkillSnapshot>();
+    }
+
+    public void RestoreCheckpointSnapshot(
+        CheckpointSkillSnapshot[] snapshot)
+    {
+        presenter?.RestoreCheckpointSnapshot(snapshot);
+    }
+
     private void ExecuteSkill(StartedPressSkillSlot type)
     {
         // 프레젠터가 없다면

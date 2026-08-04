@@ -461,4 +461,13 @@ public class SkillInstance
     /// 레벨 초기화 함수
     /// </summary>
     public void ResetLevel() => curLevel = 1;
+
+    public void RestoreCheckpointLevel(int level)
+    {
+        curLevel = Math.Clamp(level, 1, Math.Max(1, data.MaxLevel));
+        state = SKILL_STATE.Ready;
+        curCoolTime = 0f;
+        curDuration = 0f;
+        curChargingTime = 0f;
+    }
 }

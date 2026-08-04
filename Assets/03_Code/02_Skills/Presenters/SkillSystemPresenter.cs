@@ -75,6 +75,23 @@ public class SkillSystemPresenter
         RefreshPassiveSkills();
     }
 
+    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
+    {
+        return model != null
+            ? model.CaptureCheckpointSnapshot()
+            : Array.Empty<CheckpointSkillSnapshot>();
+    }
+
+    public void RestoreCheckpointSnapshot(
+        CheckpointSkillSnapshot[] snapshot)
+    {
+        if (model == null)
+            return;
+
+        model.RestoreCheckpointSnapshot(snapshot);
+        RefreshAllSkills();
+    }
+
     /// <summary>
     /// 액티브 스킬들 새로고침 함수
     /// </summary>

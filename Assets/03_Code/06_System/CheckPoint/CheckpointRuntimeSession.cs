@@ -2,6 +2,28 @@ using System;
 using UnityEngine;
 
 [Serializable]
+public struct CheckpointSkillSnapshot
+{
+    public int SkillId;
+    public int Level;
+    public int EquippedActiveSlot;
+}
+
+[Serializable]
+public struct CheckpointProgressSnapshot
+{
+    public bool IsValid;
+    public float CurrentHP;
+    public int HealItemCount;
+    public int LifeCount;
+    public int PlayerLevel;
+    public float CurrentExperience;
+    public PlayerPersistentStatSnapshot PersistentStats;
+    public CheckpointSkillSnapshot[] Skills;
+    public string[] ClearedDefenseStageIds;
+}
+
+[Serializable]
 public readonly struct CheckpointRuntimeData
 {
     public CheckpointDefinition Definition { get; }
@@ -12,6 +34,7 @@ public readonly struct CheckpointRuntimeData
     public Vector3 RespawnEulerAngles { get; }
     public float SavedHP { get; }
     public int SavedHealItemCount { get; }
+    public CheckpointProgressSnapshot Progress { get; }
 
     public Quaternion RespawnRotation =>
         Quaternion.Euler(RespawnEulerAngles);
@@ -28,7 +51,8 @@ public readonly struct CheckpointRuntimeData
         Vector3 respawnPosition,
         Vector3 respawnEulerAngles,
         float savedHP,
-        int savedHealItemCount)
+        int savedHealItemCount,
+        CheckpointProgressSnapshot progress = default)
     {
         Definition = definition;
         CheckpointId = checkpointId;
@@ -38,13 +62,15 @@ public readonly struct CheckpointRuntimeData
         RespawnEulerAngles = respawnEulerAngles;
         SavedHP = savedHP;
         SavedHealItemCount = savedHealItemCount;
+        Progress = progress;
     }
 
     // CheckpointDefinition과 플레이어 스냅샷으로 런타임 데이터를 만듭니다
     public static CheckpointRuntimeData FromDefinition(
         CheckpointDefinition definition,
         float savedHP,
-        int savedHealItemCount)
+        int savedHealItemCount,
+        CheckpointProgressSnapshot progress = default)
     {
         if (definition == null)
         {
@@ -59,7 +85,8 @@ public readonly struct CheckpointRuntimeData
             definition.RespawnPosition,
             definition.RespawnEulerAngles,
             savedHP,
-            savedHealItemCount);
+            savedHealItemCount,
+            progress);
     }
 }
 
