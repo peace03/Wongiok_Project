@@ -14,7 +14,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private readonly List<Transform> executePlaces = new();                         // 실행 위치들
     private readonly List<GameObject> effectPrefabs = new();                        // 이펙트 프리팹들
 
-    public PlayerAnimatorDriver ownerAnimatorDriver;                               // 소유자 애니메이터 시스템
+    private PlayerAnimatorDriver ownerAnimatorDriver;                               // 소유자 애니메이터 시스템
 
     private WaitForSeconds projectileDelayTime;                                     // 발사체 스킬 딜레이 시간
     private WaitForSeconds areaDelayTime;                                           // 범위 스킬 딜레이 시간
@@ -26,7 +26,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
     private int curFps;                                                             // 현재 프레임
 
-    public bool executingSkill = false;                                            // 스킬 실행 중 여부
+    private bool executingSkill = false;                                            // 스킬 실행 중 여부
 
     public IReadOnlyList<Transform> ExecutePlaces => executePlaces;
 
@@ -101,10 +101,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     {
         // 실행 중인 스킬이 있다면
         if (executingSkill)
-        {
-            Debug.Log("실행 중");
             return;
-        }
 
         // 스킬 ID로 스킬 정보 찾기
         var data = SkillDatabase.FindDataById(skillId);

@@ -21,7 +21,7 @@ public class SkillSystemModel
     [Header("모든 스킬들")]
     [SerializeField] private List<SkillInstance> allSkillList = new();          // 모든 스킬 리스트
 
-    public int sniperIndex = -1;                                                // 스나이퍼 위치
+    private int sniperIndex = -1;                                               // 스나이퍼 위치
 
     private readonly Dictionary<int, SkillInstance> allSkillDictionary          // 모든 스킬 딕셔너리
                                                                     = new();
