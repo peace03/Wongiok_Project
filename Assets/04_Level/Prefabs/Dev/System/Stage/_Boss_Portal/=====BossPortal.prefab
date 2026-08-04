@@ -89,6 +89,10 @@ PrefabInstance:
       propertyPath: transitionCoordinator
       value: 
       objectReference: {fileID: 6303570751973233410}
+    - target: {fileID: 6812619930451083269, guid: 15f8907d6de9a1a4eb8051862c57d5b7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.65
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
