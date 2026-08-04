@@ -18,7 +18,8 @@ public class SkillSystemPresenter
     /// </summary>
     /// <param name="owner">스킬 소유자</param>
     /// <param name="executer">액티브 스킬 실행기</param>
-    public SkillSystemPresenter(GameObject owner, ActiveSkillExecuter executer)
+    public SkillSystemPresenter(GameObject owner, ActiveSkillExecuter executer,
+                                                                        GameInputReader ownerInput = null)
     {
         // 스킬 데이터를 담을 리스트
         List<BaseSkillData> skillDatas = new();
@@ -29,7 +30,7 @@ public class SkillSystemPresenter
         if (skillDatas.Count != 0)
         {
             // 스킬 모델 생성하기
-            model = new(owner, executer, skillDatas);
+            model = new(owner, executer, skillDatas, ownerInput);
             // 액티브 스킬 변경 이벤트 구독
             model.OnActiveSkillsChanged += RefreshActiveSkills;
             // UI 레벨업 스킬 선택 이벤트 구독

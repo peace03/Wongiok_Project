@@ -64,6 +64,10 @@ public class GameInputReader : MonoBehaviour
         _input?.Dispose();
     }
 
+    /// <summary>
+    /// 스나이퍼 스킬 키 입력 취소 확인 함수
+    /// </summary>
+    /// <param name="skillIndex">스나이퍼 스킬 위치</param>
     public bool ReleaseSniperSkill(int skillIndex)
     {
         return skillIndex switch

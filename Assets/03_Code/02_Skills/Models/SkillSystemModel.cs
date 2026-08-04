@@ -28,7 +28,7 @@ public class SkillSystemModel
     private readonly List<EffectAddData> effectDatas = new();                   // 스킬 이펙트 정보 리스트
 
     private readonly PlayerAnimatorDriver ownerAnimatorDriver;                  // 소유자 애니메이터 시스템
-    private readonly GameInputReader ownerInputReader;                          // 소유자 입력 시스템
+    private readonly GameInputReader ownerInput;                                // 소유자 입력 시스템
 
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
     public event Action<SkillInstance> OnSkillEnhanced;                         // 스킬 강화 이벤트 변수
@@ -39,7 +39,8 @@ public class SkillSystemModel
     /// <summary>
     /// 생성자
     /// </summary>
-    public SkillSystemModel(GameObject owner, ActiveSkillExecuter executer, List<BaseSkillData> skillDatas)
+    public SkillSystemModel(GameObject owner, ActiveSkillExecuter executer, List<BaseSkillData> skillDatas,
+                                                                            GameInputReader ownerInput = null)
     {
         // 스킬 데이터가 없다면
         if(skillDatas == null)
@@ -51,7 +52,7 @@ public class SkillSystemModel
         // 소유자 애니메이터 시스템 받아오기
         ownerAnimatorDriver = owner.GetComponent<PlayerAnimatorDriver>();
         // 소유자 입력 시스템 받아오기
-        ownerInputReader = owner.GetComponent<GameInputReader>();
+        this.ownerInput = ownerInput;
         // 실행기에게 소유자 애니메이터 시스템 전달
         executer.Initialize(ownerAnimatorDriver);
 
@@ -362,7 +363,7 @@ public class SkillSystemModel
             // 장착된 액티브 스킬이 없거나, 스킬 정보가 비어있다면
             if (equippedActives[i] == null || equippedActives[i].BaseData == null)
                 continue;
-            else if (ownerInputReader != null && !ownerInputReader.ReleaseSniperSkill(sniperIndex))
+            else if (ownerInput != null && !ownerInput.ReleaseSniperSkill(sniperIndex))
             {
                 CancelActiveSkill((ACTIVE_SKILL_SLOT_TYPE)sniperIndex);
                 continue;

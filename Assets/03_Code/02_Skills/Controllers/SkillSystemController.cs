@@ -10,6 +10,8 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     [Header("스킬 시스템")]
     [SerializeField] private SkillSystemPresenter presenter;        // 프레젠터
 
+    private GameInputReader ownerInput;                             // 소유자 입력 시스템
+
     public int Priority => (int)InitOrder.Skill;                    // 중요도
 
     private void OnEnable()
@@ -37,6 +39,21 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         //    EventBus<StartedPressSkillSlot>.Publish(new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.D));
         #endregion
 
+        // A키를 눌렀다면
+        if (ownerInput.SkillAPressed)
+            // A키 누름 이벤트 발행
+            EventBus<StartedPressSkillSlot>.Publish(new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.A));
+
+        // S키를 눌렀다면
+        if (ownerInput.SkillSPressed)
+            // S키 누름 이벤트 발행
+            EventBus<StartedPressSkillSlot>.Publish(new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.S));
+
+        // D키를 눌렀다면
+        if (ownerInput.SkillDPressed)
+            // D키 누름 이벤트 발행
+            EventBus<StartedPressSkillSlot>.Publish(new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.D));
+
         // 프레젠터가 없다면
         if (presenter == null)
             return;
@@ -62,8 +79,10 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         // 소유자가 있고 실행기가 있다면
         if (owner != null && executer != null)
         {
+            // 소유자 입력 시스템 받아오기
+            ownerInput = owner.GetComponent<GameInputReader>();
             // 프레젠터 생성
-            presenter = new(owner, executer);
+            presenter = new(owner, executer, ownerInput);
 
             // 실행기의 따라다니는 대상이 소유자가 아니라면
             if(executer.transform.parent != owner.transform)
