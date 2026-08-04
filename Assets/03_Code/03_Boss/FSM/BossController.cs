@@ -140,7 +140,10 @@ public class BossController : MonoBehaviour, IInitializable
             rb.linearVelocity = Vector3.zero;
 
         if (animator != null)
-            animator.SetInteger("Num", Random.Range((int)Animation.Defeated1, (int)Animation.Defeated3 + 1));
+        {
+            int animationNum = Random.Range((int)Animation.Defeated2, (int)Animation.Defeated3 + 1);
+            animator.SetInteger("Num", animationNum);
+        }
 
         StartCoroutine(DefeatPresentation());
     }
