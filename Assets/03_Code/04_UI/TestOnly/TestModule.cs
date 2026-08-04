@@ -268,9 +268,6 @@ public class TestModule : MonoBehaviour
                 CloneSkills(cachedOwnedSkills),
                 snapshot.OwnedSkillOrder));
 
-        EventBus<UISetBossHudVisibleEvent>.Publish(
-            new UISetBossHudVisibleEvent(false));
-
         EventBus<UIChangeScreenEvent>.Publish(
             new UIChangeScreenEvent(UIScreenState.InGame));
 
@@ -690,8 +687,6 @@ public class TestModule : MonoBehaviour
         results.Clear();
         var curData = data.GetLevelData(curLevel).GetAppliedStats();
         var nextData = data.GetLevelData(nextLevel).GetAppliedStats();
-
-        string label;
 
         // 다음 레벨의 스탯의 수만큼
         for (int i = 0; i < nextData.Count; i++)

@@ -50,6 +50,13 @@ public static class DefenseStageRuntimeSession
         }
     }
 
+    public static string[] CaptureCurrentState()
+    {
+        string[] result = new string[currentClearedStageIds.Count];
+        currentClearedStageIds.CopyTo(result);
+        return result;
+    }
+
     // 현재 클리어 목록을 마지막 체크포인트 상태로 되돌립니다.
     public static void RestoreCheckpointSnapshot()
     {
@@ -59,6 +66,24 @@ public static class DefenseStageRuntimeSession
         {
             currentClearedStageIds.Add(stageId);
         }
+    }
+
+    public static void RestoreCheckpointSnapshot(string[] stageIds)
+    {
+        checkpointClearedStageIds.Clear();
+
+        if (stageIds != null)
+        {
+            for (int i = 0; i < stageIds.Length; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(stageIds[i]))
+                {
+                    checkpointClearedStageIds.Add(stageIds[i]);
+                }
+            }
+        }
+
+        RestoreCheckpointSnapshot();
     }
 
     // 새 게임 시작 시 모든 디펜스 스테이지 상태를 초기화합니다.

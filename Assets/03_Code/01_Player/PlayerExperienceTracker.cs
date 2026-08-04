@@ -63,6 +63,15 @@ public class PlayerExperienceTracker : MonoBehaviour
         PublishExperienceChanged();
     }
 
+    public void RestoreProgress(int level, float experience)
+    {
+        EnsureInitialized();
+
+        currentLevel = Mathf.Max(1, level);
+        currentExp = Mathf.Clamp(experience, 0f, RequiredExp);
+        PublishExperienceChanged();
+    }
+
     private void OnMonsterDead(MonsterDeadEvent eventData)
     {
         if (eventData.MonsterObject == null) return;

@@ -299,6 +299,15 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         return status.CurrentHP;
     }
 
+    public void RestoreCurrentHP(float currentHP)
+    {
+        status.CurrentHP = Mathf.Clamp(
+            currentHP,
+            0f,
+            status.MaxHP.FinalValue);
+        PublishHealthChanged();
+    }
+
     public float GetAttackPower()
     {
         return status.AttackPower.FinalValue;

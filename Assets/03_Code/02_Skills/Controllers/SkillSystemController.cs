@@ -99,6 +99,18 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         else
             Debug.Log($"[Error | Skill] 스킬 시스템 초기화 실패 => 입력 - 소유자(Owner) : 없음");
     }
+    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
+    {
+        return presenter != null
+            ? presenter.CaptureCheckpointSnapshot()
+            : System.Array.Empty<CheckpointSkillSnapshot>();
+    }
+
+    public void RestoreCheckpointSnapshot(
+        CheckpointSkillSnapshot[] snapshot)
+    {
+        presenter?.RestoreCheckpointSnapshot(snapshot);
+    }
 
     /// <summary>
     /// 스킬 실행 함수

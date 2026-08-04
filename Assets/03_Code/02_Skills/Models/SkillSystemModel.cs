@@ -36,6 +36,70 @@ public class SkillSystemModel
 
     public int MaxEquippedActiveCount => maxEquippedActiveCount;
 
+    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
+    {
+        CheckpointSkillSnapshot[] snapshot =
+            new CheckpointSkillSnapshot[allSkillList.Count];
+
+        for (int i = 0; i < allSkillList.Count; i++)
+        {
+            SkillInstance skill = allSkillList[i];
+
+            snapshot[i] = new CheckpointSkillSnapshot
+            {
+                SkillId = skill.BaseData.Id,
+                Level = skill.CurLevel,
+                EquippedActiveSlot = skill.IsActiveSkill
+                    ? equippedActives.IndexOf(skill)
+                    : -1
+            };
+        }
+
+        return snapshot;
+    }
+
+    public void RestoreCheckpointSnapshot(
+        CheckpointSkillSnapshot[] snapshot)
+    {
+        if (snapshot == null)
+            return;
+
+        for (int i = 0; i < snapshot.Length; i++)
+        {
+            if (allSkillDictionary.TryGetValue(
+                    snapshot[i].SkillId,
+                    out SkillInstance skill))
+            {
+                skill.RestoreCheckpointLevel(snapshot[i].Level);
+            }
+        }
+
+        for (int i = 0; i < maxEquippedActiveCount; i++)
+        {
+            if (equippedActives[i] != null)
+            {
+                SwapSkill((ACTIVE_SKILL_SLOT_TYPE)i);
+            }
+        }
+
+        for (int i = 0; i < snapshot.Length; i++)
+        {
+            int slot = snapshot[i].EquippedActiveSlot;
+
+            if (slot < 0 || slot >= maxEquippedActiveCount)
+                continue;
+
+            if (GetEquippedActiveSkillId(slot) == snapshot[i].SkillId)
+                continue;
+
+            SwapSkill(
+                (ACTIVE_SKILL_SLOT_TYPE)slot,
+                snapshot[i].SkillId);
+        }
+
+        OnActiveSkillsChanged?.Invoke();
+    }
+
     /// <summary>
     /// 생성자
     /// </summary>
