@@ -25,6 +25,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private float startAnimationWaitTime = 0;                                       // 시작 애니메이션 대기 시간
 
     private int curFps;                                                             // 현재 프레임
+    private int executingSkillId = -1;                                              // 실행 중인 스킬 ID
 
     private bool executingSkill = false;                                            // 스킬 실행 중 여부
 
@@ -103,8 +104,9 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         if (executingSkill)
             return;
 
+        executingSkillId = skillId;
         // 스킬 ID로 스킬 정보 찾기
-        var data = SkillDatabase.FindDataById(skillId);
+        var data = SkillDatabase.FindDataById(executingSkillId);
         // 총구 이펙트에 해당하는 이펙트 프리팹 받아오기
         data.AsActiveData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, effectPrefabs);
         // 발사체 스킬 딜레이 시간량 구하기
@@ -240,6 +242,9 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 스킬 실행 중지
         executingSkill = false;
+        // 무기 외형 착용 해제 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(executingSkillId, false));
+        executingSkillId = -1;
     }
 
     /// <summary>
