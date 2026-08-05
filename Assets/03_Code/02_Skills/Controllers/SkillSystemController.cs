@@ -73,9 +73,6 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     // 초기화 함수
     public void Init()
     {
-        // 스킬 데이터베이스 초기화
-        SkillDatabase.Init();
-
         // 소유자가 있고 실행기가 있다면
         if (owner != null && executer != null)
         {

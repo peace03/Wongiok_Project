@@ -34,6 +34,8 @@ public class EffectManager : MonoBehaviour, IInitializable
         EventBus<EffectAddDatas>.action += AddEffects;
         // 이펙트 실행 이벤트 구독
         EventBus<EffectPlayData>.action += OnPlayEffectEvent;
+        // 스킬 데이터베이스 초기화
+        SkillDatabase.Init();
     }
 
     /// <summary>
