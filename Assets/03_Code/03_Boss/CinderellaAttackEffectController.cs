@@ -3,6 +3,15 @@ using UnityEngine;
 //신데렐라 공격별 VFX 재생 담당
 public class CinderellaAttackEffectController : MonoBehaviour
 {
+    [Header("Audio Clip")]
+    [SerializeField] private AudioClip SFX_PatternA;
+    [SerializeField] private AudioClip SFX_PatternB;
+    [SerializeField] private AudioClip SFX_PatternC;
+    [Header("SFX Volume")]
+    [SerializeField, Range(0f, 1f)] private float kickImpactSfxVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float spinImpactSfxVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float slamImpactSfxVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float ultimateImpactSfxVolume = 1f;
     [Header("Attack A - Kick Impact")]
     [SerializeField] private GameObject kickImpactPrefab;
     [SerializeField] private Transform kickImpactPoint;
@@ -47,7 +56,8 @@ public class CinderellaAttackEffectController : MonoBehaviour
         }
         if(cue == BossEffectCue.SpinImpact) //패턴 B일 때 공격 회전도
         {
-            return Quaternion.Euler(-10f, 0f, 0f);
+            if (currentFacing == Facing.Left) return Quaternion.Euler(-5f, 10f, 160f);
+            else return Quaternion.Euler(-6f, 0f, 21f);
         }
         //패턴C 이펙트는 각도가 필요없어서 그냥 재생해줌
         if(cue == BossEffectCue.UltimateImpact) //궁극기일 때 공격 회전도
@@ -79,6 +89,9 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 kickImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue),
                 kickImpactDuration);
+            // 킥 타격음에 Inspector에서 설정한 볼륨을 적용한다.
+            EventBus<Play2DSoundEvent>.Publish(
+                new Play2DSoundEvent(SFX_PatternA, volume: kickImpactSfxVolume));
         }
         if (effectEvent.Cue == BossEffectCue.SpinImpact) //패턴B 이펙트 재생
         {
@@ -87,6 +100,9 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 spinImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue),
                 spinImpactDuration);
+            // 스핀 타격음에 Inspector에서 설정한 볼륨을 적용한다.
+            EventBus<Play2DSoundEvent>.Publish(
+                new Play2DSoundEvent(SFX_PatternA, volume: spinImpactSfxVolume));
         }
         if (effectEvent.Cue == BossEffectCue.SlamImpact) //패턴C 이펙트 재생
         {
@@ -95,6 +111,9 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 slamImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue),
                 slamImpactDuration);
+            // 슬램 타격음에 Inspector에서 설정한 볼륨을 적용한다.
+            EventBus<Play2DSoundEvent>.Publish(
+                new Play2DSoundEvent(SFX_PatternC, volume: slamImpactSfxVolume));
         }
         if(effectEvent.Cue == BossEffectCue.UltimateImpact) //궁극기 이펙트 재생
         {
@@ -104,6 +123,9 @@ public class CinderellaAttackEffectController : MonoBehaviour
                 effectEvent.Variant == 1 ? ultimateChestImpactPoint.position : ultimateCenterImpactPoint.position,
                 GetImpactRotation(effectEvent.Cue, effectEvent.Variant),
                 ultimateImpactDuration);
+            // 궁극기 타격음에 Inspector에서 설정한 볼륨을 적용한다.
+            EventBus<Play2DSoundEvent>.Publish(
+                new Play2DSoundEvent(SFX_PatternA, volume: ultimateImpactSfxVolume));
         }
     }
 }

@@ -1,12 +1,19 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BossStatus : MonoBehaviour, IInitializable, IDamageable
 {
     public int Priority => (int)InitOrder.Boss;
 
+    [Header("SFX")]
+    [SerializeField] private List<AudioClip> SFX_TakeDamages;
+    [SerializeField, Range(0f, 1f)] private float takeDamageSfxVolume = 1f;
+
+    [Header("Stats")]
     [SerializeField] private BossStatusData status;
 
-    private float playerMaxHP; //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
+    [Header("플레이어 최대체력 (PlayerStatus.cs)")]
+    [SerializeField] private PlayerStatus playerMaxHP; //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
 
     public Stat BossMaxHP => status.MaxHP;
 
@@ -14,7 +21,6 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
     {
         Debug.Log($"{Priority}번 BossStatus의 Init()호출");
         //병합할 때 플레이어 체력 ServiceLocator로 가져와서 넣어주면 됨
-        playerMaxHP = 120;
         status.ResetAllModifiers(); //계산식 먼저 초기화
         status.Init();
         TestPrint();
@@ -22,14 +28,12 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
 
     //그로기시 데미지 배율 설정
     public void SetGroggyDamageMultiplierActive(bool state) { status.SetGroggyDamageMultiplierActive(state); }
-    public void TakeDamage(float amount)//, Vector3 hitPoint = default)
+    public void TakeDamage(float amount)
     {
         status.SubCurrentHP(amount);
-        //Debug.Log($"보스 현재 체력: {status.CurrentHP}");
-        //if (hitPoint != default)
-        //{
-        //    이벤트 버스로 이펙트 실행시켜주기
-        //}
+        // 랜덤 보스 피격음에 Inspector에서 설정한 볼륨을 적용한다.
+        EventBus<Play2DSoundEvent>.Publish(
+            new Play2DSoundEvent(clips: SFX_TakeDamages, volume: takeDamageSfxVolume));
     }
 
     public float GetBossCurHP()
@@ -38,7 +42,7 @@ public class BossStatus : MonoBehaviour, IInitializable, IDamageable
     }
     public float GetAtkPower(AttackType type)
     {
-        return status.GetAtkPower(type, playerMaxHP);
+        return status.GetAtkPower(type, playerMaxHP.GetMaxHP());
     }
 
     public void TestPrint()

@@ -27,10 +27,13 @@ public abstract class BaseSkillData : ScriptableObject
     public string Desc => desc;
 
     // 액티브 스킬 데이터 변환
-    public ActiveSkillData AsActiveSkillData => this as ActiveSkillData;
+    public ActiveSkillData AsActiveData => Type == SKILL_TYPE.Active ? this as ActiveSkillData : null;
+
+    public PassiveSkillData AsPassiveData => Type == SKILL_TYPE.Passive ? this as PassiveSkillData : null;
 
     // 객체 생성 함수
-    public abstract SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer);
+    public abstract SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer,
+                                                                            CHAPTER_TYPE chapter, int fps);
 
     // 스킬 실행 함수
     public abstract void ExecuteSkill(GameObject owner, int level);

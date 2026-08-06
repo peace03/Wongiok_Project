@@ -18,10 +18,7 @@ public class BulletFactory : MonoBehaviour, IInitializable
 
     public IObjectPool<GameObject> Bullets => bullets;
 
-    public int Priority => (int)InitOrder.Skill;            // 중요도
-
-    // 임시 초기화
-    private void Awake() => Init();
+    public int Priority => (int)InitOrder.System + 3;       // 초기화 순서
 
     // 초기화 함수
     public void Init()

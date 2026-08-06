@@ -17,6 +17,18 @@ public struct ActiveSkillEffect
 }
 
 [Serializable]
+// 액티브 스킬 사운드 정보
+public struct ActiveSkillSound
+{
+    [Header("사운드 중요도")]
+    public int priority;                                            // 사운드 중요도
+    [Header("사운드 파일")]
+    public AudioClip clip;                                          // 사운드 파일
+    [Header("사운드 볼륨 크기")]
+    public float volume;                                            // 사운드 볼륨 크기
+}
+
+[Serializable]
 // 적용할 스탯 정보
 public struct StatAdjustment
 {
@@ -103,6 +115,25 @@ public readonly struct ChangeActiveSkillExecutePositions
 }
 
 /// <summary>
+/// 취소할 스킬 정보
+/// </summary>
+public readonly struct CancelSkill { }
+
+/// <summary>
+/// UI용 강화 가능한 스킬 정보들
+/// </summary>
+public readonly struct UICanEnhanceSkills
+{
+    public readonly List<UIPauseSkillInfoData> skills;              // 강화 가능한 스킬 정보들
+
+    /// <summary>
+    /// UI용 강화 가능한 스킬 정보들
+    /// </summary>
+    /// <param name="skills">강화 가능한 스킬 정보들</param>
+    public UICanEnhanceSkills(List<UIPauseSkillInfoData> skills) => this.skills = skills;
+}
+
+/// <summary>
 /// 누른 스킬 슬롯 정보
 /// </summary>
 public readonly struct StartedPressSkillSlot
@@ -113,19 +144,6 @@ public readonly struct StartedPressSkillSlot
     /// 누른 스킬 슬롯 정보 생성자
     /// </summary>
     public StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
-}
-
-/// <summary>
-/// 눌렀던 스킬 슬롯 정보
-/// </summary>
-public readonly struct CanceledPressSkillSlot
-{
-    public readonly ACTIVE_SKILL_SLOT_TYPE type;                    // 슬롯 종류
-
-    /// <summary>
-    /// 눌렀던 스킬 슬롯 정보 생성자
-    /// </summary>
-    public CanceledPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
 }
 
 /// <summary>

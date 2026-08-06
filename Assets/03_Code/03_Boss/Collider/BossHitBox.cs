@@ -18,6 +18,7 @@ public class BossHitBox : MonoBehaviour, IInitializable
     private HitBoxPhase phase = HitBoxPhase.Inactive; // 현재 이 콜라이더가 맡은 역할
     private Collider currentPlayerCollider;           // 범위 안에 들어온 플레이어 콜라이더
     private IDamageable currentTarget;                // 피해를 적용할 대상
+    private PlayerStatus currentPlayerStatus;         // 보스 피해 출처를 전달할 플레이어 상태 참조
     private PlayerParry currentPlayerParry;           // 플레이어에게 범위 안/밖 상태를 전달하기 위한 참조
 
     public void Init()
@@ -73,6 +74,7 @@ public class BossHitBox : MonoBehaviour, IInitializable
         // RangeCheck와 Damage가 같은 콜라이더를 쓰므로, 먼저 플레이어 정보를 저장한다.
         currentPlayerCollider = other;
         currentTarget = other.GetComponent<IDamageable>();
+        currentPlayerStatus = other.GetComponent<PlayerStatus>();
         currentPlayerParry = other.GetComponent<PlayerParry>();
         currentPlayerParry?.SetInBossAttackRange(true);
 
@@ -97,7 +99,17 @@ public class BossHitBox : MonoBehaviour, IInitializable
 
         // TakeDamage 전에 먼저 잠가서, 피해 처리 중 이벤트가 다시 와도 중복 피해가 생기지 않는다.
         isTriggered = true;
-        currentTarget.TakeDamage(AtkPower.GetAtkPower(AtkType));
+        float damage = AtkPower.GetAtkPower(AtkType);
+
+        // 플레이어 상태를 찾았으면 보스 피격 전용 후처리가 구분되도록 출처를 함께 전달한다.
+        if (currentPlayerStatus != null)
+        {
+            currentPlayerStatus.TakeDamage(damage, PlayerDamageSource.Boss);
+            return;
+        }
+
+        // 플레이어 상태를 찾지 못한 예외 상황에서도 기존 IDamageable 피해 처리는 유지한다.
+        currentTarget.TakeDamage(damage);
     }
 
     private void ClearTrackedPlayer()
@@ -106,6 +118,7 @@ public class BossHitBox : MonoBehaviour, IInitializable
         currentPlayerParry?.SetInBossAttackRange(false);
         currentPlayerCollider = null;
         currentTarget = null;
+        currentPlayerStatus = null;
         currentPlayerParry = null;
     }
 

@@ -15,6 +15,7 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
     private bool deletePersistentSaveOnNewGame = true;
 
     [Header("Scene Loading")]
+    [SerializeField] private string normalSceneName = "Chapter1Scene";
     [SerializeField]
     private float playerInitializationTimeout = 10f;
     [SerializeField]
@@ -44,6 +45,9 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.action +=
             HandleLoadCheckpointRequested;
 
+        EventBus<UIGameOverRestartChapterRequestedEvent>.action +=
+            HandleRestartChapterRequested;
+
         EventBus<UITitleNewGameRequestedEvent>.action +=
             HandleNewGameRequested;
     }
@@ -53,6 +57,9 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
     {
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.action -=
             HandleLoadCheckpointRequested;
+
+        EventBus<UIGameOverRestartChapterRequestedEvent>.action -=
+            HandleRestartChapterRequested;
 
         EventBus<UITitleNewGameRequestedEvent>.action -=
             HandleNewGameRequested;
@@ -84,6 +91,43 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         StartCoroutine(RespawnAtCheckpointRoutine());
     }
 
+    private void HandleRestartChapterRequested(
+        UIGameOverRestartChapterRequestedEvent eventData)
+    {
+        if (isRespawning)
+            return;
+
+        StartCoroutine(RestartChapterRoutine());
+    }
+
+    private IEnumerator RestartChapterRoutine()
+    {
+        isRespawning = true;
+        Time.timeScale = 1f;
+
+        CheckpointRuntimeSession.ClearAll();
+        DefenseStageRuntimeSession.ClearAll();
+        PrototypeGameSession.ClearCheckpoint();
+
+        if (saveSystem != null)
+        {
+            saveSystem.DeleteCheckpointSave();
+        }
+
+        AsyncOperation loadOperation =
+            SceneManager.LoadSceneAsync(
+                normalSceneName,
+                LoadSceneMode.Single);
+
+        if (loadOperation != null)
+        {
+            while (!loadOperation.isDone)
+                yield return null;
+        }
+
+        isRespawning = false;
+    }
+
     // 현재 체크포인트 Scene을 다시 불러오고 새 Player를 복원합니다.
     private IEnumerator RespawnAtCheckpointRoutine()
     {
@@ -111,10 +155,11 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
             yield break;
         }
 
-        int remainingLifeCount =
-            currentLifeTracker.CurrentLifeCount;
+        int remainingLifeCount = data.Progress.IsValid
+            ? data.Progress.LifeCount
+            : currentLifeTracker.CurrentLifeCount;
 
-        if (remainingLifeCount <= 0)
+        if (remainingLifeCount <= 0 && !data.Progress.IsValid)
         {
             Debug.LogWarning(
                 "남은 잔기가 없어 체크포인트에서 부활할 수 없습니다.",
@@ -156,8 +201,6 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
             isRespawning = false;
             yield break;
         }
-
-        DefenseStageRuntimeSession.RestoreCheckpointSnapshot();
 
         while (!loadOperation.isDone)
         {
@@ -268,10 +311,21 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         PlayerHealItemInventory healItemInventory =
             FindFirstObjectByType<PlayerHealItemInventory>();
 
+        PlayerCheckpointTracker checkpointTracker =
+            FindFirstObjectByType<PlayerCheckpointTracker>();
+
+        PlayerExperienceTracker experienceTracker =
+            FindFirstObjectByType<PlayerExperienceTracker>();
+
+        SkillSystemController skillSystem =
+            FindFirstObjectByType<SkillSystemController>();
+
         if (playerStatus == null ||
             playerController == null ||
             lifeTracker == null ||
-            healItemInventory == null)
+            healItemInventory == null ||
+            checkpointTracker == null ||
+            experienceTracker == null)
         {
             return false;
         }
@@ -286,7 +340,10 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
             playerStatus,
             playerController,
             lifeTracker,
-            healItemInventory);
+            healItemInventory,
+            checkpointTracker,
+            experienceTracker,
+            skillSystem);
 
         return true;
     }
@@ -297,11 +354,37 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         CheckpointRuntimeData data,
         int remainingLifeCount)
     {
+        CheckpointProgressSnapshot progress = data.Progress;
+
+        if (progress.IsValid)
+        {
+            references.SkillSystem?.RestoreCheckpointSnapshot(
+                progress.Skills);
+            references.PlayerStatus.ApplyPersistentStatSnapshot(
+                progress.PersistentStats);
+            references.ExperienceTracker.RestoreProgress(
+                progress.PlayerLevel,
+                progress.CurrentExperience);
+            references.PlayerStatus.RestoreCurrentHP(
+                progress.CurrentHP);
+            DefenseStageRuntimeSession.RestoreCheckpointSnapshot(
+                progress.ClearedDefenseStageIds);
+        }
+        else
+        {
+            references.PlayerStatus.RestoreCurrentHP(data.SavedHP);
+            DefenseStageRuntimeSession.RestoreCheckpointSnapshot();
+        }
+
         references.LifeTracker.RestoreCount(
-            remainingLifeCount);
+            Mathf.Max(1, remainingLifeCount));
 
         references.HealItemInventory.RestoreCount(
-            data.SavedHealItemCount);
+            progress.IsValid
+                ? progress.HealItemCount
+                : data.SavedHealItemCount);
+
+        references.CheckpointTracker.RestoreCheckpoint(data);
 
         references.PlayerController.TeleportTo(
             data.RespawnPosition);
@@ -316,18 +399,27 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
         public PlayerController PlayerController { get; }
         public PlayerLifeTracker LifeTracker { get; }
         public PlayerHealItemInventory HealItemInventory { get; }
+        public PlayerCheckpointTracker CheckpointTracker { get; }
+        public PlayerExperienceTracker ExperienceTracker { get; }
+        public SkillSystemController SkillSystem { get; }
 
         // Scene 로드 후 찾은 Player 컴포넌트 참조를 저장합니다.
         public PlayerRuntimeReferences(
             PlayerStatus playerStatus,
             PlayerController playerController,
             PlayerLifeTracker lifeTracker,
-            PlayerHealItemInventory healItemInventory)
+            PlayerHealItemInventory healItemInventory,
+            PlayerCheckpointTracker checkpointTracker,
+            PlayerExperienceTracker experienceTracker,
+            SkillSystemController skillSystem)
         {
             PlayerStatus = playerStatus;
             PlayerController = playerController;
             LifeTracker = lifeTracker;
             HealItemInventory = healItemInventory;
+            CheckpointTracker = checkpointTracker;
+            ExperienceTracker = experienceTracker;
+            SkillSystem = skillSystem;
         }
     }
 }

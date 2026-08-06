@@ -2,11 +2,9 @@ using UnityEngine;
 
 [RequireComponent(typeof(GameInputReader))]
 [RequireComponent(typeof(PlayerAnimatorDriver))]
-[RequireComponent(typeof(PlayerAudioController))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private PlayerAnimatorDriver animationDriver;
-    [SerializeField] private PlayerAudioController audioController;
 
     #region 플레이어 관련 변수, 상태, 참조등
     // 현재 실행 중인 플레이어 상태입니다.
@@ -29,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
     // 회복 아이템 보유량과 사용 완료 처리를 담당하는 컴포넌트입니다.
     private PlayerHealItemInventory _healItemInventory;
+    private PlayerAudioController _audioController;
 
     // Bootstrapper를 통한 PlayerInitializer 초기화가 끝났는지 확인합니다.
     private bool isInitialized;
@@ -74,7 +73,7 @@ public class PlayerController : MonoBehaviour
     public PlayerParry Parry => _parry;
     public PlayerHealItemInventory HealItemInventory => _healItemInventory;
     public PlayerAnimatorDriver Animation => animationDriver;
-    public PlayerAudioController Audio => audioController;
+    public PlayerAudioController Audio => _audioController;
     public bool IsFacingRight => _isFacingRight;
 
     // 현재 상태가 피해를 받을 수 있는지 Status 컴포넌트에서 확인할 때 사용합니다.
@@ -91,8 +90,8 @@ public class PlayerController : MonoBehaviour
         // 입력 전용 컴포넌트와 필수 컴포넌트들을 초기화합니다.
         EnsurePlayerParry();
         _inputReader = GetComponent<GameInputReader>();
+        _audioController = GetComponent<PlayerAudioController>();
         ResolveAnimationDriver();
-        ResolveAudioController();
 
         if (_inputReader == null)
             _inputReader = gameObject.AddComponent<GameInputReader>();
@@ -116,8 +115,8 @@ public class PlayerController : MonoBehaviour
         _attack = attack != null ? attack : GetComponent<PlayerAttack>();
         _parry = parry != null ? parry : GetComponent<PlayerParry>();
         _healItemInventory = healItemInventory != null ? healItemInventory : GetComponent<PlayerHealItemInventory>();
+        _audioController = GetComponent<PlayerAudioController>();
         ResolveAnimationDriver();
-        ResolveAudioController();
         animationDriver.Initialize();
         animationDriver.SetFacing(_isFacingRight);
 
@@ -339,14 +338,5 @@ public class PlayerController : MonoBehaviour
         animationDriver = GetComponent<PlayerAnimatorDriver>();
         if (animationDriver == null)
             animationDriver = gameObject.AddComponent<PlayerAnimatorDriver>();
-    }
-
-    private void ResolveAudioController()
-    {
-        if (audioController != null) return;
-
-        audioController = GetComponent<PlayerAudioController>();
-        if (audioController == null)
-            audioController = gameObject.AddComponent<PlayerAudioController>();
     }
 }

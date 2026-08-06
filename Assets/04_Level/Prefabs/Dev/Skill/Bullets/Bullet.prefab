@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1244123339933867414}
   - component: {fileID: -4488491299326556326}
   - component: {fileID: 4691349171600950845}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,10 +171,26 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 79a8300d9e0a57c44ba7d079fcd17e27, type: 2}
     - target: {fileID: 2300004, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2300004, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300004, guid: 1319cfeb42068a446bc5d43ef1562670, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: e29699a4170439f4e85a71b47e9a9240, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

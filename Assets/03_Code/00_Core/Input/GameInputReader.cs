@@ -42,12 +42,6 @@ public class GameInputReader : MonoBehaviour
     public bool SkillAPressed => _input.Player.SkillA.WasPressedThisFrame();
     public bool SkillSPressed => _input.Player.SkillS.WasPressedThisFrame();
     public bool SkillDPressed => _input.Player.SkillD.WasPressedThisFrame();
-    public bool SkillAReleased => _input.Player.SkillA.WasReleasedThisFrame();
-    public bool SkillSReleased => _input.Player.SkillS.WasReleasedThisFrame();
-    public bool SkillDReleased => _input.Player.SkillD.WasReleasedThisFrame();
-
-
-    
     #endregion
 
     private void Awake()
@@ -68,5 +62,20 @@ public class GameInputReader : MonoBehaviour
     private void OnDestroy()
     {
         _input?.Dispose();
+    }
+
+    /// <summary>
+    /// 스나이퍼 스킬 키 입력 취소 확인 함수
+    /// </summary>
+    /// <param name="skillIndex">스나이퍼 스킬 위치</param>
+    public bool ReleaseSniperSkill(int skillIndex)
+    {
+        return skillIndex switch
+        {
+            (int)ACTIVE_SKILL_SLOT_TYPE.A   => _input.Player.SkillA.IsPressed(),
+            (int)ACTIVE_SKILL_SLOT_TYPE.S   => _input.Player.SkillS.IsPressed(),
+            (int)ACTIVE_SKILL_SLOT_TYPE.D   => _input.Player.SkillD.IsPressed(),
+            _                               => false
+        };
     }
 }

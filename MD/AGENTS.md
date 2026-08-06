@@ -26,6 +26,7 @@ This Unity project uses Karpathy-inspired coding guidelines to keep AI-assisted 
 ## 4. Goal-Driven Execution
 
 - Convert work into clear success criteria before making non-trivial changes.
+- Before implementation begins, explicitly list every script or file that will be modified and briefly state the responsibility of each planned change.
 - Verify with the narrowest useful check available, such as compilation, Unity tests, or focused code inspection.
 - For bug fixes, prefer reproducing the bug first when practical.
 - Stop and ask if the success condition is unclear.
@@ -49,3 +50,13 @@ This Unity project uses Karpathy-inspired coding guidelines to keep AI-assisted 
 - Distinguish common industry practice from project-specific choices, and explain the tradeoffs when adapting that practice to this project's existing architecture and scope.
 - Prefer the smallest production-ready design that fits the current project instead of copying large-scale patterns or adding speculative abstractions.
 - For Unity gameplay systems, account for animation-event timing, physics update timing, collider lifecycle, duplicate callbacks, and explicit state cleanup.
+
+## 7. Object-Oriented And SOLID Design
+
+- Design and implement object-oriented code according to SOLID principles while preserving the project's existing architecture and simplicity.
+- Keep each class and method focused on one clear responsibility (Single Responsibility Principle).
+- Prefer extending behavior through existing interfaces, composition, and well-defined extension points instead of repeatedly modifying stable core logic (Open/Closed Principle).
+- Ensure derived classes and implementations preserve the contracts and expected behavior of their base types and interfaces (Liskov Substitution Principle).
+- Keep interfaces small and role-specific so consumers do not depend on methods they do not use (Interface Segregation Principle).
+- Make high-level gameplay logic depend on stable abstractions rather than concrete implementations when that separation provides a clear testing or maintenance benefit (Dependency Inversion Principle).
+- Apply SOLID pragmatically; do not introduce unnecessary interfaces, layers, or abstractions solely to satisfy a principle.

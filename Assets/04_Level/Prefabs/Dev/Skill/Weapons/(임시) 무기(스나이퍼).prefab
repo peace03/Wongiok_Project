@@ -25,11 +25,11 @@ Transform:
   m_GameObject: {fileID: 229279855435992542}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.214, y: 0.024, z: 0.673}
+  m_LocalPosition: {x: -0.08, y: 0.024000049, z: 0.67200017}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7921254456631329388}
+  m_Father: {fileID: 3097866973706234036}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &696036500620674982
 GameObject:
@@ -93,7 +93,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 369137104787395017}
-  - {fileID: 6021989299019215264}
   m_Father: {fileID: 3097866973706234036}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6067163327744034894
@@ -106,6 +105,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3097866973706234036}
   - component: {fileID: 3637333600378285594}
+  - component: {fileID: 6984409318830418496}
   m_Layer: 0
   m_Name: "(\uC784\uC2DC) \uBB34\uAE30(\uC2A4\uB098\uC774\uD37C)"
   m_TagString: Untagged
@@ -127,6 +127,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7921254456631329388}
+  - {fileID: 6021989299019215264}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &3637333600378285594
@@ -143,6 +144,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   firePoints:
   - {fileID: 6021989299019215264}
+--- !u!95 &6984409318830418496
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6067163327744034894}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ad37c42c6996b7e498cc2d67e4ba7c43, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &6567548584750914796
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -169,7 +192,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: a0e70037533056249a1bcaf8b480c5cb, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.15212345
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: a0e70037533056249a1bcaf8b480c5cb, type: 3}
       propertyPath: m_LocalRotation.x
@@ -177,7 +200,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: a0e70037533056249a1bcaf8b480c5cb, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.9883615
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: a0e70037533056249a1bcaf8b480c5cb, type: 3}
       propertyPath: m_LocalRotation.z
@@ -189,7 +212,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: a0e70037533056249a1bcaf8b480c5cb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 162.5
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: a0e70037533056249a1bcaf8b480c5cb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z

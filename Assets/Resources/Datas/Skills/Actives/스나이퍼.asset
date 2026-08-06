@@ -18,8 +18,8 @@ MonoBehaviour:
   type: 1
   unlockChapter: 0
   maxLevel: 3
-  desc: "\uC9E7\uC740 \uCC28\uC9D5 \uD6C4 \uC804\uBC29\uC744 \uD5A5\uD55C \uC800\uACA9\uD0C4\uC744
-    \uBC1C\uC0AC\uD568"
+  desc: "\uC9E7\uC740 \uCC28\uC9D5(\uD0A4\uB2E4\uC6B4) \uD6C4 \uC804\uBC29\uC744
+    \uD5A5\uD55C \uC800\uACA9\uD0C4\uC744 \uBC1C\uC0AC\uD568"
   levelDatas:
   - rid: 4582174548851687625
   - rid: 4582174548851687626
@@ -30,14 +30,21 @@ MonoBehaviour:
     priority: 0
     prefab: {fileID: 3601591287173406441, guid: 716fd9840154b4448a616d863f170451, type: 3}
   - type: 1
-    priority: 0
+    priority: 1
     prefab: {fileID: 2669777573548968389, guid: 3c29fd8ae4c3673498719dceb1983a93, type: 3}
-  - type: 3
+  - type: 1
     priority: 0
+    prefab: {fileID: 2079216311581701338, guid: 37f973e391f65674b9b8c5fb279a3809, type: 3}
+  - type: 3
+    priority: 10
     prefab: {fileID: 6628276393031643956, guid: 6b235e51b019a9f478b3da92c24ccfd5, type: 3}
   - type: 4
     priority: 0
     prefab: {fileID: 6561904271629179525, guid: 2cdd3bb1227ee9348b2be96e207b9731, type: 3}
+  sounds:
+  - priority: 0
+    clip: {fileID: 8300000, guid: c528b04aae6d7364097e0179b61234e5, type: 3}
+    volume: 1
   references:
     version: 2
     RefIds:

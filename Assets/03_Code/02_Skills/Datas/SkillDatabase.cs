@@ -26,13 +26,20 @@ public static class SkillDatabase
         // 가져온 스킬 정보들의 수만큼
         foreach(var data in datas)
         {
+            if (data == null)
+                continue;
+
             // ID에 해당하는 스킬 정보가 없다면
             if (!skillDataDictionary.TryGetValue(data.Id, out var existData))
             {
                 // 액티브 스킬 데이터 변환이 가능하다면
-                if(data.AsActiveSkillData != null)
+                if(data.AsActiveData != null)
+                {
                     // 이펙트 정렬하기
-                    data.AsActiveSkillData.SortEffects();
+                    data.AsActiveData.SortEffects();
+                    // 사운드 정렬하기
+                    data.AsActiveData.SortSounds();
+                }
 
                 // 스킬 정보 추가
                 skillDataDictionary[data.Id] = data;

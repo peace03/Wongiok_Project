@@ -52,11 +52,18 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
             out float currentHP,
             out int currentHealItemCount);
 
+        CheckpointProgressSnapshot progress =
+            CaptureProgressSnapshot(
+                checkpointEvent.PlayerObject,
+                currentHP,
+                currentHealItemCount);
+
         CheckpointRuntimeData runtimeData =
             CheckpointRuntimeData.FromDefinition(
                 definition,
                 currentHP,
-                currentHealItemCount);
+                currentHealItemCount,
+                progress);
 
         CheckpointRuntimeSession.SetActiveCheckpoint(
             runtimeData);
@@ -84,6 +91,45 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
                 $"Recovered: {didRecover}",
                 checkpointEvent.CheckpointObject);
         }
+    }
+
+    private CheckpointProgressSnapshot CaptureProgressSnapshot(
+        GameObject playerObject,
+        float currentHP,
+        int healItemCount)
+    {
+        PlayerStatus playerStatus =
+            playerObject.GetComponent<PlayerStatus>();
+        PlayerLifeTracker lifeTracker =
+            playerObject.GetComponent<PlayerLifeTracker>();
+        PlayerExperienceTracker experienceTracker =
+            playerObject.GetComponent<PlayerExperienceTracker>();
+        SkillSystemController skillSystem =
+            playerObject.GetComponentInChildren<SkillSystemController>(true);
+
+        return new CheckpointProgressSnapshot
+        {
+            IsValid = true,
+            CurrentHP = currentHP,
+            HealItemCount = healItemCount,
+            LifeCount = lifeTracker != null
+                ? lifeTracker.CurrentLifeCount
+                : 0,
+            PlayerLevel = experienceTracker != null
+                ? experienceTracker.CurrentLevel
+                : 1,
+            CurrentExperience = experienceTracker != null
+                ? experienceTracker.CurrentExp
+                : 0f,
+            PersistentStats = playerStatus != null
+                ? playerStatus.CapturePersistentStatSnapshot()
+                : default,
+            Skills = skillSystem != null
+                ? skillSystem.CaptureCheckpointSnapshot()
+                : System.Array.Empty<CheckpointSkillSnapshot>(),
+            ClearedDefenseStageIds =
+                DefenseStageRuntimeSession.CaptureCurrentState()
+        };
     }
 
     // Player에 부착된 Stage 소유 회복 시스템을 찾습니다

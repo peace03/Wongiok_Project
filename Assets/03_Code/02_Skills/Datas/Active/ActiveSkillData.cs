@@ -9,19 +9,23 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
     [SerializeField] private GameObject weapon;                     // 무기 프리팹
     [Header("스킬 이펙트들")]
     [SerializeField] private List<ActiveSkillEffect> effects;       // 스킬 이펙트들
+    [Header("스킬 사운드들")]
+    [SerializeField] private List<ActiveSkillSound> sounds;         // 스킬 사운드들
 
     // 이펙트 종류별 정보(범위) 딕셔너리(시작 위치, 개수)
     private readonly Dictionary<ACTIVE_SKILL_EFFECT_TYPE, (int index, int count)> effectRanges = new();
 
     public GameObject Weapon => weapon;
     public IReadOnlyList<ActiveSkillEffect> Effects => effects;
+    public IReadOnlyList<ActiveSkillSound> Sounds => sounds;
 
     /// <summary>
     /// 스킬 객체 생성 함수
     /// </summary>
     /// <param name="owner">스킬 소유자</param>
-    public override SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer)
-                                        => new(owner, executer, this);
+    public override SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer,
+                                                                        CHAPTER_TYPE chapter, int fps)
+                                                                => new(owner, executer, this, chapter, fps);
 
     /// <summary>
     /// 최대 쿨타임 반환 함수
@@ -92,7 +96,7 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
     /// </summary>
     /// <param name="level">스킬 레벨</param>
     /// <param name="stage">스킬 단계</param>
-    public float GetDamageByLevel(int level, int stage = 0)
+    public float GetDamage(int level, int stage = 0)
     {
         // 레벨에 맞는 정보 가져오기
         var data = GetLevelData(level);
@@ -211,5 +215,18 @@ public class ActiveSkillData : LevelBasedSkillData<ActiveSkillLevelData>
         for (int i = range.index; i < range.index + range.count; i++)
             // 이펙트 프리팹을 결과 리스트에 추가
             results.Add(effects[i].prefab);
+    }
+
+    /// <summary>
+    /// 사운드 정렬 함수
+    /// </summary>
+    public void SortSounds()
+    {
+        // 사운드가 없거나, 사운드의 개수가 없다면
+        if (sounds == null || sounds.Count == 0)
+            return;
+
+        // 사운드 정렬 시작(중요도별 내림차순[큰 -> 작] 반환)
+        sounds.Sort((a, b) => b.priority.CompareTo(a.priority));
     }
 }

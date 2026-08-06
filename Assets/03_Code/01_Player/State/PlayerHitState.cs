@@ -45,6 +45,8 @@ public class PlayerHitState : PlayerBaseState
 
         controller.Animation.PlayHit();
         controller.Movement.ResetVerticalVelocity();
+        controller.Animation.PlayHit();
+        EventBus<CancelSkill>.Publish(default);
     }
 
     public override void UpdateState()

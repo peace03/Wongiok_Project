@@ -13,7 +13,11 @@ public class BossController : MonoBehaviour, IInitializable
     private Animator animator;
     private bool isDefeated;
 
-    private const float DefeatPresentationDuration = 2f;
+    [Header("Boss BGM")]
+    [SerializeField] private AudioClip bossBgmClip;
+    [SerializeField, Range(0f, 1f)] private float bossBgmVolume = 0.5f;
+
+    private const float DefeatPresentationDuration = 5f;
     public Dictionary<State,BossState> bossState { get; }
         = new Dictionary<State, BossState>(); //상태 Dictionary
     private BossState curState; //현재 상태 패턴
@@ -42,15 +46,20 @@ public class BossController : MonoBehaviour, IInitializable
         //Debug.Log("BossController Init()실행 완료");
     }
 
+    // 보스가 활성화되면 전투 상태 전환과 플레이어 사망 이벤트를 구독한다.
     private void OnEnable()
     {
         EventBus<UltimateInvokeEvent>.action += SetUltimateState;
         EventBus<BossDeadEvent>.action += SetDefeatedState;
+        EventBus<PlayerDeadEvent>.action += DeactivateOnPlayerDeath;
     }
+
+    // 보스가 비활성화되면 모든 이벤트 구독을 해제해 중복 콜백을 방지한다.
     private void OnDisable()
     {
         EventBus<UltimateInvokeEvent>.action -= SetUltimateState;
         EventBus<BossDeadEvent>.action -= SetDefeatedState;
+        EventBus<PlayerDeadEvent>.action -= DeactivateOnPlayerDeath;
     }
 
     private void FixedUpdate()
@@ -90,13 +99,36 @@ public class BossController : MonoBehaviour, IInitializable
     //궁극기 발동상태 전환
     public void SetUltimateState(UltimateInvokeEvent data) { ChangeState(State.Ultimate); }
 
+    // 보스 스폰 상태가 시작될 때 설정된 보스 BGM 재생을 요청한다.
+    public void PlayBossBgm()
+    {
+        // BGM 클립이 없는 보스도 전투 로직은 정상적으로 진행하게 한다.
+        if (bossBgmClip == null)
+            return;
+
+        // 실제 BGM 재생과 페이드 처리는 SoundManager에 위임하고 Inspector 볼륨을 전달한다.
+        EventBus<PlayBgmEvent>.Publish(
+            new PlayBgmEvent(bossBgmClip, volume: bossBgmVolume));
+    }
+
+    // 플레이어가 사망하면 진행 중인 보스 전투와 하위 공격 오브젝트를 즉시 종료한다.
+    private void DeactivateOnPlayerDeath(PlayerDeadEvent data)
+    {
+        gameObject.SetActive(false);
+    }
+
+    //보스가 죽을 때 상태 전환
     private void SetDefeatedState(BossDeadEvent data)
     {
+        Debug.Log("죽음!!!!!!!!!!!!!!");
         if (isDefeated)
             return;
 
         isDefeated = true;
         ChangeState(State.Defeated);
+
+        // 보스가 사망한 즉시 현재 보스전 BGM의 종료를 요청한다.
+        EventBus<StopBgmEvent>.Publish(new StopBgmEvent());
 
         // 보스가 죽으면 현재 공격의 패링 창도 함께 닫는다.
         EventBus<CanParryEvent>.Publish(
@@ -108,7 +140,10 @@ public class BossController : MonoBehaviour, IInitializable
             rb.linearVelocity = Vector3.zero;
 
         if (animator != null)
-            animator.SetInteger("Num", (int)Animation.Groggy);
+        {
+            int animationNum = Random.Range((int)Animation.Defeated2, (int)Animation.Defeated3 + 1);
+            animator.SetInteger("Num", animationNum);
+        }
 
         StartCoroutine(DefeatPresentation());
     }

@@ -169,6 +169,13 @@ public class PlayerStatus : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
+        // 기존 IDamageable 호출은 출처를 알 수 없는 일반 피해로 처리한다.
+        TakeDamage(damage, PlayerDamageSource.Unknown);
+    }
+
+    // 피해 출처까지 함께 받아, 실제 피해 후처리가 공격 종류를 구분할 수 있게 한다.
+    public void TakeDamage(float damage, PlayerDamageSource source)
+    {
         #region 데미지 처리
         // 사망 처리 중에는 추가 피해와 피격 상태 진입을 모두 무시합니다.
         if (isDeathProcessing) return;
@@ -203,7 +210,7 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         
         // 이벤트 발행
         PublishHealthChanged();
-        PublishDamaged();
+        PublishDamaged(source);
 
         // 피해 적용 후 사망 상태가 되었다면 사망 이벤트를 발행합니다.
         if (status.IsDead)
@@ -290,6 +297,15 @@ public class PlayerStatus : MonoBehaviour, IDamageable
     public float GetCurrentHP()
     {
         return status.CurrentHP;
+    }
+
+    public void RestoreCurrentHP(float currentHP)
+    {
+        status.CurrentHP = Mathf.Clamp(
+            currentHP,
+            0f,
+            status.MaxHP.FinalValue);
+        PublishHealthChanged();
     }
 
     public float GetAttackPower()
@@ -432,14 +448,16 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         }
     }
 
-    private void PublishDamaged()
+    // 실제 HP가 감소한 뒤 피해 출처를 포함한 이벤트를 발행한다.
+    private void PublishDamaged(PlayerDamageSource source)
     {
         // 후처리 시스템이 실제 데미지가 적용된 시점을 받을 수 있게 알립니다.
         EventBus<PlayerDamagedEvent>.Publish(
             new PlayerDamagedEvent(
                 gameObject,
                 status.CurrentHP,
-                status.MaxHP.FinalValue
+                status.MaxHP.FinalValue,
+                source
             )
         );
     }

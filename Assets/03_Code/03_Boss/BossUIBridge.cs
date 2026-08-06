@@ -18,10 +18,7 @@ public class BossUIBridge : MonoBehaviour, IInitializable
         bossMaxHP = bossStatus.BossMaxHP.FinalValue;
         bossName = bossStatus.gameObject.name;
         bossIsDead = false;
-    }
 
-    private void Start()
-    {
         uiManager.ChangeScreen(UIScreenState.InGame);
         uiManager.SetBossHudVisible(true);
         PublishBossHudData(bossStatus.GetBossCurHP());
@@ -35,12 +32,14 @@ public class BossUIBridge : MonoBehaviour, IInitializable
         EventBus<BossHPChangedEvent>.action += BossHPChanged;
         EventBus<BossDeadEvent>.action += BossIsDead;
         EventBus<BossDeathPresentationFinishedEvent>.action += BossDeathPresentationFinished;
+        EventBus<UIRequestBossHudDataEvent>.action += HandleBossHudDataRequested;
     }
     private void OnDisable()
     {
         EventBus<BossHPChangedEvent>.action -= BossHPChanged;
         EventBus<BossDeadEvent>.action -= BossIsDead;
         EventBus<BossDeathPresentationFinishedEvent>.action -= BossDeathPresentationFinished;
+        EventBus<UIRequestBossHudDataEvent>.action -= HandleBossHudDataRequested;
     }
 
     //Update문에서 계속 검사하는건 낭비 같아서 한번만 실행하도록 만들었습니다.
@@ -64,6 +63,15 @@ public class BossUIBridge : MonoBehaviour, IInitializable
     private void BossDeathPresentationFinished(BossDeathPresentationFinishedEvent data)
     {
         uiManager.SetBossHudVisible(false);
+    }
+
+    private void HandleBossHudDataRequested(
+        UIRequestBossHudDataEvent eventData)
+    {
+        if (bossStatus == null || uiManager == null || bossIsDead)
+            return;
+
+        PublishBossHudData(bossStatus.GetBossCurHP());
     }
 
     private void PublishBossHudData(float currentHP)

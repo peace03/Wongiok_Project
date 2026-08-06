@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
 
 /// <summary>
 /// 발사체 액티브 스킬 인터페이스
@@ -33,6 +32,16 @@ public interface IHaveFirePoint
     /// 총구 위치들
     /// </summary>
     public List<Transform> FirePoints { get; }
+
+    /// <summary>
+    /// 애니메이션 재생 함수
+    /// </summary>
+    public void PlayAnimation();
+
+    /// <summary>
+    /// 애니메이션 취소 함수
+    /// </summary>
+    public void CancelAnimation();
 }
 
 /// <summary>

@@ -126,3 +126,7 @@ public struct UISetBossHudDataEvent
         MaxHp = maxHp;
     }
 }
+
+public struct UIRequestBossHudDataEvent
+{
+}

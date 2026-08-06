@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\uACF5\uACA9 \uC18D\uB3C4"
   m_EditorClassIdentifier: Assembly-CSharp::PassiveSkillData
   id: 2004
-  icon: {fileID: 0}
+  icon: {fileID: -855044176, guid: a3a0ed63fdfd075488ff2270bc440097, type: 3}
   skillName: "\uACF5\uACA9 \uC18D\uB3C4"
   type: 0
   unlockChapter: 0
@@ -21,6 +21,8 @@ MonoBehaviour:
   desc: "\uACF5\uACA9 \uC18D\uB3C4\uAC00 \uC99D\uAC00\uD55C\uB2E4."
   levelDatas:
   - rid: 1008828851650560161
+  - rid: 2620632180129005809
+  - rid: 2620632180129005810
   references:
     version: 2
     RefIds:
@@ -32,3 +34,19 @@ MonoBehaviour:
         - stat: 3
           modify: 0
           amount: 0.5
+    - rid: 2620632180129005809
+      type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        triggerType: 0
+        appliedStats:
+        - stat: 3
+          modify: 0
+          amount: 1
+    - rid: 2620632180129005810
+      type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
+      data:
+        triggerType: 0
+        appliedStats:
+        - stat: 3
+          modify: 0
+          amount: 1.5

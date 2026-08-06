@@ -5,6 +5,7 @@
 public class PassiveSkillData : LevelBasedSkillData<PassiveSkillLevelData>
 {
     // 객체 생성 함수
-    public override SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer)
-                                        => new(owner, executer, this);
+    public override SkillInstance CreateInstance(GameObject owner, ActiveSkillExecuter executer,
+                                                                        CHAPTER_TYPE chapter, int fps)
+                                                                => new(owner, executer, this, chapter, fps);
 }

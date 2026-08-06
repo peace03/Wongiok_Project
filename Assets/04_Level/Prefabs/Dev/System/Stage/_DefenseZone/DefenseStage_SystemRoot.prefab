@@ -510,7 +510,7 @@ MonoBehaviour:
   onStageCleared:
     m_PersistentCalls:
       m_Calls: []
-  stageId: 
+  stageId: CH01_DEFENSE_001
 --- !u!1 &6911505930648136094
 GameObject:
   m_ObjectHideFlags: 0

@@ -151,6 +151,13 @@ public readonly struct CheckpointActivatedEvent
     }
 }
 
+// 플레이어 피해의 발생 주체를 구분합니다.
+public enum PlayerDamageSource
+{
+    Unknown,
+    Boss
+}
+
 // 플레이어가 실제 데미지를 받은 뒤 발행되는 이벤트입니다.
 // UI, 사운드, 피격 이펙트는 이 이벤트를 구독해서 후처리만 담당합니다.
 public readonly struct PlayerDamagedEvent
@@ -164,14 +171,19 @@ public readonly struct PlayerDamagedEvent
     // 플레이어의 최대 체력입니다.
     public readonly float MaxHP;
 
+    // 실제 피해를 적용한 공격 주체입니다.
+    public readonly PlayerDamageSource Source;
+
     public PlayerDamagedEvent(
         GameObject playerObject,
         float currentHP,
-        float maxHP)
+        float maxHP,
+        PlayerDamageSource source = PlayerDamageSource.Unknown)
     {
         PlayerObject = playerObject;
         CurrentHP = currentHP;
         MaxHP = maxHP;
+        Source = source;
     }
 }
 

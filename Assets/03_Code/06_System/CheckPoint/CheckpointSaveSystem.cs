@@ -16,6 +16,7 @@ public class CheckpointSaveSystem : MonoBehaviour
     private const string HpKey = "Checkpoint.HP";
     private const string HealItemCountKey =
         "Checkpoint.HealItemCount";
+    private const string ProgressKey = "Checkpoint.Progress";
 
     public bool HasCheckpointSave =>
         PlayerPrefs.GetInt(HasSaveKey, 0) == 1;
@@ -79,6 +80,18 @@ public class CheckpointSaveSystem : MonoBehaviour
         PlayerPrefs.SetInt(
             HealItemCountKey,
             data.SavedHealItemCount);
+
+        if (data.Progress.IsValid)
+        {
+            PlayerPrefs.SetString(
+                ProgressKey,
+                JsonUtility.ToJson(data.Progress));
+        }
+        else
+        {
+            PlayerPrefs.DeleteKey(ProgressKey);
+        }
+
         PlayerPrefs.Save();
     }
 
@@ -145,6 +158,16 @@ public class CheckpointSaveSystem : MonoBehaviour
                 definition.RespawnEulerAngles;
         }
 
+        CheckpointProgressSnapshot progress = default;
+        string progressJson =
+            PlayerPrefs.GetString(ProgressKey, string.Empty);
+
+        if (!string.IsNullOrWhiteSpace(progressJson))
+        {
+            progress = JsonUtility.FromJson<CheckpointProgressSnapshot>(
+                progressJson);
+        }
+
         data = new CheckpointRuntimeData(
             definition,
             checkpointId,
@@ -155,7 +178,8 @@ public class CheckpointSaveSystem : MonoBehaviour
             PlayerPrefs.GetFloat(HpKey, 0f),
             PlayerPrefs.GetInt(
                 HealItemCountKey,
-                0));
+                0),
+            progress);
 
         return data.IsValid;
     }
@@ -251,6 +275,7 @@ public class CheckpointSaveSystem : MonoBehaviour
         PlayerPrefs.DeleteKey(RotationZKey);
         PlayerPrefs.DeleteKey(HpKey);
         PlayerPrefs.DeleteKey(HealItemCountKey);
+        PlayerPrefs.DeleteKey(ProgressKey);
         PlayerPrefs.Save();
     }
 }

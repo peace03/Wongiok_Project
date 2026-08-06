@@ -2,29 +2,13 @@ using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections.Generic;
 
-public class EffectManager : MonoBehaviour
+public class EffectManager : MonoBehaviour, IInitializable
 {
-    public static EffectManager Instance { get; private set; }        // 싱글톤 인스턴스
+    public static EffectManager Instance { get; private set; }      // 싱글톤 인스턴스
+    public int Priority => (int)InitOrder.System + 4;               // 초기화 순서 
 
     // 모든 이펙트 오브젝트 풀 딕셔너리
     private readonly Dictionary<GameObject, IObjectPool<GameObject>> effectPools = new();
-
-    private void OnEnable()
-    {
-        // 이펙트 추가 이벤트 구독
-        EventBus<EffectAddData>.action += AddEffect;
-        EventBus<EffectAddDatas>.action += AddEffects;
-        // 이펙트 실행 이벤트 구독
-        EventBus<EffectPlayData>.action += OnPlayEffectEvent;
-    }
-
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(this);
-    }
 
     private void OnDisable()
     {
@@ -33,6 +17,23 @@ public class EffectManager : MonoBehaviour
         EventBus<EffectAddDatas>.action -= AddEffects;
         // 이펙트 실행 이벤트 구독 해제
         EventBus<EffectPlayData>.action -= OnPlayEffectEvent;
+    }
+
+    /// <summary>
+    /// 초기화 함수
+    /// </summary>
+    public void Init()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(this);
+
+        // 이펙트 추가 이벤트 구독
+        EventBus<EffectAddData>.action += AddEffect;
+        EventBus<EffectAddDatas>.action += AddEffects;
+        // 이펙트 실행 이벤트 구독
+        EventBus<EffectPlayData>.action += OnPlayEffectEvent;
     }
 
     /// <summary>

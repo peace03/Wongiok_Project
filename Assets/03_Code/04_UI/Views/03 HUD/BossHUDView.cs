@@ -31,6 +31,7 @@ public class BossHUDView : UIViewBase
     protected override void OnShow()
     {
         RefreshAll();
+        EventBus<UIRequestBossHudDataEvent>.Publish(default);
     }
 
     protected override void OnHide()

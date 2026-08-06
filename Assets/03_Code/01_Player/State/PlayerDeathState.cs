@@ -40,6 +40,7 @@ public class PlayerDeathState : PlayerBaseState
 
         controller.Movement.ResetVerticalVelocity();
         controller.Animation.PlayDeath();
+        EventBus<CancelSkill>.Publish(default);
     }
 
     public override void UpdateState()

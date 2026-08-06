@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5137682873655974583}
   - component: {fileID: 1365247517992309161}
   - component: {fileID: 9096931607055580299}
+  - component: {fileID: 3180099802896253127}
   m_Layer: 0
   m_Name: InGameUIManagers
   m_TagString: Untagged
@@ -125,19 +126,39 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b379997a0d9ec414abe23af0a254000b, type: 2}
   - {fileID: 11400000, guid: 04ee4858cccf5234088dfad1694b8760, type: 2}
   - {fileID: 11400000, guid: faa1e2a2482b8064d8f7af02e0ec7374, type: 2}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 25e24392d54b4d8469ca35ad95352903, type: 2}
+  - {fileID: 11400000, guid: 7cc8fb77276aa45409b5b51bcf65ef55, type: 2}
+  - {fileID: 11400000, guid: 29ad7f38acc08bd408630cdf5447e43a, type: 2}
+  - {fileID: 11400000, guid: e5f1777bb3c46a9438efa6dfa286254d, type: 2}
+  - {fileID: 11400000, guid: 5bb25fca6c0a80941a5c1b2714e75957, type: 2}
+  - {fileID: 11400000, guid: 34917e068b23450468da2fdee3300639, type: 2}
+  - {fileID: 11400000, guid: d16f475ef63988d4792ed9e9f1a1516b, type: 2}
+  - {fileID: 11400000, guid: 0c93533c162d00541bad44f6a0f72296, type: 2}
+  - {fileID: 11400000, guid: 3729248f9308d13459597162c9e3fdc1, type: 2}
+  - {fileID: 11400000, guid: dccd518a80539f942b5860b72d458fa2, type: 2}
+  - {fileID: 11400000, guid: dc067ac15dfa04444abaff5f4f4fc54a, type: 2}
+  - {fileID: 11400000, guid: a3e86764ee05e0444858dca5ee306a37, type: 2}
+  - {fileID: 11400000, guid: 755c8f07a1d8ed14ebf8ac894a3c1677, type: 2}
+  - {fileID: 11400000, guid: 4fdc33044d6bf8c4e87148e1d0a1d2c9, type: 2}
+--- !u!114 &3180099802896253127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8510130351359545474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a93c204950f4ed781257f40a7ab69cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossCutsceneFlowController
+  bossSceneName: RougeHoodBossScene
+  bossEncounterVideoClip: {fileID: 32900000, guid: 46af37f959a133d4089e9884c244f59b, type: 3}
+  minimumEncounterLoadingPreviewTime: 3
+  encounterFadeOutDuration: 0.5
+  encounterFadeInDuration: 0.5
+  bossClearVideoClip: {fileID: 32900000, guid: 3db38279babb9fd41b95075f420ae924, type: 3}
+  bossClearFadeOutDelay: 1
+  bossClearFadeOutDuration: 0.5
+  bossClearVideoFadeInDelay: 0.2
+  bossClearFadeInDuration: 0.5

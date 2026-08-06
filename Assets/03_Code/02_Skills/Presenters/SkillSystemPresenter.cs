@@ -12,19 +12,16 @@ public class SkillSystemPresenter
     private List<SkillInstance> modelResults = new();                           // 스킬 모델 결과들 리스트
     private List<UIPauseSkillInfoData> equippedSkillUIDatas = new();            // 장착한 스킬 UI 데이터들 리스트
     private List<UIPauseSkillInfoData> unequippedSkillUIDatas = new();          // 미장착한 스킬 UI 데이터들 리스트
-    [NonSerialized] private readonly PlayerAnimatorDriver ownerAnimatorDriver;
-
-    private const int sniperSkillId = 1003;
+    private List<UIPauseSkillInfoData> canEnhanceSkillUIDatas = new();          // 강화 가능 스킬 UI 데이터들 리스트
 
     /// <summary>
     /// 생성자
     /// </summary>
     /// <param name="owner">스킬 소유자</param>
     /// <param name="executer">액티브 스킬 실행기</param>
-    public SkillSystemPresenter(GameObject owner, ActiveSkillExecuter executer)
+    public SkillSystemPresenter(GameObject owner, ActiveSkillExecuter executer,
+                                                                        GameInputReader ownerInput = null)
     {
-        ownerAnimatorDriver = owner.GetComponent<PlayerAnimatorDriver>();
-
         // 스킬 데이터를 담을 리스트
         List<BaseSkillData> skillDatas = new();
         // 현재 챕터의 스킬 데이터 받아오기
@@ -34,11 +31,11 @@ public class SkillSystemPresenter
         if (skillDatas.Count != 0)
         {
             // 스킬 모델 생성하기
-            model = new(owner, executer, skillDatas);
+            model = new(owner, executer, skillDatas, curChapter, ownerInput);
             // 액티브 스킬 변경 이벤트 구독
             model.OnActiveSkillsChanged += RefreshActiveSkills;
-            // 실제 스킬 상태에 맞춰 애니메이션을 전환하기 위한 이벤트 구독
-            model.OnSkillStateChanged += HandleSkillStateChanged;
+            // 스킬 강화 이벤트 구독
+            model.OnSkillEnhanced += RefreshCanEnhanceSkillUIDatas;
             // UI 레벨업 스킬 선택 이벤트 구독
             EventBus<UILevelUpSkillSelectedEvent>.action += RefreshSelectedSkill;
             // 패시브 스킬 새로고침
@@ -47,6 +44,8 @@ public class SkillSystemPresenter
             EventBus<UIPauseSkillEquipRequestedEvent>.action += RefreshSelectedSkills;
             // 스킬 스왑(장착 -> 장착) 이벤트 구독
             EventBus<UIPauseSkillSwapRequestedEvent>.action += RefreshSelectedSkills;
+            // 강화 가능 스킬 데이터 전달
+            GetCanEnhanceSkills();
         }
         // 스킬 데이터가 없다면
         else
@@ -59,13 +58,12 @@ public class SkillSystemPresenter
     /// </summary>
     public void DisablePresenter()
     {
-        if (model == null)
-            return;
-
         // 액티브 스킬 변경 이벤트 구독 해제
         model.OnActiveSkillsChanged -= RefreshActiveSkills;
-        // 스킬 상태 변경 이벤트 구독 해제
-        model.OnSkillStateChanged -= HandleSkillStateChanged;
+        // 스킬 강화 이벤트 구독 해제
+        model.OnSkillEnhanced -= RefreshCanEnhanceSkillUIDatas;
+        // 모델 비활성화
+        model.DisableModel();
         // UI 레벨업 스킬 선택 이벤트 구독 해제
         EventBus<UILevelUpSkillSelectedEvent>.action -= RefreshSelectedSkill;
         // 스킬 스왑(미장착 -> 장착) 이벤트 구독 해제
@@ -83,6 +81,23 @@ public class SkillSystemPresenter
         RefreshActiveSkills();
         // 패시브 스킬 새로고침
         RefreshPassiveSkills();
+    }
+
+    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
+    {
+        return model != null
+            ? model.CaptureCheckpointSnapshot()
+            : Array.Empty<CheckpointSkillSnapshot>();
+    }
+
+    public void RestoreCheckpointSnapshot(
+        CheckpointSkillSnapshot[] snapshot)
+    {
+        if (model == null)
+            return;
+
+        model.RestoreCheckpointSnapshot(snapshot);
+        RefreshAllSkills();
     }
 
     /// <summary>
@@ -175,6 +190,57 @@ public class SkillSystemPresenter
                                                                 isActiveSkill : false));
     }
 
+    private void GetCanEnhanceSkills()
+    {
+        if (model == null)
+            return;
+
+        model.GetCanEnhanceSkills(modelResults);
+
+        if (modelResults == null || modelResults.Count == 0)
+            return;
+
+        BaseSkillData data;
+        canEnhanceSkillUIDatas.Clear();
+
+        foreach (var skill in modelResults)
+        {
+            if (skill.BaseData == null)
+                continue;
+
+            data = skill.BaseData;
+            canEnhanceSkillUIDatas.Add(new(data.Icon, data.SkillName, skill.CurLevel, data.Desc,
+                                                                                skill.IsEquipped, data.Id));
+        }
+
+        EventBus<UICanEnhanceSkills>.Publish(new(canEnhanceSkillUIDatas));
+    }
+
+    private void RefreshCanEnhanceSkillUIDatas(SkillInstance skill)
+    {
+        if (model == null)
+            return;
+
+        BaseSkillData data;
+
+        for(int i = 0; i < canEnhanceSkillUIDatas.Count; i++)
+        {
+            if (canEnhanceSkillUIDatas[i].SkillId != skill.BaseData.Id)
+                continue;
+
+            data = skill.BaseData;
+
+            if (!skill.CanEnhance)
+                canEnhanceSkillUIDatas.RemoveAt(i);
+            else
+                canEnhanceSkillUIDatas[i] = new(data.Icon, data.SkillName, skill.CurLevel, data.Desc,
+                                                                                skill.IsEquipped, data.Id);
+        }
+
+        RefreshAllSkills();
+        EventBus<UICanEnhanceSkills>.Publish(new(canEnhanceSkillUIDatas));
+    }
+
     /// <summary>
     /// 특정 스킬 새로고침 함수
     /// </summary>
@@ -265,22 +331,6 @@ public class SkillSystemPresenter
     }
 
     /// <summary>
-    /// 액티브 스킬 취소 함수
-    /// </summary>
-    public void CancelActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
-    {
-        // 모델이 없다면
-        if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 액티브 스킬 취소 실패 => 입력 - 스킬 모델 : 없음");
-            return;
-        }
-
-        // 액티브 스킬 취소
-        model.CancelActiveSkill(slot);
-    }
-
-    /// <summary>
     /// 액티브 스킬 시간 진행 함수
     /// </summary>
     public void TickActiveSkills(float time)
@@ -294,30 +344,5 @@ public class SkillSystemPresenter
 
         // 액티브 스킬 시간 진행
         model.TickActiveSkills(time);
-    }
-
-    private void HandleSkillStateChanged(
-        SkillInstance skill,
-        SKILL_STATE previousState,
-        SKILL_STATE currentState)
-    {
-        if (skill?.BaseData == null ||
-            skill.BaseData.Id != sniperSkillId ||
-            ownerAnimatorDriver == null)
-            return;
-
-        if (currentState == SKILL_STATE.Charging)
-        {
-            ownerAnimatorDriver.PlaySniperSkillStart();
-            return;
-        }
-
-        if (previousState != SKILL_STATE.Charging)
-            return;
-
-        if (currentState == SKILL_STATE.Executing)
-            ownerAnimatorDriver.PlaySniperSkillEnd();
-        else
-            ownerAnimatorDriver.CancelSniperSkill();
     }
 }

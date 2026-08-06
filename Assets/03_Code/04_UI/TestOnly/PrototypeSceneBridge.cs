@@ -25,10 +25,16 @@ public class PrototypeSceneBridge : MonoBehaviour
     [SerializeField] private float fadeOutDuration = 0.35f;
     [SerializeField] private float fadeInDuration = 0.35f;
 
+    [Header("팀 스플래시")]
+    [SerializeField] private GameObject teamSplashObject;
+    [SerializeField] private GameObject teamNameObject;
 
+    [SerializeField] private float splashFadeInDuration = 0.6f;
+    [SerializeField] private float splashDisplayDuration = 1.5f;
+    [SerializeField] private float splashFadeOutDuration = 0.6f;
 
     [SerializeField] private List<ChapterTitleCardBinding> chapterTitleCards = new();
-    [SerializeField] private string inGameSceneName = "InGame";
+    [SerializeField] private string inGameSceneName = "InGame2";
 
     [SerializeField] private float testMinimumLoadingPreviewTime = 3f;
     private AsyncOperation pendingInGameLoadOperation;
@@ -54,16 +60,15 @@ public class PrototypeSceneBridge : MonoBehaviour
 
         if (PrototypeGameSession.TryConsumeSkipPrologueOnNextLobbyEnter())
         {
+            if (teamSplashObject != null)
+                teamSplashObject.SetActive(false);
+
             EventBus<UIChangeScreenEvent>.Publish(
                 new UIChangeScreenEvent(UIScreenState.Title));
         }
         else
         {
-            EventBus<UISetCutsceneEvent>.Publish(
-                new UISetCutsceneEvent(
-                    "prologue",
-                    prologueVideoClip,
-                    string.Empty));
+            yield return PlayTeamSplashThenPrologue();
         }
 
         if (PrototypeGameSession.TryConsumePendingTitleCard(out int chapterId))
@@ -217,6 +222,72 @@ public class PrototypeSceneBridge : MonoBehaviour
         pendingInGameLoadOperation = null;
         pendingInGameLoadChapterId = -1;
         isInGameLoading = false;
+    }
+
+    private IEnumerator PlayTeamSplashThenPrologue()
+    {
+        if (teamSplashObject != null)
+            teamSplashObject.SetActive(true);
+
+        if (teamNameObject != null)
+            teamNameObject.SetActive(false);
+
+        bool isBlackScreenReady = false;
+
+        // 먼저 기존 페이드를 즉시 검은 화면으로 만들어 이름이 보이지 않게함
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                1f,
+                1f,
+                0f,
+                () => isBlackScreenReady = true));
+
+        yield return new WaitUntil(() => isBlackScreenReady);
+
+        if (teamNameObject != null)
+            teamNameObject.SetActive(true);
+
+        bool isSplashFadeInFinished = false;
+
+        // 페이드가 걷히며 뒤에 있는 팀 이름이 점점 밝아지는 효과
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                1f,
+                0f,
+                splashFadeInDuration,
+                () => isSplashFadeInFinished = true));
+
+        yield return new WaitUntil(() => isSplashFadeInFinished);
+
+        yield return new WaitForSecondsRealtime(splashDisplayDuration);
+
+        bool isSplashFadeOutFinished = false;
+
+        // 페이드 다시 덮으면서 검은 화면 전환
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                0f,
+                1f,
+                splashFadeOutDuration,
+                () => isSplashFadeOutFinished = true));
+
+        yield return new WaitUntil(() => isSplashFadeOutFinished);
+
+        if (teamSplashObject != null)
+            teamSplashObject.SetActive(false);
+
+        EventBus<UISetCutsceneEvent>.Publish(
+            new UISetCutsceneEvent(
+                "prologue",
+                prologueVideoClip,
+                string.Empty));
+
+        // 검은 화면 아래에서 프롤로그 시작 후 페이드 걷힘
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                1f,
+                0f,
+                fadeInDuration));
     }
 
     private void ChangeScreenWithFade(System.Action changeScreenAction)
