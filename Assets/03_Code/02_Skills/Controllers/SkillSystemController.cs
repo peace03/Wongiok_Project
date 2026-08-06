@@ -13,7 +13,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     private GameInputReader ownerInput;                             // 소유자 입력 시스템
 
     public ISkillSystemProvider Presenter => presenter ?? null;
-    public int Priority => (int)InitOrder.Skill;                    // 중요도
+    public int Priority => (int)InitOrder.Skill + 1;                // 중요도
 
     private void OnEnable()
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class WeaponVisualManager : MonoBehaviour
+public class WeaponVisualManager : MonoBehaviour, IInitializable
 {
     [Header("무기 소유자")]
     [Tooltip("플레이어, 몬스터, NPC 등등")]
@@ -9,25 +9,7 @@ public class WeaponVisualManager : MonoBehaviour
 
     private readonly Dictionary<int, GameObject> weapons = new();       // 모든 무기 딕셔너리
 
-    private void OnEnable()
-    {
-        // 액티브 스킬 장착 이벤트 구독
-        EventBus<WeaponVisualAddData>.action += AddWeapon;
-        // 무기 외형 상태 변경 이벤트 구독
-        EventBus<ChangeWeaponState>.action += ChangeWeapon;
-    }
-
-    private void Awake()
-    {
-        // 소유자가 있고 따라다니는 대상이 소유자가 아니라면
-        if(owner != null && transform.parent != owner)
-        {
-            // 위치와 각도를 소유자로 설정
-            transform.SetPositionAndRotation(owner.position, owner.rotation);
-            // 따라다니는 대상을 소유자로 설정
-            transform.SetParent(owner, true);
-        }
-    }
+    public int Priority => (int)InitOrder.Skill;                        // 중요도
 
     private void OnDisable()
     {
@@ -35,6 +17,26 @@ public class WeaponVisualManager : MonoBehaviour
         EventBus<WeaponVisualAddData>.action -= AddWeapon;
         // 무기 외형 상태 변경 이벤트 구독 해제
         EventBus<ChangeWeaponState>.action -= ChangeWeapon;
+    }
+
+    /// <summary>
+    /// 초기화 함수
+    /// </summary>
+    public void Init()
+    {
+        // 소유자가 있고 따라다니는 대상이 소유자가 아니라면
+        if (owner != null && transform.parent != owner)
+        {
+            // 위치와 각도를 소유자로 설정
+            transform.SetPositionAndRotation(owner.position, owner.rotation);
+            // 따라다니는 대상을 소유자로 설정
+            transform.SetParent(owner, true);
+        }
+
+        // 액티브 스킬 장착 이벤트 구독
+        EventBus<WeaponVisualAddData>.action += AddWeapon;
+        // 무기 외형 상태 변경 이벤트 구독
+        EventBus<ChangeWeaponState>.action += ChangeWeapon;
     }
 
     /// <summary>
