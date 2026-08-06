@@ -120,8 +120,6 @@ public class SkillInstance
         curFps = fps > 0f ? fps : 60;
         // 이펙트 종류마다 실행 중인 이펙트들 초기화
         InitActiveEffects();
-        // 스킬 취소 이벤트 구독
-        EventBus<CancelSkill>.action += CancelSkill;
     }
 
     /// <summary>
@@ -132,11 +130,6 @@ public class SkillInstance
         activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Charging] = new List<Effect>();
         activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Target] = new List<Effect>();
     }
-
-    /// <summary>
-    /// 스킬 객체가 비활성화될 때 호출하는 함수
-    /// </summary>
-    public void DisableInstance() => EventBus<CancelSkill>.action -= CancelSkill;
 
     /// <summary>
     /// 장착된 스킬 설정 함수
@@ -266,7 +259,6 @@ public class SkillInstance
     /// <param name="type">이펙트 종류</param>
     /// <param name="place">실행 위치</param>
     /// <param name="pos">추가 위치(생략 가능, 기본값 : 없음)</param>
-    /// <param name="rot">추가 각도(생략 가능, 기본값 : 없음)</param>
     /// <param name="target">따라다닐 대상(생략 가능, 기본값 : 없음)</param>
     private void ExecuteEffects(ACTIVE_SKILL_EFFECT_TYPE type, Transform place, Vector3? pos = null,
                                                                                     Transform target = null)
@@ -376,32 +368,27 @@ public class SkillInstance
     }
 
     /// <summary>
-    /// [이벤트] 스킬 취소 함수
-    /// </summary>
-    /// <param name="cancel">취소할 스킬 정보(정보 없음))</param>
-    public void CancelSkill(CancelSkill cancel) => CancelSkill();
-
-    /// <summary>
     /// 스킬 취소 함수
     /// </summary>
-    public bool CancelSkill()
+    public void CancelSkill()
     {
         // 차징 상태가 아니라면
         if (!IsCharging)
-            return false;
+            return;
 
         // 차징이 끝났다면
         if (curChargingTime >= Math.Max(0f, data.GetMaxChargingTime(curLevel)))
         {
+            Debug.Log($"{data.SkillName} 스킬 - 스킬 진행");
             // 실행 상태로 변경(이펙트 초기화 X)
             SwitchState(SKILL_STATE.Executing, false);
-            return false;
+            return;
         }
 
         //Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
+        Debug.Log($"{data.SkillName} 스킬 - 스킬 취소 후 쿨타임 상태 변환");
         // 쿨타임 상태로 변경
         SwitchState(SKILL_STATE.CoolTime);
-        return true;
     }
 
     /// <summary>

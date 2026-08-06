@@ -21,8 +21,7 @@ public class SkillSystemModel
     [Header("모든 스킬들")]
     [SerializeField] private List<SkillInstance> allSkillList = new();          // 모든 스킬 리스트
 
-    private bool cancelAnimation = false;                                       // 애니메이션 취소 여부
-
+    private int executingSkillSlot = -1;                                        // 실행한 스킬 슬롯 위치
     private int sniperIndex = -1;                                               // 스나이퍼 위치
 
     private readonly Dictionary<int, SkillInstance> allSkillDictionary          // 모든 스킬 딕셔너리
@@ -31,6 +30,7 @@ public class SkillSystemModel
 
     private readonly PlayerAnimatorDriver ownerAnimatorDriver;                  // 소유자 애니메이터 시스템
     private readonly GameInputReader ownerInput;                                // 소유자 입력 시스템
+    private readonly ActiveSkillExecuter executer;                              // 액티브 스킬 실행기
 
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
     #endregion
@@ -52,8 +52,11 @@ public class SkillSystemModel
         ownerAnimatorDriver = owner.GetComponent<PlayerAnimatorDriver>();
         // 소유자 입력 시스템 받아오기
         this.ownerInput = ownerInput;
+        // 액티브 스킬 실행기 받아오기
+        this.executer = executer;
         // 실행기에게 소유자 애니메이터 시스템 전달
         executer.Initialize(ownerAnimatorDriver);
+        EventBus<CancelSkill>.action += CancelActiveSkill;
 
         // 스킬 데이터의 수만큼
         foreach (var data in skillDatas)
@@ -155,13 +158,7 @@ public class SkillSystemModel
     /// <summary>
     /// 모델이 비활성화될 때 호출하는 함수
     /// </summary>
-    public void DisableModel()
-    {
-        // 모든 스킬들의 수만큼
-        foreach (var skill in allSkillList)
-            // 스킬 객체 비활성화
-            skill.DisableInstance();
-    }
+    public void DisableModel() => EventBus<CancelSkill>.action -= CancelActiveSkill;
 
     /// <summary>
     /// 스킬 이펙트 정보 리스트 설정 함수
@@ -348,9 +345,7 @@ public class SkillSystemModel
             }
         }
 
-        if ((int)slot == sniperIndex)
-            cancelAnimation = false;
-
+        executingSkillSlot = (int)slot;
         // 무기 외형 착용 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(skillData.Id));
         // 스킬 실행
@@ -369,7 +364,8 @@ public class SkillSystemModel
             if (equippedActives[i] == null || equippedActives[i].BaseData == null)
                 continue;
             else if (ownerInput != null && i == sniperIndex && !ownerInput.ReleaseSniperSkill(sniperIndex))
-                CancelActiveSkill((ACTIVE_SKILL_SLOT_TYPE)sniperIndex);
+                if (equippedActives[i].IsCharging)
+                    CancelActiveSkill(sniperIndex);
 
             // 시간 진행
             equippedActives[i].Tick(time);
@@ -377,44 +373,51 @@ public class SkillSystemModel
     }
 
     /// <summary>
+    /// [이벤트] 실행한 액티브 스킬 취소 함수
+    /// </summary>
+    public void CancelActiveSkill(CancelSkill skill)
+                                        => CancelActiveSkill(executingSkillSlot);
+
+    /// <summary>
     /// 액티브 스킬 취소 함수
     /// </summary>
-    public void CancelActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
+    public void CancelActiveSkill(int slotIndex)
     {
-        if (cancelAnimation)
+        if (slotIndex < 0)
             return;
 
         // 해당 슬롯이 비어있다면
-        if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
+        if (equippedActives[slotIndex] == null || equippedActives[slotIndex].BaseData == null)
         {
             //Debug.Log($"[Skill] 취소할 액티브 스킬 없음 => 입력 - 슬롯 : {slot.ToKoreanString()}");
             return;
         }
 
-        // 스킬 취소가 필요 없다면
-        if (!equippedActives[(int)slot].CancelSkill())
-            return;
+        Debug.Log("모델 - 스킬 취소");
+
+        equippedActives[slotIndex].CancelSkill();
+        executer.CancelSkill();
+        var skillData = equippedActives[slotIndex].BaseData;
+        // 무기 외형 착용 해제 이벤트 발행
+        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(skillData.Id, false));
 
         // 소유자 애니메이터 시스템이 없다면
         if (ownerAnimatorDriver == null)
             return;
 
-        var skillData = equippedActives[(int)slot].BaseData;
-
         // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
         if (skillData.Id < (int)ACTIVE_SKILL_ID.Start + 1)
         {
             Debug.Log($"[Skill] 스킬 관련 애니메이션 없음 => 스킬 ID : {skillData.Id} / " +
-                        $"스킬 이름 : {equippedActives[(int)slot].BaseData.SkillName} / " +
+                        $"스킬 이름 : {equippedActives[slotIndex].BaseData.SkillName} / " +
                         $"액티브 스킬 ID 범위 : {(int)ACTIVE_SKILL_ID.Start} ~ ");
             return;
         }
 
-        cancelAnimation = true;
+        Debug.Log("모델 - 애니메이션 취소");
+
         // 스킬 애니메이션 취소
         ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)skillData.Id);
-        // 무기 외형 착용 해제 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(skillData.Id, false));
     }
 
     /// <summary>

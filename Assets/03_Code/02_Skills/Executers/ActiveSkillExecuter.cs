@@ -6,37 +6,35 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 {
     [Header("기본 실행 위치")]
     [Tooltip("무기 외형이 없을 때 액티브 스킬이 실행될 위치이자 해당 레이어로 스킬 판정 필터링을 할 예정임")]
-    [SerializeField] private Transform defaultExecutePos;                           // 기본 실행 위치
+    [SerializeField] private Transform defaultExecutePos;                   // 기본 실행 위치
     [Header("총알 공장")]
     [Tooltip("오브젝트 풀링 적용, 이것으로 스킬에 사용될 총알을 가져올 예정임")]
-    [SerializeField] private BulletFactory bulletFactory;                           // 총알 공장
+    [SerializeField] private BulletFactory bulletFactory;                   // 총알 공장
 
-    private readonly List<Transform> executePlaces = new();                         // 실행 위치들
-    private readonly List<GameObject> effectPrefabs = new();                        // 이펙트 프리팹들
+    private PlayerAnimatorDriver ownerAnimatorDriver;                       // 소유자 애니메이터 시스템
 
-    private PlayerAnimatorDriver ownerAnimatorDriver;                               // 소유자 애니메이터 시스템
+    private WaitForSeconds projectileDelayTime;                             // 발사체 스킬 딜레이 시간
+    private WaitForSeconds areaDelayTime;                                   // 범위 스킬 딜레이 시간
 
-    private WaitForSeconds projectileDelayTime;                                     // 발사체 스킬 딜레이 시간
-    private WaitForSeconds areaDelayTime;                                           // 범위 스킬 딜레이 시간
+    private LayerMask skillLayer;                                           // 스킬 레이어
 
-    private LayerMask skillLayer;                                                   // 스킬 레이어
+    private float projectileDelayTimeValue;                                 // 발사체 스킬 딜레이 시간량
+    private float startAnimationWaitTime = 0;                               // 시작 애니메이션 대기 시간
 
-    private float projectileDelayTimeValue;                                         // 발사체 스킬 딜레이 시간량
-    private float startAnimationWaitTime = 0;                                       // 시작 애니메이션 대기 시간
+    private int curFps;                                                     // 현재 프레임
+    private int executingSkillId = -1;                                      // 실행 중인 스킬 ID
 
-    private int curFps;                                                             // 현재 프레임
-    private int executingSkillId = -1;                                              // 실행 중인 스킬 ID
+    private bool executingSkill = false;                                    // 스킬 실행 중 여부
 
-    private bool executingSkill = false;                                            // 스킬 실행 중 여부
+    private readonly Dictionary<ACTIVE_SKILL_EFFECT_TYPE,                   // 이펙트 종류별 실행 중인 이펙트들
+                                    List<Effect>> activeEffects = new();
+    private readonly List<GameObject> effectPrefabs = new();                // 이펙트 프리팹들
+    private readonly List<Transform> executePlaces = new();                 // 실행 위치들
 
     public IReadOnlyList<Transform> ExecutePlaces => executePlaces;
 
     // 액티브 스킬 실행 위치들 변경 이벤트 구독
-    private void OnEnable()
-    {
-        EventBus<ChangeActiveSkillExecutePositions>.action += SetExecutePositions;
-        EventBus<CancelSkill>.action += CancelSkill;
-    }
+    private void OnEnable() => EventBus<ChangeActiveSkillExecutePositions>.action += SetExecutePositions;
 
     private void Awake()
     {
@@ -49,11 +47,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     }
 
     // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
-    private void OnDisable()
-    {
-        EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
-        EventBus<CancelSkill>.action -= CancelSkill;
-    }
+    private void OnDisable() => EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
 
     /// <summary>
     /// 초기화 함수
@@ -104,27 +98,23 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         if (executingSkill)
             return;
 
+        // 실행할 스킬 ID 저장
         executingSkillId = skillId;
-        // 스킬 ID로 스킬 정보 찾기
-        var data = SkillDatabase.FindDataById(executingSkillId);
-        // 총구 이펙트에 해당하는 이펙트 프리팹 받아오기
-        data.AsActiveData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, effectPrefabs);
         // 발사체 스킬 딜레이 시간량 구하기
         projectileDelayTimeValue = levelData.MaxDuration / (levelData.ProjectileCount == 0 ?
                                                                     1 : levelData.ProjectileCount);
         // 발사체 스킬 딜레이 저장하기
         projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
 
+        // 소유자 애니메이터 시스템이 있다면
         if (ownerAnimatorDriver != null)
-        {
+            // 스킬 시작 애니메이션 대기 시간(차징 시간 제외) 받아오기
             startAnimationWaitTime = Mathf.Max(0f, ownerAnimatorDriver.SkillStartAnimDuration
                                                                                     - levelData.MaxChargingTime);
-            Debug.Log(startAnimationWaitTime);
-            executingSkill = startAnimationWaitTime > 0f;
-        }
-
+        // 스킬 실행 중
+        executingSkill = true;
         // 발사체 스킬 실행
-        StartCoroutine(ProjectileRoutine(data, levelData.ProjectileCount, levelData.GetDamage(),
+        StartCoroutine(ProjectileRoutine(levelData.ProjectileCount, levelData.GetDamage(),
                                                 levelData.MaxDuration > 0f ? levelData.MaxDuration : null,
                                                     levelData.PenetrationCount, levelData.MaxChargingTime > 0f));
     }
@@ -132,14 +122,15 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// <summary>
     /// 발사체 스킬 코루틴 함수
     /// </summary>
-    /// <param name="data">스킬 데이터</param>
+    /// <param name="skillId">스킬 ID</param>
     /// <param name="bulletCount">발사체 개수</param>
     /// <param name="damage">데미지</param>
     /// <param name="penetrationCount">관통 횟수</param>
     /// <param name="isCharging">차징 여부</param>
-    private IEnumerator ProjectileRoutine(BaseSkillData data, int bulletCount, float damage,
-                                                        float? maxDuration, int penetrationCount, bool isCharging)
+    private IEnumerator ProjectileRoutine(int bulletCount, float damage, float? maxDuration,
+                                                                        int penetrationCount, bool isCharging)
     {
+        Debug.Log("발사체 스킬 코루틴 실행");
         float waitTimer = startAnimationWaitTime;
 
         while(waitTimer > 0f)
@@ -151,28 +142,27 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             yield return null;
         }
 
-        if (data.AsActiveData != null)
-            foreach (var sound in data.AsActiveData.Sounds)
-            {
-                if (sound.clip == null)
-                {
-                    //Debug.Log($"[Skill] 사운드 파일 없음 => 입력 - {data.SkillName}");
-                    continue;
-                }
+        var data = SkillDatabase.FindDataById(executingSkillId);
 
-                EventBus<Play2DSoundEvent>.Publish(new Play2DSoundEvent(sound.clip, volume: sound.volume));
+        if (data == null || data.AsActiveData == null)
+            yield break;
+
+        foreach (var sound in data.AsActiveData.Sounds)
+        {
+            if (sound.clip == null)
+            {
+                //Debug.Log($"[Skill] 사운드 파일 없음 => 입력 - {data.SkillName}");
+                continue;
             }
 
-        // 총구 이펙트 프리팹들의 수만큼
-        foreach (var prefab in effectPrefabs)
-            // 실행 위치들의 수만큼
-            foreach (var place in executePlaces)
-                // 총구 이펙트 실행하기(지속 시간이 있다면 ? 지속 시간만큼, 아니라면 이펙트 시간만큼)
-                EventBus<EffectPlayData>.Publish(new EffectPlayData(prefab, place.position, place.rotation,
-                                                                                                    maxDuration));
+            EventBus<StartControlledSfxEvent>.Publish(new($"{data.Id}_Sound", sound.clip,
+                                                                                    sound.volume, false));
+        }
 
-        // 발사체 이펙트에 해당하는 이펙트 프리팹 받아오기
-        data.AsActiveData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Main, effectPrefabs);
+        // 실행 위치들의 수만큼
+        foreach (var place in executePlaces)
+            // 총구 이펙트 실행하기
+            ExecuteEffects(data.AsActiveData, ACTIVE_SKILL_EFFECT_TYPE.Muzzle, place);
 
         // 현재 발사체 개수만큼
         for (int count = 0; count < bulletCount; count += executePlaces.Count)
@@ -181,31 +171,12 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             foreach (var place in executePlaces)
             {
                 // 총알 가져오기
-                //var bullet = bulletFactory.GetBullet();
                 var bullet = bulletFactory.GetBullet(false);
                 // 총알 위치와 각도 설정하기
                 bullet.transform.SetPositionAndRotation(place.position, place.rotation);
-
-                // 총알 이펙트들의 수만큼
-                for(int i = 0; i < effectPrefabs.Count; i++)
-                {
-                    // 첫번째(중요도가 가장 높은) 총알 이펙트라면
-                    if (i == 0)
-                        // 총알의 콜라이더 크기를 총알 이펙트 크기로 설정
-                        bullet.SetColliderSize(effectPrefabs[i].transform.localScale);
-
-                    // 이펙트 실행 및 실행한 이펙트 받아오기
-                    var effect =
-                        EffectManager.Instance.PlayEffect(effectPrefabs[i],
-                                                            place.position + new Vector3(0, 0, -0.5f),
-                                                                place.rotation, parent: bullet.transform);
-
-                    // 나선 이펙트라면
-                    if (effect.TryGetComponent<IWaveEffect>(out var wave))
-                        // 나선 이펙트 정보 설정하기
-                        wave.SetInfo();
-                }
-
+                // 총알 이펙트 실행하기
+                ExecuteEffects(data.AsActiveData, ACTIVE_SKILL_EFFECT_TYPE.Main, place,
+                                                new Vector3(0, 0, -0.5f), bullet.transform, bullet);
                 // 총알 속도 구하기
                 float bulletSpeed = 50f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
                 // 타격/피격 이펙트에 해당하는 이펙트 프리팹 받아오기
@@ -234,16 +205,117 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         executingSkill = false;
     }
 
-    public void CancelSkill(CancelSkill cancel)
+    /// <summary>
+    /// 이펙트 종류별 이펙트들 실행 함수
+    /// </summary>
+    /// <param name="data">액티브 스킬 데이터</param>
+    /// <param name="type">이펙트 종류</param>
+    /// <param name="place">실행 위치</param>
+    /// <param name="pos">추가 위치(생략 가능, 기본값 : 없음)</param>
+    /// <param name="target">따라다닐 대상(생략 가능, 기본값 : 없음)</param>
+    /// <param name="bullet">총알(생략 가능, 기본값 : 없음)</param>
+    private void ExecuteEffects(ActiveSkillData data, ACTIVE_SKILL_EFFECT_TYPE type, Transform place,
+                                        Vector3? pos = null, Transform target = null, Bullet bullet = null)
+    {
+        // 이펙트 종류에 맞는 이펙트 프리팹 받아오기
+        data.GetEffectsByEffectType(type, effectPrefabs);
+
+        // 받아온 이펙트 프리팹이 없다면
+        if (effectPrefabs.Count == 0)
+            return;
+
+        // 이펙트 프리팹의 수만큼
+        for(int i = 0; i < effectPrefabs.Count; i++)
+        {
+            // 첫번째(중요도가 가장 높은) 이펙트이고 총알이 있다면
+            if (i == 0 && bullet != null)
+                // 총알의 콜라이더 크기를 총알 이펙트 크기로 설정
+                bullet.SetColliderSize(effectPrefabs[i].transform.localScale);
+
+            // 이펙트 실행 후 받아오기
+            var effect = EffectManager.Instance.PlayEffect(effectPrefabs[i],
+                                                place.position + (pos ?? Vector3.zero),
+                                                    place.rotation, parent: target != null ? target : place);
+
+            // 나선 이펙트라면
+            if (effect.TryGetComponent<IWaveEffect>(out var wave))
+                // 나선 이펙트 정보 설정하기
+                wave.SetInfo();
+
+            // 실행 중인 이펙트들에 이펙트 종류가 없다면
+            if (!activeEffects.ContainsKey(type))
+            {
+                //Debug.Log($"[Skill] 이펙트 종류[{type.ToKoreanString()}] 추가 => " +
+                //            $"입력 - 스킬 ID : {data.Id} / 스킬 이름 : {data.SkillName}");
+                activeEffects[type] = new List<Effect>();
+            }
+
+            // 받아온 이펙트 추가
+            activeEffects[type].Add(effect);
+        }
+    }
+
+    /// <summary>
+    /// 이펙트 종류별 이펙트들 종료 함수
+    /// </summary>
+    /// <param name="type">이펙트 종류</param>
+    /// <param name="immediately">즉시 종료 여부(기본값 : 즉시 종료 안함)</param>
+    private void StopEffects(ACTIVE_SKILL_EFFECT_TYPE type, bool immediately = false)
+    {
+        // 이펙트 종류에 해당하는 이펙트들이 없다면
+        if (!activeEffects.TryGetValue(type, out var effects))
+        {
+            //Debug.Log($"[Skill] 이펙트 종료 실패 => 입력 - {type.ToKoreanString()}");
+            return;
+        }
+
+        // 이펙트들의 수만큼
+        foreach (var effect in effects)
+        {
+            // 이펙트가 없거나, 이펙트가 비활성화 되어있다면
+            if (effect == null || !effect.gameObject.activeSelf)
+                continue;
+
+            // 이펙트 종료
+            effect.StopEffect(immediately);
+        }
+
+        // 이펙트들 초기화
+        effects.Clear();
+    }
+
+    /// <summary>
+    /// 스킬 취소 함수
+    /// </summary>
+    public void CancelSkill()
     {
         // 실행 중인 스킬이 없다면
         if (!executingSkill)
             return;
 
+        Debug.Log("실행기 - 스킬 취소");
         // 스킬 실행 중지
         executingSkill = false;
+        // 스킬 사용 사운드 정지
+        EventBus<StopControlledSfxEvent>.Publish(new($"{executingSkillId}_Sound"));
+        // 총구 이펙트 즉시 종료
+        StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, true);
+        // 총알 이펙트 즉시 종료
+        StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Main, true);
         // 무기 외형 착용 해제 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(executingSkillId, false));
+
+        // 소유자 애니메이터 시스템이 없다면
+        if (ownerAnimatorDriver == null)
+            return;
+        // 실행하려는 스킬 ID가 액티브 스킬 ID의 범위를 넘어간다면
+        else if (executingSkillId < (int)ACTIVE_SKILL_ID.Start + 1)
+            return;
+
+        Debug.Log("실행기 - 애니메이션 취소");
+
+        // 스킬 애니메이션 취소
+        ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)executingSkillId);
         executingSkillId = -1;
     }
 
