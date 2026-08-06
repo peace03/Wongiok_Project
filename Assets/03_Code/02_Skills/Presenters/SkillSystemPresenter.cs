@@ -220,12 +220,22 @@ public class SkillSystemPresenter : ISkillSystemProvider
             Debug.Log($"[Error | Skill] 스킬 레벨업 실패 => 입력 - 스킬 모델 : 없음");
             return;
         }
+
+        SkillInstance skill;
+
         // 레벨업이 불가능한 스킬이라면
-        else if (!model.EnhanceSkill(skillUIData.SkillId))
+        if ((skill = model.EnhanceSkill(skillUIData.SkillId)) == null)
         {
             Debug.Log($"[Error | Skill] 스킬 레벨업 실패 => " +
                         $"입력 - 스킬 ID : {skillUIData.SkillId} / 레벨업 불가");
             return;
+        }
+        else if(skill != null)
+        {
+            if (skill.IsActiveSkill)
+                RefreshActiveSkills();
+            else
+                RefreshPassiveSkills();
         }
     }
 

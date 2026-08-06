@@ -594,10 +594,10 @@ public class SkillSystemModel
     /// <summary>
     /// 스킬 강화 함수
     /// </summary>
-    public bool EnhanceSkill(int id)
+    public SkillInstance EnhanceSkill(int id)
     {
         // 스킬 강화 성공 여부
-        bool result = false;
+        SkillInstance result = null;
 
         // ID에 해당하는 스킬이 없다면
         if (!allSkillDictionary.TryGetValue(id, out var skill))
@@ -610,7 +610,7 @@ public class SkillSystemModel
         {
             // 스킬 강화
             skill.LevelUp();
-            result = true;
+            result = skill;
         }
 
         // 결과 반환
