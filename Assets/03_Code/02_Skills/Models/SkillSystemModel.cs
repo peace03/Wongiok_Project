@@ -35,72 +35,6 @@ public class SkillSystemModel
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
     #endregion
 
-    public int MaxEquippedActiveCount => maxEquippedActiveCount;
-
-    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
-    {
-        CheckpointSkillSnapshot[] snapshot =
-            new CheckpointSkillSnapshot[allSkillList.Count];
-
-        for (int i = 0; i < allSkillList.Count; i++)
-        {
-            SkillInstance skill = allSkillList[i];
-
-            snapshot[i] = new CheckpointSkillSnapshot
-            {
-                SkillId = skill.BaseData.Id,
-                Level = skill.CurLevel,
-                EquippedActiveSlot = skill.IsActiveSkill
-                    ? equippedActives.IndexOf(skill)
-                    : -1
-            };
-        }
-
-        return snapshot;
-    }
-
-    public void RestoreCheckpointSnapshot(
-        CheckpointSkillSnapshot[] snapshot)
-    {
-        if (snapshot == null)
-            return;
-
-        for (int i = 0; i < snapshot.Length; i++)
-        {
-            if (allSkillDictionary.TryGetValue(
-                    snapshot[i].SkillId,
-                    out SkillInstance skill))
-            {
-                skill.RestoreCheckpointLevel(snapshot[i].Level);
-            }
-        }
-
-        for (int i = 0; i < maxEquippedActiveCount; i++)
-        {
-            if (equippedActives[i] != null)
-            {
-                SwapSkill((ACTIVE_SKILL_SLOT_TYPE)i);
-            }
-        }
-
-        for (int i = 0; i < snapshot.Length; i++)
-        {
-            int slot = snapshot[i].EquippedActiveSlot;
-
-            if (slot < 0 || slot >= maxEquippedActiveCount)
-                continue;
-
-            if (GetEquippedActiveSkillId(slot) == snapshot[i].SkillId)
-                continue;
-
-            SwapSkill(
-                (ACTIVE_SKILL_SLOT_TYPE)slot,
-                snapshot[i].SkillId);
-        }
-
-        OnActiveSkillsChanged?.Invoke();
-    }
-
     /// <summary>
     /// 생성자
     /// </summary>
@@ -108,7 +42,7 @@ public class SkillSystemModel
                                                         CHAPTER_TYPE chapter, GameInputReader ownerInput = null)
     {
         // 스킬 데이터가 없다면
-        if(skillDatas == null)
+        if (skillDatas == null)
         {
             //Debug.Log($"[Error | Skill] 스킬 객체 생성 실패 => 데이터 : 없음");
             return;
@@ -125,7 +59,7 @@ public class SkillSystemModel
         foreach (var data in skillDatas)
         {
             // 해당 스킬이 없다면
-            if(!allSkillDictionary.ContainsKey(data.Id))
+            if (!allSkillDictionary.ContainsKey(data.Id))
             {
                 // 스킬 객체 생성 및 저장
                 allSkillDictionary[data.Id] = data.CreateInstance(owner, executer, chapter,
@@ -156,7 +90,7 @@ public class SkillSystemModel
     private void EquipSkills()
     {
         // 모든 스킬들의 수만큼
-        foreach(var skill in allSkillList)
+        foreach (var skill in allSkillList)
         {
             // 챕터 1의 스킬이 아니거나, 장착할 액티브 슬롯이 없거나, 장착할 패시브 슬롯이 없다면
             if (skill.BaseData.UnlockChapter != CHAPTER_TYPE.First ||
@@ -429,7 +363,7 @@ public class SkillSystemModel
     public void TickActiveSkills(float time)
     {
         // 장착한 액티브 스킬들의 수만큼
-        for(int i = 0; i < maxEquippedActiveCount; i++)
+        for (int i = 0; i < maxEquippedActiveCount; i++)
         {
             // 장착된 액티브 스킬이 없거나, 스킬 정보가 비어있다면
             if (equippedActives[i] == null || equippedActives[i].BaseData == null)
@@ -492,7 +426,7 @@ public class SkillSystemModel
         bool result = false;
 
         // ID가 비어있다면
-        if(id == null)
+        if (id == null)
         {
             if (sniperIndex == (int)slot)
                 sniperIndex = -1;
@@ -520,7 +454,7 @@ public class SkillSystemModel
         else if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
         {
             if (sniperIndex < 0)
-                    sniperIndex = (int)slot;
+                sniperIndex = (int)slot;
 
             // 해당 슬롯에 변경할 스킬 저장
             equippedActives[(int)slot] = skill;
@@ -545,7 +479,7 @@ public class SkillSystemModel
 
             if (sniperIndex == (int)slot)
                 sniperIndex = swapedIndex;
-            else if(sniperIndex == swapedIndex)
+            else if (sniperIndex == swapedIndex)
                 sniperIndex = (int)slot;
 
             // 해당 슬롯에 변경할 스킬 저장
@@ -617,6 +551,7 @@ public class SkillSystemModel
         return result;
     }
 
+    #region 로그 출력용
     /// <summary>
     /// 장착한 액티브 스킬들 로그 출력 함수
     /// </summary>
@@ -638,4 +573,47 @@ public class SkillSystemModel
                         $"위치 : {slot.ToKoreanString()} / {equippedActives[i].BaseData.SkillName}");
         }
     }
+    #endregion
+
+    #region 플레이어 쪽에서 추가한 함수
+    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
+    {
+        CheckpointSkillSnapshot[] snapshot = new CheckpointSkillSnapshot[allSkillList.Count];
+
+        for (int i = 0; i < allSkillList.Count; i++)
+        {
+            Debug.Log(allSkillList[i].CurLevel);
+
+            snapshot[i] = new CheckpointSkillSnapshot
+            {
+                SkillId = allSkillList[i].BaseData.Id,
+                Level = allSkillList[i].CurLevel,
+                EquippedActiveSlot = allSkillList[i].IsEquipped ?
+                                                            equippedActives.IndexOf(allSkillList[i]) : -1
+            };
+        }
+
+        return snapshot;
+    }
+
+    public void RestoreCheckpointSnapshot(CheckpointSkillSnapshot[] snapshot)
+    {
+        if (snapshot == null)
+            return;
+
+        for (int i = 0; i < snapshot.Length; i++)
+            if (allSkillDictionary.TryGetValue(snapshot[i].SkillId, out var skill))
+                skill.RestoreCheckpointLevel(snapshot[i].Level);
+
+        for (int i = 0; i < snapshot.Length; i++)
+        {
+            int slot = snapshot[i].EquippedActiveSlot;
+
+            if (slot < 0 || slot >= maxEquippedActiveCount)
+                continue;
+
+            SwapSkill((ACTIVE_SKILL_SLOT_TYPE)slot, snapshot[i].SkillId);
+        }
+    }
+    #endregion
 }

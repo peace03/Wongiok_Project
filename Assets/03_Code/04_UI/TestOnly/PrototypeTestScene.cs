@@ -38,6 +38,8 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<UILevelUpSkillSelectedEvent>.action += HandleLevelUpSkillSelected;
         EventBus<TestRestoreSkillCheckpointEvent>.action += HandleRestoreSkillCheckpoint;
         EventBus<TestPlayerSkillUsedEvent>.action += HandleTestPlayerSkillUsed;
+
+        EventBus<RefreshUIEvent>.action += RefreshSkills;
     }
 
     private void OnDisable()
@@ -50,6 +52,8 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
         EventBus<TestRestoreSkillCheckpointEvent>.action -= HandleRestoreSkillCheckpoint;
         EventBus<TestPlayerSkillUsedEvent>.action -= HandleTestPlayerSkillUsed;
+
+        EventBus<RefreshUIEvent>.action -= RefreshSkills;
     }
 
     private void Start()
@@ -112,19 +116,20 @@ public class PrototypeTestScene : MonoBehaviour
         if (currentActiveSkills != null && currentOwnedSkills != null)
             return;
 
-        PrototypeProgressSnapshot snapshot = PrototypeGameSession.GetChapterStart();
-
-        //BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
-
         currentActiveSkills = new UIPauseSkillInfoData[3];
 
         for (int i = 0; i < currentActiveSkills.Length; i++)
             currentActiveSkills[i] = CreateEmptySkillData();
+    }
 
-        BuildEquippedSkills(snapshot);
-        BuildOwnedSkillSlots(snapshot);
-
-        currentPassiveSkills = System.Array.Empty<UIPauseSkillInfoData>();
+    private void RefreshSkills(RefreshUIEvent eventData)
+    {
+        if(eventData.IsActiveSkill)
+        {
+            currentActiveSkills = eventData.EquippedSkills;
+            currentOwnedSkills = eventData.OwnedSkills;
+            PublishCurrentPauseData();
+        }
     }
 
     private void PublishCurrentPauseData()
@@ -134,14 +139,6 @@ public class PrototypeTestScene : MonoBehaviour
                 currentActiveSkills,
                 currentOwnedSkills,
                 isOwnedSkillListUnlocked: PrototypeGameSession.CurrentChapterId >= 2));
-
-        EventBus<RefreshUIEvent>.Publish(
-            new RefreshUIEvent(
-                currentActiveSkills,
-                currentOwnedSkills,
-                currentOwnedSkills
-                    .Select(skill => skill.SkillId)
-                    .ToArray()));
 
         PublishCurrentPlayerSkillSlots();
     }

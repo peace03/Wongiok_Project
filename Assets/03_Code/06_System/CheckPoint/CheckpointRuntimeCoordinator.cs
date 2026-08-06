@@ -7,6 +7,9 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
     [SerializeField] private CheckpointUI checkpointUI;
     [SerializeField] private BossPreparationUI bossPreparationUI;
 
+    [Header("스킬 시스템")]
+    [SerializeField] private SkillSystemController skillSystem;
+
     [Header("Optional Features")]
     [SerializeField] private bool enablePersistentSave;
     [SerializeField] private bool enableBossPreparationUI;
@@ -104,8 +107,6 @@ public class CheckpointRuntimeCoordinator : MonoBehaviour
             playerObject.GetComponent<PlayerLifeTracker>();
         PlayerExperienceTracker experienceTracker =
             playerObject.GetComponent<PlayerExperienceTracker>();
-        SkillSystemController skillSystem =
-            playerObject.GetComponentInChildren<SkillSystemController>(true);
 
         return new CheckpointProgressSnapshot
         {

@@ -10,6 +10,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
     [SerializeField] private SkillSystemModel model;                            // 스킬 모델
 
     private readonly List<SkillInstance> modelResults = new();                  // 스킬 모델 결과들 리스트
+    private readonly List<BaseSkillData> databaseResults = new();               // 스킬 데이터베이스 결과들 리스트
     private readonly List<UIPauseSkillInfoData> equippedSkillUIDatas            // 장착한 스킬 UI 데이터들 리스트
                                                                 = new();
     private readonly List<UIPauseSkillInfoData> unequippedSkillUIDatas          // 미장착한 스킬 UI 데이터들 리스트
@@ -37,12 +38,12 @@ public class SkillSystemPresenter : ISkillSystemProvider
             model.OnActiveSkillsChanged += RefreshActiveSkills;
             // UI 레벨업 스킬 선택 이벤트 구독
             EventBus<UILevelUpSkillSelectedEvent>.action += RefreshSelectedSkill;
-            // 패시브 스킬 새로고침
-            RefreshPassiveSkills();
             // 스킬 스왑(미장착 -> 장착) 이벤트 구독
             EventBus<UIPauseSkillEquipRequestedEvent>.action += RefreshSelectedSkills;
             // 스킬 스왑(장착 -> 장착) 이벤트 구독
             EventBus<UIPauseSkillSwapRequestedEvent>.action += RefreshSelectedSkills;
+            // 모든 스킬 새로고침
+            RefreshAllSkills();
         }
         // 스킬 데이터가 없다면
         else
@@ -78,23 +79,6 @@ public class SkillSystemPresenter : ISkillSystemProvider
         RefreshPassiveSkills();
     }
 
-    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
-    {
-        return model != null
-            ? model.CaptureCheckpointSnapshot()
-            : Array.Empty<CheckpointSkillSnapshot>();
-    }
-
-    public void RestoreCheckpointSnapshot(
-        CheckpointSkillSnapshot[] snapshot)
-    {
-        if (model == null)
-            return;
-
-        model.RestoreCheckpointSnapshot(snapshot);
-        RefreshAllSkills();
-    }
-
     /// <summary>
     /// 액티브 스킬들 새로고침 함수
     /// </summary>
@@ -109,12 +93,22 @@ public class SkillSystemPresenter : ISkillSystemProvider
 
         // 장착한 액티브 스킬들 받아오기
         model.GetEquippedActiveSkills(modelResults);
-        // 받아온 결과들을 일시정지 UI 데이터들로 변환하기
+        // 받아온 결과들을 일시정지(스탯, 스킬) UI 데이터들로 변환하기
         ChangePauseUIDatas(equippedSkillUIDatas);
         // 미장착한 액티브 스킬들 받아오기
         model.GetUnequippedActiveSkills(modelResults);
-        // 받아올 결과들을 일시정지 UI 데이터들로 변환하기
+        // 받아온 결과들을 일시정지(스탯, 스킬) UI 데이터들로 변환하기
         ChangePauseUIDatas(unequippedSkillUIDatas);
+        
+        // 미장착한 액티브 스킬들이 없다면
+        if(unequippedSkillUIDatas.Count == 0)
+        {
+            // 스킬 데이터베이스에서 다음 챕터 스킬 데이터들 받아오기
+            SkillDatabase.FindDatasByChapter(curChapter + 1, databaseResults);
+            // 받아온 결과들을 일시정지(스탯, 스킬) UI 데이터들로 변환하기
+            ChangePauseUIDatasByDatabase(unequippedSkillUIDatas);
+        }
+
         // 액티브 스킬 새로고침 이벤트 발행
         EventBus<RefreshUIEvent>.Publish(new RefreshUIEvent(equippedSkillUIDatas.ToArray(),
                                                                 unequippedSkillUIDatas.ToArray()));
@@ -134,9 +128,9 @@ public class SkillSystemPresenter : ISkillSystemProvider
         datas.Clear();
 
         // 스킬 모델의 결과들의 수만큼
-        foreach (var modelResult in modelResults)
+        foreach (var result in modelResults)
             // 일시정지 UI 데이터 추가하기
-            AddPauseUIData(datas, modelResult);
+            AddPauseUIData(datas, result);
     }
 
     /// <summary>
@@ -155,6 +149,47 @@ public class SkillSystemPresenter : ISkillSystemProvider
             // 일시정지 UI 데이터로 변환 후, 데이터들 리스트에 저장
             datas.Add(new UIPauseSkillInfoData(skill.BaseData.Icon, skill.BaseData.SkillName,
                                 skill.CurLevel, skill.BaseData.Desc, skill.IsEquipped, skill.BaseData.Id));
+        // 스킬이 없다면
+        else
+            // 일시정지 UI 데이터의 기본값을 데이터들 리스트에 저장
+            datas.Add(new UIPauseSkillInfoData(null, "", 0, "", false));
+    }
+
+    /// <summary>
+    /// 일시정지 UI 데이터들로 변환하는 함수
+    /// </summary>
+    /// <param name="datas">데이터들을 저장할 리스트</param>
+    private void ChangePauseUIDatasByDatabase(List<UIPauseSkillInfoData> datas)
+    {
+        // 스킬 데이터베이스의 결과들이 없거나, 비어있다면
+        if (databaseResults == null || databaseResults.Count == 0)
+            return;
+
+        // 데이터들을 저장할 리스트 초기화
+        datas.Clear();
+
+        // 스킬 데이터베이스의 결과들의 수만큼
+        foreach (var result in databaseResults)
+            // 일시정지 UI 데이터 추가하기
+            AddPauseUIDataByData(datas, result);
+    }
+
+    /// <summary>
+    /// 일시정지 UI 데이터로 변환 후, 데이터들 리스트에 추가하는 함수
+    /// </summary>
+    /// <param name="datas">데이터들을 저장할 리스트</param>
+    /// <param name="skill">일시정지 UI 데이터로 변환할 스킬 데이터(생략 가능, 기본값 : 비어있음)</param>
+    private void AddPauseUIDataByData(List<UIPauseSkillInfoData> datas, BaseSkillData skill = null)
+    {
+        // 데이터들을 저장할 리스트가 없다면
+        if (datas == null)
+            return;
+
+        // 스킬 데이터가 있다면
+        if (skill != null)
+            // 일시정지 UI 데이터로 변환 후, 데이터들 리스트에 저장
+            datas.Add(new UIPauseSkillInfoData(skill.Icon, skill.SkillName, 1, skill.Desc, false,
+                                                                                        skill.Id, false));
         // 스킬이 없다면
         else
             // 일시정지 UI 데이터의 기본값을 데이터들 리스트에 저장
@@ -230,7 +265,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
                         $"입력 - 스킬 ID : {skillUIData.SkillId} / 레벨업 불가");
             return;
         }
-        else if(skill != null)
+        else if (skill != null)
         {
             if (skill.IsActiveSkill)
                 RefreshActiveSkills();
@@ -322,4 +357,18 @@ public class SkillSystemPresenter : ISkillSystemProvider
         // 액티브 스킬 시간 진행
         model.TickActiveSkills(time);
     }
+
+    #region 플레이어 쪽에서 추가한 함수
+    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
+            => model != null ? model.CaptureCheckpointSnapshot() : Array.Empty<CheckpointSkillSnapshot>();
+
+    public void RestoreCheckpointSnapshot(CheckpointSkillSnapshot[] snapshot)
+    {
+        if (model == null)
+            return;
+
+        model.RestoreCheckpointSnapshot(snapshot);
+        RefreshPassiveSkills();
+    }
+    #endregion
 }

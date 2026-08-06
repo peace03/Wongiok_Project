@@ -146,9 +146,6 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         if (presenter == null)
             return;
 
-        foreach (var snap in snapshot)
-            Debug.Log($"{snap.SkillId} / {snap.Level} / {snap.EquippedActiveSlot}");
-
         presenter.RestoreCheckpointSnapshot(snapshot);
     }
     #endregion

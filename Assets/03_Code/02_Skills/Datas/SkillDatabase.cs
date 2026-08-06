@@ -129,7 +129,7 @@ public static class SkillDatabase
         foreach (var data in skillDataList)
             // 해금 챕터 종류와 같다면
             if (data.UnlockChapter == chapter)
-                // 겨로가 리스트에 추가
+                // 결과 리스트에 추가
                 results.Add(data);
     }
 }

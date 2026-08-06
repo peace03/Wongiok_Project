@@ -460,6 +460,7 @@ public class SkillInstance
     /// </summary>
     public void ResetLevel() => curLevel = 1;
 
+    #region 플레이어 쪽에서 추가한 함수
     public void RestoreCheckpointLevel(int level)
     {
         curLevel = Math.Clamp(level, 1, Math.Max(1, data.MaxLevel));
@@ -468,4 +469,5 @@ public class SkillInstance
         curDuration = 0f;
         curChargingTime = 0f;
     }
+    #endregion
 }
