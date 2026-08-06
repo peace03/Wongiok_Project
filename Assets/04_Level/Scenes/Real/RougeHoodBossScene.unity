@@ -2567,6 +2567,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5889111591345099704, guid: cb32f26c0dd9fd1458324f935c3be8c1, type: 3}
   m_PrefabInstance: {fileID: 454008516}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &454008518 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8300423116708251226, guid: cb32f26c0dd9fd1458324f935c3be8c1, type: 3}
+  m_PrefabInstance: {fileID: 454008516}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d557f0d4f5346b849b04898736ad6c76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkillTestController
 --- !u!1001 &458569189
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7343,6 +7354,10 @@ PrefabInstance:
       propertyPath: playerStatus
       value: 
       objectReference: {fileID: 468526950}
+    - target: {fileID: 2513981832059749341, guid: 319f39f80f90a0144b4696e1b3b447dd, type: 3}
+      propertyPath: skillController
+      value: 
+      objectReference: {fileID: 454008518}
     - target: {fileID: 2513981832059749341, guid: 319f39f80f90a0144b4696e1b3b447dd, type: 3}
       propertyPath: playerExperienceTracker
       value: 
