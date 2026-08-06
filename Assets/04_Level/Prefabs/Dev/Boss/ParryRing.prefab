@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5195079337361280102}
   - component: {fileID: 3197127376057078486}
   - component: {fileID: 4761346797707165879}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: CenterDot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 5467757677575804266}
   - component: {fileID: 8602538267754820551}
   - component: {fileID: 3503361922145606439}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: ParryRing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -328,6 +328,6 @@ MonoBehaviour:
   centerDotSprite: {fileID: 0}
   dotFlashScale: 1.2
   flashColor: {r: 0.024262667, g: 1, b: 0, a: 1}
-  useSlowMo: 1
-  slowMoScale: 0.05
-  slowMoDuration: 0.2
+  useSlowMo: 0
+  slowMoScale: 0.3
+  slowMoDuration: 0.3
