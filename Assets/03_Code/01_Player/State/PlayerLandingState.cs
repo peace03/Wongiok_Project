@@ -40,14 +40,15 @@ public class PlayerLandingState : PlayerBaseState
             return;
         }
 
-        if (animationStarted && !controller.Animation.IsLandingAnimationFinished())
-            return;
-
+        // 이동 입력을 유지한 채 착지하면 Landing 포즈로 미끄러지지 않도록 Run 전환을 우선합니다.
         if (controller.MoveInput != Vector2.zero)
         {
             controller.TransitionTo(controller.PlayerMoveState);
             return;
         }
+
+        if (animationStarted && !controller.Animation.IsLandingAnimationFinished())
+            return;
 
         controller.TransitionTo(controller.PlayerIdleState);
     }
