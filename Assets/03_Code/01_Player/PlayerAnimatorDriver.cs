@@ -146,32 +146,46 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     }
 
     /// <summary>
-    /// 하강이 시작되었음을 Animator에 전달하고 Landing 애니메이션을 재생합니다.
-    /// 일반 점프 하강과 낭떠러지 추락을 모두 처리하기 위해 두 가지 전환 경로를 사용합니다.
+    /// 실제 지면 접촉 뒤 Landing 애니메이션을 처음부터 재생합니다.
     /// </summary>
-    public void PlayLanding()
+    /// <returns>Landing State가 존재해 재생 요청에 성공하면 true입니다.</returns>
+    public bool PlayLanding()
     {
-        if (!CanPlay() || skillCoroutine != null) return;
+        if (!CanPlay() || skillCoroutine != null) return false;
 
-        // Jump → Landing은 Animator Controller에 연결된 IsFalling 조건 Transition이 담당합니다.
-        animator.SetBool(IsFalling, true);
+        if (!animator.HasState(BaseLayerIndex, LandingState))
+        {
+            Debug.LogWarning(
+                "Player Animator에 'Base Layer.Landing' State가 없어 착지 애니메이션을 재생하지 않았습니다.",
+                this);
+            return false;
+        }
 
-        // 현재 Jump이거나 Jump로 블렌딩 중이라면 Animator의 실제 Transition을 사용합니다.
-        // 여기서 다시 CrossFade하면 설정해 둔 Jump → Landing 전환을 덮어써서 움직임이 끊길 수 있습니다.
-        AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
-        AnimatorStateInfo nextState = animator.GetNextAnimatorStateInfo(0);
-        bool isJumpState = currentState.fullPathHash == JumpState
-            || (animator.IsInTransition(0) && nextState.fullPathHash == JumpState);
-
-        if (isJumpState) return;
-
-        // Jump를 거치지 않고 낭떠러지에서 떨어진 경우에는 Jump → Landing Transition을 탈 수 없습니다.
-        // 이때만 코드에서 Landing으로 직접 전환하며, 끊김을 줄이기 위해 별도의 긴 블렌딩 시간을 사용합니다.
+        animator.SetBool(IsFalling, false);
         animator.CrossFadeInFixedTime(
             LandingState,
             LandingBlendDuration,
-            0,
+            BaseLayerIndex,
             0);
+        return true;
+    }
+
+    /// <summary>
+    /// Landing State에 진입한 뒤 첫 재생이 끝났는지 확인합니다.
+    /// </summary>
+    public bool IsLandingAnimationFinished()
+    {
+        if (!CanPlay() || !animator.HasState(BaseLayerIndex, LandingState))
+            return true;
+
+        AnimatorStateInfo stateInfo =
+            animator.GetCurrentAnimatorStateInfo(BaseLayerIndex);
+
+        if (stateInfo.fullPathHash != LandingState)
+            return false;
+
+        return !animator.IsInTransition(BaseLayerIndex) &&
+               stateInfo.normalizedTime >= 1f;
     }
 
     /// <summary>
@@ -261,6 +275,27 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         animator.SetBool(IsExecutingSkill, false);
         animator.SetTrigger(DeathTrigger);
         return true;
+    }
+
+    /// <summary>
+    /// Death State가 실제로 재생을 시작한 뒤 첫 재생이 끝났는지 확인합니다.
+    /// 고정 대기 시간을 사용하지 않아 클립 길이나 Animator 재생 속도가 바뀌어도 완료 시점이 맞습니다.
+    /// </summary>
+    public bool IsDeathAnimationFinished()
+    {
+        // Animator 또는 Death State가 없으면 게임오버 UI가 영구히 막히지 않도록 완료로 처리합니다.
+        if (!CanPlay() || !animator.HasState(BaseLayerIndex, DeathState))
+            return true;
+
+        AnimatorStateInfo stateInfo =
+            animator.GetCurrentAnimatorStateInfo(BaseLayerIndex);
+
+        // Trigger 직후에는 이전 State가 반환될 수 있으므로 Death 진입 전에는 기다립니다.
+        if (stateInfo.fullPathHash != DeathState)
+            return false;
+
+        return !animator.IsInTransition(BaseLayerIndex) &&
+               stateInfo.normalizedTime >= 1f;
     }
 
     /// <summary>

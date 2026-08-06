@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     public PlayerMoveState PlayerMoveState { get; private set; }
     public PlayerJumpState PlayerJumpState { get; private set; }
     public PlayerFallState PlayerFallState { get; private set; }
+    public PlayerLandingState PlayerLandingState { get; private set; }
     public PlayerDashState PlayerDashState { get; private set; }
     public PlayerHitState PlayerHitState { get; private set; }
     public PlayerDeathState PlayerDeathState { get; private set; }
@@ -124,6 +125,7 @@ public class PlayerController : MonoBehaviour
         PlayerMoveState = new PlayerMoveState(this);
         PlayerJumpState = new PlayerJumpState(this);
         PlayerFallState = new PlayerFallState(this);
+        PlayerLandingState = new PlayerLandingState(this);
         PlayerDashState = new PlayerDashState(this);
         PlayerHitState = new PlayerHitState(this);
         PlayerDeathState = new PlayerDeathState(this);

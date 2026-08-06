@@ -44,7 +44,8 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         EventBus<PlayerLifeChangedEvent>.action += HandlePlayerLifeChanged;
         EventBus<PlayerHealItemCountChangedEvent>.action += HandlePlayerHealItemCountChanged;
         EventBus<PlayerExperienceChangedEvent>.action += HandlePlayerExperienceChanged;
-        EventBus<PlayerDeadEvent>.action += HandlePlayerDead;
+        EventBus<PlayerDeathPresentationFinishedEvent>.action +=
+            HandlePlayerDeathPresentationFinished;
         EventBus<UIChangeScreenEvent>.action += HandleChangeScreen;
         EventBus<RefreshUIEvent>.action += HandleRefreshUI;
     }
@@ -55,7 +56,8 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         EventBus<PlayerLifeChangedEvent>.action -= HandlePlayerLifeChanged;
         EventBus<PlayerHealItemCountChangedEvent>.action -= HandlePlayerHealItemCountChanged;
         EventBus<PlayerExperienceChangedEvent>.action -= HandlePlayerExperienceChanged;
-        EventBus<PlayerDeadEvent>.action -= HandlePlayerDead;
+        EventBus<PlayerDeathPresentationFinishedEvent>.action -=
+            HandlePlayerDeathPresentationFinished;
         EventBus<UIChangeScreenEvent>.action -= HandleChangeScreen;
         EventBus<RefreshUIEvent>.action -= HandleRefreshUI;
     }
@@ -122,12 +124,13 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         PublishPauseStatus();
     }
 
-    private void HandlePlayerDead(PlayerDeadEvent eventData)
+    private void HandlePlayerDeathPresentationFinished(
+        PlayerDeathPresentationFinishedEvent eventData)
     {
-        EventBus<UIChangeScreenEvent>.Publish(
-            new UIChangeScreenEvent(UIScreenState.GameOver));
         EventBus<UISetGameOverEvent>.Publish(
             new UISetGameOverEvent(currentLife > 0));
+        EventBus<UIChangeScreenEvent>.Publish(
+            new UIChangeScreenEvent(UIScreenState.GameOver));
     }
 
     private void HandleChangeScreen(UIChangeScreenEvent eventData)
