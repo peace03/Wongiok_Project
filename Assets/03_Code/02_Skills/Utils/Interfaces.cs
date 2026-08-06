@@ -1,6 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+public interface ISkillSystemProvider
+{
+    public void GetCanEnhanceSkillUIDatas(List<UIPauseSkillInfoData> results);
+}
+
 /// <summary>
 /// 발사체 액티브 스킬 인터페이스
 /// </summary>

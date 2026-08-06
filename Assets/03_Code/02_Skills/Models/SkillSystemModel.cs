@@ -33,7 +33,6 @@ public class SkillSystemModel
     private readonly GameInputReader ownerInput;                                // 소유자 입력 시스템
 
     public event Action OnActiveSkillsChanged;                                  // 액티브 스킬 변경 이벤트 변수
-    public event Action<SkillInstance> OnSkillEnhanced;                         // 스킬 강화 이벤트 변수
     #endregion
 
     public int MaxEquippedActiveCount => maxEquippedActiveCount;
@@ -613,11 +612,6 @@ public class SkillSystemModel
             skill.LevelUp();
             result = true;
         }
-
-        // 스킬 강화에 성공했다면
-        if (result)
-            // 스킬 강화 이벤트 발행
-            OnSkillEnhanced?.Invoke(skill);
 
         // 결과 반환
         return result;

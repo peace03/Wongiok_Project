@@ -12,6 +12,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
 
     private GameInputReader ownerInput;                             // 소유자 입력 시스템
 
+    public ISkillSystemProvider Presenter => presenter ?? null;
     public int Priority => (int)InitOrder.Skill;                    // 중요도
 
     private void OnEnable()
@@ -73,6 +74,9 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     // 초기화 함수
     public void Init()
     {
+        // 스킬 데이터베이스 초기화
+        SkillDatabase.Init();
+
         // 소유자가 있고 실행기가 있다면
         if (owner != null && executer != null)
         {
@@ -95,18 +99,6 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         // 소유자가 없다면
         else
             Debug.Log($"[Error | Skill] 스킬 시스템 초기화 실패 => 입력 - 소유자(Owner) : 없음");
-    }
-    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
-    {
-        return presenter != null
-            ? presenter.CaptureCheckpointSnapshot()
-            : System.Array.Empty<CheckpointSkillSnapshot>();
-    }
-
-    public void RestoreCheckpointSnapshot(
-        CheckpointSkillSnapshot[] snapshot)
-    {
-        presenter?.RestoreCheckpointSnapshot(snapshot);
     }
 
     /// <summary>
@@ -143,4 +135,21 @@ public class SkillSystemController : MonoBehaviour, IInitializable
                 break;
         }
     }
+
+    #region 플레이어 쪽에서 추가한 함수
+    public CheckpointSkillSnapshot[] CaptureCheckpointSnapshot()
+                                    => presenter != null ? presenter.CaptureCheckpointSnapshot()
+                                                            : System.Array.Empty<CheckpointSkillSnapshot>();
+
+    public void RestoreCheckpointSnapshot(CheckpointSkillSnapshot[] snapshot)
+    {
+        if (presenter == null)
+            return;
+
+        foreach (var snap in snapshot)
+            Debug.Log($"{snap.SkillId} / {snap.Level} / {snap.EquippedActiveSlot}");
+
+        presenter.RestoreCheckpointSnapshot(snapshot);
+    }
+    #endregion
 }

@@ -40,6 +40,8 @@ public class TestModule : MonoBehaviour
 
     [SerializeField] private GameInputReader _input;
 
+    [SerializeField] private SkillSystemController skillController;
+
     private void Start()
     {
         PrototypeGameSession.EnsureInitialized();
@@ -58,8 +60,6 @@ public class TestModule : MonoBehaviour
         EventBus<UILevelUpSkillSelectedEvent>.action += HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action += HandlePlayerLevelUp;
 
-        EventBus<UICanEnhanceSkills>.action += GetCanEnhanceSkillDatas;
-
         EventBus<UIGameOverRestartChapterRequestedEvent>.action += HandleGameOverRestartChapterRequested;
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.action += HandleGameOverLoadCheckPointRequested;
         EventBus<UIGameOverMainMenuRequestedEvent>.action += HandleGameOverMainMenuRequested;
@@ -75,8 +75,6 @@ public class TestModule : MonoBehaviour
         EventBus<RefreshUIEvent>.action -= HandleRefreshUI;
         EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action -= HandlePlayerLevelUp;
-
-        EventBus<UICanEnhanceSkills>.action -= GetCanEnhanceSkillDatas;
 
         EventBus<UIGameOverRestartChapterRequestedEvent>.action -= HandleGameOverRestartChapterRequested;
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.action -= HandleGameOverLoadCheckPointRequested;
@@ -422,9 +420,6 @@ public class TestModule : MonoBehaviour
         OpenLevelUpOverlay();
     }
 
-    private void GetCanEnhanceSkillDatas(UICanEnhanceSkills eventData)
-                                                            => canEnhanceSkillDatas = eventData.skills;
-
     private void OpenLevelUpOverlay()
     {
         UILevelUpSkillOptionData[] options = CreateLevelUpOptionsFromRealSkills();
@@ -581,6 +576,8 @@ public class TestModule : MonoBehaviour
     private UILevelUpSkillOptionData[] CreateLevelUpOptionsFromRealSkills()
     {
         const int maxSkillLevel = 3;
+
+        skillController.Presenter.GetCanEnhanceSkillUIDatas(canEnhanceSkillDatas);
 
         List<UIPauseSkillInfoData> candidates = canEnhanceSkillDatas
             .GroupBy(skill => skill.SkillId)
