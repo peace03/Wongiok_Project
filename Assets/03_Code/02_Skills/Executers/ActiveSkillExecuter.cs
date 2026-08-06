@@ -193,6 +193,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             }
         }
 
+        // 총구 이펙트 즉시 종료
+        StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Muzzle);
+        // 총알 이펙트 즉시 종료
+        StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Main);
+
         // 발사체 스킬 딜레이 시간량이 있다면(지속 시간이 있었다면)
         if (projectileDelayTimeValue > 0f)
             // 스킬 종료 히트 스탑 이벤트 발행(현재 프레임의 3/4)
