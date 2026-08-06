@@ -2504,7 +2504,7 @@ PrefabInstance:
     - target: {fileID: 3638139924767686964, guid: cb32f26c0dd9fd1458324f935c3be8c1, type: 3}
       propertyPath: owner
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 621423283}
     - target: {fileID: 5102672676924201617, guid: cb32f26c0dd9fd1458324f935c3be8c1, type: 3}
       propertyPath: m_Name
       value: "\uC2A4\uD0AC"
@@ -2556,7 +2556,7 @@ PrefabInstance:
     - target: {fileID: 8300423116708251226, guid: cb32f26c0dd9fd1458324f935c3be8c1, type: 3}
       propertyPath: owner
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 468526935}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3416,6 +3416,11 @@ Transform:
   - {fileID: 1670160131}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &621423283 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3810258337476680276, guid: 8e5854715c70f0041a65650b8e223592, type: 3}
+  m_PrefabInstance: {fileID: 468526932}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &624261108 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 827850364075370813, guid: f24c29667c863a4478b649cff22eb4ba, type: 3}
