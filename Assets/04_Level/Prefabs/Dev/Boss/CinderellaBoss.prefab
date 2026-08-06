@@ -317,7 +317,7 @@ MonoBehaviour:
   takeDamageSfxVolume: 0.5
   status:
     maxHP:
-      BaseValue: 100
+      BaseValue: 2000
     attackSpeed:
       BaseValue: 0
     telegraphSpeed:
