@@ -7,6 +7,7 @@ public class PlayerDeathState : PlayerBaseState
 
     // 마지막 사망 정보를 저장해 이후 연출 확장에서 참조할 수 있게 합니다.
     private DeathInfo deathInfo;
+    private bool presentationFinished;
 
     #endregion
 
@@ -38,13 +39,25 @@ public class PlayerDeathState : PlayerBaseState
     {
         Debug.Log($"Death Enter: {deathInfo.Cause}");
 
+        presentationFinished = false;
         controller.Movement.ResetVerticalVelocity();
-        controller.Animation.PlayDeath();
+        bool animationStarted = controller.Animation.PlayDeath();
         EventBus<CancelSkill>.Publish(default);
+
+        // Animator나 Death State가 누락되어도 게임오버 진행이 멈추지 않게 합니다.
+        if (!animationStarted)
+            FinishDeathPresentation();
     }
 
     public override void UpdateState()
     {
+        if (presentationFinished)
+            return;
+
+        if (!controller.Animation.IsDeathAnimationFinished())
+            return;
+
+        FinishDeathPresentation();
     }
 
     public override void FixedUpdateState()
@@ -54,6 +67,16 @@ public class PlayerDeathState : PlayerBaseState
     public override void ExitState()
     {
         Debug.Log("Death Exit");
+    }
+
+    private void FinishDeathPresentation()
+    {
+        if (presentationFinished)
+            return;
+
+        presentationFinished = true;
+        EventBus<PlayerDeathPresentationFinishedEvent>.Publish(
+            new PlayerDeathPresentationFinishedEvent(deathInfo));
     }
 
     #endregion

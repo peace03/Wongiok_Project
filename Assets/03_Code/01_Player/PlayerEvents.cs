@@ -27,6 +27,18 @@ public readonly struct PlayerDeadEvent
     }
 }
 
+// 사망 애니메이션의 첫 재생이 끝난 뒤 후속 연출을 시작하기 위한 이벤트입니다.
+// 실제 사망 판정은 PlayerDeadEvent로 즉시 처리하고, 게임오버 UI만 이 이벤트를 기다립니다.
+public readonly struct PlayerDeathPresentationFinishedEvent
+{
+    public readonly DeathInfo DeathInfo;
+
+    public PlayerDeathPresentationFinishedEvent(DeathInfo deathInfo)
+    {
+        DeathInfo = deathInfo;
+    }
+}
+
 // 플레이어가 사망 후 부활했을 때 발행되는 이벤트입니다.
 // 체크포인트 부활, 부활 이펙트, UI 복구 흐름에서 사용할 수 있습니다.
 public readonly struct PlayerRevivedEvent

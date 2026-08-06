@@ -14,7 +14,6 @@ public class PlayerFallState : PlayerBaseState
     public override void EnterState()
     {
         Debug.Log("Fall Enter");
-        controller.Animation.PlayLanding();
     }
 
     public override void UpdateState()
@@ -66,15 +65,7 @@ public class PlayerFallState : PlayerBaseState
     {
         if (!controller.Movement.IsGrounded || !controller.Movement.IsFalling) return false;
 
-        controller.Audio?.PlayLanding();
-
-        if (controller.MoveInput != Vector2.zero)
-        {
-            controller.TransitionTo(controller.PlayerMoveState);
-            return true;
-        }
-
-        controller.TransitionTo(controller.PlayerIdleState);
+        controller.TransitionTo(controller.PlayerLandingState);
         return true;
     }
 
