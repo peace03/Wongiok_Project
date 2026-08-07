@@ -29,6 +29,10 @@ public class TestModule : MonoBehaviour
     [SerializeField] private string titleSceneName = "Lobby";
     [SerializeField] private bool canLoadCheckPoint = true;
 
+    // 2026.08.07_psb수정
+    [Header("게임오버 테스트 흐름")]
+    [SerializeField] private bool usePrototypeGameOverFlow = true;
+
     private List<UIPauseSkillInfoData> canEnhanceSkillDatas = new();
 
     private BaseSkillData[] cachedActiveSkillDatas;
@@ -60,8 +64,13 @@ public class TestModule : MonoBehaviour
         EventBus<UILevelUpSkillSelectedEvent>.action += HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action += HandlePlayerLevelUp;
 
-        EventBus<UIGameOverRestartChapterRequestedEvent>.action += HandleGameOverRestartChapterRequested;
-        EventBus<UIGameOverLoadCheckpointRequestedEvent>.action += HandleGameOverLoadCheckPointRequested;
+        // 2026.08.07_psb수정
+        // Real 씬에서는 CheckpointRespawnCoordinator만 복구와 재시작을 처리한다.
+        if (usePrototypeGameOverFlow)
+        {
+            EventBus<UIGameOverRestartChapterRequestedEvent>.action += HandleGameOverRestartChapterRequested;
+            EventBus<UIGameOverLoadCheckpointRequestedEvent>.action += HandleGameOverLoadCheckPointRequested;
+        }
         EventBus<UIGameOverMainMenuRequestedEvent>.action += HandleGameOverMainMenuRequested;
 
         EventBus<UIChapterClearNextRequestedEvent>.action += HandleChapterClearNextRequested;
@@ -76,8 +85,12 @@ public class TestModule : MonoBehaviour
         EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
         EventBus<PlayerLevelUpEvent>.action -= HandlePlayerLevelUp;
 
-        EventBus<UIGameOverRestartChapterRequestedEvent>.action -= HandleGameOverRestartChapterRequested;
-        EventBus<UIGameOverLoadCheckpointRequestedEvent>.action -= HandleGameOverLoadCheckPointRequested;
+        // 2026.08.07_psb수정
+        if (usePrototypeGameOverFlow)
+        {
+            EventBus<UIGameOverRestartChapterRequestedEvent>.action -= HandleGameOverRestartChapterRequested;
+            EventBus<UIGameOverLoadCheckpointRequestedEvent>.action -= HandleGameOverLoadCheckPointRequested;
+        }
         EventBus<UIGameOverMainMenuRequestedEvent>.action -= HandleGameOverMainMenuRequested;
 
         EventBus<UIChapterClearNextRequestedEvent>.action -= HandleChapterClearNextRequested;
@@ -100,7 +113,7 @@ public class TestModule : MonoBehaviour
         if (_input.TestF4Pressed)
             DamagePlayer();
 
-        if (_input.TestF5Pressed)
+        if (usePrototypeGameOverFlow && _input.TestF5Pressed)
             ShowGameOver();
 
         if (_input.TestF6Pressed)
@@ -335,7 +348,9 @@ public class TestModule : MonoBehaviour
             canLoadCheckPoint && PrototypeGameSession.HasCheckpoint;
 
         EventBus<UISetGameOverEvent>.Publish(
-            new UISetGameOverEvent(canUseCheckpoint));
+            new UISetGameOverEvent(
+                canUseCheckpoint,
+                currentLife > 0));
 
         EventBus<UIChangeScreenEvent>.Publish(
             new UIChangeScreenEvent(UIScreenState.GameOver));

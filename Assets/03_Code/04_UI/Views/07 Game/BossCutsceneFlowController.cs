@@ -26,6 +26,10 @@ public class BossCutsceneFlowController : MonoBehaviour
     private AsyncOperation pendingBossSceneLoadOperation;
     private bool isEncounterLoading;
     private bool isBossClearPlaying;
+    // 2026.08.07_psb수정
+    // 보스 영상의 첫 프레임이 RenderTexture에 준비될 때까지 Fader를 유지하기 위한 상태다.
+    private bool isWaitingForEncounterFirstFrame;
+    private bool isWaitingForBossClearFirstFrame;
 
     private void OnEnable()
     {
@@ -33,6 +37,9 @@ public class BossCutsceneFlowController : MonoBehaviour
         EventBus<UIBossEncounterActivateSceneRequestedEvent>.action += HandleBossEncounterActivateSceneRequested;
         EventBus<BossDeathPresentationFinishedEvent>.action += HandleBossDeathPresentationFinished;
         EventBus<UICutsceneFinishedEvent>.action += HandleCutsceneFinished;
+        // 2026.08.07_psb수정
+        // CutsceneView가 알린 첫 프레임 준비 시점에만 영상 페이드 인을 시작한다.
+        EventBus<UIVideoFirstFrameReadyEvent>.action += HandleVideoFirstFrameReady;
     }
 
     private void OnDisable()
@@ -41,6 +48,9 @@ public class BossCutsceneFlowController : MonoBehaviour
         EventBus<UIBossEncounterActivateSceneRequestedEvent>.action -= HandleBossEncounterActivateSceneRequested;
         EventBus<BossDeathPresentationFinishedEvent>.action -= HandleBossDeathPresentationFinished;
         EventBus<UICutsceneFinishedEvent>.action -= HandleCutsceneFinished;
+        // 2026.08.07_psb수정
+        // 영상 첫 프레임 준비 신호 구독을 해제한다.
+        EventBus<UIVideoFirstFrameReadyEvent>.action -= HandleVideoFirstFrameReady;
     }
 
     // 포털 또는 임시 F6 입력이 요청한 보스 조우 연출을 시작합니다.
@@ -99,6 +109,27 @@ public class BossCutsceneFlowController : MonoBehaviour
             new UIFadeEvent(1f, 0f, bossClearFadeInDuration));
     }
 
+    // 2026.08.07_psb수정
+    // 보스 영상이 실제로 출력 가능한 첫 프레임을 받은 뒤에만 검은 Fader를 걷는다.
+    private void HandleVideoFirstFrameReady(UIVideoFirstFrameReadyEvent eventData)
+    {
+        if (eventData.VideoId == BossEncounterCutsceneId &&
+            isWaitingForEncounterFirstFrame)
+        {
+            isWaitingForEncounterFirstFrame = false;
+            EventBus<UIFadeEvent>.Publish(
+                new UIFadeEvent(1f, 0f, encounterFadeInDuration));
+            return;
+        }
+
+        if (eventData.VideoId == BossClearCutsceneId &&
+            isWaitingForBossClearFirstFrame)
+        {
+            isWaitingForBossClearFirstFrame = false;
+            StartCoroutine(FadeInBossClearVideoAfterFirstFrame());
+        }
+    }
+
     // 조우 영상 재생과 보스 씬 비동기 로딩을 같은 전환 구간에서 시작합니다.
     private IEnumerator LoadBossSceneWithEncounterCutscene()
     {
@@ -108,6 +139,10 @@ public class BossCutsceneFlowController : MonoBehaviour
             new UIOpenOverlayEvent(UIOverlayState.Cutscene));
 
         yield return Fade(0f, 1f, encounterFadeOutDuration);
+
+        // 2026.08.07_psb수정
+        // 영상 첫 프레임이 준비되기 전에는 검은 화면을 유지한다.
+        isWaitingForEncounterFirstFrame = true;
 
         EventBus<UISetCutsceneEvent>.Publish(
             new UISetCutsceneEvent(
@@ -126,9 +161,6 @@ public class BossCutsceneFlowController : MonoBehaviour
         }
 
         pendingBossSceneLoadOperation.allowSceneActivation = false;
-
-        EventBus<UIFadeEvent>.Publish(
-            new UIFadeEvent(1f, 0f, encounterFadeInDuration));
 
         float elapsedTime = 0f;
 
@@ -161,6 +193,10 @@ public class BossCutsceneFlowController : MonoBehaviour
 
         yield return Fade(0f, 1f, bossClearFadeOutDuration);
 
+        // 2026.08.07_psb수정
+        // 영상 첫 프레임이 준비되기 전에는 검은 화면을 유지한다.
+        isWaitingForBossClearFirstFrame = true;
+
         EventBus<UISetCutsceneEvent>.Publish(
             new UISetCutsceneEvent(
                 BossClearCutsceneId,
@@ -168,6 +204,12 @@ public class BossCutsceneFlowController : MonoBehaviour
                 string.Empty,
                 CutscenePlaybackType.BossClear));
 
+    }
+
+    // 2026.08.07_psb수정
+    // 영상 첫 프레임 확인 후 기존 연출 지연 시간을 적용해 클리어 영상을 자연스럽게 노출한다.
+    private IEnumerator FadeInBossClearVideoAfterFirstFrame()
+    {
         yield return new WaitForSecondsRealtime(bossClearVideoFadeInDelay);
 
         EventBus<UIFadeEvent>.Publish(

@@ -51,7 +51,7 @@ MonoBehaviour:
   saveSystem: {fileID: 9046399773539745327}
   checkpointUI: {fileID: 4560234084792075965}
   bossPreparationUI: {fileID: 8519417872945999459}
-  enablePersistentSave: 0
+  enablePersistentSave: 1
   enableBossPreparationUI: 0
   bossCheckpointNumbers: 
   logProcessing: 0

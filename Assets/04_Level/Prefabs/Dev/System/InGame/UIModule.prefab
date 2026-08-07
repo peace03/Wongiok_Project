@@ -63,3 +63,4 @@ MonoBehaviour:
   bossDamageAmount: 25
   titleSceneName: Lobby
   canLoadCheckPoint: 1
+  usePrototypeGameOverFlow: 0
