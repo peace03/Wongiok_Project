@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerUIEventBridge : MonoBehaviour, IInitializable
@@ -16,6 +17,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
     private bool hasLifeState;
     private bool hasHealItemState;
     private bool hasExperienceState;
+    private Coroutine initialStateSyncRoutine;
 
     private UIPauseSkillInfoData[] currentEquippedActiveSkills = System.Array.Empty<UIPauseSkillInfoData>();
     private UIPauseSkillInfoData[] currentEquippedPassiveSkills = System.Array.Empty<UIPauseSkillInfoData>();
@@ -28,11 +30,15 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
 
         SubscribeEvents();
         isInitialized = true;
+        RequestInitialPlayerStateSync();
     }
 
     private void OnDestroy()
     {
         if (!isInitialized) return;
+
+        if (initialStateSyncRoutine != null)
+            StopCoroutine(initialStateSyncRoutine);
 
         UnsubscribeEvents();
         isInitialized = false;
@@ -143,7 +149,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         if (eventData.ScreenState != UIScreenState.InGame)
             return;
 
-        PublishCurrentPlayerHudState();
+        RequestInitialPlayerStateSync();
     }
 
     private void HandleRefreshUI(RefreshUIEvent eventData)
@@ -204,6 +210,67 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
                 GetDisplayMaxLifeCount(),
                 currentEquippedActiveSkills,
                 currentEquippedPassiveSkills));
+    }
+
+    // 2026.08.07_psb수정
+    // 인게임 진입 직후 실제 플레이어 컴포넌트를 읽어 상태 변경 전에도 Pause 정보를 만든다.
+    private void RequestInitialPlayerStateSync()
+    {
+        if (initialStateSyncRoutine != null)
+            StopCoroutine(initialStateSyncRoutine);
+
+        initialStateSyncRoutine = StartCoroutine(SyncInitialPlayerState());
+    }
+
+    // 2026.08.07_psb수정
+    // 플레이어 재생성 순서를 기다린 뒤 HP·경험치·목숨·회복 아이템의 현재 값을 한 번 발행한다.
+    private IEnumerator SyncInitialPlayerState()
+    {
+        const int maxRetryFrameCount = 30;
+
+        for (int frame = 0; frame < maxRetryFrameCount; frame++)
+        {
+            PlayerStatus playerStatus = FindFirstObjectByType<PlayerStatus>();
+            PlayerExperienceTracker experienceTracker =
+                FindFirstObjectByType<PlayerExperienceTracker>();
+            PlayerLifeTracker lifeTracker =
+                FindFirstObjectByType<PlayerLifeTracker>();
+            PlayerHealItemInventory healItemInventory =
+                FindFirstObjectByType<PlayerHealItemInventory>();
+
+            if (playerStatus != null &&
+                experienceTracker != null &&
+                lifeTracker != null &&
+                healItemInventory != null)
+            {
+                currentHp = playerStatus.GetCurrentHP();
+                maxHp = playerStatus.GetMaxHP();
+                hasHealthState = true;
+
+                currentLevel = experienceTracker.CurrentLevel;
+                currentExp = experienceTracker.CurrentExp;
+                requiredExp = experienceTracker.RequiredExp;
+                hasExperienceState = true;
+
+                currentLife = lifeTracker.CurrentLifeCount;
+                maxLife = lifeTracker.StartLifeCount;
+                hasLifeState = true;
+
+                currentHealItemCount = healItemInventory.CurrentCount;
+                maxHealItemCount = healItemInventory.MaxCount;
+                hasHealItemState = true;
+
+                PublishCurrentPlayerHudState();
+                initialStateSyncRoutine = null;
+                yield break;
+            }
+
+            yield return null;
+        }
+
+        // 플레이어가 없는 특수 씬에서는 기존에 수신한 값만 다시 발행한다.
+        PublishCurrentPlayerHudState();
+        initialStateSyncRoutine = null;
     }
 
     private int GetDisplayLifeCount()

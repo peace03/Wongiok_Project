@@ -75,7 +75,7 @@ public class TestModule : MonoBehaviour
 
         EventBus<UIChapterClearNextRequestedEvent>.action += HandleChapterClearNextRequested;
         EventBus<UIChapterClearMainMenuRequestedEvent>.action += HandleChapterClearMainMenuRequested;
-        EventBus<UIChapterClearQuitGameRequestedEvent>.action += HandleChapterClearQuitGameRequested;
+        EventBus<UIChapterClearQuitGameRequestedEvent>.action += HandleChapterClearQuitRequested;
         EventBus<UIBossClearVideoFinishedEvent>.action += HandleBossClearVideoFinished;
     }
 
@@ -95,7 +95,7 @@ public class TestModule : MonoBehaviour
 
         EventBus<UIChapterClearNextRequestedEvent>.action -= HandleChapterClearNextRequested;
         EventBus<UIChapterClearMainMenuRequestedEvent>.action -= HandleChapterClearMainMenuRequested;
-        EventBus<UIChapterClearQuitGameRequestedEvent>.action -= HandleChapterClearQuitGameRequested;
+        EventBus<UIChapterClearQuitGameRequestedEvent>.action -= HandleChapterClearQuitRequested;
         EventBus<UIBossClearVideoFinishedEvent>.action -= HandleBossClearVideoFinished;
     }
 
@@ -546,6 +546,20 @@ public class TestModule : MonoBehaviour
         Time.timeScale = 0f;
 
         Debug.Log("게임 종료됨");
+    }
+
+    // 2026.08.07_psb수정
+    // 챕터 클리어 화면의 종료 요청을 현재 인게임 흐름에서 실제 게임 종료로 처리한다.
+    private void HandleChapterClearQuitRequested(
+        UIChapterClearQuitGameRequestedEvent eventData)
+    {
+        Time.timeScale = 1f;
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private void ResetTestState()

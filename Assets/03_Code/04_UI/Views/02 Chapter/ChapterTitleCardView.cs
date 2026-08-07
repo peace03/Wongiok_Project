@@ -492,6 +492,11 @@ public class ChapterTitleCardView : UIViewBase
 
         isLoadingReady = true;
 
+        // 2026.08.07_psb수정
+        // 실제 씬 로딩이 준비되면 대기 중임을 나타내던 스피너를 즉시 숨긴다.
+        if (loadingSpinner != null)
+            loadingSpinner.gameObject.SetActive(false);
+
         if (!isVideoFinished && loadingSkipGuideObject != null)
         {
             loadingSkipGuideObject.SetActive(true);

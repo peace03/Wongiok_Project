@@ -6,6 +6,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
     [SerializeField] private GameInputReader _input;
 
     private bool isInitialized;
+    private bool isCursorRefreshQueued;
 
     // UIManager가 먼저 초기화된 뒤 ServiceLocator에서 가져올 수 있도록 UI보다 뒤에 초기화
     public int Priority => (int)InitOrder.UI + 30;
@@ -20,7 +21,20 @@ public class UIInputBridge : MonoBehaviour, IInitializable
             uiManager = ServiceLocator.Get<UIManager>();
         }
 
+        SubscribeCursorEvents();
+        RefreshCursorState();
+        QueueCursorStateRefresh();
         isInitialized = true;
+    }
+
+    private void OnDestroy()
+    {
+        if (!isInitialized)
+            return;
+
+        UnsubscribeCursorEvents();
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     private void Update()
@@ -37,6 +51,15 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         HandleSpaceInput();
         HandleChapterLoadingSkipInput();
         HandleCutsceneBackQuoteInput();
+    }
+
+    private void LateUpdate()
+    {
+        if (!isInitialized || !isCursorRefreshQueued)
+            return;
+
+        isCursorRefreshQueued = false;
+        RefreshCursorState();
     }
 
     private void HandlePrologueSkipInput()
@@ -138,5 +161,78 @@ public class UIInputBridge : MonoBehaviour, IInitializable
 
         EventBus<UICutsceneSkipRequestedEvent>.Publish(
             new UICutsceneSkipRequestedEvent(CutsceneSkipInput.BackQuote));
+    }
+
+    // 2026.08.07_psb수정
+    // 화면과 오버레이가 바뀔 때마다 게임 플레이 전용 커서 정책을 다시 적용한다.
+    private void SubscribeCursorEvents()
+    {
+        EventBus<UIChangeScreenEvent>.action += HandleUiStateChanged;
+        EventBus<UIOpenOverlayEvent>.action += HandleOverlayOpened;
+        EventBus<UICloseOverlayEvent>.action += HandleOverlayClosed;
+        EventBus<UIResetEvent>.action += HandleUiReset;
+    }
+
+    // 2026.08.07_psb수정
+    // 오브젝트가 파괴될 때 정적 EventBus 구독을 해제한다.
+    private void UnsubscribeCursorEvents()
+    {
+        EventBus<UIChangeScreenEvent>.action -= HandleUiStateChanged;
+        EventBus<UIOpenOverlayEvent>.action -= HandleOverlayOpened;
+        EventBus<UICloseOverlayEvent>.action -= HandleOverlayClosed;
+        EventBus<UIResetEvent>.action -= HandleUiReset;
+    }
+
+    // 2026.08.07_psb수정
+    // 화면 전환 후 커서 표시 상태를 현재 UI 상태에 맞춘다.
+    private void HandleUiStateChanged(UIChangeScreenEvent eventData)
+    {
+        QueueCursorStateRefresh();
+    }
+
+    // 2026.08.07_psb수정
+    // 오버레이가 열린 프레임에 커서 정책을 다시 적용한다.
+    private void HandleOverlayOpened(UIOpenOverlayEvent eventData)
+    {
+        QueueCursorStateRefresh();
+    }
+
+    // 2026.08.07_psb수정
+    // 오버레이가 닫힌 프레임에 커서 정책을 다시 적용한다.
+    private void HandleOverlayClosed(UICloseOverlayEvent eventData)
+    {
+        QueueCursorStateRefresh();
+    }
+
+    // 2026.08.07_psb수정
+    // UI 전체 초기화 뒤에도 타이틀과 인게임 상태에 맞는 커서를 보장한다.
+    private void HandleUiReset(UIResetEvent eventData)
+    {
+        QueueCursorStateRefresh();
+    }
+
+    // 2026.08.07_psb수정
+    // EventBus 요청 처리로 UI 상태가 확정된 뒤 같은 프레임의 LateUpdate에서 커서를 갱신한다.
+    private void QueueCursorStateRefresh()
+    {
+        isCursorRefreshQueued = true;
+    }
+
+    // 2026.08.07_psb수정
+    // 일반 인게임과 컷신에서는 숨기고, 메뉴·일시정지·레벨업에서는 포인터를 표시한다.
+    private void RefreshCursorState()
+    {
+        if (uiManager == null)
+            return;
+
+        bool shouldShowCursor =
+            uiManager.CurrentScreenState != UIScreenState.InGame ||
+            uiManager.CurrentOverlayState == UIOverlayState.Pause ||
+            uiManager.CurrentOverlayState == UIOverlayState.LevelUp;
+
+        Cursor.visible = shouldShowCursor;
+        Cursor.lockState = shouldShowCursor
+            ? CursorLockMode.None
+            : CursorLockMode.Locked;
     }
 }

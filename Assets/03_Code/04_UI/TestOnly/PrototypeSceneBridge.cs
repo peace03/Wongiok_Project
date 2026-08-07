@@ -94,6 +94,7 @@ public class PrototypeSceneBridge : MonoBehaviour
 
         EventBus<UITitleNewGameRequestedEvent>.action += HandleTitleNewGameRequested;
         EventBus<UITitleContinueRequestedEvent>.action += HandleTitleContinueRequested;
+        EventBus<UITitleExitRequestedEvent>.action += HandleTitleExitRequested;
 
         EventBus<UIChapterEnterRequestedEvent>.action += HandleChapterEnterRequested;
         EventBus<UIChapterTitleCardContinueRequestedEvent>.action += HandleChapterTitleCardContinueRequested;
@@ -109,6 +110,7 @@ public class PrototypeSceneBridge : MonoBehaviour
 
         EventBus<UITitleNewGameRequestedEvent>.action -= HandleTitleNewGameRequested;
         EventBus<UITitleContinueRequestedEvent>.action -= HandleTitleContinueRequested;
+        EventBus<UITitleExitRequestedEvent>.action -= HandleTitleExitRequested;
 
         EventBus<UIChapterEnterRequestedEvent>.action -= HandleChapterEnterRequested;
         EventBus<UIChapterTitleCardContinueRequestedEvent>.action -= HandleChapterTitleCardContinueRequested;
@@ -225,6 +227,19 @@ public class PrototypeSceneBridge : MonoBehaviour
     {
         PrototypeGameSession.BeginChapter(eventData.ChapterId);
         ShowChapterTitleCard(eventData.ChapterId, eventData.Thumbnail, eventData.Background);
+    }
+
+    // 2026.08.07_psb수정
+    // 타이틀 종료 버튼의 요청을 현재 Lobby 흐름에서 실제 게임 종료로 처리한다.
+    private void HandleTitleExitRequested(UITitleExitRequestedEvent eventData)
+    {
+        Time.timeScale = 1f;
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private void HandleTitleNewGameRequested(UITitleNewGameRequestedEvent eventData)
