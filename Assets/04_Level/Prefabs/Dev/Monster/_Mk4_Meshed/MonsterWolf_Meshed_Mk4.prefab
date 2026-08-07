@@ -392,8 +392,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterHitAnimationHandler
   animator: {fileID: 2750208965481489699}
-  monsterHealth: {fileID: 1278841075064529185}
-  meleeAI: {fileID: 7744435740442770626}
   hitTriggerName: Hit
 --- !u!114 &4534020440240090418
 MonoBehaviour:

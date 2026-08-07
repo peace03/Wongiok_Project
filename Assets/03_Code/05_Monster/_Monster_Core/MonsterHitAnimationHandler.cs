@@ -1,15 +1,14 @@
 using UnityEngine;
 
-[DisallowMultipleComponent]
-public sealed class MonsterHitAnimationHandler : MonoBehaviour
+public class MonsterHitAnimationHandler : MonoBehaviour
 {
-    [Header("Hit Animation")]
+    [Header("Animation")]
     [SerializeField] private Animator animator;
-    [SerializeField] private MonsterHealth monsterHealth;
-    [SerializeField] private MonsterMeleeAI meleeAI;
     [SerializeField] private string hitTriggerName = "Hit";
 
-    // 피격 애니메이션에 필요한 컴포넌트를 준비합니다
+    private int hitTriggerHash;
+
+    // 김연호 : Animator 참조를 찾고 Hit Trigger의 해시 값을 초기화합니다
     private void Awake()
     {
         if (animator == null)
@@ -17,79 +16,70 @@ public sealed class MonsterHitAnimationHandler : MonoBehaviour
             animator = GetComponentInChildren<Animator>();
         }
 
-        if (monsterHealth == null)
-        {
-            monsterHealth = GetComponent<MonsterHealth>();
-        }
-
-        if (meleeAI == null)
-        {
-            meleeAI = GetComponent<MonsterMeleeAI>();
-        }
+        hitTriggerHash = Animator.StringToHash(hitTriggerName);
     }
 
-    // 데미지 적용 이벤트를 구독합니다
+    // 김연호 : 몬스터가 실제 피해를 받은 시점을 감지하도록 피격 이벤트를 구독합니다
     private void OnEnable()
     {
-        EventBus<DamageHitEvent>.action += HandleDamageHit;
+        EventBus<MonsterDamagedEvent>.action += HandleMonsterDamaged;
     }
 
-    // 데미지 적용 이벤트 구독을 해제합니다
+    // 김연호 : 비활성화된 몬스터가 이벤트를 받지 않도록 구독을 해제합니다
     private void OnDisable()
     {
-        EventBus<DamageHitEvent>.action -= HandleDamageHit;
+        EventBus<MonsterDamagedEvent>.action -= HandleMonsterDamaged;
     }
 
-    // 자신이 실제로 피해를 받았을 때 피격 애니메이션을 실행합니다
-    private void HandleDamageHit(DamageHitEvent hitEvent)
+    // 김연호 : 자신에게 발생한 비치명적 피격에서만 Hit 애니메이션을 실행합니다
+    private void HandleMonsterDamaged(MonsterDamagedEvent damagedEvent)
     {
-        if (hitEvent.TargetObject == null)
+        if (damagedEvent.MonsterObject == null)
         {
             return;
         }
 
-        if (!IsSameObjectOrChild(hitEvent.TargetObject))
+        if (!IsSameObjectOrChild(damagedEvent.MonsterObject))
         {
             return;
         }
 
-        if (monsterHealth != null && monsterHealth.IsDead)
+        if (damagedEvent.CurrentHP <= 0f)
         {
             return;
-        }
-
-        if (meleeAI != null)
-        {
-            meleeAI.InterruptAttackByHit();
         }
 
         PlayHitAnimation();
     }
 
-    // 전달된 대상이 이 몬스터 또는 자식 오브젝트인지 확인합니다
-    private bool IsSameObjectOrChild(GameObject targetObject)
+    // 김연호 : 전달된 몬스터가 이 컴포넌트의 오브젝트 또는 부모 자식 관계인지 확인합니다
+    private bool IsSameObjectOrChild(GameObject monsterObject)
     {
-        if (targetObject == gameObject)
+        if (monsterObject == gameObject)
         {
             return true;
         }
 
-        Transform targetTransform = targetObject.transform;
+        Transform monsterTransform = monsterObject.transform;
 
-        return targetTransform.IsChildOf(transform) ||
-               transform.IsChildOf(targetTransform);
+        return monsterTransform.IsChildOf(transform)
+            || transform.IsChildOf(monsterTransform);
     }
 
-    // Animator의 피격 Trigger를 실행합니다
+    // 김연호 : Animator에 설정된 Hit Trigger를 실행해 피격 애니메이션을 재생합니다
     private void PlayHitAnimation()
     {
-        if (animator == null ||
-            string.IsNullOrEmpty(hitTriggerName))
+        if (animator == null)
         {
             return;
         }
 
-        animator.ResetTrigger(hitTriggerName);
-        animator.SetTrigger(hitTriggerName);
+        if (string.IsNullOrEmpty(hitTriggerName))
+        {
+            return;
+        }
+
+        animator.ResetTrigger(hitTriggerHash);
+        animator.SetTrigger(hitTriggerHash);
     }
 }
