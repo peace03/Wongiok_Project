@@ -47,12 +47,11 @@ public sealed class PrototypeProgressSnapshot
 public static class PrototypeGameSession
 {
     // 2026.08.07_psb수정
-    private const string HasSaveDataKey = "PrototypeGameSession.HasSaveData";
 
     public static int HighestClearedChapterId { get; private set;  }
     public static int CurrentChapterId { get; private set; } = 1;
     public static bool HasSaveData =>
-        PlayerPrefs.GetInt(HasSaveDataKey, 0) == 1;
+        UserSaveFileStore.HasSaveData;
     public static bool HasCheckpoint => checkpointSnapshot != null;
 
     private static PrototypeProgressSnapshot committedSnapshot;
@@ -110,6 +109,7 @@ public static class PrototypeGameSession
     {
         ResetAll();
         MarkSaveDataExists();
+        UserSaveFileStore.ClearCheckpoint();
     }
 
     // 2026.08.07_psb수정
@@ -118,6 +118,7 @@ public static class PrototypeGameSession
     {
         ResetAll();
         MarkSaveDataExists();
+        UserSaveFileStore.ClearCheckpoint();
     }
 
     public static void BeginChapter(int chapterId)
@@ -221,7 +222,6 @@ public static class PrototypeGameSession
     // 새 게임을 시작한 기록을 앱 재실행 뒤에도 타이틀에서 확인할 수 있도록 저장한다.
     private static void MarkSaveDataExists()
     {
-        PlayerPrefs.SetInt(HasSaveDataKey, 1);
-        PlayerPrefs.Save();
+        UserSaveFileStore.MarkSaveDataExists();
     }
 }

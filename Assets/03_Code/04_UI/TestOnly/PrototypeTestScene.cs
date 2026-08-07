@@ -28,24 +28,6 @@ public class PrototypeTestScene : MonoBehaviour, IInitializable
 
     public int Priority => (int)InitOrder.UI;
 
-    private void OnEnable()
-    {
-    }
-
-    private void OnDisable()
-    {
-        EventBus<UIOpenOverlayEvent>.action -= HandleOpenOverlay;
-        EventBus<UIPauseMainMenuRequestedEvent>.action -= HandlePauseMainMenuRequested;
-        EventBus<UIPauseQuitGameRequestedEvent>.action -= HandlePauseOuitGameRequested;
-        EventBus<UIPauseSkillEquipRequestedEvent>.action -= HandlePauseSkillEquipRequested;
-        EventBus<UIPauseSkillSwapRequestedEvent>.action -= HandlePauseSkillSwapRequested;
-        EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
-        EventBus<TestRestoreSkillCheckpointEvent>.action -= HandleRestoreSkillCheckpoint;
-        EventBus<TestPlayerSkillUsedEvent>.action -= HandleTestPlayerSkillUsed;
-
-        EventBus<RefreshUIEvent>.action -= RefreshSkills;
-    }
-
     private void Start()
     {
         PublishInGameHudData();
@@ -63,7 +45,7 @@ public class PrototypeTestScene : MonoBehaviour, IInitializable
         EventBus<UIOpenOverlayEvent>.action += HandleOpenOverlay;
         // 장착 슬롯끼리 드래그 했을 때 테스트 데이터 스왑을 처리하기 위한 이벤트 구독
         EventBus<UIPauseMainMenuRequestedEvent>.action += HandlePauseMainMenuRequested;
-        EventBus<UIPauseQuitGameRequestedEvent>.action += HandlePauseOuitGameRequested;
+        EventBus<UIPauseQuitGameRequestedEvent>.action += HandlePauseQuitGameRequested;
         EventBus<UIPauseSkillEquipRequestedEvent>.action += HandlePauseSkillEquipRequested;
         EventBus<UIPauseSkillSwapRequestedEvent>.action += HandlePauseSkillSwapRequested;
         EventBus<UILevelUpSkillSelectedEvent>.action += HandleLevelUpSkillSelected;
@@ -87,15 +69,17 @@ public class PrototypeTestScene : MonoBehaviour, IInitializable
         UnityEngine.SceneManagement.SceneManager.LoadScene(mainMenuSceneName);
     }
 
-    private void HandlePauseOuitGameRequested(UIPauseQuitGameRequestedEvent eventData)
+    // 2026.08.07_psb수정
+    // 일시정지 옵션 탭의 종료 요청을 에디터와 빌드 환경에 맞춰 처리한다.
+    private void HandlePauseQuitGameRequested(UIPauseQuitGameRequestedEvent eventData)
     {
         Time.timeScale = 1f;
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-    #else
+#else
         Application.Quit();
-    #endif
+#endif
     }
 
     private IEnumerator PublishPauseDataNextFrame()

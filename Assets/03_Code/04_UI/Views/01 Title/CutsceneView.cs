@@ -163,6 +163,12 @@ public class CutsceneView : UIViewBase
             return;
 
         isEncounterLoadingReady = true;
+
+        // 2026.08.07_psb수정
+        // 보스 씬 비동기 로딩이 끝난 뒤에는 회전 스피너를 더 이상 표시하지 않는다.
+        if (loadingSpinner != null)
+            loadingSpinner.gameObject.SetActive(false);
+
         SetSkipGuideVisible(true, "~ : Skip");
         TryEnterEncounterProceedState();
     }

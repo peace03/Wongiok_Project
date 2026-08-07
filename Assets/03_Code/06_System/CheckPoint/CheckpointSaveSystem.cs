@@ -1,281 +1,164 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// 2026.08.07_psb수정
 public class CheckpointSaveSystem : MonoBehaviour
 {
-    private const string HasSaveKey = "Checkpoint.HasSave";
-    private const string IdKey = "Checkpoint.Id";
-    private const string NumberKey = "Checkpoint.Number";
-    private const string ScenePathKey = "Checkpoint.ScenePath";
-    private const string PositionXKey = "Checkpoint.PositionX";
-    private const string PositionYKey = "Checkpoint.PositionY";
-    private const string PositionZKey = "Checkpoint.PositionZ";
-    private const string RotationXKey = "Checkpoint.RotationX";
-    private const string RotationYKey = "Checkpoint.RotationY";
-    private const string RotationZKey = "Checkpoint.RotationZ";
-    private const string HpKey = "Checkpoint.HP";
-    private const string HealItemCountKey =
-        "Checkpoint.HealItemCount";
-    private const string ProgressKey = "Checkpoint.Progress";
-
     public bool HasCheckpointSave =>
-        PlayerPrefs.GetInt(HasSaveKey, 0) == 1;
+        UserSaveFileStore.TryLoad(out UserSaveFileData data) &&
+        data.HasCheckpoint;
 
-
-    // 기존 PlayerCheckpointTracker 호출부를 위한 호환 저장을 수행합니다
-    public void SaveCheckpoint(
-        PlayerCheckpointTracker targetTracker)
+    // 기존 PlayerCheckpointTracker 호출부를 위해 현재 활성 체크포인트를 저장한다.
+    public void SaveCheckpoint(PlayerCheckpointTracker targetTracker)
     {
-        if (targetTracker == null ||
-            !targetTracker.HasActiveCheckpoint)
-        {
+        if (targetTracker == null || !targetTracker.HasActiveCheckpoint)
             return;
-        }
 
-        CheckpointRuntimeData data =
-            new CheckpointRuntimeData(
-                null,
-                string.Empty,
-                targetTracker.ActiveCheckpointNumber,
-                SceneManager.GetActiveScene().path,
-                targetTracker.RespawnPosition,
-                Vector3.zero,
-                targetTracker.SavedHP,
-                targetTracker.SavedHealItemCount);
+        CheckpointRuntimeData data = new CheckpointRuntimeData(
+            null,
+            string.Empty,
+            targetTracker.ActiveCheckpointNumber,
+            SceneManager.GetActiveScene().path,
+            targetTracker.RespawnPosition,
+            Vector3.zero,
+            targetTracker.SavedHP,
+            targetTracker.SavedHealItemCount);
 
         SaveCheckpoint(data);
     }
 
-    // 전달된 ScriptableObject 기반 체크포인트 데이터를 저장합니다
+    // 체크포인트의 위치와 당시 진행도를 하나의 JSON 저장 파일에 기록한다.
     public void SaveCheckpoint(CheckpointRuntimeData data)
     {
         if (!data.IsValid)
-        {
             return;
-        }
 
-        PlayerPrefs.SetInt(HasSaveKey, 1);
-        PlayerPrefs.SetString(
-            IdKey,
-            data.CheckpointId ?? string.Empty);
-        PlayerPrefs.SetInt(
-            NumberKey,
-            data.DisplayNumber);
-        PlayerPrefs.SetString(
-            ScenePathKey,
-            data.ScenePath ?? string.Empty);
+        UserSaveFileData saveData = UserSaveFileStore.LoadOrCreate();
+        saveData.HasSaveData = true;
+        saveData.HasCheckpoint = true;
+        saveData.CheckpointId = data.CheckpointId ?? string.Empty;
+        saveData.CheckpointNumber = data.DisplayNumber;
+        saveData.CheckpointScenePath = data.ScenePath ?? string.Empty;
+        saveData.RespawnPosition = data.RespawnPosition;
+        saveData.RespawnEulerAngles = data.RespawnEulerAngles;
+        saveData.SavedHP = data.SavedHP;
+        saveData.SavedHealItemCount = data.SavedHealItemCount;
+        saveData.ProgressJson = data.Progress.IsValid
+            ? JsonUtility.ToJson(data.Progress)
+            : string.Empty;
 
-        SaveVector3(
-            data.RespawnPosition,
-            PositionXKey,
-            PositionYKey,
-            PositionZKey);
-        SaveVector3(
-            data.RespawnEulerAngles,
-            RotationXKey,
-            RotationYKey,
-            RotationZKey);
-
-        PlayerPrefs.SetFloat(HpKey, data.SavedHP);
-        PlayerPrefs.SetInt(
-            HealItemCountKey,
-            data.SavedHealItemCount);
-
-        if (data.Progress.IsValid)
-        {
-            PlayerPrefs.SetString(
-                ProgressKey,
-                JsonUtility.ToJson(data.Progress));
-        }
-        else
-        {
-            PlayerPrefs.DeleteKey(ProgressKey);
-        }
-
-        PlayerPrefs.Save();
+        UserSaveFileStore.Save(saveData);
     }
 
-    // 현재 런타임 체크포인트가 있으면 해당 데이터를 저장합니다
+    // 현재 런타임 세션에 등록된 체크포인트를 저장한다.
     public void SaveCheckpoint()
     {
         if (!CheckpointRuntimeSession.HasActiveCheckpoint)
-        {
             return;
-        }
 
         SaveCheckpoint(CheckpointRuntimeSession.Current);
     }
 
-    // 저장 데이터와 Catalog를 사용해 런타임 체크포인트를 복원합니다
+    // 저장된 ID를 Catalog로 보정한 뒤 일반 스테이지 부활에 사용할 데이터를 복원한다.
     public bool TryLoadCheckpoint(
         CheckpointCatalog catalog,
         out CheckpointRuntimeData data)
     {
         data = default;
 
-        if (!HasCheckpointSave)
+        if (!UserSaveFileStore.TryLoad(out UserSaveFileData saveData) ||
+            !saveData.HasCheckpoint)
         {
             return false;
         }
 
-        string checkpointId =
-            PlayerPrefs.GetString(IdKey, string.Empty);
-
         CheckpointDefinition definition = null;
-
         if (catalog != null)
-        {
-            catalog.TryFind(
-                checkpointId,
-                out definition);
-        }
+            catalog.TryFind(saveData.CheckpointId, out definition);
 
-        int displayNumber =
-            PlayerPrefs.GetInt(NumberKey, -1);
-        string scenePath =
-            PlayerPrefs.GetString(
-                ScenePathKey,
-                string.Empty);
-        Vector3 respawnPosition =
-            LoadVector3(
-                PositionXKey,
-                PositionYKey,
-                PositionZKey);
-        Vector3 respawnEulerAngles =
-            LoadVector3(
-                RotationXKey,
-                RotationYKey,
-                RotationZKey);
+        int displayNumber = saveData.CheckpointNumber;
+        string scenePath = saveData.CheckpointScenePath;
+        Vector3 respawnPosition = saveData.RespawnPosition;
+        Vector3 respawnEulerAngles = saveData.RespawnEulerAngles;
 
-        if (definition != null &&
-            definition.IsValid)
+        if (definition != null && definition.IsValid)
         {
             displayNumber = definition.DisplayNumber;
             scenePath = definition.ScenePath;
-            respawnPosition =
-                definition.RespawnPosition;
-            respawnEulerAngles =
-                definition.RespawnEulerAngles;
+            respawnPosition = definition.RespawnPosition;
+            respawnEulerAngles = definition.RespawnEulerAngles;
         }
 
         CheckpointProgressSnapshot progress = default;
-        string progressJson =
-            PlayerPrefs.GetString(ProgressKey, string.Empty);
-
-        if (!string.IsNullOrWhiteSpace(progressJson))
+        if (!string.IsNullOrWhiteSpace(saveData.ProgressJson))
         {
             progress = JsonUtility.FromJson<CheckpointProgressSnapshot>(
-                progressJson);
+                saveData.ProgressJson);
         }
 
         data = new CheckpointRuntimeData(
             definition,
-            checkpointId,
+            saveData.CheckpointId,
             displayNumber,
             scenePath,
             respawnPosition,
             respawnEulerAngles,
-            PlayerPrefs.GetFloat(HpKey, 0f),
-            PlayerPrefs.GetInt(
-                HealItemCountKey,
-                0),
+            saveData.SavedHP,
+            saveData.SavedHealItemCount,
             progress);
 
         return data.IsValid;
     }
 
-    // 저장된 체크포인트를 런타임 세션에 적용합니다
-    public bool RestoreRuntimeSession(
-        CheckpointCatalog catalog)
+    // 저장 파일의 체크포인트를 현재 런타임 세션에도 등록한다.
+    public bool RestoreRuntimeSession(CheckpointCatalog catalog)
     {
-        if (!TryLoadCheckpoint(
-                catalog,
-                out CheckpointRuntimeData data))
-        {
+        if (!TryLoadCheckpoint(catalog, out CheckpointRuntimeData data))
             return false;
-        }
 
         CheckpointRuntimeSession.SetActiveCheckpoint(data);
         return true;
     }
 
-    // Vector3 값을 세 개의 PlayerPrefs 키로 저장합니다
-    private void SaveVector3(
-        Vector3 value,
-        string xKey,
-        string yKey,
-        string zKey)
-    {
-        PlayerPrefs.SetFloat(xKey, value.x);
-        PlayerPrefs.SetFloat(yKey, value.y);
-        PlayerPrefs.SetFloat(zKey, value.z);
-    }
-
-    // 세 개의 PlayerPrefs 키에서 Vector3 값을 복원합니다
-    private Vector3 LoadVector3(
-        string xKey,
-        string yKey,
-        string zKey)
-    {
-        return new Vector3(
-            PlayerPrefs.GetFloat(xKey, 0f),
-            PlayerPrefs.GetFloat(yKey, 0f),
-            PlayerPrefs.GetFloat(zKey, 0f));
-    }
-
-    // 저장된 체크포인트 번호를 반환합니다
+    // 기존 호출부가 필요한 단일 값 조회를 JSON 데이터에서 제공한다.
     public int LoadCheckpointNumber()
     {
-        return PlayerPrefs.GetInt(NumberKey, -1);
+        return UserSaveFileStore.TryLoad(out UserSaveFileData data)
+            ? data.CheckpointNumber
+            : -1;
     }
 
-    // 저장된 체크포인트 Scene Path를 반환합니다
     public string LoadScenePath()
     {
-        return PlayerPrefs.GetString(
-            ScenePathKey,
-            string.Empty);
+        return UserSaveFileStore.TryLoad(out UserSaveFileData data)
+            ? data.CheckpointScenePath ?? string.Empty
+            : string.Empty;
     }
 
-    // 저장된 체크포인트 위치를 반환합니다
     public Vector3 LoadRespawnPosition()
     {
-        return LoadVector3(
-            PositionXKey,
-            PositionYKey,
-            PositionZKey);
+        return UserSaveFileStore.TryLoad(out UserSaveFileData data)
+            ? data.RespawnPosition
+            : Vector3.zero;
     }
 
-    // 저장된 플레이어 체력을 반환합니다
     public float LoadSavedHP()
     {
-        return PlayerPrefs.GetFloat(HpKey, 0f);
+        return UserSaveFileStore.TryLoad(out UserSaveFileData data)
+            ? data.SavedHP
+            : 0f;
     }
 
-    // 저장된 회복 아이템 수량을 반환합니다
     public int LoadSavedHealItemCount()
     {
-        return PlayerPrefs.GetInt(
-            HealItemCountKey,
-            0);
+        return UserSaveFileStore.TryLoad(out UserSaveFileData data)
+            ? data.SavedHealItemCount
+            : 0;
     }
 
-    // 저장된 체크포인트 데이터를 모두 삭제합니다
+    // 저장 파일은 남기고 체크포인트 데이터만 비운다.
     public void DeleteCheckpointSave()
     {
-        PlayerPrefs.DeleteKey(HasSaveKey);
-        PlayerPrefs.DeleteKey(IdKey);
-        PlayerPrefs.DeleteKey(NumberKey);
-        PlayerPrefs.DeleteKey(ScenePathKey);
-        PlayerPrefs.DeleteKey(PositionXKey);
-        PlayerPrefs.DeleteKey(PositionYKey);
-        PlayerPrefs.DeleteKey(PositionZKey);
-        PlayerPrefs.DeleteKey(RotationXKey);
-        PlayerPrefs.DeleteKey(RotationYKey);
-        PlayerPrefs.DeleteKey(RotationZKey);
-        PlayerPrefs.DeleteKey(HpKey);
-        PlayerPrefs.DeleteKey(HealItemCountKey);
-        PlayerPrefs.DeleteKey(ProgressKey);
-        PlayerPrefs.Save();
+        UserSaveFileStore.ClearCheckpoint();
     }
 }
