@@ -20,15 +20,30 @@ public class PassiveSkillLevelData : BaseSkillLevelData
     // 스킬 효과 적용 함수
     public override void ApplyEffect(GameObject owner, int id, IReadOnlyList<StatAdjustment> prevStats)
     {
+        // 나중에 밑에 계산하는 부분을 클래스로 분리하기!
+
+        // 소유자가 없다면
+        if (owner == null)
+            return;
+
         // 스탯이 없다면
-        if (!owner.TryGetComponent<PlayerStatus>(out var trgStat))
+        if (!owner.TryGetComponent<PlayerStatus>(out var ownerStat))
         {
-            Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 => " +
-                        $"입력 - 대상 : {owner.name}\n", owner);
+            //Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 => " +
+            //            $"입력 - 대상 : {owner.name}\n", owner);
             return;
         }
 
-        // 나중에 밑에 계산하는 부분을 클래스로 분리하기!
+        //// 발사체 스킬 인터페이스가 없다면
+        //else if (owner.GetComponentInChildren<IProjectileSkill>(true) is not IProjectileSkill executer)
+        //{
+        //    Debug.Log($"[Error | Skill] 발사체 스킬 실행 실패 => 발사체 스킬 인터페이스 : 없음");
+        //    return;
+        //}
+        //// 발사체 스킬 인터페이스가 있다면
+        //else
+        //    // 스킬 실행
+        //    executer.ExecuteSkill(id, this);
 
         // 변화량을 저장할 변수
         float amount;
@@ -37,7 +52,8 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         foreach (var stat in appliedStats)
         {
             // 변화량 구하기
-            amount = stat.modify == MODIFY_TYPE.Addition ? stat.amount : -stat.amount;
+            amount = stat.modify == MODIFY_TYPE.Addition || stat.modify == MODIFY_TYPE.Multiplier ?
+                                                                                stat.amount : -stat.amount;
 
             // 이전 레벨 스탯이 있다면
             if(prevStats != null)
@@ -50,8 +66,9 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                     // 같은 스탯을 찾았다면
                     if (prev.stat == stat.stat)
                     {
-                        // 변화량 구하기
-                        prevAmount = prev.modify == MODIFY_TYPE.Addition ? prev.amount : -prev.amount;
+                        // 이전 변화량 구하기
+                        prevAmount = prev.modify == MODIFY_TYPE.Addition
+                                        || prev.modify == MODIFY_TYPE.Multiplier ? prev.amount : -prev.amount;
                         break;
                     }
 
@@ -66,23 +83,55 @@ public class PassiveSkillLevelData : BaseSkillLevelData
             {
                 // 체력이라면
                 case STAT_TYPE.Health:
+                    if (stat.modify == MODIFY_TYPE.Multiplier)
+                    {
+                        if (amount > 1f)
+                            amount -= 1f;
+
+                        amount = ownerStat.Status.MaxHP.BaseValue * amount;
+                    }
+
                     // 최대 체력 변경
-                    trgStat.AddMaxHPValue(amount);
+                    ownerStat.AddMaxHPValue(amount);
                     break;
                 // 공격력이라면
                 case STAT_TYPE.AtkPower:
+                    if (stat.modify == MODIFY_TYPE.Multiplier)
+                    {
+                        if (amount > 1f)
+                            amount -= 1f;
+
+                        amount = ownerStat.Status.AttackPower.BaseValue * amount;
+                    }
+
                     // 공격력 변경
-                    trgStat.AddAttackPowerValue(amount);
+                    ownerStat.AddAttackPowerValue(amount);
                     break;
                 // 이동 속도라면
                 case STAT_TYPE.MoveSpeed:
+                    if (stat.modify == MODIFY_TYPE.Multiplier)
+                    {
+                        if (amount > 1f)
+                            amount -= 1f;
+
+                        amount = ownerStat.Status.MoveSpeed.BaseValue * amount;
+                    }
+
                     // 이동 속도 변경
-                    trgStat.AddMoveSpeedValue(amount);
+                    ownerStat.AddMoveSpeedValue(amount);
                     break;
                 // 공격 속도라면
                 case STAT_TYPE.AtkSpeed:
+                    if (stat.modify == MODIFY_TYPE.Multiplier)
+                    {
+                        if (amount > 1f)
+                            amount -= 1f;
+
+                        amount = ownerStat.Status.AttackSpeed.BaseValue * amount;
+                    }
+
                     // 공격 속도 변경
-                    trgStat.AddAttackSpeedValue(amount);
+                    ownerStat.AddAttackSpeedValue(amount);
                     break;
             }
         }
@@ -91,13 +140,30 @@ public class PassiveSkillLevelData : BaseSkillLevelData
     // 스킬 효과 적용 해제 함수
     public override void RemoveEffect(GameObject owner)
     {
+        // 나중에 밑에 계산하는 부분을 클래스로 분리하기!
+
+        // 소유자가 없다면
+        if (owner == null)
+            return;
+
         // 스탯이 없다면
-        if (!owner.TryGetComponent<PlayerStatus>(out var trgStat))
+        if (!owner.TryGetComponent<PlayerStatus>(out var ownerStat))
         {
-            Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 => " +
-                        $"입력 - 대상 : {owner.name}\n", owner);
+            //Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 => " +
+            //            $"입력 - 대상 : {owner.name}\n", owner);
             return;
         }
+
+        //// 발사체 스킬 인터페이스가 없다면
+        //else if (owner.GetComponentInChildren<IProjectileSkill>(true) is not IProjectileSkill executer)
+        //{
+        //    Debug.Log($"[Error | Skill] 발사체 스킬 실행 실패 => 발사체 스킬 인터페이스 : 없음");
+        //    return;
+        //}
+        //// 발사체 스킬 인터페이스가 있다면
+        //else
+        //    // 스킬 실행
+        //    executer.ExecuteSkill(id, this);
 
         // 변화량을 저장할 변수
         float amount;
@@ -106,30 +172,63 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         foreach (var stat in appliedStats)
         {
             // 변화량 구하기
-            amount = stat.modify == MODIFY_TYPE.Addition ? -stat.amount : stat.amount;
+            amount = stat.modify == MODIFY_TYPE.Addition || stat.modify == MODIFY_TYPE.Multiplier ?
+                                                                                -stat.amount : stat.amount;
 
             // 스탯 종류에 따라서
             switch (stat.stat)
             {
                 // 체력이라면
                 case STAT_TYPE.Health:
+                    if (stat.modify == MODIFY_TYPE.Multiplier)
+                    {
+                        if (amount < -1f)
+                            amount += 1f;
+
+                        amount = ownerStat.Status.MaxHP.BaseValue * amount;
+                    }
+
                     // 최대 체력 변경
-                    trgStat.AddMaxHPValue(amount);
+                    ownerStat.AddMaxHPValue(amount);
                     break;
                 // 공격력이라면
                 case STAT_TYPE.AtkPower:
+                    if (stat.modify == MODIFY_TYPE.Multiplier)
+                    {
+                        if (amount < -1f)
+                            amount += 1f;
+
+                        amount = ownerStat.Status.AttackPower.BaseValue * amount;
+                    }
+
                     // 공격력 변경
-                    trgStat.AddAttackPowerValue(amount);
+                    ownerStat.AddAttackPowerValue(amount);
                     break;
                 // 이동 속도라면
                 case STAT_TYPE.MoveSpeed:
+                    if (stat.modify == MODIFY_TYPE.Multiplier)
+                    {
+                        if (amount < -1f)
+                            amount += 1f;
+
+                        amount = ownerStat.Status.MoveSpeed.BaseValue * amount;
+                    }
+
                     // 이동 속도 변경
-                    trgStat.AddMoveSpeedValue(amount);
+                    ownerStat.AddMoveSpeedValue(amount);
                     break;
                 // 공격 속도라면
                 case STAT_TYPE.AtkSpeed:
+                    if (stat.modify == MODIFY_TYPE.Multiplier)
+                    {
+                        if (amount < -1f)
+                            amount += 1f;
+
+                        amount = ownerStat.Status.AttackSpeed.BaseValue * amount;
+                    }
+
                     // 공격 속도 변경
-                    trgStat.AddAttackSpeedValue(amount);
+                    ownerStat.AddAttackSpeedValue(amount);
                     break;
             }
         }

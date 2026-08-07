@@ -55,7 +55,8 @@ public enum STAT_TYPE
 public enum MODIFY_TYPE
 {
     Addition,       // 더하기
-    Subtraction     // 빼기
+    Subtraction,    // 빼기
+    Multiplier      // 곱하기
 }
 
 /// <summary>

@@ -363,7 +363,7 @@ public class SkillSystemModel
             // 장착된 액티브 스킬이 없거나, 스킬 정보가 비어있다면
             if (equippedActives[i] == null || equippedActives[i].BaseData == null)
                 continue;
-            else if (ownerInput != null && i == sniperIndex && !ownerInput.ReleaseSniperSkill(sniperIndex))
+            else if (i == sniperIndex && ownerInput != null && !ownerInput.ReleaseSniperSkill(sniperIndex))
                 if (equippedActives[i].IsCharging)
                     CancelActiveSkill(sniperIndex);
 
@@ -383,7 +383,7 @@ public class SkillSystemModel
     /// </summary>
     public void CancelActiveSkill(int slotIndex)
     {
-        if (slotIndex < 0)
+        if (slotIndex < 0 || slotIndex > maxEquippedActiveCount - 1)
             return;
 
         // 해당 슬롯이 비어있다면
