@@ -111,6 +111,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             // 스킬 시작 애니메이션 대기 시간(차징 시간 제외) 받아오기
             startAnimationWaitTime = Mathf.Max(0f, ownerAnimatorDriver.SkillStartAnimDuration
                                                                                     - levelData.MaxChargingTime);
+
+        if(activeEffects.ContainsKey(ACTIVE_SKILL_EFFECT_TYPE.Main))
+            activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
+
         // 스킬 실행 중
         executingSkill = true;
         // 발사체 스킬 실행
@@ -122,7 +126,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// <summary>
     /// 발사체 스킬 코루틴 함수
     /// </summary>
-    /// <param name="skillId">스킬 ID</param>
     /// <param name="bulletCount">발사체 개수</param>
     /// <param name="damage">데미지</param>
     /// <param name="penetrationCount">관통 횟수</param>
@@ -130,7 +133,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private IEnumerator ProjectileRoutine(int bulletCount, float damage, float? maxDuration,
                                                                         int penetrationCount, bool isCharging)
     {
-        Debug.Log("발사체 스킬 코루틴 실행");
         float waitTimer = startAnimationWaitTime;
 
         while(waitTimer > 0f)
@@ -195,8 +197,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 총구 이펙트 즉시 종료
         StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Muzzle);
-        // 총알 이펙트 즉시 종료
-        StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Main);
 
         // 발사체 스킬 딜레이 시간량이 있다면(지속 시간이 있었다면)
         if (projectileDelayTimeValue > 0f)
@@ -304,8 +304,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         EventBus<StopControlledSfxEvent>.Publish(new($"{executingSkillId}_Sound"));
         // 총구 이펙트 즉시 종료
         StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, true);
-        // 총알 이펙트 즉시 종료
-        StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Main, true);
+        // 총알 이펙트 리스트 초기화
+        activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
         // 무기 외형 착용 해제 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(executingSkillId, false));
 
