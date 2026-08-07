@@ -7,6 +7,8 @@ public class WeaponVisualManager : MonoBehaviour, IInitializable
     [Tooltip("플레이어, 몬스터, NPC 등등")]
     [SerializeField] private Transform owner;                           // 소유자
 
+    private Quaternion magnumRotation;
+
     private readonly Dictionary<int, GameObject> weapons = new();       // 모든 무기 딕셔너리
 
     public int Priority => (int)InitOrder.Skill;                        // 중요도
@@ -24,6 +26,8 @@ public class WeaponVisualManager : MonoBehaviour, IInitializable
     /// </summary>
     public void Init()
     {
+        magnumRotation = transform.rotation;
+
         // 소유자가 있고 따라다니는 대상이 소유자가 아니라면
         if (owner != null && transform.parent != owner)
         {
@@ -76,11 +80,16 @@ public class WeaponVisualManager : MonoBehaviour, IInitializable
             // 무기가 활성화 상태라면
             if (change.isActiveWeapon)
             {
+                if (change.id == (int)ACTIVE_SKILL_ID.Magnum)
+                    transform.rotation = magnumRotation;
+
                 // 액티브 스킬 실행 위치들 변경 이벤트 발행
                 EventBus<ChangeActiveSkillExecutePositions>
                     .Publish(new ChangeActiveSkillExecutePositions(weapon.FirePoints));
                 weapon.PlayAnimation();
             }
+            else
+                transform.rotation = Quaternion.identity;
         }
     }
 }
