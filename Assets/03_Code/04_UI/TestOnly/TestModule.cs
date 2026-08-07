@@ -687,9 +687,17 @@ public class TestModule : MonoBehaviour
 
         // 다음 레벨의 스탯의 수만큼
         for (int i = 0; i < nextData.Count; i++)
-            // 스탯 종류, 수식 종류, 변화량
-            AddComparisonLine(results, curData[i].stat.ToKoreanString(), FormatNumber(curData[i].amount),
-                                                                            FormatNumber(nextData[i].amount));
+        {
+            if (curData[i].modify == MODIFY_TYPE.Multiplier)
+                // 스탯 종류, 변화량, 수식 종류
+                AddComparisonLine(results, curData[i].stat.ToKoreanString(),
+                                    FormatNumber(curData[i].amount) + curData[i].modify.ToKoreanString(),
+                                        FormatNumber(nextData[i].amount) + nextData[i].modify.ToKoreanString());
+            else
+                // 스탯 종류, 변화량
+                AddComparisonLine(results, curData[i].stat.ToKoreanString(),
+                                            FormatNumber(curData[i].amount), FormatNumber(nextData[i].amount));
+        }
     }
 
     private void SetActiveSkillDataText(ActiveSkillData data, int curLevel, int nextLevel, List<string> results)
