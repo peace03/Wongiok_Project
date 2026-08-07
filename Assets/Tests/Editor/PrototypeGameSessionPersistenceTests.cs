@@ -1,43 +1,53 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using UnityEngine;
 
 // 2026.08.07_psb수정
 public class PrototypeGameSessionPersistenceTests
 {
-    private const string HasSaveDataKey = "PrototypeGameSession.HasSaveData";
-
-    private bool hadSaveDataKey;
-    private int previousSaveDataValue;
+    private string temporarySaveDirectory;
+    private Type saveStoreType;
+    private PropertyInfo saveDirectoryOverride;
 
     [SetUp]
     public void SetUp()
     {
-        hadSaveDataKey = PlayerPrefs.HasKey(HasSaveDataKey);
-        previousSaveDataValue = PlayerPrefs.GetInt(HasSaveDataKey);
-        PlayerPrefs.DeleteKey(HasSaveDataKey);
+        saveStoreType = FindType("UserSaveFileStore");
+        Assert.That(saveStoreType, Is.Not.Null);
+
+        saveDirectoryOverride = saveStoreType.GetProperty(
+            "SaveDirectoryOverrideForTests",
+            BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+        Assert.That(saveDirectoryOverride, Is.Not.Null);
+
+        temporarySaveDirectory = Path.Combine(
+            Path.GetTempPath(),
+            "GrimoireSaveTests",
+            Guid.NewGuid().ToString("N"));
+
+        saveDirectoryOverride.SetValue(null, temporarySaveDirectory);
     }
 
     [TearDown]
     public void TearDown()
     {
-        if (hadSaveDataKey)
-            PlayerPrefs.SetInt(HasSaveDataKey, previousSaveDataValue);
-        else
-            PlayerPrefs.DeleteKey(HasSaveDataKey);
+        if (saveDirectoryOverride != null)
+            saveDirectoryOverride.SetValue(null, null);
 
-        PlayerPrefs.Save();
+        if (!string.IsNullOrWhiteSpace(temporarySaveDirectory) &&
+            Directory.Exists(temporarySaveDirectory))
+        {
+            Directory.Delete(temporarySaveDirectory, true);
+        }
     }
 
     [Test]
-    public void ResetAll_PreservesSaveAvailabilityCreatedByNewGame()
+    public void StartNewGame_CreatesJsonSaveMarkerThatSurvivesSessionReset()
     {
-        Type sessionType = AppDomain.CurrentDomain
-            .GetAssemblies()
-            .Select(assembly => assembly.GetType("PrototypeGameSession"))
-            .FirstOrDefault(type => type != null);
+        Type sessionType = FindType("PrototypeGameSession");
 
         Assert.That(sessionType, Is.Not.Null);
 
@@ -48,9 +58,22 @@ public class PrototypeGameSessionPersistenceTests
         resetAll.Invoke(null, null);
         startNewGame.Invoke(null, null);
 
+        string saveFilePath = Path.Combine(
+            temporarySaveDirectory,
+            "user-save.json");
+
+        Assert.That(File.Exists(saveFilePath), Is.True);
+
         resetAll.Invoke(null, null);
 
         Assert.That((bool)hasSaveData.GetValue(null), Is.True);
     }
 
+    private static Type FindType(string typeName)
+    {
+        return AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Select(assembly => assembly.GetType(typeName))
+            .FirstOrDefault(type => type != null);
+    }
 }
