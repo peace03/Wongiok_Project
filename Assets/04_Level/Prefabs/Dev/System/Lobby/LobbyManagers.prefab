@@ -116,7 +116,7 @@ MonoBehaviour:
     loadingVideoClip: {fileID: 32900000, guid: 9d48b2fde72e6c4489ed2250edf9c015, type: 3}
   inGameSceneName: Chapter1Scene
   testMinimumLoadingPreviewTime: 3
-  prologueVideoClip: {fileID: 32900000, guid: 9b1b18f31c316d0489bd80089bfa2dcb, type: 3}
+  prologueVideoClip: {fileID: 32900000, guid: 25bb8503d123b094aab9e7d67a586431, type: 3}
 --- !u!114 &6342794808984572233
 MonoBehaviour:
   m_ObjectHideFlags: 0

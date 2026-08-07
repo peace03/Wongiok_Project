@@ -46,9 +46,13 @@ public sealed class PrototypeProgressSnapshot
 
 public static class PrototypeGameSession
 {
+    // 2026.08.07_psb수정
+    private const string HasSaveDataKey = "PrototypeGameSession.HasSaveData";
+
     public static int HighestClearedChapterId { get; private set;  }
     public static int CurrentChapterId { get; private set; } = 1;
-    public static bool HasSaveData { get; private set;  }
+    public static bool HasSaveData =>
+        PlayerPrefs.GetInt(HasSaveDataKey, 0) == 1;
     public static bool HasCheckpoint => checkpointSnapshot != null;
 
     private static PrototypeProgressSnapshot committedSnapshot;
@@ -72,8 +76,6 @@ public static class PrototypeGameSession
 
     public static void ResetAll()
     {
-        HasSaveData = false;
-
         HighestClearedChapterId = 0;
         CurrentChapterId = 1;
         pendingTitleCardChapterId = -1;
@@ -107,14 +109,22 @@ public static class PrototypeGameSession
     public static void StartNewGame()
     {
         ResetAll();
-        HasSaveData = true;
+        MarkSaveDataExists();
+    }
+
+    // 2026.08.07_psb수정
+    // 게임오버에서 처음부터 다시 시작할 때 런 진행도만 기본값으로 되돌린다.
+    public static void RestartRunFromBeginning()
+    {
+        ResetAll();
+        MarkSaveDataExists();
     }
 
     public static void BeginChapter(int chapterId)
     {
         EnsureInitialized();
 
-        HasSaveData = true;
+        MarkSaveDataExists();
         CurrentChapterId = chapterId;
         checkpointSnapshot = null;
         chapterStartSnapshot = committedSnapshot.Clone();
@@ -143,7 +153,7 @@ public static class PrototypeGameSession
 
         if (currentProgress == null) return;
 
-        HasSaveData = true;
+        MarkSaveDataExists();
 
         HighestClearedChapterId = Mathf.Max(HighestClearedChapterId, chapterId);
 
@@ -205,5 +215,13 @@ public static class PrototypeGameSession
         if (skills.Any(skill => skill.SkillId == skillId)) return;
 
         skills.Add(new PrototypeSkillState(skillId, 1, -1));
+    }
+
+    // 2026.08.07_psb수정
+    // 새 게임을 시작한 기록을 앱 재실행 뒤에도 타이틀에서 확인할 수 있도록 저장한다.
+    private static void MarkSaveDataExists()
+    {
+        PlayerPrefs.SetInt(HasSaveDataKey, 1);
+        PlayerPrefs.Save();
     }
 }

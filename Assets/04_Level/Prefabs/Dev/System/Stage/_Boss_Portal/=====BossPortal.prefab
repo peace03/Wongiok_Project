@@ -41,6 +41,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6063929351495029498}
     m_Modifications:
+    - target: {fileID: 2383634067985462107, guid: 15f8907d6de9a1a4eb8051862c57d5b7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4259672855895361145, guid: 15f8907d6de9a1a4eb8051862c57d5b7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4570811250145004051, guid: 15f8907d6de9a1a4eb8051862c57d5b7, type: 3}
       propertyPath: m_Name
       value: BossPortal_Root
@@ -185,8 +193,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6781296084785170188, guid: d27da762ac36dfc49ab02e82ecda8137, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6781296084785170188, guid: d27da762ac36dfc49ab02e82ecda8137, type: 3}
       propertyPath: objectsToEnableForBattle.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8860253350002574835, guid: d27da762ac36dfc49ab02e82ecda8137, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8860253350002574835, guid: d27da762ac36dfc49ab02e82ecda8137, type: 3}
       propertyPath: playBossIntro
@@ -219,7 +235,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 3282905639427659505}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb22861a02f697b4b86118f3dbd6e427, type: 3}
   m_Name: 

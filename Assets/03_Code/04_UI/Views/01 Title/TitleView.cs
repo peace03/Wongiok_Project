@@ -50,6 +50,9 @@ public class TitleView : UIViewBase
     private bool isTitleInputReady;
     private TitleVidoeState titleVideoState;
     private PendingTitleRequest pendingTitleRequest;
+    // 2026.08.07_psb수정
+    // 타이틀 입장 영상의 첫 프레임이 준비되기 전에는 전환 페이드를 걷지 않도록 상태를 보관한다.
+    private bool isWaitingForFirstVideoFrame;
 
     // 구독 및 구독 해제
     protected override void Awake()
@@ -128,13 +131,24 @@ public class TitleView : UIViewBase
     private void SubscribeVideoEvent()
     {
         if (videoPlayer != null)
+        {
             videoPlayer.loopPointReached += HandleVideoFinished;
+            // 2026.08.07_psb수정
+            // 디코더 준비 및 첫 프레임 출력 시점을 구독해 빈 영상 텍스처 노출을 막는다.
+            videoPlayer.prepareCompleted += HandleVideoPrepared;
+            videoPlayer.frameReady += HandleVideoFrameReady;
+            videoPlayer.sendFrameReadyEvents = true;
+        }
     }
 
     private void UnsubscribeVideoEvent()
     {
         if (videoPlayer != null)
+        {
             videoPlayer.loopPointReached -= HandleVideoFinished;
+            videoPlayer.prepareCompleted -= HandleVideoPrepared;
+            videoPlayer.frameReady -= HandleVideoFrameReady;
+        }
     }
 
     private void HandleSetTitleSaveState(UISetTitleSaveStateEvent eventData)
@@ -233,7 +247,10 @@ public class TitleView : UIViewBase
         videoPlayer.Stop();
         videoPlayer.clip = videoClip;
         videoPlayer.isLooping = isLooping;
-        videoPlayer.Play();
+        // 2026.08.07_psb수정
+        // 첫 프레임을 실제로 출력한 뒤에만 외부 전환 페이드가 시작될 수 있도록 Prepare를 사용한다.
+        isWaitingForFirstVideoFrame = true;
+        videoPlayer.Prepare();
 
         if (videoImage != null)
             videoImage.enabled = true;
@@ -290,6 +307,10 @@ public class TitleView : UIViewBase
     {
         if (videoPlayer != null)
             videoPlayer.Stop();
+
+        // 2026.08.07_psb수정
+        // View가 닫힌 뒤 늦게 도착한 준비 완료 콜백을 무시한다.
+        isWaitingForFirstVideoFrame = false;
 
         if (videoImage != null)
             videoImage.enabled = false;
@@ -399,5 +420,31 @@ public class TitleView : UIViewBase
         {
             exitButton.Clear(); 
         }
+    }
+
+    // 2026.08.07_psb수정
+    // VideoPlayer 준비가 끝난 시점에 재생을 시작한다.
+    private void HandleVideoPrepared(VideoPlayer source)
+    {
+        if (!isWaitingForFirstVideoFrame || source != videoPlayer)
+            return;
+
+        source.Play();
+    }
+
+    // 2026.08.07_psb수정
+    // 타이틀 입장 영상의 첫 프레임이 준비되면 전환 담당자에게 페이드 인 가능 상태를 알린다.
+    private void HandleVideoFrameReady(VideoPlayer source, long frameIndex)
+    {
+        if (!isWaitingForFirstVideoFrame || source != videoPlayer)
+            return;
+
+        isWaitingForFirstVideoFrame = false;
+
+        if (titleVideoState != TitleVidoeState.Enter)
+            return;
+
+        EventBus<UIVideoFirstFrameReadyEvent>.Publish(
+            new UIVideoFirstFrameReadyEvent("title-enter"));
     }
 }

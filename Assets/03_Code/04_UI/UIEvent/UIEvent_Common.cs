@@ -26,3 +26,15 @@ public struct UIFadeEvent
         OnComplete = onComplete;
     }
 }
+
+// 2026.08.07_psb수정
+// 영상 View가 첫 프레임을 출력할 준비를 마쳤음을 전환 담당자에게 알린다.
+public struct UIVideoFirstFrameReadyEvent
+{
+    public string VideoId { get; private set; }
+
+    public UIVideoFirstFrameReadyEvent(string videoId)
+    {
+        VideoId = videoId;
+    }
+}

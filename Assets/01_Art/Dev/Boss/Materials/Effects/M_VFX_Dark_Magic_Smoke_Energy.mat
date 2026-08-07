@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M_VFX_Dark_Magic_Smoke_Energy
-  m_Shader: {fileID: 4800000, guid: b33cbfb8f2f28484c94f5a4fc09d7ccb, type: 3}
+  m_Shader: {fileID: 4800000, guid: 06c8891e75dd7804b856922eb8657b6f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -24,7 +24,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Texture:
-        m_Texture: {fileID: 2800000, guid: 100f6e18762379449b88ea934138ffd2, type: 3}
+        m_Texture: {fileID: 2800000, guid: e76c14c5ee174eb4cb547fef4a431d41, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture1:
@@ -68,3 +68,4 @@ Material:
     m_Colors:
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

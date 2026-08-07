@@ -127,10 +127,15 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
     private void HandlePlayerDeathPresentationFinished(
         PlayerDeathPresentationFinishedEvent eventData)
     {
-        EventBus<UISetGameOverEvent>.Publish(
-            new UISetGameOverEvent(currentLife > 0));
+        // 2026.08.07_psb수정
+        // 비활성 상태의 GameOverView가 상태 이벤트를 놓치지 않도록 화면을 먼저 연다.
         EventBus<UIChangeScreenEvent>.Publish(
             new UIChangeScreenEvent(UIScreenState.GameOver));
+
+        EventBus<UISetGameOverEvent>.Publish(
+            new UISetGameOverEvent(
+                CheckpointRuntimeSession.HasActiveCheckpoint,
+                currentLife > 0));
     }
 
     private void HandleChangeScreen(UIChangeScreenEvent eventData)

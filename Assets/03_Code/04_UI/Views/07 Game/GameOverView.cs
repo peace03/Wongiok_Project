@@ -12,7 +12,9 @@ public class GameOverView : UIViewBase
     [SerializeField] private CommonButtonView loadCheckpointButton;
     [SerializeField] private CommonButtonView mainMenuButton;
 
-    private bool canLoadCheckpoint;
+    // 2026.08.07_psb수정
+    private bool hasCheckpoint;
+    private bool hasRemainingLife;
 
     protected override void Awake()
     {
@@ -37,9 +39,12 @@ public class GameOverView : UIViewBase
     }
 
     // 체크포인트 재시작 가능 여부를 직접 갱신할 때 사용하는 공개 메서드
-    public void SetCheckpointAvailable(bool canLoadCheckpoint)
+    public void SetCheckpointAvailable(
+        bool hasCheckpoint,
+        bool hasRemainingLife)
     {
-        this.canLoadCheckpoint = canLoadCheckpoint;
+        this.hasCheckpoint = hasCheckpoint;
+        this.hasRemainingLife = hasRemainingLife;
         RefreshButtons();
     }
 
@@ -58,13 +63,16 @@ public class GameOverView : UIViewBase
     // 외부 시스템이 전달한 게임 오버 상태를 받아 View 상태에 저장
     private void HandleSetGameOver(UISetGameOverEvent eventData)
     {
-        SetCheckpointAvailable(eventData.CanLoadCheckpoint);
+        SetCheckpointAvailable(
+            eventData.HasCheckpoint,
+            eventData.HasRemainingLife);
     }
 
     // 전체 UI Reset 시 게임 오버 화면의 내부 상태를 초기화
     private void HandleReset(UIResetEvent eventData)
     {
-        canLoadCheckpoint = false;
+        hasCheckpoint = false;
+        hasRemainingLife = false;
         ClearButtons();
     }
 
@@ -90,7 +98,7 @@ public class GameOverView : UIViewBase
             loadCheckpointButton.Setup(
                 "책갈피부터 다시 읽기",
                 HandleLoadCheckpointClicked,
-                canLoadCheckpoint);
+                hasCheckpoint);
         }
 
         if (mainMenuButton != null)
@@ -137,6 +145,17 @@ public class GameOverView : UIViewBase
     // 마지막 체크포인트에서 재시작 요청을 발행
     private void HandleLoadCheckpointClicked()
     {
+        // 2026.08.07_psb수정
+        // 목숨을 모두 소진했을 때는 복구 요청 대신 안내 Alert를 표시한다.
+        if (!hasRemainingLife)
+        {
+            EventBus<UIShowAlertPopupEvent>.Publish(
+                new UIShowAlertPopupEvent(
+                    "알림",
+                    "모든 목숨을 소진했습니다."));
+            return;
+        }
+
         EventBus<UIGameOverLoadCheckpointRequestedEvent>.Publish(
             new UIGameOverLoadCheckpointRequestedEvent());
     }

@@ -163,7 +163,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 76752bdff7f48394eb7fd558c0b0cf05, type: 2}
     - target: {fileID: 919132149155446097, guid: d1524d8730435a3489f6e69e85f4de08, type: 3}
       propertyPath: m_Name
-      value: RougeHood
+      value: RougeHood_DevModel
       objectReference: {fileID: 0}
     - target: {fileID: 1355922856181170023, guid: d1524d8730435a3489f6e69e85f4de08, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -188,7 +188,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: d1524d8730435a3489f6e69e85f4de08, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 4d0a9ad46135fe64ca39200b03b05a9f, type: 2}
+      objectReference: {fileID: 9100000, guid: 954ff4034be88b34ea78c573da1c21a5, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

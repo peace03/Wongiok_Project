@@ -152,11 +152,19 @@ public struct UIChangeScreenEvent
 // 체크포인트에서 재시작 가능한지만 확인
 public struct UISetGameOverEvent
 {
-    public bool CanLoadCheckpoint { get; private set; }
+    // 2026.08.07_psb수정
+    public bool HasCheckpoint { get; private set; }
+    public bool HasRemainingLife { get; private set; }
 
-    public UISetGameOverEvent(bool canLoadCheckpoint)
+    public bool CanLoadCheckpoint =>
+        HasCheckpoint && HasRemainingLife;
+
+    public UISetGameOverEvent(
+        bool hasCheckpoint,
+        bool hasRemainingLife)
     {
-        CanLoadCheckpoint = canLoadCheckpoint;
+        HasCheckpoint = hasCheckpoint;
+        HasRemainingLife = hasRemainingLife;
     }
 }
 

@@ -20,6 +20,9 @@ public class CutsceneView : UIViewBase
     [Header("Boss Transition")]
     [SerializeField] private RectTransform loadingSpinner;
     [SerializeField] private GameObject proceedGuideObject;
+    // 2026.08.07_psb수정
+    // 프롤로그 스킵 시 영상 View를 숨기기 전에 검은 화면으로 전환하는 시간이다.
+    [SerializeField, Min(0f)] private float prologueSkipFadeOutDuration = 0.35f;
     [SerializeField, Min(0f)] private float bossEncounterFadeOutDuration = 0.5f;
     [SerializeField, Min(0f)] private float bossClearEndFadeOutDuration = 0.5f;
     [SerializeField] private float loadingSpinnerSpeed = 180f;
@@ -37,6 +40,9 @@ public class CutsceneView : UIViewBase
     private bool isWaitingForEncounterProceed;
     private bool isTransitionFinishing;
     private bool isBossClearSkipGuideShown;
+    // 2026.08.07_psb수정
+    // 페이드가 빈 RenderTexture를 드러내지 않도록 현재 영상의 첫 프레임 준비 여부를 추적한다.
+    private bool isWaitingForFirstVideoFrame;
 
     protected override void Awake()
     {
@@ -137,7 +143,9 @@ public class CutsceneView : UIViewBase
 
         if (currentCutsceneId == "prologue")
         {
-            FinishedCutscene(true);
+            // 2026.08.07_psb수정
+            // 스킵 직후 VideoPlayer를 멈추지 않고, 검은 Fader가 덮인 뒤 종료한다.
+            StartCoroutine(FinishPrologueAfterFadeOut());
             return;
         }
 
@@ -213,7 +221,10 @@ public class CutsceneView : UIViewBase
         videoPlayer.Stop();
         videoPlayer.clip = currentVideoClip;
         videoPlayer.isLooping = false;
-        videoPlayer.Play();
+        // 2026.08.07_psb수정
+        // Play 직후가 아닌 첫 프레임 준비 후에만 전환 페이드를 걷도록 영상을 먼저 준비한다.
+        isWaitingForFirstVideoFrame = true;
+        videoPlayer.Prepare();
 
         if (videoImage != null)
             videoImage.enabled = true;
@@ -251,6 +262,10 @@ public class CutsceneView : UIViewBase
         if (videoPlayer != null)
             videoPlayer.Stop();
 
+        // 2026.08.07_psb수정
+        // 숨김 또는 종료 뒤 늦게 도착한 프레임 준비 콜백은 무시한다.
+        isWaitingForFirstVideoFrame = false;
+
         isPlayingCutscene = false;
 
         if (videoImage != null)
@@ -282,6 +297,31 @@ public class CutsceneView : UIViewBase
     {
         isSkipPopupOpen = false;
         ResumeCurrentCutscene();
+    }
+
+    // 2026.08.07_psb수정
+    // 프롤로그 스킵 시 빈 RenderTexture가 드러나지 않도록 페이드 아웃 완료 후 영상을 종료한다.
+    private IEnumerator FinishPrologueAfterFadeOut()
+    {
+        if (isTransitionFinishing || isFinished)
+            yield break;
+
+        isTransitionFinishing = true;
+        SetSkipGuideVisible(false, string.Empty);
+
+        bool isFadeOutFinished = false;
+
+        EventBus<UIFadeEvent>.Publish(
+            new UIFadeEvent(
+                0f,
+                1f,
+                prologueSkipFadeOutDuration,
+                () => isFadeOutFinished = true));
+
+        yield return new WaitUntil(() => isFadeOutFinished);
+
+        isTransitionFinishing = false;
+        FinishedCutscene(true);
     }
 
     // VideoPlayer의 자연 종료를 재생 유형별 완료 단계로 전달합니다.
@@ -421,12 +461,46 @@ public class CutsceneView : UIViewBase
     private void SubscribeVideoEvent()
     {
         if (videoPlayer != null)
+        {
             videoPlayer.loopPointReached += HandleVideoFinished;
+            // 2026.08.07_psb수정
+            // VideoPlayer가 실제로 출력할 첫 프레임을 받는 시점을 전환 완료 기준으로 사용한다.
+            videoPlayer.prepareCompleted += HandleVideoPrepared;
+            videoPlayer.frameReady += HandleVideoFrameReady;
+            videoPlayer.sendFrameReadyEvents = true;
+        }
     }
 
     private void UnsubscribeVideoEvent()
     {
         if (videoPlayer != null)
+        {
             videoPlayer.loopPointReached -= HandleVideoFinished;
+            videoPlayer.prepareCompleted -= HandleVideoPrepared;
+            videoPlayer.frameReady -= HandleVideoFrameReady;
+        }
+    }
+
+    // 2026.08.07_psb수정
+    // 영상 디코더 준비가 끝난 뒤 재생을 시작해 첫 프레임 콜백을 받는다.
+    private void HandleVideoPrepared(VideoPlayer source)
+    {
+        if (!isWaitingForFirstVideoFrame || source != videoPlayer)
+            return;
+
+        source.Play();
+    }
+
+    // 2026.08.07_psb수정
+    // 첫 프레임이 RenderTexture에 준비된 시점에만 다음 화면 페이드 인을 허용한다.
+    private void HandleVideoFrameReady(VideoPlayer source, long frameIndex)
+    {
+        if (!isWaitingForFirstVideoFrame || source != videoPlayer)
+            return;
+
+        isWaitingForFirstVideoFrame = false;
+
+        EventBus<UIVideoFirstFrameReadyEvent>.Publish(
+            new UIVideoFirstFrameReadyEvent(currentCutsceneId));
     }
 }

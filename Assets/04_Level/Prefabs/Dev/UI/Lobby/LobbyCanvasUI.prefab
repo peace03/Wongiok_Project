@@ -9573,6 +9573,7 @@ MonoBehaviour:
   skipGuideText: {fileID: 2772881974885281514}
   loadingSpinner: {fileID: 0}
   proceedGuideObject: {fileID: 0}
+  prologueSkipFadeOutDuration: 0.35
   bossEncounterFadeOutDuration: 0.5
   bossClearEndFadeOutDuration: 0.5
   loadingSpinnerSpeed: 180
