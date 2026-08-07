@@ -135,6 +135,9 @@ public class TestModule : MonoBehaviour
         if (_input.TestF11Pressed)
             SaveCheckpoint();
 
+        if (Time.timeScale <= 0f)
+            return;
+
         if (_input.SkillAPressed)
             EventBus<TestPlayerSkillUsedEvent>.Publish(
                 new TestPlayerSkillUsedEvent(0));
