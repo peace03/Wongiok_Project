@@ -51,27 +51,27 @@ MonoBehaviour:
     - rid: 4582174548851687625
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
-        maxCoolTime: 8
+        maxCoolTime: 5
         maxDuration: 0
-        damage: 9
+        damage: 35
         projectileCount: 1
         penetrationCount: -1
         maxChargingTime: 1
     - rid: 4582174548851687626
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
-        maxCoolTime: 7
+        maxCoolTime: 5
         maxDuration: 0
-        damage: 200
+        damage: 39
         projectileCount: 1
         penetrationCount: -1
-        maxChargingTime: 0.8
+        maxChargingTime: 1
     - rid: 4582174548851687627
       type: {class: ProjectileSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
-        maxCoolTime: 6
+        maxCoolTime: 5
         maxDuration: 0
-        damage: 250
+        damage: 44
         projectileCount: 1
         penetrationCount: -1
-        maxChargingTime: 0.6
+        maxChargingTime: 1

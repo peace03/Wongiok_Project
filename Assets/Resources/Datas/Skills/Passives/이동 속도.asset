@@ -32,21 +32,21 @@ MonoBehaviour:
         triggerType: 0
         appliedStats:
         - stat: 2
-          modify: 0
-          amount: 2
+          modify: 2
+          amount: 1.1
     - rid: 2620632180129005728
       type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
         triggerType: 0
         appliedStats:
         - stat: 2
-          modify: 0
-          amount: 3
+          modify: 2
+          amount: 1.2
     - rid: 2620632180129005729
       type: {class: PassiveSkillLevelData, ns: , asm: Assembly-CSharp}
       data:
         triggerType: 0
         appliedStats:
         - stat: 2
-          modify: 0
-          amount: 4
+          modify: 2
+          amount: 1.3
