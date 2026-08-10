@@ -47,7 +47,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     }
 
     // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
-    private void OnDisable() => EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
+    private void OnDisable()
+    {
+        EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
+        SetExecutingSkill(false);
+    }
 
     /// <summary>
     /// 초기화 함수
@@ -111,8 +115,12 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             // 스킬 시작 애니메이션 대기 시간(차징 시간 제외) 받아오기
             startAnimationWaitTime = Mathf.Max(0f, ownerAnimatorDriver.SkillStartAnimDuration
                                                                                     - levelData.MaxChargingTime);
+
+        if(activeEffects.ContainsKey(ACTIVE_SKILL_EFFECT_TYPE.Main))
+            activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
+
         // 스킬 실행 중
-        executingSkill = true;
+        SetExecutingSkill(true);
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(levelData.ProjectileCount, levelData.GetDamage(),
                                                 levelData.MaxDuration > 0f ? levelData.MaxDuration : null,
@@ -122,7 +130,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     /// <summary>
     /// 발사체 스킬 코루틴 함수
     /// </summary>
-    /// <param name="skillId">스킬 ID</param>
     /// <param name="bulletCount">발사체 개수</param>
     /// <param name="damage">데미지</param>
     /// <param name="penetrationCount">관통 횟수</param>
@@ -130,7 +137,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private IEnumerator ProjectileRoutine(int bulletCount, float damage, float? maxDuration,
                                                                         int penetrationCount, bool isCharging)
     {
-        Debug.Log("발사체 스킬 코루틴 실행");
         float waitTimer = startAnimationWaitTime;
 
         while(waitTimer > 0f)
@@ -145,7 +151,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         var data = SkillDatabase.FindDataById(executingSkillId);
 
         if (data == null || data.AsActiveData == null)
+        {
+            SetExecutingSkill(false);
             yield break;
+        }
 
         foreach (var sound in data.AsActiveData.Sounds)
         {
@@ -164,14 +173,23 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             // 총구 이펙트 실행하기
             ExecuteEffects(data.AsActiveData, ACTIVE_SKILL_EFFECT_TYPE.Muzzle, place);
 
+        Bullet bullet;
+
         // 현재 발사체 개수만큼
         for (int count = 0; count < bulletCount; count += executePlaces.Count)
         {
             // 실행 위치들의 수만큼
             foreach (var place in executePlaces)
             {
-                // 총알 가져오기
-                var bullet = bulletFactory.GetBullet(false);
+                // 돌격 소총이라면
+                if (executingSkillId == (int)ACTIVE_SKILL_ID.Rifle)
+                    // 외형 킨 총알 가져오기
+                    bullet = bulletFactory.GetBullet();
+                // 그 외라면
+                else
+                    // 외형 끈 총알 가져오기
+                    bullet = bulletFactory.GetBullet(false);
+
                 // 총알 위치와 각도 설정하기
                 bullet.transform.SetPositionAndRotation(place.position, place.rotation);
                 // 총알 이펙트 실행하기
@@ -195,8 +213,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 총구 이펙트 즉시 종료
         StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Muzzle);
-        // 총알 이펙트 즉시 종료
-        StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Main);
 
         // 발사체 스킬 딜레이 시간량이 있다면(지속 시간이 있었다면)
         if (projectileDelayTimeValue > 0f)
@@ -207,7 +223,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 실행 위치들 초기화
         ResetExecutePositions();
         // 스킬 실행 끝남
-        executingSkill = false;
+        SetExecutingSkill(false);
     }
 
     /// <summary>
@@ -239,8 +255,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
             // 이펙트 실행 후 받아오기
             var effect = EffectManager.Instance.PlayEffect(effectPrefabs[i],
-                                                place.position + (pos ?? Vector3.zero),
-                                                    place.rotation, parent: target != null ? target : place);
+                                                place.position + (pos ?? Vector3.zero), place.rotation,
+                                                                    parent : target != null ? target : place);
 
             // 나선 이펙트라면
             if (effect.TryGetComponent<IWaveEffect>(out var wave))
@@ -299,13 +315,13 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             return;
 
         // 스킬 실행 중지
-        executingSkill = false;
+        SetExecutingSkill(false);
         // 스킬 사용 사운드 정지
         EventBus<StopControlledSfxEvent>.Publish(new($"{executingSkillId}_Sound"));
         // 총구 이펙트 즉시 종료
         StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, true);
-        // 총알 이펙트 즉시 종료
-        StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Main, true);
+        // 총알 이펙트 리스트 초기화
+        activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
         // 무기 외형 착용 해제 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(executingSkillId, false));
 
@@ -319,6 +335,16 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 스킬 애니메이션 취소
         ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)executingSkillId);
         executingSkillId = -1;
+    }
+
+    private void SetExecutingSkill(bool isExecuting)
+    {
+        if (executingSkill == isExecuting)
+            return;
+
+        executingSkill = isExecuting;
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(
+            new PlayerSkillEffectExecutionChangedEvent(isExecuting));
     }
 
     /// <summary>

@@ -40,6 +40,10 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         //    EventBus<StartedPressSkillSlot>.Publish(new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.D));
         #endregion
 
+        // 시간이 멈춰있다면
+        if (Time.timeScale <= 0f)
+            return;
+
         // A키를 눌렀다면
         if (ownerInput.SkillAPressed)
             // A키 누름 이벤트 발행

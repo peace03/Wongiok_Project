@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Video;
 
-public class PrototypeTestScene : MonoBehaviour
+public class PrototypeTestScene : MonoBehaviour, IInitializable
 {
     [SerializeField] private string mainMenuSceneName = "Lobby";
 
@@ -26,7 +26,20 @@ public class PrototypeTestScene : MonoBehaviour
     private float[] skillCooldownRemaining = new float[3];
     private float[] skillCooldownDuration = new float[3];
 
-    private void OnEnable()
+    public int Priority => (int)InitOrder.UI;
+
+    private void Start()
+    {
+        PublishInGameHudData();
+        PublishPauseTestData();
+    }
+
+    private void Update()
+    {
+        TickSkillCooldowns();
+    }
+
+    public void Init()
     {
         // 보유 스킬을 장착 슬롯에 드롭했을 때 테스트 데이터 교체를 처리하기 위한 이벤트 구독
         EventBus<UIOpenOverlayEvent>.action += HandleOpenOverlay;
@@ -40,31 +53,6 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<TestPlayerSkillUsedEvent>.action += HandleTestPlayerSkillUsed;
 
         EventBus<RefreshUIEvent>.action += RefreshSkills;
-    }
-
-    private void OnDisable()
-    {
-        EventBus<UIOpenOverlayEvent>.action -= HandleOpenOverlay;
-        EventBus<UIPauseMainMenuRequestedEvent>.action -= HandlePauseMainMenuRequested;
-        EventBus<UIPauseQuitGameRequestedEvent>.action -= HandlePauseQuitGameRequested;
-        EventBus<UIPauseSkillEquipRequestedEvent>.action -= HandlePauseSkillEquipRequested;
-        EventBus<UIPauseSkillSwapRequestedEvent>.action -= HandlePauseSkillSwapRequested;
-        EventBus<UILevelUpSkillSelectedEvent>.action -= HandleLevelUpSkillSelected;
-        EventBus<TestRestoreSkillCheckpointEvent>.action -= HandleRestoreSkillCheckpoint;
-        EventBus<TestPlayerSkillUsedEvent>.action -= HandleTestPlayerSkillUsed;
-
-        EventBus<RefreshUIEvent>.action -= RefreshSkills;
-    }
-
-    private void Start()
-    {
-        PublishInGameHudData();
-        PublishPauseTestData();
-    }
-
-    private void Update()
-    {
-        TickSkillCooldowns();
     }
 
     private void HandleOpenOverlay(UIOpenOverlayEvent eventData)

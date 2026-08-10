@@ -46,6 +46,11 @@ public class Bullet : MonoBehaviour, IPoolable
         bulletRenderers = GetComponentsInChildren<Renderer>();
         // 총알 콜라이더 받아오기
         bulletCollider = transform.GetComponent<BoxCollider>();
+        // 총알 외형 받아오기
+        var bulletLook = transform.GetChild(0);
+        // 총알 콜라이더 위치에 맞게 외형 위치 수정
+        transform.position = new Vector3(transform.position.x, transform.position.y,
+                                                        -0.0125f * bulletLook.localScale.z);
 
         // 총알 콜라이더가 없다면
         if (bulletCollider == null)
@@ -53,7 +58,9 @@ public class Bullet : MonoBehaviour, IPoolable
             // 총알 콜라이더 추가
             bulletCollider = gameObject.AddComponent<BoxCollider>();
             // 총알 콜라이더 크기 조절
-            bulletCollider.size = new Vector3(0.02f, 0.02f, 0.05f);
+            bulletCollider.size = new Vector3(0.01f * bulletLook.localScale.x,
+                                                0.01f * bulletLook.localScale.y,
+                                                    0.025f * bulletLook.localScale.z);
         }
 
         // 총알 콜라이더 크기 받아오기
@@ -186,10 +193,10 @@ public class Bullet : MonoBehaviour, IPoolable
             var executeEffect = EffectManager.Instance.PlayEffect(hitEffect, pos,
                                             Quaternion.LookRotation(-transform.forward), maxEffectTime);
 
-            // 실행한 이펙트가 타격/피격 이펙트 인터페이스를 가지고 있다면
-            if (executeEffect.TryGetComponent<IHitEffect>(out var IHitEffect))
+            // 실행한 이펙트가 타겟 이펙트 인터페이스를 가지고 있다면
+            if (executeEffect.TryGetComponent<ITargetEffect>(out var targetEffect))
                 // 따라다닐 대상 설정하기
-                IHitEffect.SetInfo(other.transform);
+                targetEffect.SetInfo(other.transform);
         }
 
         // 카메라 흔들림 값이 있다면

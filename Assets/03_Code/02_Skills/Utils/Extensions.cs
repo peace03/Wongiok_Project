@@ -87,6 +87,7 @@ public static class EnumExtensions
         {
             MODIFY_TYPE.Addition                    => "+",
             MODIFY_TYPE.Subtraction                 => "-",
+            MODIFY_TYPE.Multiplier                  => "배",
             _                                       => ""
         };
     }
