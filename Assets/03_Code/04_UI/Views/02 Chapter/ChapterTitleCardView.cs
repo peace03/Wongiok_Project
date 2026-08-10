@@ -5,11 +5,6 @@ using System.Collections;
 
 public class ChapterTitleCardView : UIViewBase
 {
-    [Header("Text")]
-    [SerializeField] private Text titleText;
-    [SerializeField] private Text subtitleText;
-    [SerializeField] private Text descriptionText;
-
     [Header("Visual")]
     [SerializeField] private Image thumbnailImage;
     [SerializeField] private Image backgroundImage;
@@ -69,6 +64,7 @@ public class ChapterTitleCardView : UIViewBase
     private bool isVideoFinished;
     private bool isFinishingVideo;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     protected override void Awake()
     {
         base.Awake();
@@ -80,6 +76,7 @@ public class ChapterTitleCardView : UIViewBase
             loadingVideoPlayer.loopPointReached += HandleLoadingVideoFinished;
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
@@ -88,6 +85,7 @@ public class ChapterTitleCardView : UIViewBase
             loadingVideoPlayer.loopPointReached -= HandleLoadingVideoFinished;
     }
 
+    // 2026.08.10_UI 정리: 화면 표시 시 필요한 UI 상태를 초기화한다.
     protected override void OnShow()
     {
         ResetLoadingVisual();
@@ -105,6 +103,7 @@ public class ChapterTitleCardView : UIViewBase
         SetupBackButton();
     }
 
+    // 2026.08.10_UI 정리: 화면 숨김 시 임시 UI 상태를 정리한다.
     protected override void OnHide()
     {
         isKeyboardInputReady = false;
@@ -120,6 +119,7 @@ public class ChapterTitleCardView : UIViewBase
         Clear();
     }
 
+    // 2026.08.10_UI 정리: 프레임 단위 UI 상태와 입력을 갱신한다.
     private void Update()
     {
         if (!isLoadingVisualActive || loadingSpinner == null) return;
@@ -127,11 +127,9 @@ public class ChapterTitleCardView : UIViewBase
         loadingSpinner.Rotate(0f, 0f, -loadingSpinnerSpeed * Time.unscaledDeltaTime);
     }
 
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 UI 상태 상태를 설정한다.
     public void Setup(
         int chapterId,
-        string title,
-        string subtitle,
-        string description,
         Sprite thumbnail,
         Sprite background,
         VideoClip loadingVideoClip)
@@ -141,24 +139,19 @@ public class ChapterTitleCardView : UIViewBase
         currentBackground = background;
         currentLoadingVideoClip = loadingVideoClip;
 
-        SetText(titleText, title);
-        SetText(subtitleText, subtitle);
-        SetText(descriptionText, description);
         SetThumbnail(thumbnail);
         SetBackground(background);
 
         RefreshContinueButton();
     }
 
+    // 2026.08.10_UI 정리: UI 상태 상태를 정리한다.
     public void Clear()
     {
         currentChapterId = -1;
         currentThumbnail = null;
         currentBackground = null;
 
-        SetText(titleText, string.Empty);
-        SetText(subtitleText, string.Empty);
-        SetText(descriptionText, string.Empty);
         SetThumbnail(null);
         SetBackground(null);
 
@@ -173,6 +166,7 @@ public class ChapterTitleCardView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UISetChapterTitleCardEvent>.action += HandleSetChapterTitleCard;
@@ -181,6 +175,7 @@ public class ChapterTitleCardView : UIViewBase
         EventBus<UIChapterTitleCardInputSkipRequestedEvent>.action += HandleSkipRequested;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UISetChapterTitleCardEvent>.action -= HandleSetChapterTitleCard;
@@ -189,6 +184,7 @@ public class ChapterTitleCardView : UIViewBase
         EventBus<UIChapterTitleCardInputSkipRequestedEvent>.action -= HandleSkipRequested;
     }
 
+    // 2026.08.10_UI 정리: 키보드 입력 다음 프레임 UI 입력 또는 표시를 활성화한다.
     private IEnumerator EnableKeyboardInputNextFrame()
     {
         yield return null;
@@ -197,18 +193,17 @@ public class ChapterTitleCardView : UIViewBase
         keyboardInputReadyCoroutine = null;
     }
 
+    // 2026.08.10_UI 정리: Set 챕터 타이틀 카드 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetChapterTitleCard(UISetChapterTitleCardEvent eventData)
     {
         Setup(
             eventData.ChapterId,
-            eventData.Title,
-            eventData.Subtitle,
-            eventData.Description,
             eventData.Thumbnail,
             eventData.Background,
             eventData.LoadingVideoClip);
     }
 
+    // 2026.08.10_UI 정리: 입력 계속 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleInputContinueRequested(UIChapterTitleCardInputContinueRequestedEvent eventData)
     {
         if (!IsVisible) return;
@@ -227,28 +222,32 @@ public class ChapterTitleCardView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 뒤로가기 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleBackClicked()
     {
         EventBus<UIChapterSelectScrollPreserveRequestedEvent>.Publish(default);
         EventBus<UIChapterTitleCardBackRequestedEvent>.Publish(default);
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 계속 버튼 표시를 갱신한다.
     private void RefreshContinueButton()
     {
         if (continueButton == null)
             return;
 
-        continueButton.Setup("계속", HandleContinueClicked, currentChapterId >= 0);
+        continueButton.Setup(UITextManager.Get("Chapter.Continue"), HandleContinueClicked, currentChapterId >= 0);
     }
 
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 뒤로가기 버튼 상태를 설정한다.
     private void SetupBackButton()
     {
         if (backButton != null)
         {
-            backButton.Setup("뒤로가기", HandleBackClicked);
+            backButton.Setup(UITextManager.Get("Chapter.BackToSelect"), HandleBackClicked);
         }
     }
 
+    // 2026.08.10_UI 정리: 계속 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleContinueClicked()
     {
         if (currentChapterId < 0 || isTransitioning || loadingTransitionState != LoadingTransitionState.Idle) return;
@@ -265,6 +264,7 @@ public class ChapterTitleCardView : UIViewBase
         transitionCoroutine = StartCoroutine(PlayLoadingTransition());
     }
 
+    // 2026.08.10_UI 정리: 로딩 전환 UI 연출을 재생한다.
     private IEnumerator PlayLoadingTransition()
     {
         RectTransform titleCardRect = thumbnailImage.rectTransform;
@@ -339,6 +339,7 @@ public class ChapterTitleCardView : UIViewBase
         transitionCoroutine = null;
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private IEnumerator StartLoadingVisualAfterVideoStarts()
     {
         isLoadingReady = false;
@@ -383,6 +384,7 @@ public class ChapterTitleCardView : UIViewBase
         yield return null;
     }
 
+    // 2026.08.10_UI 정리: 현재 Initial 비주얼 상태 상태를 저장한다.
     private void CaptureInitialVisualState()
     {
         if (thumbnailImage != null)
@@ -407,6 +409,7 @@ public class ChapterTitleCardView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 로딩 비주얼 상태를 기본값으로 초기화한다.
     private void ResetLoadingVisual()
     {
         if (transitionCoroutine != null)
@@ -460,6 +463,7 @@ public class ChapterTitleCardView : UIViewBase
             proceedGuideObject.SetActive(false);
     }
 
+    // 2026.08.10_UI 정리: 카드 상세 Objects 액티브 표시 값을 반영한다.
     private void SetCardDetailObjectsActive(bool isActive)
     {
         foreach (GameObject detailObject in cardDetailObjects)
@@ -469,6 +473,7 @@ public class ChapterTitleCardView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 저장된 카드 상세 Objects 상태를 복원한다.
     private void RestoreCardDetailObjects()
     {
         for (int i = 0; i < cardDetailObjects.Length; i++)
@@ -480,12 +485,14 @@ public class ChapterTitleCardView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 로딩 영상 Finished 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleLoadingVideoFinished(VideoPlayer source)
     {
         isVideoFinished = true;
         TryFinishVideoStage();
     }
 
+    // 2026.08.10_UI 정리: 로딩 준비 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleLoadingReady(UIChapterTitleCardLoadingReadyEvent eventData)
     {
         if (eventData.ChapterId != currentChapterId || loadingTransitionState != LoadingTransitionState.VideoPlaying) return;
@@ -505,6 +512,7 @@ public class ChapterTitleCardView : UIViewBase
         TryFinishVideoStage();
     }
 
+    // 2026.08.10_UI 정리: Skip Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSkipRequested(UIChapterTitleCardInputSkipRequestedEvent eventData)
     {
         if (loadingTransitionState != LoadingTransitionState.VideoPlaying || !isLoadingReady || isVideoFinished) return;
@@ -518,6 +526,7 @@ public class ChapterTitleCardView : UIViewBase
         TryFinishVideoStage();
     }
 
+    // 2026.08.10_UI 정리: Finish 영상 Stage 동작을 시도한다.
     private void TryFinishVideoStage()
     {
         if (!isVideoFinished || !isLoadingReady || isFinishingVideo) return;
@@ -525,6 +534,7 @@ public class ChapterTitleCardView : UIViewBase
         StartCoroutine(FinishVideoStage());
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private IEnumerator FinishVideoStage()
     {
         isFinishingVideo = true;
@@ -567,6 +577,7 @@ public class ChapterTitleCardView : UIViewBase
         isFinishingVideo = false;
     }
 
+    // 2026.08.10_UI 정리: 진행 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleProceedRequested()
     {
         if (loadingTransitionState != LoadingTransitionState.WaitingForProceed) return;
@@ -578,14 +589,8 @@ public class ChapterTitleCardView : UIViewBase
             new UIChapterTitleCardActivateSceneRequestedEvent(currentChapterId));
     }
 
-    private void SetText(Text targetText, string value)
-    {
-        if (targetText == null)
-            return;
-
-        targetText.text = value;
-    }
-
+    // 2026.08.10_UI 정리: 텍스트 표시 값을 반영한다.
+    // 2026.08.10_UI 정리: 썸네일 표시 값을 반영한다.
     private void SetThumbnail(Sprite thumbnail)
     {
         if (thumbnailImage == null)
@@ -596,6 +601,7 @@ public class ChapterTitleCardView : UIViewBase
 
     }
 
+    // 2026.08.10_UI 정리: 배경 표시 값을 반영한다.
     private void SetBackground(Sprite background)
     {
         if (backgroundImage == null)

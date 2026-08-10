@@ -33,6 +33,7 @@ public class PopupManager : MonoBehaviour, IInitializable
         SubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
@@ -45,8 +46,8 @@ public class PopupManager : MonoBehaviour, IInitializable
         string message,
         Action onConfirm,
         Action onCancel = null,
-        string confirmText = "확인",
-        string cancelText = "취소")
+        string confirmText = null,
+        string cancelText = null)
     {
         if (confirmPopupView == null)
         {
@@ -58,6 +59,15 @@ public class PopupManager : MonoBehaviour, IInitializable
         {
             CloseCurrentPopup();
         }
+
+        // 2026.08.10_UI 문구 중앙화
+        // 별도 버튼 문구가 없으면 카탈로그의 공통 확인·취소 문구를 사용한다.
+        confirmText = string.IsNullOrWhiteSpace(confirmText)
+            ? UITextManager.Get("Common.Confirm")
+            : confirmText;
+        cancelText = string.IsNullOrWhiteSpace(cancelText)
+            ? UITextManager.Get("Common.Cancel")
+            : cancelText;
 
         currentConfirmCallback = onConfirm;
         currentCancelCallback = onCancel;
@@ -75,11 +85,12 @@ public class PopupManager : MonoBehaviour, IInitializable
         SetPopupState(UIPopupType.Confirm);
     }
 
+    // 2026.08.10_UI 정리: 알림 UI 요소를 표시한다.
     public void ShowAlert(
         string title,
         string message,
         Action onConfirm = null,
-        string confirmText = "확인")
+        string confirmText = null)
     {
         if (alertPopupView == null)
         {
@@ -90,6 +101,12 @@ public class PopupManager : MonoBehaviour, IInitializable
         {
             CloseCurrentPopup();
         }
+
+        // 2026.08.10_UI 문구 중앙화
+        // 별도 확인 문구가 없으면 카탈로그의 공통 확인 문구를 사용한다.
+        confirmText = string.IsNullOrWhiteSpace(confirmText)
+            ? UITextManager.Get("Common.Confirm")
+            : confirmText;
 
         currentConfirmCallback = onConfirm;
         currentPopupType = UIPopupType.Alert;
@@ -135,18 +152,21 @@ public class PopupManager : MonoBehaviour, IInitializable
         cancelCallback?.Invoke();
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UIShowConfirmPopupEvent>.action += HandleShowConfirmPopup;
         EventBus<UIShowAlertPopupEvent>.action += HandleShowAlertPopup;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UIShowConfirmPopupEvent>.action -= HandleShowConfirmPopup;
         EventBus<UIShowAlertPopupEvent>.action -= HandleShowAlertPopup;
     }
 
+    // 2026.08.10_UI 정리: 표시 Confirm 팝업 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleShowConfirmPopup(UIShowConfirmPopupEvent eventData)
     {
         ShowConfirm(
@@ -158,6 +178,7 @@ public class PopupManager : MonoBehaviour, IInitializable
             eventData.CancelText);
     }
     
+    // 2026.08.10_UI 정리: 표시 알림 팝업 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleShowAlertPopup(UIShowAlertPopupEvent eventData)
     {
         ShowAlert(
@@ -177,6 +198,7 @@ public class PopupManager : MonoBehaviour, IInitializable
         confirmCallback?.Invoke();
     }
 
+    // 2026.08.10_UI 정리: 알림 Confirm 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleAlertConfirmClicked()
     {
         Action confirmCallback = currentConfirmCallback;
@@ -222,6 +244,7 @@ public class PopupManager : MonoBehaviour, IInitializable
         }
     }
 
+    // 2026.08.10_UI 정리: 알림 팝업 View UI 요소를 숨긴다.
     private void HideAlertPopupView()
     {
         if (alertPopupView == null)

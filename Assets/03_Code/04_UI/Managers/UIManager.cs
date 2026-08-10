@@ -475,6 +475,7 @@ public class UIManager : MonoBehaviour, IInitializable
 
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private bool ShouldPauseGameplayByUIState()
     {
         if (CurrentPopupType != UIPopupType.None)

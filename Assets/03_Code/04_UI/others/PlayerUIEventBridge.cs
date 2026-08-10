@@ -24,6 +24,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
 
     public int Priority => (int)InitOrder.PlayerUIBridge;
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public void Init()
     {
         if (isInitialized) return;
@@ -33,6 +34,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         RequestInitialPlayerStateSync();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         if (!isInitialized) return;
@@ -44,6 +46,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         isInitialized = false;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<PlayerHealthChangedEvent>.action += HandlePlayerHealthChanged;
@@ -56,6 +59,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         EventBus<RefreshUIEvent>.action += HandleRefreshUI;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<PlayerHealthChangedEvent>.action -= HandlePlayerHealthChanged;
@@ -68,6 +72,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         EventBus<RefreshUIEvent>.action -= HandleRefreshUI;
     }
 
+    // 2026.08.10_UI 정리: 플레이어 체력 Changed 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePlayerHealthChanged(PlayerHealthChangedEvent eventData)
     {
         currentHp = eventData.CurrentHP;
@@ -84,6 +89,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         PublishPauseStatus();
     }
 
+    // 2026.08.10_UI 정리: 플레이어 목숨 Changed 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePlayerLifeChanged(PlayerLifeChangedEvent eventData)
     {
         currentLife = eventData.CurrentLifeCount;
@@ -100,6 +106,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         PublishPauseStatus();
     }
 
+    // 2026.08.10_UI 정리: 플레이어 회복 아이템 Count Changed 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePlayerHealItemCountChanged(PlayerHealItemCountChangedEvent eventData)
     {
         currentHealItemCount = eventData.CurrentCount;
@@ -114,6 +121,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         );
     }
 
+    // 2026.08.10_UI 정리: 플레이어 경험치 Changed 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePlayerExperienceChanged(PlayerExperienceChangedEvent eventData)
     {
         currentLevel = eventData.CurrentLevel;
@@ -130,6 +138,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         PublishPauseStatus();
     }
 
+    // 2026.08.10_UI 정리: 플레이어 Death Presentation Finished 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePlayerDeathPresentationFinished(
         PlayerDeathPresentationFinishedEvent eventData)
     {
@@ -144,6 +153,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
                 currentLife > 0));
     }
 
+    // 2026.08.10_UI 정리: Change 화면 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChangeScreen(UIChangeScreenEvent eventData)
     {
         if (eventData.ScreenState != UIScreenState.InGame)
@@ -152,6 +162,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         RequestInitialPlayerStateSync();
     }
 
+    // 2026.08.10_UI 정리: 갱신 UI 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleRefreshUI(RefreshUIEvent eventData)
     {
         if(eventData.IsActiveSkill)
@@ -164,6 +175,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         PublishPauseStatus();
     }
 
+    // 2026.08.10_UI 정리: Current 플레이어 HUD 상태 요청 또는 상태를 EventBus로 발행한다.
     private void PublishCurrentPlayerHudState()
     {
         if (hasExperienceState)
@@ -197,6 +209,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         PublishPauseStatus();
     }
 
+    // 2026.08.10_UI 정리: 일시정지 전체현황 요청 또는 상태를 EventBus로 발행한다.
     private void PublishPauseStatus()
     {
         EventBus<UISetPauseStatusEvent>.Publish(
@@ -273,11 +286,13 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
         initialStateSyncRoutine = null;
     }
 
+    // 2026.08.10_UI 정리: 현재 Display 목숨 Count 값을 반환한다.
     private int GetDisplayLifeCount()
     {
         return Mathf.Clamp(currentLife - 1, 0, GetDisplayMaxLifeCount());
     }
 
+    // 2026.08.10_UI 정리: 현재 Display Max 목숨 Count 값을 반환한다.
     private int GetDisplayMaxLifeCount()
     {
         return Mathf.Max(0, maxLife - 1);

@@ -44,6 +44,7 @@ public class CutsceneView : UIViewBase
     // 페이드가 빈 RenderTexture를 드러내지 않도록 현재 영상의 첫 프레임 준비 여부를 추적한다.
     private bool isWaitingForFirstVideoFrame;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     protected override void Awake()
     {
         base.Awake();
@@ -52,12 +53,14 @@ public class CutsceneView : UIViewBase
         ResetBossTransitionVisuals();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
         UnsubscribeVideoEvent();
     }
 
+    // 2026.08.10_UI 정리: 프레임 단위 UI 상태와 입력을 갱신한다.
     private void Update()
     {
         if (loadingSpinner == null || !loadingSpinner.gameObject.activeSelf)
@@ -69,6 +72,7 @@ public class CutsceneView : UIViewBase
             -loadingSpinnerSpeed * Time.unscaledDeltaTime);
     }
 
+    // 2026.08.10_UI 정리: 화면 표시 시 필요한 UI 상태를 초기화한다.
     protected override void OnShow()
     {
         if (currentVideoClip == null)
@@ -81,6 +85,7 @@ public class CutsceneView : UIViewBase
         PlayCurrentCutscene();
     }
 
+    // 2026.08.10_UI 정리: 화면 숨김 시 임시 UI 상태를 정리한다.
     protected override void OnHide()
     {
         StopCurrentCutscene();
@@ -133,7 +138,7 @@ public class CutsceneView : UIViewBase
             if (!isBossClearSkipGuideShown)
             {
                 isBossClearSkipGuideShown = true;
-                SetSkipGuideVisible(true, "~ : Skip");
+                SetSkipGuideVisible(true, UITextManager.Get("Cutscene.SkipGuide"));
                 return;
             }
 
@@ -169,7 +174,7 @@ public class CutsceneView : UIViewBase
         if (loadingSpinner != null)
             loadingSpinner.gameObject.SetActive(false);
 
-        SetSkipGuideVisible(true, "~ : Skip");
+        SetSkipGuideVisible(true, UITextManager.Get("Cutscene.SkipGuide"));
         TryEnterEncounterProceedState();
     }
 
@@ -215,7 +220,9 @@ public class CutsceneView : UIViewBase
 
         SetSkipGuideVisible(
             true,
-            currentCutsceneId == "prologue" ? "~ : Skip" : "ESC : Skip");
+            currentCutsceneId == "prologue"
+                ? UITextManager.Get("Cutscene.SkipGuide")
+                : UITextManager.Get("Cutscene.EscapeSkipGuide"));
     }
 
     // 전달된 VideoClip을 출력 RawImage에 재생합니다.
@@ -285,20 +292,20 @@ public class CutsceneView : UIViewBase
 
         EventBus<UIShowConfirmPopupEvent>.Publish(
             new UIShowConfirmPopupEvent(
-                "건너뛰기",
+                UITextManager.Get("Cutscene.SkipTitle"),
                 currentSkipSummary,
                 HandleSkipConfirmed,
-                HandleSkipCanceled,
-                "확인",
-                "취소"));
+                HandleSkipCanceled));
     }
 
+    // 2026.08.10_UI 정리: Skip Confirmed 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSkipConfirmed()
     {
         isSkipPopupOpen = false;
         FinishedCutscene(true);
     }
 
+    // 2026.08.10_UI 정리: Skip Canceled 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSkipCanceled()
     {
         isSkipPopupOpen = false;
@@ -424,6 +431,7 @@ public class CutsceneView : UIViewBase
         ResetBossTransitionVisuals();
     }
 
+    // 2026.08.10_UI 정리: 보스 전환 Visuals 상태를 기본값으로 초기화한다.
     private void ResetBossTransitionVisuals()
     {
         if (loadingSpinner != null)
@@ -446,6 +454,7 @@ public class CutsceneView : UIViewBase
             skipGuideText.text = text;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UISetCutsceneEvent>.action += HandleSetCutscene;
@@ -455,6 +464,7 @@ public class CutsceneView : UIViewBase
         EventBus<UIResetEvent>.action += HandleReset;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UISetCutsceneEvent>.action -= HandleSetCutscene;
@@ -464,6 +474,7 @@ public class CutsceneView : UIViewBase
         EventBus<UIResetEvent>.action -= HandleReset;
     }
 
+    // 2026.08.10_UI 정리: 영상 이벤트 이벤트를 구독한다.
     private void SubscribeVideoEvent()
     {
         if (videoPlayer != null)
@@ -477,6 +488,7 @@ public class CutsceneView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 영상 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeVideoEvent()
     {
         if (videoPlayer != null)

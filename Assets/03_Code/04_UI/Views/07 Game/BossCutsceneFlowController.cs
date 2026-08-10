@@ -31,6 +31,7 @@ public class BossCutsceneFlowController : MonoBehaviour
     private bool isWaitingForEncounterFirstFrame;
     private bool isWaitingForBossClearFirstFrame;
 
+    // 2026.08.10_UI 정리: 활성화 시 필요한 UI 상태와 이벤트 구독을 준비한다.
     private void OnEnable()
     {
         EventBus<UIBossEncounterRequestedEvent>.action += HandleBossEncounterRequested;
@@ -42,6 +43,7 @@ public class BossCutsceneFlowController : MonoBehaviour
         EventBus<UIVideoFirstFrameReadyEvent>.action += HandleVideoFirstFrameReady;
     }
 
+    // 2026.08.10_UI 정리: 비활성화 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDisable()
     {
         EventBus<UIBossEncounterRequestedEvent>.action -= HandleBossEncounterRequested;

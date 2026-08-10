@@ -30,6 +30,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
     public int SourceSlotIndex => sourceSlotIndex;
     public int SourceOwnedSlotIndex => sourceOwnedSlotIndex;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     private void Awake()
     {
         if (rootCanvas == null)
@@ -40,6 +41,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         HideDragPreview();
     }
 
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 보유 스킬 상태를 설정한다.
     public void SetupOwnedSkill(int skillId, int sourceOwnedSlotIndex, bool canDrag)
     {
         sourceType = PauseSkillDragSourceType.OwnedSkill;
@@ -49,6 +51,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         this.canDrag = canDrag && skillId >= 0;
     }
 
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 장착 슬롯 상태를 설정한다.
     public void SetupEquippedSlot(int skillId, int sourceSlotIndex, bool canDrag =true)
     {
         sourceType = PauseSkillDragSourceType.EquippedSlot;
@@ -57,6 +60,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         this.canDrag = canDrag && skillId >= 0 && sourceSlotIndex >= 0;
     }
 
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 드래그 비주얼 Refs 상태를 설정한다.
     public void SetupDragVisualRefs(Canvas rootCanvas, RectTransform dragPreviewRoot, Image dragPreviewIconImage)
     {
         this.rootCanvas = rootCanvas;
@@ -64,6 +68,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         this.dragPreviewIconImage = dragPreviewIconImage;
     }
 
+    // 2026.08.10_UI 정리: 드래그 데이터 상태를 정리한다.
     public void ClearDragData()
     {
         sourceType = PauseSkillDragSourceType.None;
@@ -75,6 +80,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         RestoreOriginalVisual();
     }
 
+    // 2026.08.10_UI 정리: 스킬 드래그 시작 상태와 프리뷰를 준비한다.
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (!CanStartDrag())
@@ -84,6 +90,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         ShowDragPreview(eventData);
     }
 
+    // 2026.08.10_UI 정리: 포인터 위치에 맞춰 드래그 프리뷰를 이동한다.
     public void OnDrag(PointerEventData eventData)
     {
         if (!CanStartDrag())
@@ -92,6 +99,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         MoveDragPreview(eventData);
     }
 
+    // 2026.08.10_UI 정리: 드래그 종료 후 원본 UI 상태를 복원한다.
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!CanStartDrag())
@@ -101,11 +109,13 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         RestoreOriginalVisual();
     }
 
+    // 2026.08.10_UI 정리: Start 드래그 동작이 가능한지 판단한다.
     private bool CanStartDrag()
     {
         return canDrag && skillId >= 0 && sourceType != PauseSkillDragSourceType.None;
     }
 
+    // 2026.08.10_UI 정리: 원본 Dragging 비주얼 표시 값을 반영한다.
     private void SetOriginalDraggingVisual(bool isDragging)
     {
         if (canvasGroup == null)
@@ -115,6 +125,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         canvasGroup.blocksRaycasts = !isDragging;
     }
 
+    // 2026.08.10_UI 정리: 저장된 원본 비주얼 상태를 복원한다.
     private void RestoreOriginalVisual()
     {
         if (canvasGroup == null)
@@ -124,6 +135,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         canvasGroup.blocksRaycasts = true;
     }
 
+    // 2026.08.10_UI 정리: 드래그 프리뷰 UI 요소를 표시한다.
     private void ShowDragPreview(PointerEventData eventData)
     {
         if (dragPreviewRoot == null)
@@ -142,6 +154,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         MoveDragPreview(eventData);
     }
 
+    // 2026.08.10_UI 정리: 드래그 프리뷰 상태를 이동한다.
     private void MoveDragPreview(PointerEventData eventData)
     {
         if (dragPreviewRoot == null || rootCanvas == null)
@@ -165,6 +178,7 @@ public class PauseSkillDragView : MonoBehaviour, IBeginDragHandler, IDragHandler
         }
     }
 
+    // 2026.08.10_UI 정리: 드래그 프리뷰 UI 요소를 숨긴다.
     private void HideDragPreview()
     {
         if (dragPreviewRoot != null)

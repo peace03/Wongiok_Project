@@ -37,6 +37,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
     private Vector3 initialPivotLocalPosition;
     private float initialDistance;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     private void Awake()
     {
         if (previewArea == null && previewImage != null)
@@ -62,12 +63,14 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         }
     }
 
+    // 2026.08.10_UI 정리: 활성화 시 필요한 UI 상태와 이벤트 구독을 준비한다.
     private void OnEnable()
     {
         SetPreviewWorldVisible(true);
         ResetPreview();
     }
 
+    // 2026.08.10_UI 정리: 비활성화 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDisable()
     {
         isPointerInside = false;
@@ -76,6 +79,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         SetPreviewWorldVisible(false);
     }
 
+    // 2026.08.10_UI 정리: 프레임 단위 UI 상태와 입력을 갱신한다.
     private void Update()
     {
         HandleRotateInput();
@@ -84,17 +88,20 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         ApplyPreviewTransform();
     }
 
+    // 2026.08.10_UI 정리: 포인터 상호작용에 맞춰 UI 표시 상태를 갱신한다.
     public void OnPointerEnter(PointerEventData eventData)
     {
         isPointerInside = true;
     }
 
+    // 2026.08.10_UI 정리: 포인터 상호작용에 맞춰 UI 표시 상태를 갱신한다.
     public void OnPointerExit(PointerEventData eventData)
     {
         isPointerInside = false;
         isDragging = false;
     }
 
+    // 2026.08.10_UI 정리: 포인터 상호작용에 맞춰 UI 표시 상태를 갱신한다.
     public void OnPointerDown(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left)
@@ -107,6 +114,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         lastMousePosition = eventData.position;
     }
 
+    // 2026.08.10_UI 정리: 포인터 상호작용에 맞춰 UI 표시 상태를 갱신한다.
     public void OnPointerUp(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left)
@@ -115,6 +123,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         isDragging = false;
     }
 
+    // 2026.08.10_UI 정리: 프리뷰 상태를 기본값으로 초기화한다.
     public void ResetPreview()
     {
         isPointerInside = false;
@@ -141,6 +150,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         ApplyPreviewTransform();
     }
 
+    // 2026.08.10_UI 정리: 프리뷰 월드 Visible 표시 값을 반영한다.
     private void SetPreviewWorldVisible(bool isVisible)
     {
         if (previewWorldRoot != null) previewWorldRoot.SetActive(isVisible);
@@ -150,6 +160,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         if (previewCamera != null) previewCamera.enabled = isVisible;
     }
 
+    // 2026.08.10_UI 정리: Rotate 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleRotateInput()
     {
         if (modelRoot == null)
@@ -172,6 +183,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         modelRoot.Rotate(Vector3.up, direction * rotateSpeed * Time.unscaledDeltaTime, Space.World);
     }
 
+    // 2026.08.10_UI 정리: 확대 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleZoomInput()
     {
         if (!isPointerInside)
@@ -186,6 +198,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         currentDistance = Mathf.Clamp(currentDistance, minCameraDistance, maxCameraDistance);
     }
 
+    // 2026.08.10_UI 정리: Pan 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePanInput()
     {
         if (!CanPan())
@@ -210,6 +223,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         currentPanOffset.y = Mathf.Clamp(currentPanOffset.y, -maxPanOffset.y, maxPanOffset.y);
     }
 
+    // 2026.08.10_UI 정리: 계산된 프리뷰 Transform 상태를 화면에 적용한다.
     private void ApplyPreviewTransform()
     {
         if (previewCamera != null)
@@ -228,6 +242,7 @@ public class PauseCharacterPreviewView : MonoBehaviour, IPointerEnterHandler, IP
         }
     }
 
+    // 2026.08.10_UI 정리: Pan 동작이 가능한지 판단한다.
     private bool CanPan()
     {
         if (!isPointerInside)

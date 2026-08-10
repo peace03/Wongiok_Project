@@ -10,13 +10,9 @@ public class PlayerHUDView : UIViewBase
 
     [Header("EXP")]
     [SerializeField] private Image expFillImage;
-    [SerializeField] private Text expText;
 
     [Header("HP")]
     [SerializeField] private Image hpFillImage;
-    [SerializeField] private Text hpText;
-    [SerializeField] private GameObject hpWarningObject;
-    [SerializeField] private float hpWarningRatio = 0.2f;
 
     [Header("Life")]
     [SerializeField] private Image[] lifeIcons;
@@ -48,32 +44,38 @@ public class PlayerHUDView : UIViewBase
     private bool[] previousSkillInitialized;
     private float[] readyFlashTimers;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     protected override void Awake()
     {
         base.Awake();
         SubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 프레임 단위 UI 상태와 입력을 갱신한다.
     private void Update()
     {
         UpdateReadyFlash();
     }
 
+    // 2026.08.10_UI 정리: 화면 표시 시 필요한 UI 상태를 초기화한다.
     protected override void OnShow()
     {
         RefreshAll();
     }
 
+    // 2026.08.10_UI 정리: 화면 숨김 시 임시 UI 상태를 정리한다.
     protected override void OnHide()
     {
         ClearReadyFlashState();
     }
 
+    // 2026.08.10_UI 정리: HUD View 상태를 기본값으로 초기화한다.
     public void ResetHudView()
     {
         currentLevel = 1;
@@ -90,6 +92,7 @@ public class PlayerHUDView : UIViewBase
         RefreshAll();
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UISetPlayerLevelEvent>.action += HandleSetPlayerLevel;
@@ -101,6 +104,7 @@ public class PlayerHUDView : UIViewBase
         EventBus<UIResetEvent>.action += HandleReset;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UISetPlayerLevelEvent>.action -= HandleSetPlayerLevel;
@@ -112,12 +116,14 @@ public class PlayerHUDView : UIViewBase
         EventBus<UIResetEvent>.action -= HandleReset;
     }
 
+    // 2026.08.10_UI 정리: Set 플레이어 레벨 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetPlayerLevel(UISetPlayerLevelEvent eventData)
     {
         currentLevel = Mathf.Max(1, eventData.Level);
         RefreshLevel();
     }
 
+    // 2026.08.10_UI 정리: Set 플레이어 Exp 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetPlayerExp(UISetPlayerExpEvent eventData)
     {
         currentExp = Mathf.Max(0f, eventData.CurrentExp);
@@ -125,6 +131,7 @@ public class PlayerHUDView : UIViewBase
         RefreshExp();
     }
 
+    // 2026.08.10_UI 정리: Set 플레이어 체력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetPlayerHp(UISetPlayerHpEvent eventData)
     {
         maxHp = Mathf.Max(1f, eventData.MaxHp);
@@ -132,6 +139,7 @@ public class PlayerHUDView : UIViewBase
         RefreshHp();
     }
 
+    // 2026.08.10_UI 정리: Set Playerlife 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetPlayerlife(UISetPlayerLifeEvent eventData)
     {
         maxLife = Mathf.Max(0, eventData.MaxLife);
@@ -139,11 +147,13 @@ public class PlayerHUDView : UIViewBase
         RefreshLife();
     }
 
+    // 2026.08.10_UI 정리: Set 플레이어 스킬 슬롯 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetPlayerSkillSlots(UISetPlayerSkillSlotsEvent eventData)
     {
         RefreshSkillSlots(eventData.SkillSlots);
     }
 
+    // 2026.08.10_UI 정리: Set 플레이어 회복 아이템 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetPlayerHealItem(UISetPlayerHealItemEvent eventData)
     {
         maxHealItemCount = Mathf.Max(0, eventData.MaxCount);
@@ -151,11 +161,13 @@ public class PlayerHUDView : UIViewBase
         RefreshHealItem();
     }
 
+    // 2026.08.10_UI 정리: 초기화 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleReset(UIResetEvent eventData)
     {
         ResetHudView();
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 전체 표시를 갱신한다.
     private void RefreshAll()
     {
         RefreshLevel();
@@ -165,11 +177,13 @@ public class PlayerHUDView : UIViewBase
         RefreshHealItem();
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 레벨 표시를 갱신한다.
     private void RefreshLevel()
     {
         SetText(levelText, $"{currentLevel}Lv");
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 Exp 표시를 갱신한다.
     private void RefreshExp()
     {
         float ratio = Mathf.Clamp01(currentExp / requiredExp);
@@ -179,9 +193,9 @@ public class PlayerHUDView : UIViewBase
             expFillImage.fillAmount = ratio;
         }
 
-        SetText(expText, $"{Mathf.FloorToInt(currentExp)} / {Mathf.FloorToInt(requiredExp)}");
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 체력 표시를 갱신한다.
     private void RefreshHp()
     {
         float ratio = Mathf.Clamp01(currentHp / maxHp);
@@ -191,14 +205,9 @@ public class PlayerHUDView : UIViewBase
             hpFillImage.fillAmount = ratio;
         }
 
-        SetText(hpText, $"{Mathf.CeilToInt(currentHp)} / {Mathf.CeilToInt(maxHp)}");
-
-        if (hpWarningObject != null)
-        {
-            hpWarningObject.SetActive(ratio <= hpWarningRatio);
-        }
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 목숨 표시를 갱신한다.
     private void RefreshLife()
     {
         if (lifeIcons == null)
@@ -217,6 +226,7 @@ public class PlayerHUDView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 스킬 슬롯 표시를 갱신한다.
     private void RefreshSkillSlots(UIPlayerSkillSlotData[] skillSlots)
     {
         int slotCount = skillIconImages == null ? 0 : skillIconImages.Length;
@@ -232,6 +242,7 @@ public class PlayerHUDView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 스킬 슬롯 표시를 갱신한다.
     private void RefreshSkillSlot(int index, bool hasData, UIPlayerSkillSlotData slotData)
     {
         if (skillIconImages != null && index < skillIconImages.Length && skillIconImages[index] != null)
@@ -271,6 +282,7 @@ public class PlayerHUDView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 회복 아이템 표시를 갱신한다.
     private void RefreshHealItem()
     {
         if (healItemIconImage != null)
@@ -281,6 +293,7 @@ public class PlayerHUDView : UIViewBase
         SetText(healItemCountText, $"{healItemCount}/{maxHealItemCount}");
     }
 
+    // 2026.08.10_UI 정리: 스킬 준비 상태 처리 상태가 준비되었는지 보장한다.
     private void EnsureSkillReadyState(int slotCount)
     {
         if (previousSkillAvailable != null && previousSkillAvailable.Length == slotCount) return;
@@ -292,6 +305,7 @@ public class PlayerHUDView : UIViewBase
         ClearReadyFlashImage();
     }
 
+    // 2026.08.10_UI 정리: 준비 Flash UI 강조 연출을 시작한다.
     private void TriggerReadyFlash(int index)
     {
         if (readyFlashTimers == null || index >= readyFlashTimers.Length) return;
@@ -306,6 +320,7 @@ public class PlayerHUDView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void UpdateReadyFlash()
     {
         if (readyFlashTimers == null) return;
@@ -333,6 +348,7 @@ public class PlayerHUDView : UIViewBase
         if (!hasChanged) return;
     }
 
+    // 2026.08.10_UI 정리: 준비 Flash 상태 상태를 정리한다.
     private void ClearReadyFlashState()
     {
         if (readyFlashTimers != null)
@@ -344,6 +360,7 @@ public class PlayerHUDView : UIViewBase
         ClearReadyFlashImage();
     }
 
+    // 2026.08.10_UI 정리: 준비 Flash 이미지 상태를 정리한다.
     private void ClearReadyFlashImage()
     {
         if (skillReadyFlashImages == null) return;
@@ -356,6 +373,7 @@ public class PlayerHUDView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 이미지 Alpha 표시 값을 반영한다.
     private void SetImageAlpha(Image targetImage, float alpha)
     {
         if (targetImage == null)
@@ -366,6 +384,7 @@ public class PlayerHUDView : UIViewBase
         targetImage.color = color;
     }
 
+    // 2026.08.10_UI 정리: 텍스트 표시 값을 반영한다.
     private void SetText(Text targetText, string value)
     {
         if (targetText == null)

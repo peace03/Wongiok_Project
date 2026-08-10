@@ -1,13 +1,8 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 // 챕터 클리어 결과 화면 전체를 담당하는 View
 public class GameClearView : UIViewBase
 {
-    [Header("Text")]
-    [SerializeField] private Text titleText;
-    [SerializeField] private Text subtitleText;
-
     [Header("Buttons")]
     // 다음 챕터 진행
     [SerializeField] private CommonButtonView nextChapterButton;
@@ -19,87 +14,92 @@ public class GameClearView : UIViewBase
     // 다음 챕터 존재 여부
     private bool hasNextChapter;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     protected override void Awake()
     {
         base.Awake();
         SubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 화면 표시 시 필요한 UI 상태를 초기화한다.
     protected override void OnShow()
     {
-        RefreshTexts();
         RefreshButtons();
     }
 
+    // 2026.08.10_UI 정리: 화면 숨김 시 임시 UI 상태를 정리한다.
     protected override void OnHide()
     {
         ClearButtons();
     }
 
+    // 2026.08.10_UI 정리: 다음 챕터 Available 표시 값을 반영한다.
     public void SetNextChapterAvailable(bool hasNextChapter)
     {
         this.hasNextChapter = hasNextChapter;
         RefreshButtons();
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UISetChapterClearEvent>.action += HandleSetChapterClear;
         EventBus<UIResetEvent>.action += HandleReset;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UISetChapterClearEvent>.action -= HandleSetChapterClear;
         EventBus<UIResetEvent>.action -= HandleReset;
     }
 
+    // 2026.08.10_UI 정리: Set 챕터 클리어 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetChapterClear(UISetChapterClearEvent eventData)
     {
         SetNextChapterAvailable(eventData.HasNextChapter);
     }
 
+    // 2026.08.10_UI 정리: 초기화 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleReset(UIResetEvent eventData)
     {
         hasNextChapter = false;
         ClearButtons();
     }
 
-    private void RefreshTexts()
-    {
-        SetText(titleText, "Chapter Clear");
-        SetText(subtitleText, "다음 이야기를 선택하세요.");
-    }
-
+    // 2026.08.10_UI 정리: 현재 데이터로 Texts 표시를 갱신한다.
+    // 2026.08.10_UI 정리: 현재 데이터로 Buttons 표시를 갱신한다.
     public void RefreshButtons()
     {
         if (nextChapterButton != null)
         {
             nextChapterButton.Setup(
-                "다음 이야기 읽기",
+                UITextManager.Get("GameClear.Next"),
                 HandleNextChapterClicked);
         }
 
         if (mainMenuButton != null)
         {
             mainMenuButton.Setup(
-                "메인 메뉴",
+                UITextManager.Get("GameClear.MainMenu"),
                 HandleMainMenuClicked);
         }
 
         if (quitGameButton != null)
         {
             quitGameButton.Setup(
-                "게임 종료",
+                UITextManager.Get("GameClear.Quit"),
                 HandleQuitGameClicked);
         }
     }
 
+    // 2026.08.10_UI 정리: Buttons 상태를 정리한다.
     private void ClearButtons()
     {
         if (nextChapterButton != null)
@@ -127,6 +127,7 @@ public class GameClearView : UIViewBase
             new UIChapterClearNextRequestedEvent());
     }
 
+    // 2026.08.10_UI 정리: 메인 메뉴 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleMainMenuClicked()
     {
         EventBus<UIChapterClearMainMenuRequestedEvent>.Publish(
@@ -138,8 +139,8 @@ public class GameClearView : UIViewBase
     {
         EventBus<UIShowConfirmPopupEvent>.Publish(
             new UIShowConfirmPopupEvent(
-                "게임 종료",
-                "게임을 종료하시겠습니까?",
+                UITextManager.Get("GameClear.QuitConfirmTitle"),
+                UITextManager.Get("GameClear.QuitConfirmMessage"),
                 () =>
                 {
                     EventBus<UIChapterClearQuitGameRequestedEvent>.Publish(
@@ -147,11 +148,5 @@ public class GameClearView : UIViewBase
                 }));
     }
 
-    private void SetText(Text targetText, string value)
-    {
-        if (targetText == null)
-            return;
-
-        targetText.text = value;
-    }
+    // 2026.08.10_UI 정리: 텍스트 표시 값을 반영한다.
 }

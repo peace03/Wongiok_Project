@@ -51,6 +51,7 @@ public struct UISetCutsceneEvent
     public string SkipSummary { get; private set; }
     public CutscenePlaybackType PlaybackType { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetCutsceneEvent(
         string cutsceneId,
         VideoClip videoClip,
@@ -69,6 +70,7 @@ public struct UICutsceneSkipRequestedEvent
 {
     public CutsceneSkipInput Input { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UICutsceneSkipRequestedEvent(
         CutsceneSkipInput input = CutsceneSkipInput.Escape)
     {
@@ -103,6 +105,7 @@ public struct UICutsceneFinishedEvent
     public string CutsceneId { get; private set; }
     public bool WasSkipped { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UICutsceneFinishedEvent(string cutsceneId, bool wasSkipped)
     {
         CutsceneId = cutsceneId;
@@ -115,6 +118,7 @@ public struct UIPauseTabMoveRequestedEvent
 {
     public int Direction { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIPauseTabMoveRequestedEvent(int direction)
     {
         Direction = direction;
@@ -144,6 +148,7 @@ public struct UIPauseSkillInfoData
     public bool IsEquipped { get; private set; }
     public bool IsUnlocked { get; private set;  }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIPauseSkillInfoData(
         Sprite icon,
         string skillName,
@@ -176,6 +181,7 @@ public struct UISetPauseStatusEvent
     public UIPauseSkillInfoData[] ActiveSkills { get; private set; }
     public UIPauseSkillInfoData[] PassiveSkills { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetPauseStatusEvent(
         int level,
         float currentExp,
@@ -206,6 +212,7 @@ public struct RefreshUIEvent
     public int[] OwnedSkillOrder { get; private set; }
     public bool IsActiveSkill { get; private set; }
 
+    // 2026.08.10_UI 정리: 이 타입의 초기 상태를 설정한다.
     public RefreshUIEvent(UIPauseSkillInfoData[] equippedSkills, UIPauseSkillInfoData[] ownedSkills,
                                                 int[] ownedSkillOrder = null, bool isActiveSkill = true)
     {
@@ -225,6 +232,7 @@ public struct UISetPauseSkillPageEvent
     public UIPauseSkillInfoData SelectedSkill { get; private set; }
     public bool IsOwnedSkillListUnlocked { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetPauseSkillPageEvent(
         UIPauseSkillInfoData[] equippedActiveSkills,
         UIPauseSkillInfoData[] ownedSkills,
@@ -252,6 +260,7 @@ public struct UILevelUpSkillOptionData
     public string EffectText { get; private set; }
     public bool IsMaxLevel { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UILevelUpSkillOptionData(
         int skillId,
         Sprite icon,
@@ -278,6 +287,7 @@ public struct UISetLevelUpOptionsEvent
 {
     public UILevelUpSkillOptionData[] Options { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetLevelUpOptionsEvent(UILevelUpSkillOptionData[] options)
     {
         Options = options;
@@ -290,6 +300,7 @@ public struct UILevelUpSkillSelectedEvent
     public int OptionIndex { get; private set; }
     public int SkillId { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UILevelUpSkillSelectedEvent(int optionIndex, int skillId)
     {
         OptionIndex = optionIndex;
@@ -304,6 +315,7 @@ public struct UIPauseSkillEquipRequestedEvent
     public int TargetSlotIndex { get; private set; }
     public int SourceOwnedSlotIndex { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIPauseSkillEquipRequestedEvent(int skillId, int targetSlotIndex, int sourceOwnedSlotIndex)
     {
         SkillId = skillId;
@@ -318,6 +330,7 @@ public struct UIPauseSkillSwapRequestedEvent
     public int SourceSlotIndex { get; private set; }
     public int TargetSlotIndex { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIPauseSkillSwapRequestedEvent(int sourceSlotIndex, int targetSlotIndex)
     {
         SourceSlotIndex = sourceSlotIndex;

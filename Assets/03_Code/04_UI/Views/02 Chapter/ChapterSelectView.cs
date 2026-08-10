@@ -12,7 +12,6 @@ public class ChapterSelectView : UIViewBase
     private struct ChapterBinding
     {
         public int chapterId;
-        public string chapterNumber;
         public string chapterName;
         public Sprite titleCardThumbnail;
         public Sprite titleCardBackground;
@@ -56,6 +55,7 @@ public class ChapterSelectView : UIViewBase
 
     private int selectedChapterId = -1;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     protected override void Awake()
     {
         base.Awake();
@@ -63,12 +63,14 @@ public class ChapterSelectView : UIViewBase
         EventBus<UIChapterSelectScrollPreserveRequestedEvent>.action += HandleChapterSelectScrollPreserveRequested;
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         EventBus<UISetChapterProgressEvent>.action -= HandleSetChapterProgress;
         EventBus<UIChapterSelectScrollPreserveRequestedEvent>.action -= HandleChapterSelectScrollPreserveRequested;
     }
 
+    // 2026.08.10_UI 정리: 화면 표시 시 필요한 UI 상태를 초기화한다.
     protected override void OnShow()
     {
         ClearSelection();
@@ -78,6 +80,7 @@ public class ChapterSelectView : UIViewBase
         SetupBackButton();
     }
 
+    // 2026.08.10_UI 정리: 화면 숨김 시 임시 UI 상태를 정리한다.
     protected override void OnHide()
     {
         ClearChapterList();
@@ -93,6 +96,7 @@ public class ChapterSelectView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 챕터 목록 표시를 갱신한다.
     public void RefreshChapterList()
     {
         foreach (ChapterBinding binding in chapterBindings)
@@ -102,8 +106,6 @@ public class ChapterSelectView : UIViewBase
 
             binding.listView.Setup(
                 binding.chapterId,
-                binding.chapterNumber,
-                binding.chapterName,
                 binding.listTitleSprite,
                 binding.listSubNumberSprite,
                 binding.state,
@@ -111,6 +113,7 @@ public class ChapterSelectView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 챕터 목록 Scroll If Needed 상태를 기본값으로 초기화한다.
     private void ResetChapterListScrollIfNeeded()
     {
         if (preserveListPositionOnNextShow)
@@ -127,11 +130,13 @@ public class ChapterSelectView : UIViewBase
         chapterListScrollRect.verticalNormalizedPosition = 1f;
     }
 
+    // 2026.08.10_UI 정리: 챕터 Select Scroll Preserve Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterSelectScrollPreserveRequested(UIChapterSelectScrollPreserveRequestedEvent eventData)
     {
         preserveListPositionOnNextShow = true;
     }
 
+    // 2026.08.10_UI 정리: 챕터 선택 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterSelected(int chapterId)
     {
         selectedChapterId = chapterId;
@@ -160,6 +165,7 @@ public class ChapterSelectView : UIViewBase
         RefreshEnterButton();
     }
 
+    // 2026.08.10_UI 정리: 입장 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleEnterClicked()
     {
         if (selectedChapterId < 0)
@@ -168,11 +174,13 @@ public class ChapterSelectView : UIViewBase
         PublishChapterEnterRequested();
     }
 
+    // 2026.08.10_UI 정리: 뒤로가기 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleBackClicked()
     {
         EventBus<UIChapterBackRequestedEvent>.Publish(default);
     }
 
+    // 2026.08.10_UI 정리: Set 챕터 진행도 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetChapterProgress(UISetChapterProgressEvent eventData)
     {
         for (int i = 0; i < chapterBindings.Count; i++)
@@ -203,6 +211,7 @@ public class ChapterSelectView : UIViewBase
         RefreshChapterList();
     }
 
+    // 2026.08.10_UI 정리: 챕터 입장 Requested 요청 또는 상태를 EventBus로 발행한다.
     private void PublishChapterEnterRequested()
     {
         foreach (ChapterBinding binding in chapterBindings)
@@ -220,22 +229,25 @@ public class ChapterSelectView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 입장 버튼 표시를 갱신한다.
     private void RefreshEnterButton()
     {
         if (enterButton == null)
             return;
 
-        enterButton.Setup("Enter", HandleEnterClicked, selectedChapterId >= 0);
+        enterButton.Setup(UITextManager.Get("Chapter.Enter"), HandleEnterClicked, selectedChapterId >= 0);
     }
 
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 뒤로가기 버튼 상태를 설정한다.
     private void SetupBackButton()
     {
         if (backButton != null)
         {
-            backButton.Setup("Back", HandleBackClicked);
+            backButton.Setup(UITextManager.Get("Chapter.Back"), HandleBackClicked);
         }
     }
 
+    // 2026.08.10_UI 정리: 선택 상태를 정리한다.
     private void ClearSelection()
     {
         if (bossPanel != null) bossPanel.SetActive(false);
@@ -248,6 +260,7 @@ public class ChapterSelectView : UIViewBase
         SetText(bossJobText, string.Empty);
     }
 
+    // 2026.08.10_UI 정리: 챕터 목록 상태를 정리한다.
     private void ClearChapterList()
     {
         foreach (ChapterBinding binding in chapterBindings)
@@ -259,6 +272,7 @@ public class ChapterSelectView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 텍스트 표시 값을 반영한다.
     private void SetText(Text targetText, string value)
     {
         if (targetText == null)
@@ -267,6 +281,7 @@ public class ChapterSelectView : UIViewBase
         targetText.text = value;
     }
 
+    // 2026.08.10_UI 정리: 이미지 표시 값을 반영한다.
     private void SetImage(Image targetImage, Sprite sprite)
     {
         if (targetImage == null)
