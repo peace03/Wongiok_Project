@@ -41,6 +41,9 @@ public class PlayerMovement : MonoBehaviour
     // 수직 속도 중심의 이동 속도입니다. 점프와 중력이 이 값의 y를 갱신합니다.
     private Vector3 velocity;
 
+    // 2.5D 이동 평면에서 플레이어가 유지해야 하는 Z 위치입니다.
+    private float fixedZ;
+
     // 현재 바닥에 닿아 있는지 CharacterController 기준으로 반환합니다.
     public bool IsGrounded => cc.isGrounded;
 
@@ -64,6 +67,7 @@ public class PlayerMovement : MonoBehaviour
         cc = GetComponent<CharacterController>();
         playerStatus = status != null ? status : GetComponent<PlayerStatus>();
         defaultExcludedLayers = cc.excludeLayers;
+        fixedZ = transform.position.z;
 
         // 시작 시점의 바닥 상태를 저장해 첫 중력 처리에서 착지 판정이 꼬이지 않게 합니다.
         wasGrounded = cc.isGrounded;
@@ -99,18 +103,28 @@ public class PlayerMovement : MonoBehaviour
         Vector3 move = new Vector3(input.x, 0f, 0f);
 
         cc.Move(move * moveSpeed * Time.deltaTime);
+        FixDepthPosition();
     }
 
     public void MoveVerticalVelocity()
     {
         // Jump와 ApplyGravity에서 누적한 수직 속도를 실제 위치에 반영합니다.
         cc.Move(velocity * Time.deltaTime);
+        FixDepthPosition();
     }
 
     public void MoveByVelocity(Vector3 moveVelocity)
     {
         // 대쉬처럼 외부에서 계산한 속도를 그대로 적용할 때 사용합니다.
         cc.Move(moveVelocity * Time.deltaTime);
+        FixDepthPosition();
+    }
+
+    private void FixDepthPosition()
+    {
+        Vector3 position = transform.position;
+        position.z = fixedZ;
+        transform.position = position;
     }
 
     public bool CanJump()
