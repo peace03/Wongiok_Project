@@ -19,66 +19,67 @@ public class PauseView : UIViewBase
     [SerializeField] private GameObject skillPageRoot;
     [SerializeField] private GameObject optionPageRoot;
 
-    [Header("Command Buttons")]
-    [SerializeField] private CommonButtonView continueButton;
-
     private PauseTabType currentTab = PauseTabType.Status;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     protected override void Awake()
     {
         base.Awake();
         SubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UIPauseTabMoveRequestedEvent>.action += HandlePauseTabMoveRequested;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UIPauseTabMoveRequestedEvent>.action -= HandlePauseTabMoveRequested;
     }
 
+    // 2026.08.10_UI 정리: 화면 표시 시 필요한 UI 상태를 초기화한다.
     protected override void OnShow()
     {
         SetupButtons();
         ChangeTab(PauseTabType.Status);
     }
 
+    // 2026.08.10_UI 정리: 화면 숨김 시 임시 UI 상태를 정리한다.
     protected override void OnHide()
     {
         ClearButtons();
     }
     
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 Buttons 상태를 설정한다.
     private void SetupButtons()
     {
         if (statusTabButton != null)
         {
-            statusTabButton.Setup("STATUS", HandleStatusTabClicked);
+            statusTabButton.Setup(UITextManager.Get("Pause.StatusTab"), HandleStatusTabClicked);
         }
 
         if (skillTabButton != null)
         {
-            skillTabButton.Setup("SKILL", HandleSkillTabClicked);
+            skillTabButton.Setup(UITextManager.Get("Pause.SkillTab"), HandleSkillTabClicked);
         }
 
         if (optionTabButton != null)
         {
-            optionTabButton.Setup("OPTION", HandleOptionTabClicked);
+            optionTabButton.Setup(UITextManager.Get("Pause.OptionTab"), HandleOptionTabClicked);
         }
 
-        if (continueButton != null)
-        {
-            continueButton.Setup("계속하기", HandleContinueClicked);
-        }
     }
 
+    // 2026.08.10_UI 정리: Buttons 상태를 정리한다.
     private void ClearButtons()
     {
         if (statusTabButton != null)
@@ -96,12 +97,9 @@ public class PauseView : UIViewBase
             optionTabButton.Clear();
         }
 
-        if (continueButton != null)
-        {
-            continueButton.Clear();
-        }
     }
 
+    // 2026.08.10_UI 정리: 일시정지 탭 Move Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePauseTabMoveRequested(UIPauseTabMoveRequestedEvent eventData)
     {
         if (!IsVisible)
@@ -110,6 +108,7 @@ public class PauseView : UIViewBase
         MoveTab(eventData.Direction);
     }
 
+    // 2026.08.10_UI 정리: 탭 상태를 이동한다.
     private void MoveTab(int direction)
     {
         int currentIndex = (int)currentTab;
@@ -121,27 +120,25 @@ public class PauseView : UIViewBase
         ChangeTab((PauseTabType)nextIndex);
     }
 
+    // 2026.08.10_UI 정리: 전체현황 탭 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleStatusTabClicked()
     {
         ChangeTab(PauseTabType.Status);
     }
 
+    // 2026.08.10_UI 정리: 스킬 탭 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSkillTabClicked()
     {
         ChangeTab(PauseTabType.Skill);
     }
 
+    // 2026.08.10_UI 정리: 옵션 탭 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleOptionTabClicked()
     {
         ChangeTab(PauseTabType.Option);
     }
 
-    private void HandleContinueClicked()
-    {
-        EventBus<UICloseOverlayEvent>.Publish(
-            new UICloseOverlayEvent(UIOverlayState.Pause));
-    }
-
+    // 2026.08.10_UI 정리: 탭 상태로 전환한다.
     private void ChangeTab(PauseTabType nextTab)
     {
         currentTab = nextTab;
@@ -151,6 +148,7 @@ public class PauseView : UIViewBase
         SetPageActive(optionPageRoot, currentTab == PauseTabType.Option);
     }
 
+    // 2026.08.10_UI 정리: 페이지 액티브 표시 값을 반영한다.
     private void SetPageActive(GameObject pageRoot, bool isActive)
     {
         if (pageRoot == null)

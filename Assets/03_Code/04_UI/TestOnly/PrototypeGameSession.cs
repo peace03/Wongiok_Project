@@ -10,6 +10,7 @@ public struct PrototypeSkillState
     public int Level;
     public int SlotIndex;
 
+    // 2026.08.10_UI 정리: 테스트용 보유 스킬 진행 상태를 초기화한다.
     public PrototypeSkillState(int skillId, int level, int slotIndex)
     {
         SkillId = skillId;
@@ -29,6 +30,7 @@ public sealed class PrototypeProgressSnapshot
     public PrototypeSkillState[] Skills;
     public int[] OwnedSkillOrder;
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public PrototypeProgressSnapshot Clone()
     {
         return new PrototypeProgressSnapshot
@@ -61,11 +63,13 @@ public static class PrototypeGameSession
     private static bool skipPrologueOnNextLobbyEnter;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    // 2026.08.10_UI 정리: Static 상태를 기본값으로 초기화한다.
     private static void ResetStatic()
     {
         ResetAll();
     }
 
+    // 2026.08.10_UI 정리: Initialized 처리 상태가 준비되었는지 보장한다.
     public static void EnsureInitialized()
     {
         if (committedSnapshot != null) return;
@@ -73,6 +77,7 @@ public static class PrototypeGameSession
         ResetAll();
     }
 
+    // 2026.08.10_UI 정리: 전체 상태를 기본값으로 초기화한다.
     public static void ResetAll()
     {
         HighestClearedChapterId = 0;
@@ -105,6 +110,7 @@ public static class PrototypeGameSession
         chapterStartSnapshot = committedSnapshot.Clone();
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public static void StartNewGame()
     {
         ResetAll();
@@ -121,6 +127,7 @@ public static class PrototypeGameSession
         UserSaveFileStore.ClearCheckpoint();
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public static void BeginChapter(int chapterId)
     {
         EnsureInitialized();
@@ -131,22 +138,26 @@ public static class PrototypeGameSession
         chapterStartSnapshot = committedSnapshot.Clone();
     }
 
+    // 2026.08.10_UI 정리: 현재 챕터 Start 값을 반환한다.
     public static PrototypeProgressSnapshot GetChapterStart()
     {
         EnsureInitialized();
         return chapterStartSnapshot.Clone();
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public static void SaveCheckpoint(PrototypeProgressSnapshot snapshot)
     {
         checkpointSnapshot = snapshot?.Clone();
     }
 
+    // 2026.08.10_UI 정리: Checkpoint 상태를 정리한다.
     public static void ClearCheckpoint()
     {
         checkpointSnapshot = null;
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public static void CommitChapterClear(
         int chapterId, PrototypeProgressSnapshot currentProgress)
     {
@@ -180,12 +191,14 @@ public static class PrototypeGameSession
         checkpointSnapshot = null;
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public static void PrepareNextChapter(int chapterId)
     {
         BeginChapter(chapterId);
         pendingTitleCardChapterId = chapterId;
     }
 
+    // 2026.08.10_UI 정리: Consume Pending 타이틀 카드 동작을 시도한다.
     public static bool TryConsumePendingTitleCard(out int chapterId)
     {
         chapterId = pendingTitleCardChapterId;
@@ -193,6 +206,7 @@ public static class PrototypeGameSession
         return chapterId >= 0;
     }
 
+    // 2026.08.10_UI 정리: Consume Skip 프롤로그 On 다음 Lobby 입장 동작을 시도한다.
     public static bool TryConsumeSkipPrologueOnNextLobbyEnter()
     {
         bool shouldSkipPrologue = skipPrologueOnNextLobbyEnter;
@@ -201,6 +215,7 @@ public static class PrototypeGameSession
         return shouldSkipPrologue;
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public static void ReturnToMainMenu()
     {
         checkpointSnapshot = null;
@@ -209,6 +224,7 @@ public static class PrototypeGameSession
         skipPrologueOnNextLobbyEnter = true;
     }
 
+    // 2026.08.10_UI 정리: 표시 목록에 Unlocked 스킬 항목을 추가한다.
     private static void AddUnlockedSkill(
         List<PrototypeSkillState> skills,
         int skillId)

@@ -70,12 +70,14 @@ public class PauseSkillInfoView : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 상세 Visible 표시 값을 반영한다.
     public void SetDetailVisible(bool visible)
     {
         SetTextVisible(nameText, visible);
         SetTextVisible(descriptionText, visible);
     }
 
+    // 2026.08.10_UI 정리: 텍스트 Visible 표시 값을 반영한다.
     private void SetTextVisible(Text targetText, bool visible)
     {
         if (targetText == null) return;

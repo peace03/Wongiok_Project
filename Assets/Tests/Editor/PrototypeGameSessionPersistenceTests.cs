@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using UnityEngine;
 
 // 2026.08.07_psb수정
 public class PrototypeGameSessionPersistenceTests
@@ -67,6 +68,38 @@ public class PrototypeGameSessionPersistenceTests
         resetAll.Invoke(null, null);
 
         Assert.That((bool)hasSaveData.GetValue(null), Is.True);
+    }
+
+    [Test]
+    public void UITextCatalog_ReturnsTextRegisteredForItsKey()
+    {
+        Type catalogType = FindType("UITextCatalog");
+        Type entryType = FindType("UITextEntry");
+
+        Assert.That(catalogType, Is.Not.Null);
+        Assert.That(entryType, Is.Not.Null);
+
+        ScriptableObject catalog = ScriptableObject.CreateInstance(catalogType);
+        object entry = Activator.CreateInstance(entryType);
+
+        entryType.GetField("key", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(entry, "Common.Confirm");
+        entryType.GetField("text", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(entry, "확인");
+
+        Array entries = Array.CreateInstance(entryType, 1);
+        entries.SetValue(entry, 0);
+
+        catalogType.GetField("entries", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(catalog, entries);
+
+        MethodInfo tryGet = catalogType.GetMethod("TryGet");
+        object[] arguments = { "Common.Confirm", null };
+
+        bool found = (bool)tryGet.Invoke(catalog, arguments);
+
+        Assert.That(found, Is.True);
+        Assert.That(arguments[1], Is.EqualTo("확인"));
     }
 
     private static Type FindType(string typeName)

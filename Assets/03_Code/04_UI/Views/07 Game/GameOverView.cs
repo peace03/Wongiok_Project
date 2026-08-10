@@ -1,12 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameOverView : UIViewBase
 {
-    [Header("Text")]
-    [SerializeField] private Text titleText;
-    [SerializeField] private Text subtitleText;
-
     [Header("Buttons")]
     [SerializeField] private CommonButtonView restartChpaterButton;
     [SerializeField] private CommonButtonView loadCheckpointButton;
@@ -16,23 +11,26 @@ public class GameOverView : UIViewBase
     private bool hasCheckpoint;
     private bool hasRemainingLife;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     protected override void Awake()
     {
         base.Awake();
         SubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 화면 표시 시 필요한 UI 상태를 초기화한다.
     protected override void OnShow()
     {
-        RefreshTexts();
         RefreshButtons();
     }
 
+    // 2026.08.10_UI 정리: 화면 숨김 시 임시 UI 상태를 정리한다.
     protected override void OnHide()
     {
         ClearButtons();
@@ -48,12 +46,14 @@ public class GameOverView : UIViewBase
         RefreshButtons();
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UISetGameOverEvent>.action += HandleSetGameOver;
         EventBus<UIResetEvent>.action += HandleReset;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UISetGameOverEvent>.action -= HandleSetGameOver;
@@ -77,26 +77,20 @@ public class GameOverView : UIViewBase
     }
 
     // 게임 오버 화면의 고정 문구를 설정
-    private void RefreshTexts()
-    {
-        SetText(titleText, "Game Over");
-        SetText(subtitleText, "다시 읽을 방법을 선택하세요.");
-    }
-
     // 버튼 문구, 클릭 콜백, 활성 상태를 현재 상태에 맞게 다시 설정
     public void RefreshButtons()
     {
         if (restartChpaterButton != null)
         {
             restartChpaterButton.Setup(
-                "처음부터 다시 읽기",
+                UITextManager.Get("GameOver.Restart"),
                 HandleRestartChapterClicked);
         }
 
         if (loadCheckpointButton != null)
         {
             loadCheckpointButton.Setup(
-                "책갈피부터 다시 읽기",
+                UITextManager.Get("GameOver.LoadCheckpoint"),
                 HandleLoadCheckpointClicked,
                 hasCheckpoint);
         }
@@ -104,7 +98,7 @@ public class GameOverView : UIViewBase
         if (mainMenuButton != null)
         {
             mainMenuButton.Setup(
-                "메인 화면으로 돌아가기",
+                UITextManager.Get("GameOver.MainMenu"),
                 HandleMainMenuClicked);
         }
     }
@@ -133,8 +127,8 @@ public class GameOverView : UIViewBase
     {
         EventBus<UIShowConfirmPopupEvent>.Publish(
             new UIShowConfirmPopupEvent(
-                "처음부터 다시 읽기",
-                "현재 챕터의 진행 상황을 초기화하고 처음부터 다시 시작하시겠습니까?",
+                UITextManager.Get("GameOver.RestartConfirmTitle"),
+                UITextManager.Get("GameOver.RestartConfirmMessage"),
                 () =>
                 {
                     EventBus<UIGameOverRestartChapterRequestedEvent>.Publish(
@@ -151,8 +145,8 @@ public class GameOverView : UIViewBase
         {
             EventBus<UIShowAlertPopupEvent>.Publish(
                 new UIShowAlertPopupEvent(
-                    "알림",
-                    "모든 목숨을 소진했습니다."));
+                    UITextManager.Get("Common.NoticeTitle"),
+                    UITextManager.Get("GameOver.LifeDepletedMessage")));
             return;
         }
 
@@ -167,11 +161,5 @@ public class GameOverView : UIViewBase
             new UIGameOverMainMenuRequestedEvent());
     }
 
-    private void SetText(Text targetText, string value)
-    {
-        if (targetText == null)
-            return;
-
-        targetText.text = value;
-    }
+    // 2026.08.10_UI 정리: 텍스트 표시 값을 반영한다.
 }
