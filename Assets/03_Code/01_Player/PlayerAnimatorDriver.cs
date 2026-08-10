@@ -61,6 +61,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private float skillStartAnimDuration = 0f;
 
     public float SkillStartAnimDuration => skillStartAnimDuration;
+    public bool IsPlayingSkillAnimation => skillCoroutine != null;
 
     private void Awake()
     {

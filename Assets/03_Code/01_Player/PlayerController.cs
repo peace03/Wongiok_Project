@@ -275,13 +275,14 @@ public class PlayerController : MonoBehaviour
     private void PlayerInput()
     {
         // 입력 전용 컴포넌트에서 현재 프레임 입력 값을 읽어 상태들이 사용할 수 있게 저장합니다.
-        MoveInput = _inputReader.MoveInput;
-        JumpTriggered = _inputReader.JumpTriggered
-            && !isSkillExecuting
-            && !isSkillEffectExecuting;
+        bool isMovementLocked = animationDriver != null
+            && animationDriver.IsPlayingSkillAnimation;
+
+        MoveInput = isMovementLocked ? Vector2.zero : _inputReader.MoveInput;
+        JumpTriggered = _inputReader.JumpTriggered && !isMovementLocked;
         IsJumping = _inputReader.IsJumping;
         AttackTriggered = _inputReader.AttackTriggered;
-        DashTriggered = _inputReader.DashTriggered;
+        DashTriggered = _inputReader.DashTriggered && !isMovementLocked;
         ParryTriggered = _inputReader.ParryTriggered;
         UseHealItemTriggered = _inputReader.UseHealItemTriggered;
     }
