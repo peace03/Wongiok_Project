@@ -150,7 +150,7 @@ public class CutsceneView : UIViewBase
         {
             // 2026.08.07_psb수정
             // 스킵 직후 VideoPlayer를 멈추지 않고, 검은 Fader가 덮인 뒤 종료한다.
-            StartCoroutine(FinishPrologueAfterFadeOut());
+            StartCoroutine(FinishPrologueAfterFadeOut(true));
             return;
         }
 
@@ -314,7 +314,7 @@ public class CutsceneView : UIViewBase
 
     // 2026.08.07_psb수정
     // 프롤로그 스킵 시 빈 RenderTexture가 드러나지 않도록 페이드 아웃 완료 후 영상을 종료한다.
-    private IEnumerator FinishPrologueAfterFadeOut()
+    private IEnumerator FinishPrologueAfterFadeOut(bool wasSkipped)
     {
         if (isTransitionFinishing || isFinished)
             yield break;
@@ -334,7 +334,7 @@ public class CutsceneView : UIViewBase
         yield return new WaitUntil(() => isFadeOutFinished);
 
         isTransitionFinishing = false;
-        FinishedCutscene(true);
+        FinishedCutscene(wasSkipped);
     }
 
     // VideoPlayer의 자연 종료를 재생 유형별 완료 단계로 전달합니다.
@@ -350,6 +350,13 @@ public class CutsceneView : UIViewBase
         if (currentPlaybackType == CutscenePlaybackType.BossClear)
         {
             FinishBossClearCutscene(false);
+            return;
+        }
+
+        if (currentCutsceneId == "prologue")
+        {
+            // 2026.08.10_프롤로그 자연 종료도 영상 출력 유지 후 검은 화면으로 전환한다.
+            StartCoroutine(FinishPrologueAfterFadeOut(false));
             return;
         }
 
