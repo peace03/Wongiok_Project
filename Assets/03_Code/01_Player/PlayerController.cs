@@ -276,7 +276,9 @@ public class PlayerController : MonoBehaviour
     {
         // 입력 전용 컴포넌트에서 현재 프레임 입력 값을 읽어 상태들이 사용할 수 있게 저장합니다.
         MoveInput = _inputReader.MoveInput;
-        JumpTriggered = _inputReader.JumpTriggered;
+        JumpTriggered = _inputReader.JumpTriggered
+            && !isSkillExecuting
+            && !isSkillEffectExecuting;
         IsJumping = _inputReader.IsJumping;
         AttackTriggered = _inputReader.AttackTriggered;
         DashTriggered = _inputReader.DashTriggered;
