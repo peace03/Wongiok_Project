@@ -110,8 +110,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
         }
 
         // 액티브 스킬 새로고침 이벤트 발행
-        EventBus<RefreshUIEvent>.Publish(new RefreshUIEvent(equippedSkillUIDatas.ToArray(),
-                                                                unequippedSkillUIDatas.ToArray()));
+        EventBus<RefreshUIEvent>.Publish(new(equippedSkillUIDatas.ToArray(), unequippedSkillUIDatas.ToArray()));
     }
 
     /// <summary>
@@ -147,12 +146,12 @@ public class SkillSystemPresenter : ISkillSystemProvider
         // 스킬 객체가 있고 데이터가 있다면
         if (skill != null && skill.BaseData != null)
             // 일시정지 UI 데이터로 변환 후, 데이터들 리스트에 저장
-            datas.Add(new UIPauseSkillInfoData(skill.BaseData.Icon, skill.BaseData.SkillName,
-                                skill.CurLevel, skill.BaseData.Desc, skill.IsEquipped, skill.BaseData.Id));
+            datas.Add(new(skill.BaseData.Icon, skill.BaseData.SkillName, skill.CurLevel,
+                                                skill.BaseData.Desc, skill.IsEquipped, skill.BaseData.Id));
         // 스킬이 없다면
         else
             // 일시정지 UI 데이터의 기본값을 데이터들 리스트에 저장
-            datas.Add(new UIPauseSkillInfoData(null, "", 0, "", false));
+            datas.Add(new(null, "", 0, "", false));
     }
 
     /// <summary>
@@ -188,12 +187,11 @@ public class SkillSystemPresenter : ISkillSystemProvider
         // 스킬 데이터가 있다면
         if (skill != null)
             // 일시정지 UI 데이터로 변환 후, 데이터들 리스트에 저장
-            datas.Add(new UIPauseSkillInfoData(skill.Icon, skill.SkillName, 1, skill.Desc, false,
-                                                                                        skill.Id, false));
+            datas.Add(new(skill.Icon, skill.SkillName, 1, skill.Desc, false, skill.Id, false));
         // 스킬이 없다면
         else
             // 일시정지 UI 데이터의 기본값을 데이터들 리스트에 저장
-            datas.Add(new UIPauseSkillInfoData(null, "", 0, "", false));
+            datas.Add(new(null, "", 0, "", false));
     }
 
     /// <summary>
@@ -215,9 +213,8 @@ public class SkillSystemPresenter : ISkillSystemProvider
         // 미장착한 스킬 UI 데이터 초기화
         unequippedSkillUIDatas.Clear();
         // 패시브 스킬 새로고침 이벤트 발행
-        EventBus<RefreshUIEvent>.Publish(new RefreshUIEvent(equippedSkillUIDatas.ToArray(),
-                                                                unequippedSkillUIDatas.ToArray(),
-                                                                isActiveSkill: false));
+        EventBus<RefreshUIEvent>.Publish(new(equippedSkillUIDatas.ToArray(),
+                                                    unequippedSkillUIDatas.ToArray(), isActiveSkill: false));
     }
 
     public void GetCanEnhanceSkillUIDatas(List<UIPauseSkillInfoData> results)

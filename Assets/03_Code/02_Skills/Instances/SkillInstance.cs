@@ -207,6 +207,7 @@ public class SkillInstance
 
         // 현재 상태 바꾸기
         state = change;
+        #region 플레이어 쪽에서 추가한 로직
         bool isUsingSkill = IsActiveSkill && (IsCharging || IsExecuting);
 
         if (wasUsingSkill != isUsingSkill)
@@ -214,6 +215,7 @@ public class SkillInstance
             EventBus<PlayerSkillExecutionChangedEvent>.Publish(
                 new PlayerSkillExecutionChangedEvent(isUsingSkill));
         }
+        #endregion
 
         Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
 
@@ -234,7 +236,7 @@ public class SkillInstance
             // 차징 시간이 있는 스킬이라면 ? 히트 스탑 프레임을 현재 프레임의 3/4 : 즉발 스킬이라면 현재 프레임의 절반
             int hitStopFrame = data.GetMaxChargingTime(curLevel) > 0f ? (curFps / 4) * 3 : curFps / 2;
             // 스킬 시작 히트 스탑 이벤트 발행
-            EventBus<HitStopEvent>.Publish(new HitStopEvent(hitStopFrame, TimeEffectSource.Skill,
+            EventBus<HitStopEvent>.Publish(new(hitStopFrame, TimeEffectSource.Skill,
                                                 TimeEffectPriority.Medium, TimeEffectGroups.CombatFeel));
             // 현재 지속 시간 초기화
             curDuration = 0f;

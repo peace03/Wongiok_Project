@@ -47,17 +47,17 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         // A키를 눌렀다면
         if (ownerInput.SkillAPressed)
             // A키 누름 이벤트 발행
-            EventBus<StartedPressSkillSlot>.Publish(new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.A));
+            EventBus<StartedPressSkillSlot>.Publish(new(ACTIVE_SKILL_SLOT_TYPE.A));
 
         // S키를 눌렀다면
         if (ownerInput.SkillSPressed)
             // S키 누름 이벤트 발행
-            EventBus<StartedPressSkillSlot>.Publish(new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.S));
+            EventBus<StartedPressSkillSlot>.Publish(new(ACTIVE_SKILL_SLOT_TYPE.S));
 
         // D키를 눌렀다면
         if (ownerInput.SkillDPressed)
             // D키 누름 이벤트 발행
-            EventBus<StartedPressSkillSlot>.Publish(new StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE.D));
+            EventBus<StartedPressSkillSlot>.Publish(new(ACTIVE_SKILL_SLOT_TYPE.D));
 
         // 프레젠터가 없다면
         if (presenter == null)

@@ -108,7 +108,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         projectileDelayTimeValue = levelData.MaxDuration / (levelData.ProjectileCount == 0 ?
                                                                     1 : levelData.ProjectileCount);
         // 발사체 스킬 딜레이 저장하기
-        projectileDelayTime = new WaitForSeconds(projectileDelayTimeValue);
+        projectileDelayTime = new(projectileDelayTimeValue);
 
         // 소유자 애니메이터 시스템이 있다면
         if (ownerAnimatorDriver != null)
@@ -217,7 +217,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 발사체 스킬 딜레이 시간량이 있다면(지속 시간이 있었다면)
         if (projectileDelayTimeValue > 0f)
             // 스킬 종료 히트 스탑 이벤트 발행(현재 프레임의 3/4)
-            EventBus<HitStopEvent>.Publish(new HitStopEvent((curFps / 4) * 3, TimeEffectSource.Skill,
+            EventBus<HitStopEvent>.Publish(new((curFps / 4) * 3, TimeEffectSource.Skill,
                                                 TimeEffectPriority.Medium, TimeEffectGroups.CombatFeel));
         
         // 실행 위치들 초기화
@@ -323,7 +323,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 총알 이펙트 리스트 초기화
         activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
         // 무기 외형 착용 해제 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState(executingSkillId, false));
+        EventBus<ChangeWeaponState>.Publish(new(executingSkillId, false));
 
         // 소유자 애니메이터 시스템이 없다면
         if (ownerAnimatorDriver == null)
@@ -337,6 +337,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         executingSkillId = -1;
     }
 
+    #region 플레이어 쪽에서 추가한 함수
     private void SetExecutingSkill(bool isExecuting)
     {
         if (executingSkill == isExecuting)
@@ -346,6 +347,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(
             new PlayerSkillEffectExecutionChangedEvent(isExecuting));
     }
+    #endregion
 
     /// <summary>
     /// 범위 스킬 실행 함수
