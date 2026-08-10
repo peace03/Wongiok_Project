@@ -64,11 +64,13 @@ public class PauseSkillPageView : MonoBehaviour
     // 선택 스킬 상세 데이터
     private UIPauseSkillInfoData currentSelectedSkill;
 
+    // 2026.08.10_UI 정리: 컴포넌트 초기화와 이벤트 구독을 준비한다.
     private void Awake()
     {        
         SubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 활성화 시 필요한 UI 상태와 이벤트 구독을 준비한다.
     private void OnEnable()
     {
         SetupCharacterPreviewButtons();
@@ -80,17 +82,20 @@ public class PauseSkillPageView : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 비활성화 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDisable()
     {
         ClearCharacterPreviewButtons();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         ClearCharacterPreviewButtons();
         UnsubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UISetPauseSkillPageEvent>.action += HandleSetPauseSkillPage;
@@ -98,6 +103,7 @@ public class PauseSkillPageView : MonoBehaviour
         EventBus<UIResetEvent>.action += HandleReset;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UISetPauseSkillPageEvent>.action -= HandleSetPauseSkillPage;
@@ -128,11 +134,13 @@ public class PauseSkillPageView : MonoBehaviour
         RefreshAll();
     }
 
+    // 2026.08.10_UI 정리: 초기화 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleReset(UIResetEvent eventData)
     {
         ResetSkillPage();
     }
 
+    // 2026.08.10_UI 정리: 스킬 페이지 상태를 기본값으로 초기화한다.
     private void ResetSkillPage()
     {
         currentEquippedActiveSkills = null;
@@ -144,6 +152,7 @@ public class PauseSkillPageView : MonoBehaviour
         RefreshAll();
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 전체 표시를 갱신한다.
     private void RefreshAll()
     {
         RefreshEquippedActiveSkills();
@@ -153,6 +162,7 @@ public class PauseSkillPageView : MonoBehaviour
         HideHoverPreview();
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 보유 스킬 Lock 표시를 갱신한다.
     private void RefreshOwnedSkillLock()
     {
         bool isLocked = !isOwnedSkillListUnlocked;
@@ -168,10 +178,11 @@ public class PauseSkillPageView : MonoBehaviour
     {
         if (characterPreviewResetButton != null)
         {
-            characterPreviewResetButton.Setup("리셋", HandleCharacterPreviewResetClicked);
+            characterPreviewResetButton.Setup(UITextManager.Get("Pause.Reset"), HandleCharacterPreviewResetClicked);
         }
     }
 
+    // 2026.08.10_UI 정리: 캐릭터 프리뷰 Buttons 상태를 정리한다.
     private void ClearCharacterPreviewButtons()
     {
         if (characterPreviewResetButton != null)
@@ -180,6 +191,7 @@ public class PauseSkillPageView : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 캐릭터 프리뷰 초기화 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleCharacterPreviewResetClicked()
     {
         if (characterPreviewView != null)
@@ -196,6 +208,7 @@ public class PauseSkillPageView : MonoBehaviour
         RefreshDropSlots();
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 장착 스킬 Views 표시를 갱신한다.
     private void RefreshEquippedSkillViews()
     {
         if (equippedActiveSkillViews == null)
@@ -285,6 +298,7 @@ public class PauseSkillPageView : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 필요한 Locked Placeholder 데이터 데이터를 생성한다.
     private UIPauseSkillInfoData CreateLockedPlaceholderData()
     {
         return new UIPauseSkillInfoData(
@@ -308,6 +322,7 @@ public class PauseSkillPageView : MonoBehaviour
         selectedSkillDetailView.gameObject.SetActive(false);
     }
 
+    // 2026.08.10_UI 정리: 호버 프리뷰 UI 요소를 표시한다.
     public void ShowHoverPreview(UIPauseSkillInfoData skillData)
     {
         if (skillData.SkillId < 0)
@@ -326,6 +341,7 @@ public class PauseSkillPageView : MonoBehaviour
         SetHoverText(hoverSkillDescriptionText, BuildSkillEffectDescription(skillData.SkillId, skillData.Level));
     }
 
+    // 2026.08.10_UI 정리: 호버 프리뷰 UI 요소를 숨긴다.
     public void HideHoverPreview()
     {
         if (hoverPreviewRoot != null)
@@ -334,6 +350,7 @@ public class PauseSkillPageView : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 호버 텍스트 표시 값을 반영한다.
     private void SetHoverText(Text targetText, string value)
     {
         if (targetText == null) return;
@@ -341,6 +358,7 @@ public class PauseSkillPageView : MonoBehaviour
         targetText.text = value;
     }
 
+    // 2026.08.10_UI 정리:  사용할 데이터를 생성한다.
     private string BuildSkillEffectDescription(int skillId, int level)
     {
         BaseSkillData[] skillDatas = Resources.LoadAll<BaseSkillData>("Datas/Skills");
@@ -367,6 +385,7 @@ public class PauseSkillPageView : MonoBehaviour
         return string.Empty;
     }
 
+    // 2026.08.10_UI 정리:  사용할 데이터를 생성한다.
     private string BuildActiveSkillEffectDescription(ActiveSkillData skillData, int level)
     {
         ActiveSkillLevelData levelData = skillData.GetLevelData(level);
@@ -405,6 +424,7 @@ public class PauseSkillPageView : MonoBehaviour
         return string.Join("\n", lines);
     }
 
+    // 2026.08.10_UI 정리:  사용할 데이터를 생성한다.
     private string BuildPassiveSkillEffectDescription(PassiveSkillData skillData, int level)
     {
         PassiveSkillLevelData levelData = skillData.GetLevelData(level);
@@ -427,6 +447,7 @@ public class PauseSkillPageView : MonoBehaviour
         return string.Join("\n", lines);
     }
 
+    // 2026.08.10_UI 정리: 표시 목록에 범위 스킬 효과 Lines 항목을 추가한다.
     private void AddAreaSkillEffectLines(List<string> lines, AreaSkillLevelData areaData)
     {
         if (areaData.Stages == null || areaData.Stages.Count == 0) return;
@@ -480,6 +501,7 @@ public class PauseSkillPageView : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 표시 목록에 효과 Line 항목을 추가한다.
     private void AddEffectLine(List<string> lines, string label, string value)
     {
         if (string.IsNullOrEmpty(value)) return;
@@ -487,6 +509,7 @@ public class PauseSkillPageView : MonoBehaviour
         lines.Add($"{label}: {value}");
     }
 
+    // 2026.08.10_UI 정리: 표시 목록에 효과 Number Line 항목을 추가한다.
     private void AddEffectNumberLine(List<string> lines, string label, float value)
     {
         if (value <= 0f) return;
@@ -494,6 +517,7 @@ public class PauseSkillPageView : MonoBehaviour
         AddEffectLine(lines, label, FormatEffectNumber(value));
     }
 
+    // 2026.08.10_UI 정리: 표시 목록에 효과 Seconds Line 항목을 추가한다.
     private void AddEffectSecondsLine(List<string> lines, string label, float value)
     {
         if (value <= 0f) return;
@@ -501,11 +525,13 @@ public class PauseSkillPageView : MonoBehaviour
         AddEffectLine(lines, label, $"{FormatEffectNumber(value)}초");
     }
 
+    // 2026.08.10_UI 정리: 효과 Number 값을 UI 문구 형식으로 변환한다.
     private string FormatEffectNumber(float value)
     {
         return value.ToString("0.##");
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 장착 드래그 Items 표시를 갱신한다.
     private void RefreshEquippedDragItems()
     {
         if (equippedActiveDragItems == null)
@@ -530,6 +556,7 @@ public class PauseSkillPageView : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 드롭 슬롯 표시를 갱신한다.
     private void RefreshDropSlots()
     {
         if (equippedSlotDropViews == null)

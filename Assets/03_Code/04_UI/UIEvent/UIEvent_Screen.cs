@@ -6,6 +6,7 @@ public struct UISetTitleSaveStateEvent
 {
     public bool HasSaveFile { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetTitleSaveStateEvent(bool hasSaveFile)
     {
         HasSaveFile = hasSaveFile;
@@ -38,6 +39,7 @@ public struct UIChapterEnterRequestedEvent
     public Sprite Thumbnail { get; private set; }
     public Sprite Background { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIChapterEnterRequestedEvent(int chapterId, Sprite thumbnail, Sprite background)
     {
         ChapterId = chapterId;
@@ -56,26 +58,18 @@ public struct UIChapterBackRequestedEvent
 public struct UISetChapterTitleCardEvent
 {
     public int ChapterId { get; private set; }
-    public string Title { get; private set; }
-    public string Subtitle { get; private set; }
-    public string Description { get; private set; }
     public Sprite Thumbnail { get; private set; }
     public Sprite Background { get; private set; }
     public VideoClip LoadingVideoClip { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetChapterTitleCardEvent(
         int chapterId,
-        string title,
-        string subtitle,
-        string description,
         Sprite thumbnail,
         Sprite background,
         VideoClip loadingVideoClip)
     {
         ChapterId = chapterId;
-        Title = title;
-        Subtitle = subtitle;
-        Description = description;
         Thumbnail = thumbnail;
         Background = background;
         LoadingVideoClip = loadingVideoClip;
@@ -87,6 +81,7 @@ public struct UIChapterTitleCardContinueRequestedEvent
 {
     public int ChapterId { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIChapterTitleCardContinueRequestedEvent(int chapterId)
     {
         ChapterId = chapterId;
@@ -103,6 +98,7 @@ public struct UIChapterTitleCardLoadingReadyEvent
 {
     public int ChapterId { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIChapterTitleCardLoadingReadyEvent(int chapterId)
     {
         ChapterId = chapterId;
@@ -117,6 +113,7 @@ public struct UIChapterTitleCardActivateSceneRequestedEvent
 {
     public int ChapterId { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIChapterTitleCardActivateSceneRequestedEvent(int chapterId)
     {
         ChapterId = chapterId;
@@ -159,6 +156,7 @@ public struct UISetGameOverEvent
     public bool CanLoadCheckpoint =>
         HasCheckpoint && HasRemainingLife;
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetGameOverEvent(
         bool hasCheckpoint,
         bool hasRemainingLife)
@@ -191,6 +189,7 @@ public struct UISetChapterClearEvent
 {
     public bool HasNextChapter { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetChapterClearEvent(bool hasNextChapter)
     {
         HasNextChapter = hasNextChapter;
@@ -220,6 +219,7 @@ public struct UISetChapterProgressEvent
 {
     public int HighestClearedChapterId { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetChapterProgressEvent(int highestClearedChapterId)
     {
         HighestClearedChapterId = highestClearedChapterId;

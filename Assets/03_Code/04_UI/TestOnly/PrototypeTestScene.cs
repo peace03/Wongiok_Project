@@ -26,6 +26,7 @@ public class PrototypeTestScene : MonoBehaviour
     private float[] skillCooldownRemaining = new float[3];
     private float[] skillCooldownDuration = new float[3];
 
+    // 2026.08.10_UI 정리: 활성화 시 필요한 UI 상태와 이벤트 구독을 준비한다.
     private void OnEnable()
     {
         // 보유 스킬을 장착 슬롯에 드롭했을 때 테스트 데이터 교체를 처리하기 위한 이벤트 구독
@@ -42,6 +43,7 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<RefreshUIEvent>.action += RefreshSkills;
     }
 
+    // 2026.08.10_UI 정리: 비활성화 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDisable()
     {
         EventBus<UIOpenOverlayEvent>.action -= HandleOpenOverlay;
@@ -56,17 +58,20 @@ public class PrototypeTestScene : MonoBehaviour
         EventBus<RefreshUIEvent>.action -= RefreshSkills;
     }
 
+    // 2026.08.10_UI 정리: 초기 데이터와 화면 상태를 설정한다.
     private void Start()
     {
         PublishInGameHudData();
         PublishPauseTestData();
     }
 
+    // 2026.08.10_UI 정리: 프레임 단위 UI 상태와 입력을 갱신한다.
     private void Update()
     {
         TickSkillCooldowns();
     }
 
+    // 2026.08.10_UI 정리: Open 오버레이 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleOpenOverlay(UIOpenOverlayEvent eventData)
     {
         if (eventData.OverlayState != UIOverlayState.Pause)
@@ -74,6 +79,7 @@ public class PrototypeTestScene : MonoBehaviour
 
         StartCoroutine(PublishPauseDataNextFrame());
     }
+    // 2026.08.10_UI 정리: 일시정지 메인 메뉴 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePauseMainMenuRequested(UIPauseMainMenuRequestedEvent eventData)
     {
         Time.timeScale = 1f;
@@ -94,6 +100,7 @@ public class PrototypeTestScene : MonoBehaviour
 #endif
     }
 
+    // 2026.08.10_UI 정리: 일시정지 데이터 다음 프레임 요청 또는 상태를 EventBus로 발행한다.
     private IEnumerator PublishPauseDataNextFrame()
     {
         yield return null;
@@ -101,18 +108,21 @@ public class PrototypeTestScene : MonoBehaviour
         PublishPauseTestData();
     }
 
+    // 2026.08.10_UI 정리: In 게임 HUD 데이터 요청 또는 상태를 EventBus로 발행한다.
     private void PublishInGameHudData()
     {
         EventBus<UIChangeScreenEvent>.Publish(
             new UIChangeScreenEvent(UIScreenState.InGame));
     }
 
+    // 2026.08.10_UI 정리: 일시정지 Test 데이터 요청 또는 상태를 EventBus로 발행한다.
     private void PublishPauseTestData()
     {
         EnsurePauseTestData();
         PublishCurrentPauseData();
     }
 
+    // 2026.08.10_UI 정리: 일시정지 Test 데이터 처리 상태가 준비되었는지 보장한다.
     private void EnsurePauseTestData()
     {
         if (currentActiveSkills != null && currentOwnedSkills != null)
@@ -124,6 +134,7 @@ public class PrototypeTestScene : MonoBehaviour
             currentActiveSkills[i] = CreateEmptySkillData();
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 스킬 표시를 갱신한다.
     private void RefreshSkills(RefreshUIEvent eventData)
     {
         if(eventData.IsActiveSkill)
@@ -134,6 +145,7 @@ public class PrototypeTestScene : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: Current 일시정지 데이터 요청 또는 상태를 EventBus로 발행한다.
     private void PublishCurrentPauseData()
     {
         EventBus<UISetPauseSkillPageEvent>.Publish(
@@ -145,6 +157,7 @@ public class PrototypeTestScene : MonoBehaviour
         PublishCurrentPlayerSkillSlots();
     }
 
+    // 2026.08.10_UI 정리: 레벨 Up 스킬 동작을 시도한다.
     private bool TryLevelUpSkill(UIPauseSkillInfoData[] skills, int skillId)
     {
         const int maxSkillLevel = 3;
@@ -174,6 +187,7 @@ public class PrototypeTestScene : MonoBehaviour
         return true;
     }
 
+    // 2026.08.10_UI 정리: 현재 스킬 쿨타임 Duration 값을 반환한다.
     private float GetSkillCooldownDuration(int slotIndex)
     {
         if (!IsValidSlotIndex(slotIndex)) return 0f;
@@ -191,6 +205,7 @@ public class PrototypeTestScene : MonoBehaviour
         return Mathf.Max(0f, skillData.GetMaxCoolTime(skill.Level));
     }
 
+    // 2026.08.10_UI 정리: 일시정지 스킬 장착 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePauseSkillEquipRequested(UIPauseSkillEquipRequestedEvent eventData)
     {
         EnsurePauseTestData();
@@ -225,6 +240,7 @@ public class PrototypeTestScene : MonoBehaviour
         PublishCurrentPauseData();
     }
 
+    // 2026.08.10_UI 정리: 일시정지 스킬 교체 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePauseSkillSwapRequested(UIPauseSkillSwapRequestedEvent eventData)
     {
         EnsurePauseTestData();
@@ -246,6 +262,7 @@ public class PrototypeTestScene : MonoBehaviour
         PublishCurrentPauseData();
     }
 
+    // 2026.08.10_UI 정리: 레벨 Up 스킬 선택 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleLevelUpSkillSelected(UILevelUpSkillSelectedEvent eventData)
     {
         EnsurePauseTestData();
@@ -257,6 +274,7 @@ public class PrototypeTestScene : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 복원 스킬 Checkpoint 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleRestoreSkillCheckpoint(
         TestRestoreSkillCheckpointEvent eventData)
     {
@@ -270,6 +288,7 @@ public class PrototypeTestScene : MonoBehaviour
         PublishCurrentPauseData();
     }
 
+    // 2026.08.10_UI 정리: 저장된 보유 스킬 슬롯 상태를 복원한다.
     private void RestoreOwnedSkillSlots(UIPauseSkillInfoData[] restoredOwnedSkills, int[] ownedSkillOrder)
     {
         HashSet<int> unlockedSkillIds = new HashSet<int>();
@@ -314,6 +333,7 @@ public class PrototypeTestScene : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: Current 플레이어 스킬 슬롯 요청 또는 상태를 EventBus로 발행한다.
     private void PublishCurrentPlayerSkillSlots()
     {
         EnsurePauseTestData();
@@ -358,6 +378,7 @@ public class PrototypeTestScene : MonoBehaviour
             new UISetPlayerSkillSlotsEvent(skillSlots));
     }
 
+    // 2026.08.10_UI 정리: Test 플레이어 스킬 Used 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleTestPlayerSkillUsed(TestPlayerSkillUsedEvent eventData)
     {
         EnsurePauseTestData();
@@ -379,6 +400,7 @@ public class PrototypeTestScene : MonoBehaviour
         PublishCurrentPlayerSkillSlots();
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void TickSkillCooldowns()
     {
         if (skillCooldownRemaining == null) return;
@@ -397,6 +419,7 @@ public class PrototypeTestScene : MonoBehaviour
         if (hasChanged) PublishCurrentPlayerSkillSlots();
     }
 
+    // 2026.08.10_UI 정리: 쿨타임 Arrays 처리 상태가 준비되었는지 보장한다.
     private void EnsureCooldownArrays()
     {
         int slotCount = currentActiveSkills == null
@@ -418,6 +441,7 @@ public class PrototypeTestScene : MonoBehaviour
             skillCooldownDuration[i] = GetSkillCooldownDuration(i);
     }
 
+    // 2026.08.10_UI 정리: 스킬 Cooldowns 상태를 기본값으로 초기화한다.
     private void ResetSkillCooldowns()
     {
         EnsureCooldownArrays();
@@ -426,6 +450,7 @@ public class PrototypeTestScene : MonoBehaviour
             ResetSkillCooldown(i);
     }
 
+    // 2026.08.10_UI 정리: 스킬 쿨타임 상태를 기본값으로 초기화한다.
     private void ResetSkillCooldown(int slotIndex)
     {
         EnsureCooldownArrays();
@@ -436,11 +461,13 @@ public class PrototypeTestScene : MonoBehaviour
         skillCooldownDuration[slotIndex] = GetSkillCooldownDuration(slotIndex);
     }
 
+    // 2026.08.10_UI 정리: 현재 Valid 슬롯 Index 조건을 판별한다.
     private bool IsValidSlotIndex(int slotIndex)
     {
         return currentActiveSkills != null && slotIndex >= 0 && slotIndex < currentActiveSkills.Length;
     }
 
+    // 2026.08.10_UI 정리: 조건에 맞는 스킬 Index 데이터를 찾는다.
     private int FindSkillIndex(UIPauseSkillInfoData[] skills, int skillId)
     {
         if (skills == null)
@@ -455,6 +482,7 @@ public class PrototypeTestScene : MonoBehaviour
         return -1;
     }
 
+    // 2026.08.10_UI 정리:  사용할 데이터를 생성한다.
     private void BuildEquippedSkills(PrototypeProgressSnapshot snapshot)
     {
         currentActiveSkills = new UIPauseSkillInfoData[EquippedSkillSlotCount];
@@ -486,6 +514,7 @@ public class PrototypeTestScene : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 조건에 맞는 Catalog 스킬 데이터 데이터를 찾는다.
     private ActiveSkillData FindCatalogSkillData(int skillId)
     {
         if (activeSkillCatalog == null) return null;
@@ -498,6 +527,7 @@ public class PrototypeTestScene : MonoBehaviour
         return null;
     }
 
+    // 2026.08.10_UI 정리: 필요한 보유 슬롯 데이터 데이터를 생성한다.
     private UIPauseSkillInfoData CreateOwnedSlotData(PrototypeProgressSnapshot snapshot, int skillId)
     {
         if (skillId < 0)
@@ -553,6 +583,7 @@ public class PrototypeTestScene : MonoBehaviour
             isUnlocked);
     }
 
+    // 2026.08.10_UI 정리:  사용할 데이터를 생성한다.
     private void BuildOwnedSkillSlots(PrototypeProgressSnapshot snapshot)
     {
         currentOwnedSkills = new UIPauseSkillInfoData[OwnedSkillSlotCount];
@@ -567,6 +598,7 @@ public class PrototypeTestScene : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 장착 표시 값을 반영한다.
     private UIPauseSkillInfoData SetEquipped(UIPauseSkillInfoData skillData, bool isEquipped)
     {
         return new UIPauseSkillInfoData(
@@ -579,6 +611,7 @@ public class PrototypeTestScene : MonoBehaviour
             skillData.IsUnlocked);
     }
 
+    // 2026.08.10_UI 정리: 필요한 Empty 스킬 데이터 데이터를 생성한다.
     private UIPauseSkillInfoData CreateEmptySkillData()
     {
         return new UIPauseSkillInfoData(

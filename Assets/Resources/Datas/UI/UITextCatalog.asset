@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d84b8fc422c4da3a532d9957ed5a201, type: 3}
+  m_Name: UITextCatalog
+  m_EditorClassIdentifier: 
+  entries:
+  - key: Common.Confirm
+    text: "\uD655\uC778"
+  - key: Common.Cancel
+    text: "\uCDE8\uC18C"
+  - key: Common.NoticeTitle
+    text: "\uC54C\uB9BC"
+  - key: Title.NewGame
+    text: New
+  - key: Title.Continue
+    text: Continue
+  - key: Title.Quit
+    text: Quit
+  - key: Title.NewGameConfirmTitle
+    text: "\uC0C8 \uAC8C\uC784 \uC2DC\uC791"
+  - key: Title.NewGameConfirmMessage
+    text: "\uC774\uC804 \uB370\uC774\uD130\uB97C \uD30C\uAE30\uD558\uACE0 \uC0C8\uB85C
+      \uC2DC\uC791\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
+  - key: Title.QuitConfirmTitle
+    text: "\uAC8C\uC784 \uC885\uB8CC"
+  - key: Title.QuitConfirmMessage
+    text: "\uAC8C\uC784\uC744 \uC885\uB8CC\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
+  - key: Chapter.Enter
+    text: Enter
+  - key: Chapter.Back
+    text: Back
+  - key: Chapter.Continue
+    text: Enter
+  - key: Chapter.BackToSelect
+    text: Back
+  - key: Pause.StatusTab
+    text: STATUS
+  - key: Pause.SkillTab
+    text: SKILL
+  - key: Pause.OptionTab
+    text: OPTION
+  - key: Pause.MainMenu
+    text: "\uBA54\uC778 \uBA54\uB274"
+  - key: Pause.Quit
+    text: "\uAC8C\uC784 \uC885\uB8CC"
+  - key: Pause.MainMenuConfirmTitle
+    text: "\uBA54\uC778 \uBA54\uB274"
+  - key: Pause.MainMenuConfirmMessage
+    text: "\uD604\uC7AC \uC9C4\uD589 \uC0C1\uD669\uC744 \uB05D\uB0B4\uACE0 \uBA54\uC778
+      \uBA54\uB274\uB85C \uB3CC\uC544\uAC00\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
+  - key: Pause.QuitConfirmTitle
+    text: "\uAC8C\uC784 \uC885\uB8CC"
+  - key: Pause.QuitConfirmMessage
+    text: "\uAC8C\uC784\uC744 \uC885\uB8CC\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
+  - key: Pause.Reset
+    text: "\uB9AC\uC14B"
+  - key: GameOver.Restart
+    text: "\uCC98\uC74C\uBD80\uD130 \uB2E4\uC2DC \uC77D\uAE30"
+  - key: GameOver.LoadCheckpoint
+    text: "\uCC45\uAC08\uD53C\uBD80\uD130 \uB2E4\uC2DC \uC77D\uAE30"
+  - key: GameOver.MainMenu
+    text: "\uBA54\uC778 \uBA54\uB274"
+  - key: GameOver.RestartConfirmTitle
+    text: "\uCC98\uC74C\uBD80\uD130 \uB2E4\uC2DC \uC77D\uAE30"
+  - key: GameOver.RestartConfirmMessage
+    text: "\uD604\uC7AC \uCC55\uD130\uC758 \uC9C4\uD589 \uC0C1\uD669\uC744 \uCD08\uAE30\uD654\uD558\uACE0
+      \uCC98\uC74C\uBD80\uD130 \uB2E4\uC2DC \uC2DC\uC791\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
+  - key: GameOver.LifeDepletedMessage
+    text: "\uBAA8\uB4E0 \uBAA9\uC228\uC744 \uC18C\uC9C4\uD588\uC2B5\uB2C8\uB2E4."
+  - key: GameClear.Next
+    text: "\uB2E4\uC74C \uC774\uC57C\uAE30 \uC77D\uAE30"
+  - key: GameClear.MainMenu
+    text: "\uBA54\uC778 \uBA54\uB274"
+  - key: GameClear.Quit
+    text: "\uAC8C\uC784 \uC885\uB8CC"
+  - key: GameClear.QuitConfirmTitle
+    text: "\uAC8C\uC784 \uC885\uB8CC"
+  - key: GameClear.QuitConfirmMessage
+    text: "\uAC8C\uC784\uC744 \uC885\uB8CC\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
+  - key: LevelUp.Title
+    text: "\uB808\uBCA8\uC5C5"
+  - key: LevelUp.Guide
+    text: "\uAC15\uD654\uD560 \uC2A4\uD0AC \uC120\uD0DD"
+  - key: LevelUp.Continue
+    text: "\uACC4\uC18D"
+  - key: Cutscene.SkipTitle
+    text: Skip
+  - key: Cutscene.SkipGuide
+    text: '~ : Skip'
+  - key: Cutscene.EscapeSkipGuide
+    text: 'ESC : Skip'
+  - key: Chapter.ProceedGuide
+    text: "Space\uB97C \uB20C\uB7EC \uC9C4\uD589"
+  - key: Test.NoSaveData
+    text: "\uC800\uC7A5\uB41C \uB370\uC774\uD130\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4."
+  - key: Test.CannotReviveTitle
+    text: "\uBD80\uD65C \uBD88\uAC00"
+  - key: Test.CannotReviveMessage
+    text: "\uB0A8\uC740 \uBAA9\uC228 \uBAA8\uB450 \uC18C\uC9C4"
+  - key: Test.PublicChapterEndMessage
+    text: "\uD50C\uB808\uC774 \uD574\uC8FC\uC154\uC11C \uAC10\uC0AC\uD569\uB2C8\uB2E4.
+      \n\uD604\uC7AC \uACF5\uAC1C\uB41C \uCC55\uD130\uB294 \uC5EC\uAE30\uAE4C\uC9C0\uC785\uB2C8\uB2E4."

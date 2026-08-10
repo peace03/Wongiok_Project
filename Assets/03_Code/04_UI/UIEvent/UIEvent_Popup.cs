@@ -25,13 +25,14 @@ public struct UIShowConfirmPopupEvent
     public Action OnConfirm { get; private set; }
     public Action OnCancel { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIShowConfirmPopupEvent(
         string title,
         string message,
         Action onConfirm,
         Action onCancel = null,
-        string confirmText = "확인",
-        string cancelText = "취소")
+        string confirmText = null,
+        string cancelText = null)
     {
         Title = title;
         Message = message;
@@ -49,11 +50,12 @@ public struct UIShowAlertPopupEvent
     public string ConfirmText { get; private set; }
     public Action OnConfirm { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIShowAlertPopupEvent(
         string title,
         string message,
         Action onConfirm = null,
-        string confirmText = "확인")
+        string confirmText = null)
     {
         Title = title;
         Message = message;

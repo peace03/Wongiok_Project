@@ -13,9 +13,6 @@ public class PrototypeSceneBridge : MonoBehaviour
     private struct ChapterTitleCardBinding
     {
         public int chapterId;
-        public string title;
-        public string subtitle;
-        [TextArea] public string description;
         public Sprite thumbnail;
         public Sprite background;
         public VideoClip loadingVideoClip;
@@ -59,6 +56,7 @@ public class PrototypeSceneBridge : MonoBehaviour
             teamNameObject.SetActive(false);
     }
 
+    // 2026.08.10_UI 정리: 초기 데이터와 화면 상태를 설정한다.
     private IEnumerator Start()
     {
         PrototypeGameSession.EnsureInitialized();
@@ -85,6 +83,7 @@ public class PrototypeSceneBridge : MonoBehaviour
             ShowChapterTitleCard(chapterId);
     }
 
+    // 2026.08.10_UI 정리: 활성화 시 필요한 UI 상태와 이벤트 구독을 준비한다.
     private void OnEnable()
     {
         EventBus<UICutsceneFinishedEvent>.action += HandleCutsceneFinished;
@@ -101,6 +100,7 @@ public class PrototypeSceneBridge : MonoBehaviour
         EventBus<UIChapterTitleCardActivateSceneRequestedEvent>.action += HandleChapterTitleCardActivateSceneRequested;
     }
 
+    // 2026.08.10_UI 정리: 비활성화 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDisable()
     {
         EventBus<UICutsceneFinishedEvent>.action -= HandleCutsceneFinished;
@@ -117,6 +117,7 @@ public class PrototypeSceneBridge : MonoBehaviour
         EventBus<UIChapterTitleCardActivateSceneRequestedEvent>.action -= HandleChapterTitleCardActivateSceneRequested;
     }
 
+    // 2026.08.10_UI 정리: 컷신 Finished 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleCutsceneFinished(UICutsceneFinishedEvent eventData)
     {
         if (eventData.CutsceneId != "prologue") return;
@@ -189,6 +190,7 @@ public class PrototypeSceneBridge : MonoBehaviour
             new UISetTitleSaveStateEvent(PrototypeGameSession.HasSaveData));
     }
 
+    // 2026.08.10_UI 정리: 챕터 타이틀 카드 UI 요소를 표시한다.
     private void ShowChapterTitleCard(int chapterId, Sprite fallbackThumbnail = null, Sprite fallbackBackground = null)
     {
         foreach (ChapterTitleCardBinding binding in chapterTitleCards)
@@ -210,9 +212,6 @@ public class PrototypeSceneBridge : MonoBehaviour
             EventBus<UISetChapterTitleCardEvent>.Publish(
                 new UISetChapterTitleCardEvent(
                     binding.chapterId,
-                    binding.title,
-                    binding.subtitle,
-                    binding.description,
                     thumbnail,
                     background,
                     binding.loadingVideoClip));
@@ -223,6 +222,7 @@ public class PrototypeSceneBridge : MonoBehaviour
         Debug.LogError($"Chapter {chapterId}의 TitleCard Binding이 없다.");
     }
 
+    // 2026.08.10_UI 정리: 챕터 입장 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterEnterRequested(UIChapterEnterRequestedEvent eventData)
     {
         PrototypeGameSession.BeginChapter(eventData.ChapterId);
@@ -242,6 +242,7 @@ public class PrototypeSceneBridge : MonoBehaviour
 #endif
     }
 
+    // 2026.08.10_UI 정리: 타이틀 New 게임 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleTitleNewGameRequested(UITitleNewGameRequestedEvent eventData)
     {
         ChangeScreenWithFade(() =>
@@ -259,6 +260,7 @@ public class PrototypeSceneBridge : MonoBehaviour
         });
     }
 
+    // 2026.08.10_UI 정리: 타이틀 계속 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleTitleContinueRequested(UITitleContinueRequestedEvent eventData)
     {
         ChangeScreenWithFade(() =>
@@ -273,6 +275,7 @@ public class PrototypeSceneBridge : MonoBehaviour
         });
     }
 
+    // 2026.08.10_UI 정리: 챕터 타이틀 카드 계속 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterTitleCardContinueRequested(UIChapterTitleCardContinueRequestedEvent eventData)
     {
         if (isInGameLoading) return;
@@ -280,6 +283,7 @@ public class PrototypeSceneBridge : MonoBehaviour
         StartCoroutine(LoadInGame(eventData.ChapterId));
     }
 
+    // 2026.08.10_UI 정리: 챕터 타이틀 카드 Activate 씬 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterTitleCardActivateSceneRequested(UIChapterTitleCardActivateSceneRequestedEvent eventData)
     {
         if (!isInGameLoading || pendingInGameLoadOperation == null || eventData.ChapterId != pendingInGameLoadChapterId) return;
@@ -287,6 +291,7 @@ public class PrototypeSceneBridge : MonoBehaviour
         pendingInGameLoadOperation.allowSceneActivation = true;
     }
 
+    // 2026.08.10_UI 정리: In 게임 UI 표시용 데이터를 불러온다.
     private IEnumerator LoadInGame(int chapterId)
     {
         isInGameLoading = true;
@@ -316,6 +321,7 @@ public class PrototypeSceneBridge : MonoBehaviour
         isInGameLoading = false;
     }
 
+    // 2026.08.10_UI 정리: Team Splash Then 프롤로그 UI 연출을 재생한다.
     private IEnumerator PlayTeamSplashThenPrologue()
     {
         if (teamSplashObject != null)
@@ -385,6 +391,7 @@ public class PrototypeSceneBridge : MonoBehaviour
 
     }
 
+    // 2026.08.10_UI 정리: 화면 With 페이드 상태로 전환한다.
     private void ChangeScreenWithFade(System.Action changeScreenAction)
     {
         EventBus<UIFadeEvent>.Publish(

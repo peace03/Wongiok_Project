@@ -10,6 +10,7 @@ public struct UIPlayerSkillSlotData
     public float CooldownProgress { get; private set; }
     public bool IsAvailable { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIPlayerSkillSlotData(
         Sprite icon,
         string keyText,
@@ -29,6 +30,7 @@ public struct UIPlayerSkillSlotData
 public struct UISetPlayerLevelEvent
 {
     public int Level { get; private set; }
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetPlayerLevelEvent(int level)
     {
         Level = level;
@@ -41,6 +43,7 @@ public struct UISetPlayerExpEvent
     public float CurrentExp { get; private set; }
     public float RequiredExp { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetPlayerExpEvent(float currentExp, float requiredExp)
     {
         CurrentExp = currentExp;
@@ -54,6 +57,7 @@ public struct UISetPlayerHpEvent
     public float CurrentHp { get; private set; }
     public float MaxHp { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetPlayerHpEvent(float currentHp, float maxHp)
     {
         CurrentHp = currentHp;
@@ -67,6 +71,7 @@ public struct UISetPlayerLifeEvent
     public int CurrentLife { get; private set; }
     public int MaxLife { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetPlayerLifeEvent(int currentLife, int maxLife)
     {
         CurrentLife = currentLife;
@@ -79,6 +84,7 @@ public struct UISetPlayerSkillSlotsEvent
 {
     public UIPlayerSkillSlotData[] SkillSlots { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetPlayerSkillSlotsEvent(UIPlayerSkillSlotData[] skillSlots)
     {
         SkillSlots = skillSlots;
@@ -91,6 +97,7 @@ public struct UISetPlayerHealItemEvent
     public int Count { get; private set; }
     public int MaxCount { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetPlayerHealItemEvent(int count, int maxCount)
     {
         Count = count;
@@ -119,6 +126,7 @@ public struct UISetBossHudDataEvent
     public float CurrentHp { get; private set; }
     public float MaxHp { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UISetBossHudDataEvent(string bossName, float currentHp, float maxHp)
     {
         BossName = bossName;

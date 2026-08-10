@@ -21,11 +21,13 @@ public class SkillSelectCardView : MonoBehaviour
     private int skillId;
     private Action<int, int> selectedCallback;
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         Clear();
     }
 
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 UI 상태 상태를 설정한다.
     public void Setup(UILevelUpSkillOptionData data, int optionIndex, Action<int, int> onSelected)
     {
         ClearButtonListener();
@@ -51,6 +53,7 @@ public class SkillSelectCardView : MonoBehaviour
         RefreshButtonListener();
     }
 
+    // 2026.08.10_UI 정리: UI 상태 상태를 정리한다.
     public void Clear()
     {
         ClearButtonListener();
@@ -73,6 +76,7 @@ public class SkillSelectCardView : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    // 2026.08.10_UI 정리: Interactable 표시 값을 반영한다.
     public void SetInteractable(bool isInteractable)
     {
         if (button != null)
@@ -81,6 +85,7 @@ public class SkillSelectCardView : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 버튼 Listener 표시를 갱신한다.
     private void RefreshButtonListener()
     {
         if (button == null)
@@ -89,6 +94,7 @@ public class SkillSelectCardView : MonoBehaviour
         button.onClick.AddListener(HandleClicked);
     }
 
+    // 2026.08.10_UI 정리: 버튼 Listener 상태를 정리한다.
     private void ClearButtonListener()
     {
         if (button == null)
@@ -97,11 +103,13 @@ public class SkillSelectCardView : MonoBehaviour
         button.onClick.RemoveListener(HandleClicked);
     }
 
+    // 2026.08.10_UI 정리: 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleClicked()
     {
         selectedCallback?.Invoke(optionIndex, skillId);
     }
 
+    // 2026.08.10_UI 정리: 아이콘 표시 값을 반영한다.
     private void SetIcon(Sprite icon)
     {
         if (iconImage == null)
@@ -111,6 +119,7 @@ public class SkillSelectCardView : MonoBehaviour
         iconImage.enabled = icon != null;
     }
 
+    // 2026.08.10_UI 정리: 텍스트 표시 값을 반영한다.
     private void SetText(Text targetText, string value)
     {
         if (targetText == null)

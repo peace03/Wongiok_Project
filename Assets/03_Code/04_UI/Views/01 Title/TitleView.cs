@@ -62,6 +62,7 @@ public class TitleView : UIViewBase
         SubscribeVideoEvent();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
@@ -104,30 +105,33 @@ public class TitleView : UIViewBase
     {
         if (newGameButton != null)
         {
-            newGameButton.Setup("New", HandleNewGameClicked, isTitleInputReady);
+            newGameButton.Setup(UITextManager.Get("Title.NewGame"), HandleNewGameClicked, isTitleInputReady);
         }
 
         if (continueButton != null)
         {
-            continueButton.Setup("Continue", HandleContinueClicked, isTitleInputReady && hasSaveFile);
+            continueButton.Setup(UITextManager.Get("Title.Continue"), HandleContinueClicked, isTitleInputReady && hasSaveFile);
         }
 
         if (exitButton != null)
         {
-            exitButton.Setup("Quit", HandleExitClicked, isTitleInputReady);
+            exitButton.Setup(UITextManager.Get("Title.Quit"), HandleExitClicked, isTitleInputReady);
         }
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트를 구독한다.
     private void SubscribeEvents()
     {
         EventBus<UISetTitleSaveStateEvent>.action += HandleSetTitleSaveState;
     }
 
+    // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeEvents()
     {
         EventBus<UISetTitleSaveStateEvent>.action -= HandleSetTitleSaveState;
     }
 
+    // 2026.08.10_UI 정리: 영상 이벤트 이벤트를 구독한다.
     private void SubscribeVideoEvent()
     {
         if (videoPlayer != null)
@@ -141,6 +145,7 @@ public class TitleView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 영상 이벤트 이벤트 구독을 해제한다.
     private void UnsubscribeVideoEvent()
     {
         if (videoPlayer != null)
@@ -151,19 +156,21 @@ public class TitleView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: Set 타이틀 저장 상태 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSetTitleSaveState(UISetTitleSaveStateEvent eventData)
     {
         SetSaveFileAvailable(eventData.HasSaveFile);
     }
 
+    // 2026.08.10_UI 정리: New 게임 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleNewGameClicked()
     {
         if (hasSaveFile)
         {
             EventBus<UIShowConfirmPopupEvent>.Publish(
                 new UIShowConfirmPopupEvent(
-                    "새 게임 시작",
-                    "이전 데이터를 파기하고 새로 시작하시겠습니까?",
+                    UITextManager.Get("Title.NewGameConfirmTitle"),
+                    UITextManager.Get("Title.NewGameConfirmMessage"),
                     BeginNewGameStartVideo));
 
             return;
@@ -172,6 +179,7 @@ public class TitleView : UIViewBase
         BeginNewGameStartVideo();
     }
 
+    // 2026.08.10_UI 정리: 계속 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleContinueClicked()
     {
         if (!hasSaveFile)
@@ -180,25 +188,29 @@ public class TitleView : UIViewBase
         BeginContinueStartVideo();
     }
 
+    // 2026.08.10_UI 정리: 종료 클릭 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleExitClicked()
     {
         EventBus<UIShowConfirmPopupEvent>.Publish(
             new UIShowConfirmPopupEvent(
-                "게임 종료",
-                "정말 게임 종료?",
+                UITextManager.Get("Title.QuitConfirmTitle"),
+                UITextManager.Get("Title.QuitConfirmMessage"),
                 PublishExitRequested));
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void BeginNewGameStartVideo()
     {
         PlayTitleStartVideo(PendingTitleRequest.NewGame);
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void BeginContinueStartVideo()
     {
         PlayTitleStartVideo(PendingTitleRequest.Continue);
     }
 
+    // 2026.08.10_UI 정리: 타이틀 입장 영상 UI 연출을 재생한다.
     private void PlayTitleEnterVideo()
     {
         StopButtonRevealCoroutine();
@@ -208,6 +220,7 @@ public class TitleView : UIViewBase
         PlayVideo(titleEnterVideoClip, false);
     }
 
+    // 2026.08.10_UI 정리: 타이틀 대기 영상 UI 연출을 재생한다.
     private void PlayTitleWaitingVideo()
     {
         titleVideoState = TitleVidoeState.Waiting;
@@ -223,6 +236,7 @@ public class TitleView : UIViewBase
         buttonRevealCoroutine = StartCoroutine(RevealButtonsSequentially());
     }
 
+    // 2026.08.10_UI 정리: 타이틀 Start 영상 UI 연출을 재생한다.
     private void PlayTitleStartVideo(PendingTitleRequest request)
     {
         StopButtonRevealCoroutine();
@@ -236,6 +250,7 @@ public class TitleView : UIViewBase
         PlayVideo(titleStartVideoClip, false);
     }
 
+    // 2026.08.10_UI 정리: 영상 UI 연출을 재생한다.
     private void PlayVideo(VideoClip videoClip, bool isLooping)
     {
         if (videoPlayer == null || videoClip == null)
@@ -256,6 +271,7 @@ public class TitleView : UIViewBase
             videoImage.enabled = true;
     }
 
+    // 2026.08.10_UI 정리: 누락 영상 Clip 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleMissingVideoClip()
     {
         if (titleVideoState == TitleVidoeState.Enter)
@@ -270,6 +286,7 @@ public class TitleView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 영상 Finished 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleVideoFinished(VideoPlayer source)
     {
         if (titleVideoState == TitleVidoeState.Enter)
@@ -284,6 +301,7 @@ public class TitleView : UIViewBase
         }    
     }
 
+    // 2026.08.10_UI 정리: 타이틀 Start 영상 UI 전환을 완료 처리한다.
     private void CompleteTitleStartVideo()
     {
         PendingTitleRequest request = pendingTitleRequest;
@@ -303,6 +321,7 @@ public class TitleView : UIViewBase
         }
     }
 
+    // 2026.08.10_UI 정리: 진행 중인 타이틀 영상 UI 연출을 중지한다.
     private void StopTitleVideo()
     {
         if (videoPlayer != null)
@@ -318,6 +337,7 @@ public class TitleView : UIViewBase
         titleVideoState = TitleVidoeState.None;
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private IEnumerator RevealButtonsSequentially()
     {
         yield return RevealButton(
@@ -342,6 +362,7 @@ public class TitleView : UIViewBase
         buttonRevealCoroutine = null;
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private IEnumerator RevealButton(CommonButtonView button, CanvasGroup canvasGroup, float delay, bool isInteractable)
     {
         if (canvasGroup == null) yield break;
@@ -375,6 +396,7 @@ public class TitleView : UIViewBase
         button.SetInteractable(isInteractable);
     }
 
+    // 2026.08.10_UI 정리: 타이틀 Buttons UI 요소를 숨긴다.
     private void HideTitleButtons()
     {
         HideButton(newGameButtonCanvasGroup);
@@ -382,6 +404,7 @@ public class TitleView : UIViewBase
         HideButton(exitButtonCanvasGroup);
     }
 
+    // 2026.08.10_UI 정리: 버튼 UI 요소를 숨긴다.
     private void HideButton(CanvasGroup canvasGroup)
     {
         if (canvasGroup == null) return;
@@ -391,6 +414,7 @@ public class TitleView : UIViewBase
         canvasGroup.blocksRaycasts = false;
     }
     
+    // 2026.08.10_UI 정리: 진행 중인 버튼 Reveal Coroutine UI 연출을 중지한다.
     private void StopButtonRevealCoroutine()
     {
         if (buttonRevealCoroutine == null) return;
@@ -399,11 +423,13 @@ public class TitleView : UIViewBase
         buttonRevealCoroutine = null;
     }
 
+    // 2026.08.10_UI 정리: 종료 Requested 요청 또는 상태를 EventBus로 발행한다.
     private void PublishExitRequested()
     {
         EventBus<UITitleExitRequestedEvent>.Publish(default);
     }
 
+    // 2026.08.10_UI 정리: Buttons 상태를 정리한다.
     private void ClearButtons()
     {
         if (newGameButton != null)

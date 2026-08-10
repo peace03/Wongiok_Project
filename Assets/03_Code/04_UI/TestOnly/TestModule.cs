@@ -46,6 +46,7 @@ public class TestModule : MonoBehaviour
 
     [SerializeField] private SkillSystemController skillController;
 
+    // 2026.08.10_UI 정리: 초기 데이터와 화면 상태를 설정한다.
     private void Start()
     {
         PrototypeGameSession.EnsureInitialized();
@@ -58,6 +59,7 @@ public class TestModule : MonoBehaviour
         ApplyPrototypeSnapshot(PrototypeGameSession.GetChapterStart());
     }
 
+    // 2026.08.10_UI 정리: 활성화 시 필요한 UI 상태와 이벤트 구독을 준비한다.
     private void OnEnable()
     {
         EventBus<RefreshUIEvent>.action += HandleRefreshUI;
@@ -79,6 +81,7 @@ public class TestModule : MonoBehaviour
         EventBus<UIBossClearVideoFinishedEvent>.action += HandleBossClearVideoFinished;
     }
 
+    // 2026.08.10_UI 정리: 비활성화 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDisable()
     {
         EventBus<RefreshUIEvent>.action -= HandleRefreshUI;
@@ -99,6 +102,7 @@ public class TestModule : MonoBehaviour
         EventBus<UIBossClearVideoFinishedEvent>.action -= HandleBossClearVideoFinished;
     }
 
+    // 2026.08.10_UI 정리: 프레임 단위 UI 상태와 입력을 갱신한다.
     private void Update()
     {
         if (_input.TestF1Pressed)
@@ -148,6 +152,7 @@ public class TestModule : MonoBehaviour
                 new TestPlayerSkillUsedEvent(2));
     }
 
+    // 2026.08.10_UI 정리: 현재 Prototype Snapshot 상태를 저장한다.
     private PrototypeProgressSnapshot CapturePrototypeSnapshot()
     {
         PlayerStatus status = GetPlayerStatus();
@@ -189,6 +194,7 @@ public class TestModule : MonoBehaviour
         };
     }
 
+    // 2026.08.10_UI 정리: 계산된 Prototype Snapshot 상태를 화면에 적용한다.
     private void ApplyPrototypeSnapshot(PrototypeProgressSnapshot snapshot)
     {
         if (snapshot == null) return;
@@ -284,6 +290,7 @@ public class TestModule : MonoBehaviour
 
     }
 
+    // 2026.08.10_UI 정리: Current 챕터 UI 전환을 완료 처리한다.
     private void CompleteCurrentChapter()
     {
         int clearedChapterId = currentChapterId;
@@ -310,6 +317,7 @@ public class TestModule : MonoBehaviour
         CompleteCurrentChapter();
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void GainExp()
     {
         PlayerExperienceTracker experienceTracker = GetPlayerExperienceTracker();
@@ -318,6 +326,7 @@ public class TestModule : MonoBehaviour
         experienceTracker.AddExperience(expGainAmount);
     }
 
+    // 2026.08.10_UI 정리: 레벨 Up UI 요소를 표시한다.
     private void ShowLevelUp()
     {
         PlayerExperienceTracker experienceTracker = GetPlayerExperienceTracker();
@@ -329,6 +338,7 @@ public class TestModule : MonoBehaviour
         OpenLevelUpOverlay();
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void DamagePlayer()
     {
         PlayerStatus status = GetPlayerStatus();
@@ -342,6 +352,7 @@ public class TestModule : MonoBehaviour
         status.TakeDamage(hpDamageAmount);
     }
 
+    // 2026.08.10_UI 정리: 게임 Over UI 요소를 표시한다.
     private void ShowGameOver()
     {
         bool canUseCheckpoint =
@@ -356,6 +367,7 @@ public class TestModule : MonoBehaviour
             new UIChangeScreenEvent(UIScreenState.GameOver));
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void SpawnBoss()
     {
         bossSpawned = true;
@@ -368,6 +380,7 @@ public class TestModule : MonoBehaviour
             new UISetBossHudVisibleEvent(true));
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void DamageBoss()
     {
         if (!bossSpawned)
@@ -384,6 +397,7 @@ public class TestModule : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void KillBossAndClearChapter()
     {
         if(!bossSpawned)
@@ -404,6 +418,7 @@ public class TestModule : MonoBehaviour
         CompleteCurrentChapter();
     }
 
+    // 2026.08.10_UI 정리: 챕터 Select UI 요소를 표시한다.
     private void ShowChapterSelect()
     {
         highestClearedChapterId = PrototypeGameSession.HighestClearedChapterId;
@@ -415,6 +430,7 @@ public class TestModule : MonoBehaviour
             new UISetChapterProgressEvent(highestClearedChapterId));
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void SaveCheckpoint()
     {
         PrototypeGameSession.SaveCheckpoint(CapturePrototypeSnapshot());
@@ -422,6 +438,7 @@ public class TestModule : MonoBehaviour
         Debug.Log("저장 완료");
     }
 
+    // 2026.08.10_UI 정리: 갱신 UI 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleRefreshUI(RefreshUIEvent eventData)
     {
         cachedEquippedActiveSkills = CloneSkills(eventData.EquippedSkills);
@@ -429,12 +446,14 @@ public class TestModule : MonoBehaviour
         cachedOwnedSkillOrder = eventData.OwnedSkillOrder;
     }
 
+    // 2026.08.10_UI 정리: 플레이어 레벨 Up 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePlayerLevelUp(PlayerLevelUpEvent eventData)
     {
         playerLevel = Mathf.Max(1, eventData.CurrentLevel);
         OpenLevelUpOverlay();
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void OpenLevelUpOverlay()
     {
         UILevelUpSkillOptionData[] options = CreateLevelUpOptionsFromRealSkills();
@@ -446,6 +465,7 @@ public class TestModule : MonoBehaviour
             new UISetLevelUpOptionsEvent(options));
     }
 
+    // 2026.08.10_UI 정리: 현재 플레이어 경험치 Tracker 값을 반환한다.
     private PlayerExperienceTracker GetPlayerExperienceTracker()
     {
         if (playerExperienceTracker == null)
@@ -458,6 +478,7 @@ public class TestModule : MonoBehaviour
         return null;
     }
 
+    // 2026.08.10_UI 정리: 현재 플레이어 전체현황 값을 반환한다.
     private PlayerStatus GetPlayerStatus()
     {
         if (playerStatus == null)
@@ -466,12 +487,14 @@ public class TestModule : MonoBehaviour
         return playerStatus;
     }
 
+    // 2026.08.10_UI 정리: 레벨 Up 스킬 선택 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleLevelUpSkillSelected(UILevelUpSkillSelectedEvent eventData)
     {
         EventBus<UICloseOverlayEvent>.Publish(
             new UICloseOverlayEvent(UIOverlayState.LevelUp));
     }
 
+    // 2026.08.10_UI 정리: 게임 Over Restart 챕터 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleGameOverRestartChapterRequested(UIGameOverRestartChapterRequestedEvent eventData)
     {
         Time.timeScale = 1f;
@@ -482,6 +505,7 @@ public class TestModule : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
     }
 
+    // 2026.08.10_UI 정리: 게임 Over Load Check Point Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleGameOverLoadCheckPointRequested(UIGameOverLoadCheckpointRequestedEvent eventData)
     {
         PlayerStatus status = GetPlayerStatus();
@@ -489,8 +513,8 @@ public class TestModule : MonoBehaviour
         {
             EventBus<UIShowAlertPopupEvent>.Publish(
                 new UIShowAlertPopupEvent(
-                    "알림",
-                    "저장된 데이터가 없습니다."));
+                    UITextManager.Get("Common.NoticeTitle"),
+                    UITextManager.Get("Test.NoSaveData")));
 
             return;
         }
@@ -499,8 +523,8 @@ public class TestModule : MonoBehaviour
         {
             EventBus<UIShowAlertPopupEvent>.Publish(
                 new UIShowAlertPopupEvent(
-                    "부활 불가",
-                    "남은 목숨 모두 소진"));
+                    UITextManager.Get("Test.CannotReviveTitle"),
+                    UITextManager.Get("Test.CannotReviveMessage")));
 
             return;
         }
@@ -510,6 +534,7 @@ public class TestModule : MonoBehaviour
             new UIChangeScreenEvent(UIScreenState.InGame));
     }
 
+    // 2026.08.10_UI 정리: 게임 Over 메인 메뉴 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleGameOverMainMenuRequested(UIGameOverMainMenuRequestedEvent eventData)
     {
         Time.timeScale = 1f;
@@ -519,12 +544,13 @@ public class TestModule : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene(titleSceneName);
     }
 
+    // 2026.08.10_UI 정리: 챕터 클리어 다음 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterClearNextRequested(UIChapterClearNextRequestedEvent eventData)
     {
         EventBus<UIShowAlertPopupEvent>.Publish(
             new UIShowAlertPopupEvent(
-                "알림",
-                "플레이 해주셔서 감사합니다. \n현재 공개된 챕터는 여기까지입니다.",
+                UITextManager.Get("Common.NoticeTitle"),
+                UITextManager.Get("Test.PublicChapterEndMessage"),
                 () =>
                 {
                     EventBus<UIChapterClearMainMenuRequestedEvent>.Publish(
@@ -532,6 +558,7 @@ public class TestModule : MonoBehaviour
                 }));
     }
 
+    // 2026.08.10_UI 정리: 챕터 클리어 메인 메뉴 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterClearMainMenuRequested(UIChapterClearMainMenuRequestedEvent eventData)
     {
         Time.timeScale = 1f;
@@ -541,6 +568,7 @@ public class TestModule : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene(titleSceneName);
     }
 
+    // 2026.08.10_UI 정리: 챕터 클리어 종료 게임 Requested 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterClearQuitGameRequested(UIChapterClearQuitGameRequestedEvent eventData)
     {
         Time.timeScale = 0f;
@@ -562,6 +590,7 @@ public class TestModule : MonoBehaviour
 #endif
     }
 
+    // 2026.08.10_UI 정리: Test 상태 상태를 기본값으로 초기화한다.
     private void ResetTestState()
     {
         Time.timeScale = 1f;
@@ -589,6 +618,7 @@ public class TestModule : MonoBehaviour
         ApplyPrototypeSnapshot(PrototypeGameSession.GetChapterStart());
     }
 
+    // 2026.08.10_UI 정리: 스킬 Datas UI 표시용 데이터를 불러온다.
     private BaseSkillData[] LoadSkillDatas()
     {
         if (cachedActiveSkillDatas != null)
@@ -602,6 +632,7 @@ public class TestModule : MonoBehaviour
         return cachedActiveSkillDatas;
     }
 
+    // 2026.08.10_UI 정리: 필요한 레벨 Up 옵션 From Real 스킬 데이터를 생성한다.
     private UILevelUpSkillOptionData[] CreateLevelUpOptionsFromRealSkills()
     {
         const int maxSkillLevel = 3;
@@ -676,6 +707,7 @@ public class TestModule : MonoBehaviour
             -1);
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private UIPauseSkillInfoData[] CloneSkills(UIPauseSkillInfoData[] source)
     {
         return source == null
@@ -683,6 +715,7 @@ public class TestModule : MonoBehaviour
             : source.ToArray();
     }
 
+    // 2026.08.10_UI 정리:  사용할 데이터를 생성한다.
     private string BuildLevelUpComparison(BaseSkillData skillData, int currentLevel, int nextLevel)
     {
         if (skillData == null)
@@ -705,6 +738,7 @@ public class TestModule : MonoBehaviour
         }
     }
 
+    // 2026.08.10_UI 정리: 패시브 스킬 데이터 텍스트 표시 값을 반영한다.
     private void SetPassiveSkillDataText(PassiveSkillData data, int curLevel, int nextLevel, List<string> results)
     {
         if (results == null)
@@ -721,6 +755,7 @@ public class TestModule : MonoBehaviour
                                                                             FormatNumber(nextData[i].amount));
     }
 
+    // 2026.08.10_UI 정리: 액티브 스킬 데이터 텍스트 표시 값을 반영한다.
     private void SetActiveSkillDataText(ActiveSkillData data, int curLevel, int nextLevel, List<string> results)
     {
         if (results == null)
@@ -731,6 +766,7 @@ public class TestModule : MonoBehaviour
                                                             FormatNumber(data.GetDamage(nextLevel)));
     }
 
+    // 2026.08.10_UI 정리: 표시 목록에 Comparison Line 항목을 추가한다.
     private void AddComparisonLine(List<string> lines, string label, string currentValue, string nextValue)
     {
         if (currentValue == nextValue) return;
@@ -740,11 +776,13 @@ public class TestModule : MonoBehaviour
         lines.Add($"{label}: {currentValue} -> {nextValue}");
     }
 
+    // 2026.08.10_UI 정리: Number 값을 UI 문구 형식으로 변환한다.
     private string FormatNumber(float value)
     {
         return value.ToString("0.##");
     }
 
+    // 2026.08.10_UI 정리: Seconds 값을 UI 문구 형식으로 변환한다.
     private string FormatSeconds(float value)
     {
         return $"{FormatNumber(value)}초";
@@ -757,6 +795,7 @@ public struct TestRestoreSkillCheckpointEvent
     public UIPauseSkillInfoData[] OwnedSkills { get; private set; }
     public int[] OwnedSkillOrder { get; private set;  }
 
+    // 2026.08.10_UI 정리: 테스트 입력 이벤트 데이터를 초기화한다.
     public TestRestoreSkillCheckpointEvent(
         UIPauseSkillInfoData[] equippedSkills,
         UIPauseSkillInfoData[] ownedSkills,
@@ -773,6 +812,7 @@ public struct TestPlayerSkillUsedEvent
 {
     public int SlotIndex { get; private set; }
 
+    // 2026.08.10_UI 정리: 테스트 입력 이벤트 데이터를 초기화한다.
     public TestPlayerSkillUsedEvent(int slotIndex)
     {
         SlotIndex = slotIndex;

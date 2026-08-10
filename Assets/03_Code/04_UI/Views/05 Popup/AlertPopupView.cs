@@ -13,6 +13,7 @@ public class AlertPopupView : UIViewBase
     // 확인 버튼 클릭 시 실행할 콜백
     private Action confirmCallback;
 
+    // 2026.08.10_UI 정리: 전달받은 데이터와 콜백으로 UI 상태 상태를 설정한다.
     public void Setup(
         string title,
         string message,
@@ -28,6 +29,7 @@ public class AlertPopupView : UIViewBase
         RefreshButtonListeners();
     }
 
+    // 2026.08.10_UI 정리: 화면 숨김 시 임시 UI 상태를 정리한다.
     protected override void OnHide()
     {
         ClearButtonListeners();
