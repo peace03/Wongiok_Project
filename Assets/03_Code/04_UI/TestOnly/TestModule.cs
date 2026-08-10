@@ -138,21 +138,6 @@ public class TestModule : MonoBehaviour
 
         if (_input.TestF11Pressed)
             SaveCheckpoint();
-
-        if (Time.timeScale <= 0f)
-            return;
-
-        if (_input.SkillAPressed)
-            EventBus<TestPlayerSkillUsedEvent>.Publish(
-                new TestPlayerSkillUsedEvent(0));
-
-        if (_input.SkillSPressed)
-            EventBus<TestPlayerSkillUsedEvent>.Publish(
-                new TestPlayerSkillUsedEvent(1));
-
-        if (_input.SkillDPressed)
-            EventBus<TestPlayerSkillUsedEvent>.Publish(
-                new TestPlayerSkillUsedEvent(2));
     }
 
     // 2026.08.10_UI 정리: 현재 Prototype Snapshot 상태를 저장한다.
