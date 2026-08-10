@@ -13,13 +13,11 @@ public class PauseStatusPageView : MonoBehaviour
     // 현재 경험치 비율을 채워서 보여주는 게이지 이미지
     [SerializeField] private Image expFillImage;
     // 현재 경험치와 다음 레벨까지 필요한 경험치를 숫자로 표시하는 텍스트
-    [SerializeField] private Text expText;
 
     [Header("HP")]
     // 현재 HP 비율을 채워서 보여주는 게이지 이미지
     [SerializeField] private Image hpFillImage;
     // 현재 HP와 최대 HP를 숫자로 표시하는 텍스트
-    [SerializeField] private Text hpText;
 
     [Header("Life")]
     // 플레이어의 남은 목숨을 아이콘으로 표시하기 위한 배열
@@ -167,7 +165,6 @@ public class PauseStatusPageView : MonoBehaviour
             expFillImage.fillAmount = ratio;
         }
 
-        SetText(expText, $"{Mathf.FloorToInt(currentExp)} / {Mathf.FloorToInt(requiredExp)}");
     }
 
     // HP 게이지와 HP 수치 텍스트를 갱신합니다.
@@ -180,7 +177,6 @@ public class PauseStatusPageView : MonoBehaviour
             hpFillImage.fillAmount = ratio;
         }
 
-        SetText(hpText, $"{Mathf.CeilToInt(currentHp)} / {Mathf.CeilToInt(maxHp)}");
     }
 
     // 목숨 아이콘 표시를 갱신합니다.
