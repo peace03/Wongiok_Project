@@ -166,14 +166,23 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             // 총구 이펙트 실행하기
             ExecuteEffects(data.AsActiveData, ACTIVE_SKILL_EFFECT_TYPE.Muzzle, place);
 
+        Bullet bullet;
+
         // 현재 발사체 개수만큼
         for (int count = 0; count < bulletCount; count += executePlaces.Count)
         {
             // 실행 위치들의 수만큼
             foreach (var place in executePlaces)
             {
-                // 총알 가져오기
-                var bullet = bulletFactory.GetBullet(false);
+                // 돌격 소총이라면
+                if (executingSkillId == (int)ACTIVE_SKILL_ID.Rifle)
+                    // 외형 킨 총알 가져오기
+                    bullet = bulletFactory.GetBullet();
+                // 그 외라면
+                else
+                    // 외형 끈 총알 가져오기
+                    bullet = bulletFactory.GetBullet(false);
+
                 // 총알 위치와 각도 설정하기
                 bullet.transform.SetPositionAndRotation(place.position, place.rotation);
                 // 총알 이펙트 실행하기
@@ -239,8 +248,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
             // 이펙트 실행 후 받아오기
             var effect = EffectManager.Instance.PlayEffect(effectPrefabs[i],
-                                                place.position + (pos ?? Vector3.zero),
-                                                    place.rotation, parent: target != null ? target : place);
+                                                place.position + (pos ?? Vector3.zero), place.rotation,
+                                                                    parent : target != null ? target : place);
 
             // 나선 이펙트라면
             if (effect.TryGetComponent<IWaveEffect>(out var wave))

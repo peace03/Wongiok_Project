@@ -85,7 +85,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 case STAT_TYPE.Health:
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
-                        if (amount > 1f)
+                        if (amount >= 1f)
                             amount -= 1f;
 
                         amount = ownerStat.Status.MaxHP.BaseValue * amount;
@@ -98,7 +98,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 case STAT_TYPE.AtkPower:
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
-                        if (amount > 1f)
+                        if (amount >= 1f)
                             amount -= 1f;
 
                         amount = ownerStat.Status.AttackPower.BaseValue * amount;
@@ -111,7 +111,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 case STAT_TYPE.MoveSpeed:
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
-                        if (amount > 1f)
+                        if (amount >= 1f)
                             amount -= 1f;
 
                         amount = ownerStat.Status.MoveSpeed.BaseValue * amount;
@@ -124,7 +124,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 case STAT_TYPE.AtkSpeed:
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
-                        if (amount > 1f)
+                        if (amount >= 1f)
                             amount -= 1f;
 
                         amount = ownerStat.Status.AttackSpeed.BaseValue * amount;
@@ -182,7 +182,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 case STAT_TYPE.Health:
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
-                        if (amount < -1f)
+                        if (amount <= -1f)
                             amount += 1f;
 
                         amount = ownerStat.Status.MaxHP.BaseValue * amount;
@@ -195,7 +195,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 case STAT_TYPE.AtkPower:
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
-                        if (amount < -1f)
+                        if (amount <= -1f)
                             amount += 1f;
 
                         amount = ownerStat.Status.AttackPower.BaseValue * amount;
@@ -208,7 +208,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 case STAT_TYPE.MoveSpeed:
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
-                        if (amount < -1f)
+                        if (amount <= -1f)
                             amount += 1f;
 
                         amount = ownerStat.Status.MoveSpeed.BaseValue * amount;
@@ -221,7 +221,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
                 case STAT_TYPE.AtkSpeed:
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
-                        if (amount < -1f)
+                        if (amount <= -1f)
                             amount += 1f;
 
                         amount = ownerStat.Status.AttackSpeed.BaseValue * amount;

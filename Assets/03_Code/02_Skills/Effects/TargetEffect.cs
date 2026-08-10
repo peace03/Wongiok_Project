@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HitEffect : Effect, IHitEffect
+public class TargetEffect : Effect, ITargetEffect
 {
     [Header("따라다닐 대상")]
     [SerializeField] private Transform target;

@@ -91,7 +91,7 @@ public interface IWaveEffect
 /// <summary>
 /// 타격/피격 이펙트 인터페이스
 /// </summary>
-public interface IHitEffect
+public interface ITargetEffect
 {
     /// <summary>
     /// 정보 설정 함수
