@@ -241,6 +241,30 @@ public readonly struct PlayerAttackFiredEvent
     }
 }
 
+// 플레이어 액티브 스킬의 실제 실행 상태가 바뀔 때 발행됩니다.
+// 일반 공격처럼 스킬과 동시에 실행되면 안 되는 행동이 이 상태를 구독합니다.
+public readonly struct PlayerSkillExecutionChangedEvent
+{
+    public readonly bool IsExecuting;
+
+    public PlayerSkillExecutionChangedEvent(bool isExecuting)
+    {
+        IsExecuting = isExecuting;
+    }
+}
+
+// 액티브 스킬의 실제 발사 및 효과 실행 상태가 바뀔 때 발행됩니다.
+// 스킬 상태 시간이 끝났더라도 실제 발사가 남아 있으면 일반 공격 잠금을 유지합니다.
+public readonly struct PlayerSkillEffectExecutionChangedEvent
+{
+    public readonly bool IsExecuting;
+
+    public PlayerSkillEffectExecutionChangedEvent(bool isExecuting)
+    {
+        IsExecuting = isExecuting;
+    }
+}
+
 // 플레이어 총알이 무언가에 닿았을 때 발행되는 이벤트입니다.
 // 실제 데미지 적용, 피격 사운드, 충돌 이펙트 등을 한 곳에 묶지 않기 위해 사용합니다.
 public readonly struct PlayerBulletHitEvent

@@ -47,7 +47,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     }
 
     // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
-    private void OnDisable() => EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
+    private void OnDisable()
+    {
+        EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
+        SetExecutingSkill(false);
+    }
 
     /// <summary>
     /// 초기화 함수
@@ -116,7 +120,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
 
         // 스킬 실행 중
-        executingSkill = true;
+        SetExecutingSkill(true);
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(levelData.ProjectileCount, levelData.GetDamage(),
                                                 levelData.MaxDuration > 0f ? levelData.MaxDuration : null,
@@ -147,7 +151,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         var data = SkillDatabase.FindDataById(executingSkillId);
 
         if (data == null || data.AsActiveData == null)
+        {
+            SetExecutingSkill(false);
             yield break;
+        }
 
         foreach (var sound in data.AsActiveData.Sounds)
         {
@@ -216,7 +223,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 실행 위치들 초기화
         ResetExecutePositions();
         // 스킬 실행 끝남
-        executingSkill = false;
+        SetExecutingSkill(false);
     }
 
     /// <summary>
@@ -308,7 +315,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             return;
 
         // 스킬 실행 중지
-        executingSkill = false;
+        SetExecutingSkill(false);
         // 스킬 사용 사운드 정지
         EventBus<StopControlledSfxEvent>.Publish(new($"{executingSkillId}_Sound"));
         // 총구 이펙트 즉시 종료
@@ -328,6 +335,16 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 스킬 애니메이션 취소
         ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)executingSkillId);
         executingSkillId = -1;
+    }
+
+    private void SetExecutingSkill(bool isExecuting)
+    {
+        if (executingSkill == isExecuting)
+            return;
+
+        executingSkill = isExecuting;
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(
+            new PlayerSkillEffectExecutionChangedEvent(isExecuting));
     }
 
     /// <summary>
