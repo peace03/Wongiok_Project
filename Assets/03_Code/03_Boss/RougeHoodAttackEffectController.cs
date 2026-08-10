@@ -1,7 +1,7 @@
 using UnityEngine;
 
 //신데렐라 공격별 VFX 재생 담당
-public class CinderellaAttackEffectController : MonoBehaviour
+public class RougeHoodAttackEffectController : MonoBehaviour
 {
     [Header("Audio Clip")]
     [SerializeField] private AudioClip SFX_PatternA;

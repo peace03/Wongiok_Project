@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 /// BossPatternBase가 제공하는 로우 레벨 API(물리, 애니메이션, 마샬링)를 활용하여, 
 /// 신데렐라 고유의 패턴(발차기, 파편, 점프 찍기, 궁극기)을 행동 트리(Behavior Tree)로 조립하는 'AI 두뇌' 클래스입니다.
 /// </summary>
-public class Cinderella_Patterns : BossPatternBase
+public class RougeHood_Patterns : BossPatternBase
 {
 
     #region [1. 인스펙터 (기획 데이터 주입부)]

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class RougeHood_Patterns : BossPatternBase
+public class RougeHood_Patterns_Legacy : BossPatternBase
 {
     [Header("Test")]
     [SerializeField] private ExcuteAttackType_InGame excuteAttackType_InGame;
