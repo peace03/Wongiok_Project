@@ -194,6 +194,8 @@ public class SkillInstance
     /// <param name="effectClear">이펙트 초기화 여부</param>
     private void SwitchState(SKILL_STATE change, bool effectClear = true)
     {
+        bool wasUsingSkill = IsActiveSkill && (IsCharging || IsExecuting);
+
         // 현재 상태가 차징이였다면
         if(IsCharging)
         {
@@ -205,6 +207,14 @@ public class SkillInstance
 
         // 현재 상태 바꾸기
         state = change;
+        bool isUsingSkill = IsActiveSkill && (IsCharging || IsExecuting);
+
+        if (wasUsingSkill != isUsingSkill)
+        {
+            EventBus<PlayerSkillExecutionChangedEvent>.Publish(
+                new PlayerSkillExecutionChangedEvent(isUsingSkill));
+        }
+
         Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
 
         // 바꾼 상태가 사용 가능이라면

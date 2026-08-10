@@ -32,6 +32,12 @@ public class PlayerController : MonoBehaviour
     // Bootstrapper를 통한 PlayerInitializer 초기화가 끝났는지 확인합니다.
     private bool isInitialized;
 
+    // 액티브 스킬 실행 중에는 일반 공격 입력만 차단합니다.
+    private bool isSkillExecuting;
+
+    // 스킬 데이터의 실행 시간이 끝난 뒤에도 실제 발사가 남아 있는지 확인합니다.
+    private bool isSkillEffectExecuting;
+
     // 플레이어가 마지막으로 바라본 방향입니다. true면 오른쪽, false면 왼쪽으로 취급합니다.
     private bool _isFacingRight = true;
 
@@ -100,6 +106,20 @@ public class PlayerController : MonoBehaviour
         // 실제 참조 캐싱과 상태 생성은 PlayerInitializer에서 순서를 보장해 처리합니다.
 
         // 상태 객체를 미리 만들어두고, 이후에는 TransitionTo로 상태만 교체합니다.
+    }
+
+    private void OnEnable()
+    {
+        EventBus<PlayerSkillExecutionChangedEvent>.action += OnSkillExecutionChanged;
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.action += OnSkillEffectExecutionChanged;
+    }
+
+    private void OnDisable()
+    {
+        EventBus<PlayerSkillExecutionChangedEvent>.action -= OnSkillExecutionChanged;
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.action -= OnSkillEffectExecutionChanged;
+        isSkillExecuting = false;
+        isSkillEffectExecuting = false;
     }
 
     public void Initialize(
@@ -171,7 +191,8 @@ public class PlayerController : MonoBehaviour
 
         // 상태가 공격을 허용하는 경우에만 공격 입력을 처리합니다.
         // 예를 들어 DashState에서는 CanAttack이 false라 공격이 막힙니다.
-        if (_currentState != null && _currentState.CanAttack)
+        if (_currentState != null && _currentState.CanAttack
+            && !isSkillExecuting && !isSkillEffectExecuting)
         {
             HandleAttackInput();
         }
@@ -305,6 +326,16 @@ public class PlayerController : MonoBehaviour
 
         // 공격 방향 계산에 이동 입력, 바라보는 방향, 지상 여부를 넘깁니다.
         _attack.Attack(MoveInput, _isFacingRight, _cc.isGrounded);
+    }
+
+    private void OnSkillExecutionChanged(PlayerSkillExecutionChangedEvent skillState)
+    {
+        isSkillExecuting = skillState.IsExecuting;
+    }
+
+    private void OnSkillEffectExecutionChanged(PlayerSkillEffectExecutionChangedEvent skillState)
+    {
+        isSkillEffectExecuting = skillState.IsExecuting;
     }
 
     private void HandleParryInput()
