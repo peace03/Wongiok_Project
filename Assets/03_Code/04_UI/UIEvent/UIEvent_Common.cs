@@ -14,6 +14,7 @@ public struct UIFadeEvent
     public float Duration { get; private set; }
     public Action OnComplete { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIFadeEvent(
         float fromAlpha,
         float toAlpha,
@@ -33,6 +34,7 @@ public struct UIVideoFirstFrameReadyEvent
 {
     public string VideoId { get; private set; }
 
+    // 2026.08.10_UI 정리: UI 이벤트 또는 표시 데이터를 초기화한다.
     public UIVideoFirstFrameReadyEvent(string videoId)
     {
         VideoId = videoId;

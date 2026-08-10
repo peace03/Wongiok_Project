@@ -11,6 +11,7 @@ public class ScreenFader : MonoBehaviour, IInitializable
     // 초기화 순서
     public int Priority => (int)InitOrder.UI + 20;
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public void Init()
     {
         SetAlpha(0f);
@@ -18,6 +19,7 @@ public class ScreenFader : MonoBehaviour, IInitializable
         SubscribeEvents();
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         UnsubscribeEvents();
@@ -45,6 +47,7 @@ public class ScreenFader : MonoBehaviour, IInitializable
             eventData.OnComplete);
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public void StartFade(
         float fromAlpha,
         float toAlpha,
@@ -59,6 +62,7 @@ public class ScreenFader : MonoBehaviour, IInitializable
         fadeCoroutine = StartCoroutine(FadeRoutine(fromAlpha, toAlpha, duration, onComplete));
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private IEnumerator FadeRoutine(
         float fromAlpha,
         float toAlpha,
@@ -91,6 +95,7 @@ public class ScreenFader : MonoBehaviour, IInitializable
         onComplete?.Invoke();
     }
 
+    // 2026.08.10_UI 정리: 입력 Block 표시 값을 반영한다.
     private void SetInputBlock(bool shouldBlock)
     {
         if (fadeCanvasGroup == null)
@@ -101,6 +106,7 @@ public class ScreenFader : MonoBehaviour, IInitializable
         fadeCanvasGroup.interactable = shouldBlock;
     }
 
+    // 2026.08.10_UI 정리: Alpha 표시 값을 반영한다.
     private void SetAlpha(float alpha)
     {
         if (fadeCanvasGroup == null)

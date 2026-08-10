@@ -37,6 +37,7 @@ public class CommonButtonView : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private float InteractableAlpha = 1f;
     private float NonInteractiveAlpha = 0.45f;
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         Clear();
@@ -85,12 +86,14 @@ public class CommonButtonView : MonoBehaviour, IPointerEnterHandler, IPointerExi
         canvasGroup.blocksRaycasts = isInteractable;
     }
 
+    // 2026.08.10_UI 정리: 선택 표시 값을 반영한다.
     public void SetSelected(bool isSelected)
     {
         this.isSelected = isSelected;
         RefreshVisual();
     }
 
+    // 2026.08.10_UI 정리: UI 상태 상태를 정리한다.
     public void Clear()
     {
         ClearButtonListener();
@@ -102,6 +105,7 @@ public class CommonButtonView : MonoBehaviour, IPointerEnterHandler, IPointerExi
         RefreshVisual();
     }
 
+    // 2026.08.10_UI 정리: 포인터 상호작용에 맞춰 UI 표시 상태를 갱신한다.
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!isInteractable)
@@ -112,12 +116,14 @@ public class CommonButtonView : MonoBehaviour, IPointerEnterHandler, IPointerExi
         RefreshVisual();
     }
 
+    // 2026.08.10_UI 정리: 포인터 상호작용에 맞춰 UI 표시 상태를 갱신한다.
     public void OnPointerExit(PointerEventData eventData)
     {
         isPointerInside = false;
         RefreshVisual();
     }
 
+    // 2026.08.10_UI 정리: 포인터 상호작용에 맞춰 UI 표시 상태를 갱신한다.
     public void OnPointerDown(PointerEventData eventData)
     {
         if (!isInteractable)
@@ -126,6 +132,7 @@ public class CommonButtonView : MonoBehaviour, IPointerEnterHandler, IPointerExi
         PlaySound(clickSound);
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 버튼 Listener 표시를 갱신한다.
     private void RefreshButtonListener()
     {
         if (button == null)
@@ -134,6 +141,7 @@ public class CommonButtonView : MonoBehaviour, IPointerEnterHandler, IPointerExi
         button.onClick.AddListener(InvokeClick);
     }
 
+    // 2026.08.10_UI 정리: 버튼 Listener 상태를 정리한다.
     private void ClearButtonListener()
     {
         if (button == null)
@@ -142,11 +150,13 @@ public class CommonButtonView : MonoBehaviour, IPointerEnterHandler, IPointerExi
         button.onClick.RemoveListener(InvokeClick);
     }
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     private void InvokeClick()
     {
         clickCallback?.Invoke();
     }
 
+    // 2026.08.10_UI 정리: 현재 데이터로 비주얼 표시를 갱신한다.
     private void RefreshVisual()
     {
         if (selectedObject != null)
@@ -172,6 +182,7 @@ public class CommonButtonView : MonoBehaviour, IPointerEnterHandler, IPointerExi
         backgroundImage.color = isPointerInside ? hoverColor : normalColor;
     }
 
+    // 2026.08.10_UI 정리: Sound UI 연출을 재생한다.
     private void PlaySound(AudioClip clip)
     {
         if (clip == null)

@@ -11,6 +11,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
     // UIManager가 먼저 초기화된 뒤 ServiceLocator에서 가져올 수 있도록 UI보다 뒤에 초기화
     public int Priority => (int)InitOrder.UI + 30;
 
+    // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public void Init()
     {
         if (isInitialized)
@@ -27,6 +28,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         isInitialized = true;
     }
 
+    // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
     private void OnDestroy()
     {
         if (!isInitialized)
@@ -37,6 +39,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         Cursor.lockState = CursorLockMode.None;
     }
 
+    // 2026.08.10_UI 정리: 프레임 단위 UI 상태와 입력을 갱신한다.
     private void Update()
     {
         if (!isInitialized) return;
@@ -53,6 +56,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         HandleCutsceneBackQuoteInput();
     }
 
+    // 2026.08.10_UI 정리: 프레임 종료 시점에 UI 상태를 보정한다.
     private void LateUpdate()
     {
         if (!isInitialized || !isCursorRefreshQueued)
@@ -62,6 +66,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         RefreshCursorState();
     }
 
+    // 2026.08.10_UI 정리: 프롤로그 Skip 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePrologueSkipInput()
     {
         if (uiManager.CurrentScreenState != UIScreenState.Prologue) return;
@@ -73,6 +78,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
             new UICutsceneSkipRequestedEvent(CutsceneSkipInput.BackQuote));
     }
 
+    // 2026.08.10_UI 정리: Escape 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleEscapeInput()
     {
         if (!_input.MenuPressed)
@@ -105,6 +111,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         }
     }
 
+    // 2026.08.10_UI 정리: 일시정지 탭 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandlePauseTabInput()
     {
         if (uiManager.CurrentOverlayState != UIOverlayState.Pause)
@@ -124,6 +131,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
         }
     }
 
+    // 2026.08.10_UI 정리: Space 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleSpaceInput()
     {
         if (uiManager.CurrentOverlayState == UIOverlayState.Cutscene)
@@ -143,6 +151,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
             new UIChapterTitleCardInputContinueRequestedEvent());
     }
 
+    // 2026.08.10_UI 정리: 챕터 로딩 Skip 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleChapterLoadingSkipInput()
     {
         if (uiManager.CurrentScreenState != UIScreenState.ChapterTitleCard) return;
@@ -153,6 +162,7 @@ public class UIInputBridge : MonoBehaviour, IInitializable
             new UIChapterTitleCardInputSkipRequestedEvent());
     }
 
+    // 2026.08.10_UI 정리: 컷신 뒤로가기 Quote 입력 관련 입력 또는 EventBus 요청을 처리한다.
     private void HandleCutsceneBackQuoteInput()
     {
         if (uiManager.CurrentOverlayState != UIOverlayState.Cutscene) return;
