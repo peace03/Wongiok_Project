@@ -6,6 +6,9 @@ public class ScreenFader : MonoBehaviour, IInitializable
 {
     [SerializeField] private CanvasGroup fadeCanvasGroup;
 
+    private static bool hasPendingSceneFadeIn;
+    private static float pendingSceneFadeInDuration;
+
     private Coroutine fadeCoroutine;
 
     // 초기화 순서
@@ -14,9 +17,22 @@ public class ScreenFader : MonoBehaviour, IInitializable
     // 2026.08.10_UI 정리: 이 메서드의 UI 처리 역할을 수행한다.
     public void Init()
     {
-        SetAlpha(0f);
-        SetInputBlock(false);
+        bool shouldFadeInAfterSceneLoad = TryConsumeSceneFadeIn(
+            out float sceneFadeInDuration);
+
+        SetAlpha(shouldFadeInAfterSceneLoad ? 1f : 0f);
+        SetInputBlock(shouldFadeInAfterSceneLoad);
         SubscribeEvents();
+
+        if (shouldFadeInAfterSceneLoad)
+            StartCoroutine(FadeInAfterFirstSceneFrame(sceneFadeInDuration));
+    }
+
+    // 2026.08.10_씬 활성화 중에도 검은 화면을 유지하도록 다음 Fader에 전환 정보를 전달한다.
+    public static void HoldBlackForNextScene(float fadeInDuration)
+    {
+        hasPendingSceneFadeIn = true;
+        pendingSceneFadeInDuration = Mathf.Max(0f, fadeInDuration);
     }
 
     // 2026.08.10_UI 정리: 파괴 시 등록한 이벤트와 임시 UI 상태를 정리한다.
@@ -93,6 +109,26 @@ public class ScreenFader : MonoBehaviour, IInitializable
 
         fadeCoroutine = null;
         onComplete?.Invoke();
+    }
+
+    // 2026.08.10_새 씬의 첫 프레임이 그려진 뒤에만 검은 전환 화면을 걷는다.
+    private IEnumerator FadeInAfterFirstSceneFrame(float duration)
+    {
+        yield return new WaitForEndOfFrame();
+        StartFade(1f, 0f, duration);
+    }
+
+    // 2026.08.10_다음 씬 전용 검은 화면 유지 요청을 한 번만 소비한다.
+    private static bool TryConsumeSceneFadeIn(out float fadeInDuration)
+    {
+        fadeInDuration = pendingSceneFadeInDuration;
+
+        if (!hasPendingSceneFadeIn)
+            return false;
+
+        hasPendingSceneFadeIn = false;
+        pendingSceneFadeInDuration = 0f;
+        return true;
     }
 
     // 2026.08.10_UI 정리: 입력 Block 표시 값을 반영한다.

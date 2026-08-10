@@ -122,34 +122,7 @@ public class PrototypeSceneBridge : MonoBehaviour
     {
         if (eventData.CutsceneId != "prologue") return;
 
-        if (eventData.WasSkipped)
-        {
-            // 2026.08.07_psb수정
-            // 스킵 경로는 이미 CutsceneView가 검은 화면을 완성했으므로 다시 페이드 아웃하지 않는다.
-            PrepareTitleUnderBlackFader();
-            return;
-        }
-
-        // 2026.08.07_psb수정
-        // 프롤로그 종료 후 타이틀 영상의 첫 프레임을 준비한 뒤에만 검은 페이드를 걷는다.
-        StartCoroutine(TransitionPrologueToTitle());
-    }
-
-    // 2026.08.07_psb수정
-    // 검은 화면 아래에서 타이틀 View와 입장 영상을 준비해 빈 화면 노출 없이 전환한다.
-    private IEnumerator TransitionPrologueToTitle()
-    {
-        bool isFadeOutFinished = false;
-
-        EventBus<UIFadeEvent>.Publish(
-            new UIFadeEvent(
-                0f,
-                1f,
-                fadeOutDuration,
-                () => isFadeOutFinished = true));
-
-        yield return new WaitUntil(() => isFadeOutFinished);
-
+        // 2026.08.10_스킵과 자연 종료 모두 CutsceneView가 완성한 검은 화면 아래에서 준비한다.
         PrepareTitleUnderBlackFader();
     }
 

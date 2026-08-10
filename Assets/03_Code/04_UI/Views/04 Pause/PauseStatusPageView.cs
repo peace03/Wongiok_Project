@@ -71,6 +71,8 @@ public class PauseStatusPageView : MonoBehaviour
     // 이후 구현 단계에서는 캐싱된 상태값으로 화면을 다시 갱신하는 지점으로 사용합니다.
     private void OnEnable()
     {
+        // 2026.08.10_초기 Pause 상태를 활성화 이후 다시 받아 이벤트 누락을 보완한다.
+        EventBus<UIRequestPauseStatusEvent>.Publish(default);
         RefreshAll();
     }
 

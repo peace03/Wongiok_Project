@@ -57,6 +57,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
             HandlePlayerDeathPresentationFinished;
         EventBus<UIChangeScreenEvent>.action += HandleChangeScreen;
         EventBus<RefreshUIEvent>.action += HandleRefreshUI;
+        EventBus<UIRequestPauseStatusEvent>.action += HandlePauseStatusRequested;
     }
 
     // 2026.08.10_UI 정리: 이벤트 이벤트 구독을 해제한다.
@@ -70,6 +71,7 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
             HandlePlayerDeathPresentationFinished;
         EventBus<UIChangeScreenEvent>.action -= HandleChangeScreen;
         EventBus<RefreshUIEvent>.action -= HandleRefreshUI;
+        EventBus<UIRequestPauseStatusEvent>.action -= HandlePauseStatusRequested;
     }
 
     // 2026.08.10_UI 정리: 플레이어 체력 Changed 관련 입력 또는 EventBus 요청을 처리한다.
@@ -172,6 +174,12 @@ public class PlayerUIEventBridge : MonoBehaviour, IInitializable
             currentEquippedPassiveSkills = eventData.EquippedSkills ??
                                                             System.Array.Empty<UIPauseSkillInfoData>();
 
+        PublishPauseStatus();
+    }
+
+    // 2026.08.10_초기 Pause 상태를 페이지 활성화 시점에 다시 발행한다.
+    private void HandlePauseStatusRequested(UIRequestPauseStatusEvent eventData)
+    {
         PublishPauseStatus();
     }
 

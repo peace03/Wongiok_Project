@@ -38,8 +38,8 @@ public class PlayerAttack : MonoBehaviour
     {
         if (!CanAttackWithCurrentSettings()) return;
 
-        // 입력과 바라보는 방향을 기준으로 공격 방향을 계산합니다.
-        Vector3 attackDirection = GetAttackDirection(aimInput, isFacingRight, isGrounded);
+        // 일반 공격은 현재 바라보는 좌우 방향으로만 발사합니다.
+        Vector3 attackDirection = GetAttackDirection(isFacingRight);
 
         // 발사 시점의 최종 공격력을 총알 데미지로 사용합니다.
         float damage = playerStatus.GetAttackPower();
@@ -88,33 +88,9 @@ public class PlayerAttack : MonoBehaviour
             parent: firePoint));
     }
 
-    private Vector3 GetAttackDirection(Vector2 aimInput, bool isFacingRight, bool isGrounded)
+    private Vector3 GetAttackDirection(bool isFacingRight)
     {
-        float x = aimInput.x;
-        float y = aimInput.y;
-
-        // 지상에서 아래 입력만 들어오면 아래로 쏘지 않고 바라보는 반대 방향으로 공격합니다.
-        // 바닥을 향해 바로 발사하는 어색한 상황을 막기 위한 예외 처리입니다.
-        // 방향 입력이 없으면 마지막으로 바라보는 방향으로 공격합니다.
-        if (Mathf.Approximately(x, 0f) && Mathf.Approximately(y, 0f))
-        {
-            return isFacingRight ? Vector3.right : Vector3.left;
-        }
-
-        // 수평 입력 없이 위아래 입력만 있으면 수직 방향으로 공격합니다.
-        if (Mathf.Approximately(x, 0f))
-        {
-            return new Vector3(isFacingRight ? 1f : -1f, Mathf.Sign(y), 0f).normalized;
-        }
-
-        // 좌하단/우하단 입력은 대각선 아래 공격으로 쓰지 않고 수평 공격으로 보정합니다.
-        if (y < 0f)
-        {
-            return new Vector3(Mathf.Sign(x), -1f, 0f).normalized;
-        }
-
-        Vector3 direction = new Vector3(x, y, 0f);
-        return direction.normalized;
+        return isFacingRight ? Vector3.right : Vector3.left;
     }
     #region 플레이어 경고 문구 ( 특정 오브젝트 or 스크립트 존재의 확인 )
     private bool CanAttackWithCurrentSettings()

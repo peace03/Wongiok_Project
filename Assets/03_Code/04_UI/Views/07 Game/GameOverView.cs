@@ -157,6 +157,16 @@ public class GameOverView : UIViewBase
     // 메인 화면 복귀 요청 발행
     private void HandleMainMenuClicked()
     {
+        EventBus<UIShowConfirmPopupEvent>.Publish(
+            new UIShowConfirmPopupEvent(
+                UITextManager.Get("Pause.MainMenuConfirmTitle"),
+                UITextManager.Get("Pause.MainMenuConfirmMessage"),
+                PublishMainMenuRequested));
+    }
+
+    // 2026.08.10_메인 메뉴 복귀 확인 후에만 게임오버 종료 요청을 발행한다.
+    private void PublishMainMenuRequested()
+    {
         EventBus<UIGameOverMainMenuRequestedEvent>.Publish(
             new UIGameOverMainMenuRequestedEvent());
     }
