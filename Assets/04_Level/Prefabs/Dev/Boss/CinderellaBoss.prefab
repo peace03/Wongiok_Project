@@ -314,7 +314,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 283cd03bdcbdbe7438df11543c031306, type: 3}
   - {fileID: 8300000, guid: 31b018381c907574896f184e6debdf3a, type: 3}
   - {fileID: 8300000, guid: 0face090c1327b541ab1b9c0f7f024ed, type: 3}
-  takeDamageSfxVolume: 0.5
+  takeDamageSfxVolume: 0.35
   status:
     maxHP:
       BaseValue: 2000
@@ -335,7 +335,7 @@ MonoBehaviour:
     hpThresholds:
     - 0.7
     - 0.5
-    - 0.1
+    - 0.18
     - 0
     groggyDamageMultiplier: 1.5
   playerMaxHP: {fileID: 0}
@@ -352,7 +352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: PeaceScripts::BossController
   bossBgmClip: {fileID: 8300000, guid: a15fad831a1ec11428d0418b734f65ae, type: 3}
-  bossBgmVolume: 0.232
+  bossBgmVolume: 0.2
 --- !u!114 &2783848254328767939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -386,7 +386,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: cb16c56bb35c8cf4c8689b191e1017cc, type: 3}
   - {fileID: 8300000, guid: 6da6ea2a6289fa641828cc5624b3b2d8, type: 3}
   - {fileID: 8300000, guid: 684bdbc59d57f8d429a89fcc36fdfd24, type: 3}
-  punishmentSfxVolume: 0.128
+  punishmentSfxVolume: 0.5
   A_ChaseSpeed: 13.5
   A_ChasePos: {x: 1.5, y: 0, z: 0}
   A_telegraphTime: 1
@@ -729,10 +729,10 @@ MonoBehaviour:
   SFX_PatternA: {fileID: 8300000, guid: 25ba360a5b2de884395a74051337f843, type: 3}
   SFX_PatternB: {fileID: 8300000, guid: 485626ae960936346ad91e0d42f5d65e, type: 3}
   SFX_PatternC: {fileID: 8300000, guid: 495cf15e3eea75a4ab09b559c1c7bd7f, type: 3}
-  kickImpactSfxVolume: 0.03
-  spinImpactSfxVolume: 0.03
-  slamImpactSfxVolume: 0.03
-  ultimateImpactSfxVolume: 0.03
+  kickImpactSfxVolume: 0.5
+  spinImpactSfxVolume: 0.5
+  slamImpactSfxVolume: 0.5
+  ultimateImpactSfxVolume: 0.5
   kickImpactPrefab: {fileID: 3716170479167962960}
   kickImpactPoint: {fileID: 4177043900862076547}
   kickImpactDuration: 1
