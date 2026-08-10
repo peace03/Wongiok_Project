@@ -319,6 +319,9 @@ public class SkillSystemModel
             return;
         }
 
+        if (equippedActives[(int)slot].IsOnCoolTime || equippedActives[(int)slot].IsExecuting)
+            return;
+
         var skillData = equippedActives[(int)slot].BaseData;
 
         // 소유자 애니메이터 시스템이 있다면
