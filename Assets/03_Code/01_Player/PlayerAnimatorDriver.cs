@@ -53,6 +53,8 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
     private Quaternion animatedModelInitialLocalRotation;
     private bool hasAnimatedModelAnchor;
 
+    // 입력 시스템
+    private GameInputReader inputReader = null;
     // 스킬 애니메이션 재생 코루틴
     private Coroutine skillCoroutine = null;
     // 스킬 시작 애니메이션 지속 시간
@@ -557,6 +559,10 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         animator.SetBool(IsExecutingSkill, false);
         // 무기 외형 착용 해제 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState((int)skillId, false));
+
+        if (inputReader.MoveInput.magnitude > 0f)
+            animator.SetBool(IsMoving, true);
+
         SetLocomotion(animator.GetBool(IsMoving));
     }
 
@@ -590,6 +596,9 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         // 현재 모델 구조에서는 Animator의 부모가 좌우 회전을 담당하는 visualRoot입니다.
         if (visualRoot == null && animator != null && animator.transform != transform)
             visualRoot = animator.transform.parent;
+
+        if (inputReader == null)
+            inputReader = transform.GetComponent<GameInputReader>();
     }
 
     /// <summary>
