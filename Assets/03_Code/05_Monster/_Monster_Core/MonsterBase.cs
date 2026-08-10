@@ -120,6 +120,23 @@ public abstract class MonsterBase : MonoBehaviour
         }
     }
 
+    // 프레임 마지막에 Z 이탈을 감지하고 최초 Z 위치로 복원합니다
+    private void LateUpdate()
+    {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (Mathf.Abs(transform.position.z - lockedZ) > 0.001f)
+        {
+            Debug.LogWarning(
+                $"[MonsterDepthLock] {name} Z drift detected. " +
+                $"Current: {transform.position.z:F4}, Locked: {lockedZ:F4}",
+                this
+            );
+        }
+#endif
+
+        FixDepthPosition();
+    }
+
     // 자식 클래스에서 몬스터별 행동을 구현합니다
     protected abstract void TickMonster();
 
