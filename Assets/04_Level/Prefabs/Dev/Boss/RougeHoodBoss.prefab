@@ -687,7 +687,7 @@ GameObject:
   - component: {fileID: 4456096972685270820}
   - component: {fileID: 4733329839489382315}
   m_Layer: 14
-  m_Name: CinderellaBoss
+  m_Name: RougeHoodBoss
   m_TagString: Boss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
