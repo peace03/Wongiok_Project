@@ -173,6 +173,7 @@ public class PlayerController : MonoBehaviour
     {
         // 매 프레임 입력을 먼저 읽고, 그 입력을 바탕으로 상태 로직을 실행합니다.
         if (!isInitialized) return;
+        if (Time.timeScale <= 0f) return;
 
         PlayerInput();
         UpdateFacingDirection();
@@ -278,7 +279,13 @@ public class PlayerController : MonoBehaviour
         bool isMovementLocked = animationDriver != null
             && animationDriver.IsPlayingSkillAnimation;
 
-        MoveInput = isMovementLocked ? Vector2.zero : _inputReader.MoveInput;
+        Vector2 rawMoveInput = _inputReader.MoveInput;
+        float horizontalInput = Mathf.Approximately(rawMoveInput.x, 0f)
+            ? 0f
+            : Mathf.Sign(rawMoveInput.x);
+        MoveInput = isMovementLocked
+            ? Vector2.zero
+            : new Vector2(horizontalInput, 0f);
         JumpTriggered = _inputReader.JumpTriggered && !isMovementLocked;
         IsJumping = _inputReader.IsJumping;
         AttackTriggered = _inputReader.AttackTriggered;

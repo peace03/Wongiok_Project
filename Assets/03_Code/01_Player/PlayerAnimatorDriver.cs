@@ -561,7 +561,7 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         // 무기 외형 착용 해제 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState((int)skillId, false));
 
-        if (inputReader.MoveInput.magnitude > 0f)
+        if (!Mathf.Approximately(inputReader.MoveInput.x, 0f))
             animator.SetBool(IsMoving, true);
 
         SetLocomotion(animator.GetBool(IsMoving));
