@@ -169,6 +169,11 @@ public struct UIPauseSkillInfoData
 }
 
 // 일시정지 - 전체 현황에서의 플레이어 상태
+// 2026.08.10_초기 Pause 상태를 현재 캐시 값으로 다시 요청한다.
+public struct UIRequestPauseStatusEvent
+{
+}
+
 public struct UISetPauseStatusEvent
 {
     public int Level { get; private set; }

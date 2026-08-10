@@ -77,6 +77,8 @@ public class BossCutsceneFlowController : MonoBehaviour
         if (!isEncounterLoading || pendingBossSceneLoadOperation == null)
             return;
 
+        // 2026.08.10_보스 씬 첫 프레임까지 검은 화면을 유지해 씬 전환 공백을 막는다.
+        ScreenFader.HoldBlackForNextScene(encounterFadeInDuration);
         pendingBossSceneLoadOperation.allowSceneActivation = true;
     }
 
