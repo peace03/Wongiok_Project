@@ -114,10 +114,17 @@ public readonly struct ChangeActiveSkillExecutePositions
     public ChangeActiveSkillExecutePositions(List<Transform> positions) => this.positions = positions;
 }
 
-/// <summary>
-/// 취소할 스킬 정보
-/// </summary>
-public readonly struct CancelSkill { }
+public readonly struct CanExecutingActiveSkill
+{
+    public readonly GameObject charactor;
+    public readonly bool isGrounded;
+
+    public CanExecutingActiveSkill(GameObject charactor, bool isGrounded = true)
+    {
+        this.charactor = charactor;
+        this.isGrounded = isGrounded;
+    }
+}
 
 /// <summary>
 /// 누른 스킬 슬롯 정보
@@ -131,6 +138,11 @@ public readonly struct StartedPressSkillSlot
     /// </summary>
     public StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
 }
+
+/// <summary>
+/// 취소할 스킬 정보
+/// </summary>
+public readonly struct CancelSkill { }
 
 /// <summary>
 /// 추가할 이펙트 정보

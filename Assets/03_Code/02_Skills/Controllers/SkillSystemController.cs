@@ -12,6 +12,8 @@ public class SkillSystemController : MonoBehaviour, IInitializable
 
     private GameInputReader ownerInput;                             // 소유자 입력 시스템
 
+    private bool ownerIsGrounded = true;                            // 소유자 땅에 있음 여부
+
     public ISkillSystemProvider Presenter => presenter ?? null;
     public int Priority => (int)InitOrder.Skill + 1;                // 중요도
 
@@ -19,6 +21,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     {
         // 액티브 스킬 슬롯 키 누름 이벤트 구독
         EventBus<StartedPressSkillSlot>.action += ExecuteSkill;
+        EventBus<CanExecutingActiveSkill>.action += SetOwnerIsGrounded;
     }
 
     private void Update()
@@ -41,7 +44,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         #endregion
 
         // 시간이 멈춰있다면
-        if (Time.timeScale <= 0f)
+        if (Time.timeScale <= 0f || !ownerIsGrounded)
             return;
 
         // A키를 눌렀다면
@@ -73,6 +76,7 @@ public class SkillSystemController : MonoBehaviour, IInitializable
         presenter.DisablePresenter();
         // 액티브 스킬 슬롯 누름 이벤트 구독 해제
         EventBus<StartedPressSkillSlot>.action -= ExecuteSkill;
+        EventBus<CanExecutingActiveSkill>.action -= SetOwnerIsGrounded;
     }
 
     // 초기화 함수
@@ -138,6 +142,14 @@ public class SkillSystemController : MonoBehaviour, IInitializable
                             $"입력 - 슬롯 : {type.type.ToKoreanString()}", this);
                 break;
         }
+    }
+
+    private void SetOwnerIsGrounded(CanExecutingActiveSkill eventData)
+    {
+        if (owner != eventData.charactor)
+            return;
+
+        ownerIsGrounded = eventData.isGrounded;
     }
 
     #region 플레이어 쪽에서 추가한 함수

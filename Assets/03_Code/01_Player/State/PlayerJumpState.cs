@@ -18,6 +18,7 @@ public class PlayerJumpState : PlayerBaseState
         controller.Animation.PlayJump();
         controller.Movement.Jump();
         controller.Audio?.PlayJump();
+        EventBus<CanExecutingActiveSkill>.Publish(new(controller.gameObject, false));
     }
 
     public override void UpdateState()

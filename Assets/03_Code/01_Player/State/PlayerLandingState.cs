@@ -60,5 +60,6 @@ public class PlayerLandingState : PlayerBaseState
     public override void ExitState()
     {
         Debug.Log("Landing Exit");
+        EventBus<CanExecutingActiveSkill>.Publish(new(controller.gameObject));
     }
 }
