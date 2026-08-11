@@ -71,6 +71,7 @@ public class WeaponVisualManager : MonoBehaviour, IInitializable
         if (!weapons.TryGetValue(change.id, out var weaponVisual))
             return;
 
+        transform.localRotation = Quaternion.identity;
         // 무기 외형 상태 변경
         weaponVisual.SetActive(change.isActiveWeapon);
 
@@ -84,16 +85,12 @@ public class WeaponVisualManager : MonoBehaviour, IInitializable
             // 매그넘 무기라면
             if (change.id == (int)ACTIVE_SKILL_ID.Magnum)
                 // 각도 변환
-                transform.rotation = magnumRotation;
+                transform.localRotation = magnumRotation;
 
             // 액티브 스킬 실행 위치들 변경 이벤트 발행
             EventBus<ChangeActiveSkillExecutePositions>.Publish(new(weapon.FirePoints));
             // 무기 애니메이션 재생
             weapon.PlayAnimation();
         }
-        // 매그넘 무기가 비활성화 상태라면
-        else if (change.id == (int)ACTIVE_SKILL_ID.Magnum)
-            // 각도 원상복구
-            transform.rotation = Quaternion.identity;
     }
 }
