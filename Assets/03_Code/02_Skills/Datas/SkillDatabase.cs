@@ -29,32 +29,26 @@ public static class SkillDatabase
             if (data == null)
                 continue;
 
-            // ID에 해당하는 스킬 정보가 없다면
-            if (!skillDataDictionary.TryGetValue(data.Id, out var existData))
-            {
-                // 액티브 스킬 데이터 변환이 가능하다면
-                if(data.AsActiveData != null)
-                {
-                    // 이펙트 정렬하기
-                    data.AsActiveData.SortEffects();
-                    // 사운드 정렬하기
-                    data.AsActiveData.SortSounds();
-                }
-
-                // 스킬 정보 추가
-                skillDataDictionary[data.Id] = data;
-                skillDataList.Add(data);
-            }
             // ID에 해당하는 스킬 정보가 있다면
-            else
-                Debug.Log($"[Error | Skill] 해당 데이터 있음 => " +
-                            $"입력 - {data.SkillName} : ID({data.Id}) / " +
-                            $"{existData.SkillName} : ID({existData.Id})");
+            if (skillDataDictionary.TryGetValue(data.Id, out var existData))
+                continue;
+
+            // 액티브 스킬 데이터 변환이 가능하다면
+            if (data.AsActiveData != null)
+            {
+                // 이펙트 정렬하기
+                data.AsActiveData.SortEffects();
+                // 사운드 정렬하기
+                data.AsActiveData.SortSounds();
+            }
+
+            // 스킬 정보 추가
+            skillDataDictionary[data.Id] = data;
+            skillDataList.Add(data);
         }
 
         // 초기화됨
         isInit = true;
-        //Debug.Log($"[Skill] 데이터베이스 초기화 완료");
     }
 
     /// <summary>
@@ -87,12 +81,7 @@ public static class SkillDatabase
     {
         // ID들이 없거나, 찾는 ID가 없거나, 결과를 담을 리스트가 없다면
         if(ids == null || ids.Length == 0 || results == null)
-        {
-            Debug.Log($"[Error | Skill] 필수 검색 조건 부족 => " +
-                        $"입력 - ID : {(ids == null ? "없음" : $"있음({ids.Length})")} / " +
-                        $"리스트 : {(results == null ? "없음" : "있음")}");
             return;
-        }
 
         // 리스트 초기화
         results.Clear();
@@ -116,11 +105,7 @@ public static class SkillDatabase
     {
         // 결과를 담을 리스트가 없다면
         if(results == null)
-        {
-            Debug.Log($"[Error | Skill] 필수 검색 조건 부족 => " +
-                        $"입력 - {chapter.ToKoreanString()} / 리스트 : 없음");
             return;
-        }
 
         // 리스트 초기화
         results.Clear();

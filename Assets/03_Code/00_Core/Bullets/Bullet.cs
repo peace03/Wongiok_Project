@@ -189,9 +189,16 @@ public class Bullet : MonoBehaviour, IPoolable
                 // 최대 이펙트 시간 받아오기
                 maxEffectTime = effect.MaxEffectTime;
 
-            // 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
-            var executeEffect = EffectManager.Instance.PlayEffect(hitEffect, pos,
-                                            Quaternion.LookRotation(-transform.forward), maxEffectTime);
+            Effect executeEffect;
+
+            if (target.HitEffectPlace != null)
+                // 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
+                executeEffect = EffectManager.Instance.PlayEffect(hitEffect, target.HitEffectPlace.position,
+                                                Quaternion.LookRotation(-transform.forward), maxEffectTime);
+            else
+                // 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
+                executeEffect = EffectManager.Instance.PlayEffect(hitEffect, pos,
+                                                Quaternion.LookRotation(-transform.forward), maxEffectTime);
 
             // 실행한 이펙트가 타겟 이펙트 인터페이스를 가지고 있다면
             if (executeEffect.TryGetComponent<ITargetEffect>(out var targetEffect))

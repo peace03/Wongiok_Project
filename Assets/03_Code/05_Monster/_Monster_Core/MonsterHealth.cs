@@ -6,9 +6,13 @@ public class MonsterHealth : MonoBehaviour, IDamageable, IDeadState
     [SerializeField] private float maxHp = 30f;
     [SerializeField] private bool resetHpOnEnable = true;
     [SerializeField] private bool invulnerable;
+    [Header("타격/피격 이펙트 실행할 위치")]
+    [SerializeField] private Transform hitEffectPlace;
 
     private float currentHp;
     private bool isDead;
+
+    public Transform HitEffectPlace => hitEffectPlace != null ? hitEffectPlace : null;
 
     public float MaxHp
     {

@@ -46,18 +46,20 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         ResetExecutePositions();
     }
 
-    // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
     private void OnDisable()
     {
+        // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
         EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
+        #region 플레이어 쪽에서 추가한 로직
         SetExecutingSkill(false);
+        #endregion
     }
 
     /// <summary>
     /// 초기화 함수
     /// </summary>
     /// <param name="driver">소유자 애니메이터 시스템</param>
-    public void Initialize(PlayerAnimatorDriver driver) => ownerAnimatorDriver = driver;
+    public void Init(PlayerAnimatorDriver driver) => ownerAnimatorDriver = driver;
 
     /// <summary>
     /// 실행 위치들 설정 함수
@@ -116,7 +118,9 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             startAnimationWaitTime = Mathf.Max(0f, ownerAnimatorDriver.SkillStartAnimDuration
                                                                                     - levelData.MaxChargingTime);
 
+        // 실행 중인 이펙트 딕셔너리에 메인(총알) 이펙트가 있다면
         if(activeEffects.ContainsKey(ACTIVE_SKILL_EFFECT_TYPE.Main))
+            // 메인 이펙트 리스트 초기화
             activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
 
         // 스킬 실행 중
@@ -137,33 +141,41 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private IEnumerator ProjectileRoutine(int bulletCount, float damage, float? maxDuration,
                                                                         int penetrationCount, bool isCharging)
     {
+        // 스킬 시작 애니메이션 대기 시간 저장
         float waitTimer = startAnimationWaitTime;
 
-        while(waitTimer > 0f)
+        // 대기 시간이 끝날 때까지
+        while (waitTimer > 0f)
         {
+            // 스킬 실행 중이 아니라면
             if (!executingSkill)
                 yield break;
 
+            // 대기 시간 감소
             waitTimer -= Time.deltaTime;
             yield return null;
         }
 
+        // 실행 중인 스킬 정보 받아오기
         var data = SkillDatabase.FindDataById(executingSkillId);
 
+        // 정보가 비어있거나, 액티브 스킬이 아니라면
         if (data == null || data.AsActiveData == null)
         {
+            #region 플레이어 쪽에서 추가한 로직
             SetExecutingSkill(false);
+            #endregion
             yield break;
         }
 
+        // 액티브 스킬 사운드의 수만큼
         foreach (var sound in data.AsActiveData.Sounds)
         {
+            // 사운드 파일이 없다면
             if (sound.clip == null)
-            {
-                //Debug.Log($"[Skill] 사운드 파일 없음 => 입력 - {data.SkillName}");
                 continue;
-            }
 
+            // 사운드 재생
             EventBus<StartControlledSfxEvent>.Publish(new($"{data.Id}_Sound", sound.clip,
                                                                                     sound.volume, false));
         }
@@ -173,6 +185,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             // 총구 이펙트 실행하기
             ExecuteEffects(data.AsActiveData, ACTIVE_SKILL_EFFECT_TYPE.Muzzle, place);
 
+        // 총알을 담을 변수
         Bullet bullet;
 
         // 현재 발사체 개수만큼
@@ -183,11 +196,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             {
                 // 돌격 소총이라면
                 if (executingSkillId == (int)ACTIVE_SKILL_ID.Rifle)
-                    // 외형 킨 총알 가져오기
+                    // 외형이 켜진 총알 가져오기
                     bullet = bulletFactory.GetBullet();
                 // 그 외라면
                 else
-                    // 외형 끈 총알 가져오기
+                    // 외형이 꺼진 총알 가져오기
                     bullet = bulletFactory.GetBullet(false);
 
                 // 총알 위치와 각도 설정하기
@@ -199,8 +212,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
                 float bulletSpeed = 50f / (projectileDelayTimeValue == 0f ? 1f : projectileDelayTimeValue);
                 // 타격/피격 이펙트에 해당하는 이펙트 프리팹 받아오기
                 data.AsActiveData.GetEffectsByEffectType(ACTIVE_SKILL_EFFECT_TYPE.Hit, effectPrefabs);
-                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수,
-                //                  총알 속도, 카메라 흔들림 값, 타격/피격 이펙트들)
+                // 총알 발사 시작(실행 위치, 스킬 레이어, 데미지, 관통 횟수, 총알 속도, 카메라 흔들림 값,
+                //                                                                      타격/피격 이펙트들)
                 bullet.StartFire(skillLayer, damage, penetrationCount,
                                     Mathf.Clamp(bulletSpeed, 10f, 50f),
                                     projectileDelayTimeValue > 0f ? 0.1f : (!isCharging ? 1f : 0.5f),
@@ -265,11 +278,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
             // 실행 중인 이펙트들에 이펙트 종류가 없다면
             if (!activeEffects.ContainsKey(type))
-            {
-                //Debug.Log($"[Skill] 이펙트 종류[{type.ToKoreanString()}] 추가 => " +
-                //            $"입력 - 스킬 ID : {data.Id} / 스킬 이름 : {data.SkillName}");
+                // 해당 이펙트 리스트 생성
                 activeEffects[type] = new List<Effect>();
-            }
 
             // 받아온 이펙트 추가
             activeEffects[type].Add(effect);
@@ -285,10 +295,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     {
         // 이펙트 종류에 해당하는 이펙트들이 없다면
         if (!activeEffects.TryGetValue(type, out var effects))
-        {
-            //Debug.Log($"[Skill] 이펙트 종료 실패 => 입력 - {type.ToKoreanString()}");
             return;
-        }
 
         // 이펙트들의 수만큼
         foreach (var effect in effects)
@@ -334,6 +341,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
 
         // 스킬 애니메이션 취소
         ownerAnimatorDriver.CancelSkill((ACTIVE_SKILL_ID)executingSkillId);
+        // 실행 중인 스킬 ID 초기화
         executingSkillId = -1;
     }
 
@@ -349,6 +357,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     }
     #endregion
 
+    #region 기획 축소로 인한 사용하지 않는 함수들
     /// <summary>
     /// 범위 스킬 실행 함수
     /// </summary>
@@ -356,10 +365,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     {
         // 실행할 스킬 단계가 없다면
         if (skillData.Stages.Count == 0)
-        {
-            //Debug.Log($"[Skill] 범위 액티브 스킬 실행 실패 => 입력 - 스킬 ID : {id} / 스킬 단계 : 없음");
             return;
-        }
 
         // 범위 스킬 실행
         StartCoroutine(AreaRoutine(skillData));
@@ -454,4 +460,5 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 타겟들 리스트 반환
         return targets;
     }
+    #endregion
 }

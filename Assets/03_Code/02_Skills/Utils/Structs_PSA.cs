@@ -115,9 +115,24 @@ public readonly struct ChangeActiveSkillExecutePositions
 }
 
 /// <summary>
-/// 취소할 스킬 정보
+/// 스킬 사용 가능 여부 정보
 /// </summary>
-public readonly struct CancelSkill { }
+public readonly struct CanExecutingActiveSkill
+{
+    public readonly GameObject charactor;                           // 상태가 변한 객체
+    public readonly bool isGrounded;                                // 땅에 있음 여부
+
+    /// <summary>
+    /// 스킬 사용 가능 여부 정보 생성자
+    /// </summary>
+    /// <param name="charactor">상태가 변한 객체</param>
+    /// <param name="isGrounded">땅에 있음 여부</param>
+    public CanExecutingActiveSkill(GameObject charactor, bool isGrounded = true)
+    {
+        this.charactor = charactor;
+        this.isGrounded = isGrounded;
+    }
+}
 
 /// <summary>
 /// 누른 스킬 슬롯 정보
@@ -131,6 +146,11 @@ public readonly struct StartedPressSkillSlot
     /// </summary>
     public StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
 }
+
+/// <summary>
+/// 취소할 스킬 정보
+/// </summary>
+public readonly struct CancelSkill { }
 
 /// <summary>
 /// 추가할 이펙트 정보

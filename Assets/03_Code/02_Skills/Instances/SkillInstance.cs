@@ -147,10 +147,7 @@ public class SkillInstance
     {
         // 강화 불가능이라면
         if(!CanEnhance)
-        {
-            Debug.Log($"[Skill] 강화 불가 => {data.SkillName} : Lv.{curLevel}");
             return;
-        }
 
         // 레벨 증가
         curLevel = Math.Clamp(curLevel + 1, 1, Math.Max(1, data.MaxLevel));
@@ -168,12 +165,8 @@ public class SkillInstance
     {
         // 사용 가능한 상태가 아니라면
         if (!IsReady)
-        {
-            Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
             return;
-        }
 
-        //Debug.Log($"[Skill] 사용 시작 => {data.SkillName}");
         // 현재 쿨타임 초기화
         curCoolTime = 0f;
 
@@ -194,8 +187,6 @@ public class SkillInstance
     /// <param name="effectClear">이펙트 초기화 여부</param>
     private void SwitchState(SKILL_STATE change, bool effectClear = true)
     {
-        bool wasUsingSkill = IsActiveSkill && (IsCharging || IsExecuting);
-
         // 현재 상태가 차징이였다면
         if(IsCharging)
         {
@@ -205,6 +196,9 @@ public class SkillInstance
             StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Target, effectClear);
         }
 
+        #region 플레이어 쪽에서 추가한 로직
+        bool wasUsingSkill = IsActiveSkill && (IsCharging || IsExecuting);
+        #endregion
         // 현재 상태 바꾸기
         state = change;
         #region 플레이어 쪽에서 추가한 로직
@@ -217,21 +211,12 @@ public class SkillInstance
         }
         #endregion
 
-        Debug.Log($"[Skill] {state.ToKoreanString()} => {data.SkillName}");
-
-        // 바꾼 상태가 사용 가능이라면
-        if (IsReady)
-            Debug.Log("스킬 슬롯 UI에 반짝거리는 이펙트가 필요하다면 이벤트 보내기");
         // 바꾼 상태가 실행이라면
-        else if (IsExecuting)
+        if (IsExecuting)
         {
             // 소유자가 없다면
             if (owner == null)
-            {
-                //Debug.Log($"[Error | Skill] 사용 불가 => " +
-                //            $"입력 - {data.SkillName} : Lv.{curLevel} / 소유자(Owner) : 없음");
                 return;
-            }
 
             // 차징 시간이 있는 스킬이라면 ? 히트 스탑 프레임을 현재 프레임의 3/4 : 즉발 스킬이라면 현재 프레임의 절반
             int hitStopFrame = data.GetMaxChargingTime(curLevel) > 0f ? (curFps / 4) * 3 : curFps / 2;
@@ -291,11 +276,8 @@ public class SkillInstance
             
             // 실행 중인 이펙트들에 이펙트 종류가 없다면
             if (!activeEffects.ContainsKey(type))
-            {
-                //Debug.Log($"[Skill] 이펙트 종류[{type.ToKoreanString()}] 추가 => " +
-                //            $"입력 - 스킬 ID : {data.Id} / 스킬 이름 : {data.SkillName}");
+                // 해당 이펙트 리스트 생성
                 activeEffects[type] = new List<Effect>();
-            }
 
             // 받아온 이펙트 추가
             activeEffects[type].Add(effect);
@@ -311,10 +293,7 @@ public class SkillInstance
     {
         // 이펙트 종류에 해당하는 이펙트들이 없다면
         if(!activeEffects.TryGetValue(type, out var effects))
-        {
-            //Debug.Log($"[Skill] 이펙트 종료 실패 => 입력 - {type.ToKoreanString()}");
             return;
-        }
 
         // 이펙트들의 수만큼
         foreach(var effect in effects)
@@ -391,14 +370,11 @@ public class SkillInstance
         // 차징이 끝났다면
         if (curChargingTime >= Math.Max(0f, data.GetMaxChargingTime(curLevel)))
         {
-            Debug.Log($"{data.SkillName} 스킬 - 스킬 진행");
             // 실행 상태로 변경(이펙트 초기화 X)
             SwitchState(SKILL_STATE.Executing, false);
             return;
         }
 
-        //Debug.Log($"[Skill] 사용 취소 => {data.SkillName}");
-        Debug.Log($"{data.SkillName} 스킬 - 스킬 취소 후 쿨타임 상태 변환");
         // 쿨타임 상태로 변경
         SwitchState(SKILL_STATE.CoolTime);
     }
