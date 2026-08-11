@@ -222,13 +222,13 @@ public class SkillSystemPresenter : ISkillSystemProvider
         if (model == null)
             return;
 
+        results.Clear();
         model.GetCanEnhanceSkills(modelResults);
 
         if (modelResults == null || modelResults.Count == 0)
             return;
 
         BaseSkillData data;
-        results.Clear();
 
         foreach (var skill in modelResults)
         {

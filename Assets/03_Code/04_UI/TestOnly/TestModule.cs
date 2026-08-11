@@ -767,8 +767,6 @@ public class TestModule : MonoBehaviour
     {
         if (currentValue == nextValue) return;
 
-        Debug.Log(label);
-
         lines.Add($"{label}: {currentValue} -> {nextValue}");
     }
 
