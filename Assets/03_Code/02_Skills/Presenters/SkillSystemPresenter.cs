@@ -29,26 +29,22 @@ public class SkillSystemPresenter : ISkillSystemProvider
         // 현재 챕터의 스킬 데이터 받아오기
         SkillDatabase.FindDatasByChapter(curChapter, skillDatas);   // 나중에 현재 챕터 부분 수정해야 함
 
-        // 스킬 데이터가 있다면
-        if (skillDatas.Count != 0)
-        {
-            // 스킬 모델 생성하기
-            model = new(owner, executer, skillDatas, curChapter, ownerInput);
-            // 액티브 스킬 변경 이벤트 구독
-            model.OnActiveSkillsChanged += RefreshActiveSkills;
-            // UI 레벨업 스킬 선택 이벤트 구독
-            EventBus<UILevelUpSkillSelectedEvent>.action += RefreshSelectedSkill;
-            // 스킬 스왑(미장착 -> 장착) 이벤트 구독
-            EventBus<UIPauseSkillEquipRequestedEvent>.action += RefreshSelectedSkills;
-            // 스킬 스왑(장착 -> 장착) 이벤트 구독
-            EventBus<UIPauseSkillSwapRequestedEvent>.action += RefreshSelectedSkills;
-            // 모든 스킬 새로고침
-            RefreshAllSkills();
-        }
         // 스킬 데이터가 없다면
-        else
-            Debug.Log($"[Error | Skill] 스킬 모델 생성 실패 => " +
-                        $"입력 - 대상 : {owner.name} / 스킬 데이터 : 없음", owner);
+        if (skillDatas.Count == 0)
+            return;
+
+        // 스킬 모델 생성하기
+        model = new(owner, executer, skillDatas, curChapter, ownerInput);
+        // 액티브 스킬 변경 이벤트 구독
+        model.OnActiveSkillsChanged += RefreshActiveSkills;
+        // UI 레벨업 스킬 선택 이벤트 구독
+        EventBus<UILevelUpSkillSelectedEvent>.action += RefreshSelectedSkill;
+        // 스킬 스왑(미장착 -> 장착) 이벤트 구독
+        EventBus<UIPauseSkillEquipRequestedEvent>.action += RefreshSelectedSkills;
+        // 스킬 스왑(장착 -> 장착) 이벤트 구독
+        EventBus<UIPauseSkillSwapRequestedEvent>.action += RefreshSelectedSkills;
+        // 모든 스킬 새로고침
+        RefreshAllSkills();
     }
 
     /// <summary>
@@ -86,10 +82,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
     {
         // 모델이 없다면
         if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 액티브 스킬들 새로고침 실패 => 입력 - 스킬 모델 : 없음");
             return;
-        }
 
         // 장착한 액티브 스킬들 받아오기
         model.GetEquippedActiveSkills(modelResults);
@@ -201,10 +194,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
     {
         // 모델이 없다면
         if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 패시브 스킬들 새로고침 실패 => 입력 - 스킬 모델 : 없음");
             return;
-        }
 
         // 장착한 패시브 스킬들 받아오기
         model.GetEquippedPassiveSkills(modelResults);
@@ -217,25 +207,38 @@ public class SkillSystemPresenter : ISkillSystemProvider
                                                     unequippedSkillUIDatas.ToArray(), isActiveSkill: false));
     }
 
+    /// <summary>
+    /// UI용 강화 가능한 스킬 정보들 반환 함수
+    /// </summary>
+    /// <param name="results">결과를 담을 리스트</param>
     public void GetCanEnhanceSkillUIDatas(List<UIPauseSkillInfoData> results)
     {
+        // 모델이 없다면
         if (model == null)
             return;
 
+        // UI용 리스트 초기화
         results.Clear();
+        // 강화 가능한 스킬들 받아오기
         model.GetCanEnhanceSkills(modelResults);
 
+        // 리스트가 없거나, 리스트가 비어있다면
         if (modelResults == null || modelResults.Count == 0)
             return;
 
+        // 스킬 정보를 담을 변수
         BaseSkillData data;
 
+        // 강화 가능한 스킬들의 수만큼
         foreach (var skill in modelResults)
         {
+            // 스킬 정보가 없다면
             if (skill.BaseData == null)
                 continue;
 
+            // 스킬 정보 저장
             data = skill.BaseData;
+            // UI용 정보로 변환해서 리스트에 추가
             results.Add(new(data.Icon, data.SkillName, skill.CurLevel, data.Desc, skill.IsEquipped, data.Id));
         }
     }
@@ -248,27 +251,23 @@ public class SkillSystemPresenter : ISkillSystemProvider
     {
         // 모델이 없다면
         if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 스킬 레벨업 실패 => 입력 - 스킬 모델 : 없음");
             return;
-        }
 
+        // 스킬 객체를 담을 변수
         SkillInstance skill;
 
         // 레벨업이 불가능한 스킬이라면
         if ((skill = model.EnhanceSkill(skillUIData.SkillId)) == null)
-        {
-            Debug.Log($"[Error | Skill] 스킬 레벨업 실패 => " +
-                        $"입력 - 스킬 ID : {skillUIData.SkillId} / 레벨업 불가");
             return;
-        }
-        else if (skill != null)
-        {
-            if (skill.IsActiveSkill)
-                RefreshActiveSkills();
-            else
-                RefreshPassiveSkills();
-        }
+
+        // 액티브 스킬이라면
+        if (skill.IsActiveSkill)
+            // 액티브 스킬 새로고침
+            RefreshActiveSkills();
+        // 그 외라면
+        else
+            // 패시브 스킬 새로고침
+            RefreshPassiveSkills();
     }
 
     /// <summary>
@@ -279,21 +278,14 @@ public class SkillSystemPresenter : ISkillSystemProvider
     {
         // 모델이 없다면
         if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 스킬 스왑 실패 => 입력 - 스킬 모델 : 없음");
             return;
-        }
 
         // 슬롯 위치 받아오기
         ACTIVE_SKILL_SLOT_TYPE slot = (ACTIVE_SKILL_SLOT_TYPE)skillUIData.TargetSlotIndex;
 
         // 스킬 스왑에 실패했다면
         if (!model.SwapSkill(slot, skillUIData.SkillId))
-        {
-            Debug.Log($"[Error | Skill] 스킬 스왑 실패 => " +
-                        $"입력 - 스킬 ID : {skillUIData.SkillId} / 변경 위치 : {slot.ToKoreanString()}");
             return;
-        }
     }
 
     /// <summary>
@@ -304,10 +296,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
     {
         // 모델이 없다면
         if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 스킬 스왑 실패 => 입력 - 스킬 모델 : 없음");
             return;
-        }
 
         // 슬롯 위치 받아오기
         ACTIVE_SKILL_SLOT_TYPE slot = (ACTIVE_SKILL_SLOT_TYPE)skillUIData.TargetSlotIndex;
@@ -316,11 +305,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
 
         // 스킬 스왑에 실패했다면
         if (!model.SwapSkill(slot, skillId))
-        {
-            Debug.Log($"[Error | Skill] 스킬 스왑 실패 => " +
-                        $"입력 - 스킬 ID : {skillId} / 변경 위치 : {slot.ToKoreanString()}");
             return;
-        }
     }
 
     /// <summary>
@@ -330,10 +315,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
     {
         // 모델이 없다면
         if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 액티브 스킬 실행 실패 => 입력 - 스킬 모델 : 없음");
             return;
-        }
 
         // 액티브 스킬 실행
         model.ExecuteActiveSkill(slot);
@@ -346,10 +328,7 @@ public class SkillSystemPresenter : ISkillSystemProvider
     {
         // 모델이 없다면
         if (model == null)
-        {
-            Debug.Log($"[Error | Skill] 액티브 스킬 실행 실패 => 입력 - 스킬 모델 : 없음");
             return;
-        }
 
         // 액티브 스킬 시간 진행
         model.TickActiveSkills(time);

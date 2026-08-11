@@ -145,9 +145,9 @@ public static class EnumExtensions
     {
         return type switch
         {
-            ACTIVE_SKILL_ID.Magnum             => "매그넘",
-            ACTIVE_SKILL_ID.Rifle              => "돌격소총",
-            ACTIVE_SKILL_ID.Sniper             => "저격총",
+            ACTIVE_SKILL_ID.Magnum                  => "매그넘",
+            ACTIVE_SKILL_ID.Rifle                   => "돌격소총",
+            ACTIVE_SKILL_ID.Sniper                  => "저격총",
             _                                       => ""
         };
     }

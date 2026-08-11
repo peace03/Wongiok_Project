@@ -114,11 +114,19 @@ public readonly struct ChangeActiveSkillExecutePositions
     public ChangeActiveSkillExecutePositions(List<Transform> positions) => this.positions = positions;
 }
 
+/// <summary>
+/// 스킬 사용 가능 여부 정보
+/// </summary>
 public readonly struct CanExecutingActiveSkill
 {
-    public readonly GameObject charactor;
-    public readonly bool isGrounded;
+    public readonly GameObject charactor;                           // 상태가 변한 객체
+    public readonly bool isGrounded;                                // 땅에 있음 여부
 
+    /// <summary>
+    /// 스킬 사용 가능 여부 정보 생성자
+    /// </summary>
+    /// <param name="charactor">상태가 변한 객체</param>
+    /// <param name="isGrounded">땅에 있음 여부</param>
     public CanExecutingActiveSkill(GameObject charactor, bool isGrounded = true)
     {
         this.charactor = charactor;

@@ -1,8 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 스킬 시스템 제공 인터페이스
+/// </summary>
 public interface ISkillSystemProvider
 {
+    /// <summary>
+    /// UI용 강화 가능한 스킬 정보들 반환 함수
+    /// </summary>
+    /// <param name="results">결과를 담을 리스트</param>
     public void GetCanEnhanceSkillUIDatas(List<UIPauseSkillInfoData> results);
 }
 
@@ -14,6 +21,8 @@ public interface IProjectileSkill
     /// <summary>
     /// 발사체 액티브 스킬 실행 함수
     /// </summary>
+    /// <param name="id">실행할 스킬 ID</param>
+    /// <param name="skillData">실행할 스킬 레벨별 정보</param>
     public void ExecuteSkill(int id, ProjectileSkillLevelData skillData);
 }
 
@@ -25,6 +34,8 @@ public interface IAreaSkill
     /// <summary>
     /// 범위 액티브 스킬 실행 함수
     /// </summary>
+    /// <param name="id">실행할 스킬 ID</param>
+    /// <param name="skillData">실행할 스킬 레벨별 정보</param>
     public void ExecuteSkill(int id, AreaSkillLevelData skillData);
 }
 

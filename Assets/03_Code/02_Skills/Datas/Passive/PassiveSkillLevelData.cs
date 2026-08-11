@@ -20,20 +20,15 @@ public class PassiveSkillLevelData : BaseSkillLevelData
     // 스킬 효과 적용 함수
     public override void ApplyEffect(GameObject owner, int id, IReadOnlyList<StatAdjustment> prevStats)
     {
-        // 나중에 밑에 계산하는 부분을 클래스로 분리하기!
-
         // 소유자가 없다면
         if (owner == null)
             return;
 
         // 스탯이 없다면
         if (!owner.TryGetComponent<PlayerStatus>(out var ownerStat))
-        {
-            //Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 => " +
-            //            $"입력 - 대상 : {owner.name}\n", owner);
             return;
-        }
 
+        #region 계산하는 부분을 클래스로 분리할 때 참고
         //// 발사체 스킬 인터페이스가 없다면
         //else if (owner.GetComponentInChildren<IProjectileSkill>(true) is not IProjectileSkill executer)
         //{
@@ -44,6 +39,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         //else
         //    // 스킬 실행
         //    executer.ExecuteSkill(id, this);
+        #endregion
 
         // 변화량을 저장할 변수
         float amount;
@@ -83,11 +79,15 @@ public class PassiveSkillLevelData : BaseSkillLevelData
             {
                 // 체력이라면
                 case STAT_TYPE.Health:
+                    // 수식 종류가 곱하기라면
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
+                        // 변화량이 100 + N%로 작성되었다면
                         if (amount >= 1f)
+                            // 100% 제거
                             amount -= 1f;
 
+                        // 실제 변화량 구하기
                         amount = ownerStat.Status.MaxHP.BaseValue * amount;
                     }
 
@@ -140,20 +140,15 @@ public class PassiveSkillLevelData : BaseSkillLevelData
     // 스킬 효과 적용 해제 함수
     public override void RemoveEffect(GameObject owner)
     {
-        // 나중에 밑에 계산하는 부분을 클래스로 분리하기!
-
         // 소유자가 없다면
         if (owner == null)
             return;
 
         // 스탯이 없다면
         if (!owner.TryGetComponent<PlayerStatus>(out var ownerStat))
-        {
-            //Debug.Log($"[Error | Skill] 해당하는 {typeof(PlayerStatus)} 없음 => " +
-            //            $"입력 - 대상 : {owner.name}\n", owner);
             return;
-        }
 
+        #region 계산하는 부분을 클래스로 분리할 때 참고
         //// 발사체 스킬 인터페이스가 없다면
         //else if (owner.GetComponentInChildren<IProjectileSkill>(true) is not IProjectileSkill executer)
         //{
@@ -164,6 +159,7 @@ public class PassiveSkillLevelData : BaseSkillLevelData
         //else
         //    // 스킬 실행
         //    executer.ExecuteSkill(id, this);
+        #endregion
 
         // 변화량을 저장할 변수
         float amount;
@@ -180,11 +176,15 @@ public class PassiveSkillLevelData : BaseSkillLevelData
             {
                 // 체력이라면
                 case STAT_TYPE.Health:
+                    // 수식 종류가 곱하기라면
                     if (stat.modify == MODIFY_TYPE.Multiplier)
                     {
+                        // 변화량이 100 + N%로 작성되었다면
                         if (amount <= -1f)
+                            // 100% 제거
                             amount += 1f;
 
+                        // 실제 변화량 구하기
                         amount = ownerStat.Status.MaxHP.BaseValue * amount;
                     }
 
