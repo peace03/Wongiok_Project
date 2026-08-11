@@ -51,7 +51,7 @@ public class BossController : MonoBehaviour, IInitializable
     {
         EventBus<UltimateInvokeEvent>.action += SetUltimateState;
         EventBus<BossDeadEvent>.action += SetDefeatedState;
-        EventBus<PlayerDeadEvent>.action += DeactivateOnPlayerDeath;
+        EventBus<PlayerDeathPresentationFinishedEvent>.action += DeactivateOnPlayerDeath;
     }
 
     // 보스가 비활성화되면 모든 이벤트 구독을 해제해 중복 콜백을 방지한다.
@@ -59,7 +59,7 @@ public class BossController : MonoBehaviour, IInitializable
     {
         EventBus<UltimateInvokeEvent>.action -= SetUltimateState;
         EventBus<BossDeadEvent>.action -= SetDefeatedState;
-        EventBus<PlayerDeadEvent>.action -= DeactivateOnPlayerDeath;
+        EventBus<PlayerDeathPresentationFinishedEvent>.action -= DeactivateOnPlayerDeath;
     }
 
     private void FixedUpdate()
@@ -111,8 +111,8 @@ public class BossController : MonoBehaviour, IInitializable
             new PlayBgmEvent(bossBgmClip, volume: bossBgmVolume));
     }
 
-    // 플레이어가 사망하면 진행 중인 보스 전투와 하위 공격 오브젝트를 즉시 종료한다.
-    private void DeactivateOnPlayerDeath(PlayerDeadEvent data)
+    // 플레이어가 사망하고 사망UI 뜨면 진행 중인 보스 전투와 하위 공격 오브젝트를 즉시 종료한다.
+    private void DeactivateOnPlayerDeath(PlayerDeathPresentationFinishedEvent data)
     {
         gameObject.SetActive(false);
     }
