@@ -76,6 +76,9 @@ public class PlayerExperienceTracker : MonoBehaviour
     {
         if (eventData.MonsterObject == null) return;
 
+        // 자폭은 몬스터 제거와 스테이지 진행에는 포함하지만 플레이어 처치 보상에서는 제외합니다.
+        if (eventData.Cause != MonsterDeathCause.PlayerAttack) return;
+
         MonsterExpReward reward = eventData.MonsterObject.GetComponent<MonsterExpReward>();
         if (reward == null) return;
 

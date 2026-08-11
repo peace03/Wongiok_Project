@@ -75,7 +75,7 @@ public class MonsterHealth : MonoBehaviour, IDamageable, IDeadState
 
         if (currentHp <= 0f)
         {
-            Die();
+            Die(MonsterDeathCause.PlayerAttack);
         }
     }
 
@@ -90,7 +90,8 @@ public class MonsterHealth : MonoBehaviour, IDamageable, IDeadState
     }
 
     // 몬스터를 즉시 사망 상태로 전환합니다
-    public void Kill()
+    public void Kill(
+        MonsterDeathCause cause = MonsterDeathCause.PlayerAttack)
     {
         if (isDead)
         {
@@ -100,7 +101,7 @@ public class MonsterHealth : MonoBehaviour, IDamageable, IDeadState
         currentHp = 0f;
 
         PublishHealthChangedEvent();
-        Die();
+        Die(cause);
     }
 
     // 몬스터의 무적 상태를 설정합니다
@@ -110,7 +111,7 @@ public class MonsterHealth : MonoBehaviour, IDamageable, IDeadState
     }
 
     // 체력이 0이 된 몬스터를 사망 처리하고 사망 이벤트를 발행합니다
-    private void Die()
+    private void Die(MonsterDeathCause cause)
     {
         if (isDead)
         {
@@ -120,7 +121,7 @@ public class MonsterHealth : MonoBehaviour, IDamageable, IDeadState
         isDead = true;
 
         EventBus<MonsterDeadEvent>.Publish(
-            new MonsterDeadEvent(gameObject));
+            new MonsterDeadEvent(gameObject, cause));
     }
 
     // 체력 변경 사실과 현재 체력을 이벤트로 전달합니다
