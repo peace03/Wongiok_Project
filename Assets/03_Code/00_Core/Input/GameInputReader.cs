@@ -25,17 +25,17 @@ public class GameInputReader : MonoBehaviour
     #endregion
 
     #region Test Input
-    public bool TestF1Pressed => _input.Test.F1.WasPressedThisFrame();
-    public bool TestF2Pressed => _input.Test.F2.WasPressedThisFrame();
-    public bool TestF3Pressed => _input.Test.F3.WasPressedThisFrame();
-    public bool TestF4Pressed => _input.Test.F4.WasPressedThisFrame();
-    public bool TestF5Pressed => _input.Test.F5.WasPressedThisFrame();
-    public bool TestF6Pressed => _input.Test.F6.WasPressedThisFrame();
-    public bool TestF7Pressed => _input.Test.F7.WasPressedThisFrame();
-    public bool TestF8Pressed => _input.Test.F8.WasPressedThisFrame();
-    public bool TestF9Pressed => _input.Test.F9.WasPressedThisFrame();
-    public bool TestF10Pressed => _input.Test.F10.WasPressedThisFrame();
-    public bool TestF11Pressed => _input.Test.F11.WasPressedThisFrame();
+    //public bool TestF1Pressed => _input.Test.F1.WasPressedThisFrame();
+    //public bool TestF2Pressed => _input.Test.F2.WasPressedThisFrame();
+    //public bool TestF3Pressed => _input.Test.F3.WasPressedThisFrame();
+    //public bool TestF4Pressed => _input.Test.F4.WasPressedThisFrame();
+    //public bool TestF5Pressed => _input.Test.F5.WasPressedThisFrame();
+    //public bool TestF6Pressed => _input.Test.F6.WasPressedThisFrame();
+    //public bool TestF7Pressed => _input.Test.F7.WasPressedThisFrame();
+    //public bool TestF8Pressed => _input.Test.F8.WasPressedThisFrame();
+    //public bool TestF9Pressed => _input.Test.F9.WasPressedThisFrame();
+    //public bool TestF10Pressed => _input.Test.F10.WasPressedThisFrame();
+    //public bool TestF11Pressed => _input.Test.F11.WasPressedThisFrame();
     #endregion
 
     #region Skill Input

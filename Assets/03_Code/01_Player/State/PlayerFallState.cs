@@ -13,7 +13,6 @@ public class PlayerFallState : PlayerBaseState
 
     public override void EnterState()
     {
-        Debug.Log("Fall Enter");
     }
 
     public override void UpdateState()
@@ -32,7 +31,6 @@ public class PlayerFallState : PlayerBaseState
 
     public override void ExitState()
     {
-        Debug.Log("Fall Exit");
     }
 
     #endregion

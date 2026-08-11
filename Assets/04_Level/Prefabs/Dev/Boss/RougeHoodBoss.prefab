@@ -687,7 +687,7 @@ GameObject:
   - component: {fileID: 4456096972685270820}
   - component: {fileID: 4733329839489382315}
   m_Layer: 14
-  m_Name: CinderellaBoss
+  m_Name: RougeHoodBoss
   m_TagString: Boss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -950,6 +950,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 919863168413146222}
     m_Modifications:
+    - target: {fileID: 4425930546966944691, guid: 423d10d6604e4f648b6d22742d8a1c1f, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 4d0a9ad46135fe64ca39200b03b05a9f, type: 2}
     - target: {fileID: 6973802144877927283, guid: 423d10d6604e4f648b6d22742d8a1c1f, type: 3}
       propertyPath: m_Name
       value: RougeHood_DevModel

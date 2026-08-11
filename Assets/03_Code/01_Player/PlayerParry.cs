@@ -102,7 +102,6 @@ public class PlayerParry : MonoBehaviour
             return CompleteBossParry();
         }
 
-        Debug.Log("플레이어 패링 입력");
         return true;
     }
 
@@ -136,7 +135,6 @@ public class PlayerParry : MonoBehaviour
         ResetPlayerParryWindow();
         LastParrySucceeded = true;
 
-        Debug.Log("근접 패링 성공");
         return true;
     }
 
@@ -154,7 +152,6 @@ public class PlayerParry : MonoBehaviour
         // 패링 성공음에 Inspector에서 설정한 볼륨을 적용한다.
         EventBus<Play2DSoundEvent>.Publish(
             new Play2DSoundEvent(clip: SFX_Parryed, volume: parrySfxVolume));
-        Debug.Log("보스 근접 패링 성공");
         return true;
     }
 

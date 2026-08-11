@@ -14,7 +14,6 @@ public class PlayerLandingState : PlayerBaseState
 
     public override void EnterState()
     {
-        Debug.Log("Landing Enter");
 
         controller.Audio?.PlayLanding();
         animationStarted = controller.Animation.PlayLanding();
@@ -59,7 +58,6 @@ public class PlayerLandingState : PlayerBaseState
 
     public override void ExitState()
     {
-        Debug.Log("Landing Exit");
         EventBus<CanExecutingActiveSkill>.Publish(new(controller.gameObject));
     }
 }

@@ -14,7 +14,6 @@ public class PlayerIdleState : PlayerBaseState
     public override void EnterState()
     {
         controller.Animation.SetLocomotion(false);
-        Debug.Log("Idle Enter");
     }
 
     public override void UpdateState()
@@ -35,7 +34,6 @@ public class PlayerIdleState : PlayerBaseState
 
     public override void ExitState()
     {
-        Debug.Log("Idle Exit");
     }
 
     #endregion

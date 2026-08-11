@@ -35,7 +35,6 @@ public class PlayerDashState : PlayerBaseState
 
     public override void EnterState()
     {
-        Debug.Log("Dash Enter");
 
         dashTimer = controller.Movement.DashDuration;
         dashDirection = GetDashDirection();
@@ -67,7 +66,6 @@ public class PlayerDashState : PlayerBaseState
     public override void ExitState()
     {
         controller.Movement.SetDashPiercing(false);
-        Debug.Log("Dash Exit");
     }
 
     #endregion

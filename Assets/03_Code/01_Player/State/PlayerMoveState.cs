@@ -15,7 +15,6 @@ public class PlayerMoveState : PlayerBaseState
     {
         controller.Animation.SetLocomotion(true);
         controller.Audio?.StartWalking();
-        Debug.Log("Move Enter");
     }
 
     public override void UpdateState()
@@ -37,7 +36,6 @@ public class PlayerMoveState : PlayerBaseState
     public override void ExitState()
     {
         controller.Audio?.StopWalking();
-        Debug.Log("Move Exit");
     }
 
     #endregion

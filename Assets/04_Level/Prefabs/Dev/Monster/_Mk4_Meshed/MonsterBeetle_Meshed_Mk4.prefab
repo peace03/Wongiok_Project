@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 8057687909995680969}
   - component: {fileID: 7856917874265365921}
   - component: {fileID: -5373912821776756640}
+  - component: {fileID: 3201641901675774584}
   m_Layer: 8
   m_Name: MonsterBeetle_Meshed_Mk4
   m_TagString: Enemy
@@ -260,6 +261,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterExpReward
   expReward: 10
+--- !u!114 &3201641901675774584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161236733381727142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 504cbffd668c5444485fc2b9c2a3b8c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterPoolMember
 --- !u!1 &1322725660097333272
 GameObject:
   m_ObjectHideFlags: 0

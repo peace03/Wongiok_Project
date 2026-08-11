@@ -186,14 +186,12 @@ public class PlayerStatus : MonoBehaviour, IDamageable
         // 현재 상태가 회피 무적 상태라면 HP 감소와 피격 피드백을 모두 막습니다.
         if (playerController != null && !playerController.CanTakeDamage)
         {
-            Debug.Log("회피 성공: 데미지 무시");
             return;
         }
 
         // 피격 후 무적 시간 동안에는 추가 데미지와 넉백을 막습니다.
         if (Time.time < invincibleEndTime)
         {
-            Debug.Log("피격 무적: 데미지 무시");
             return;
         }
         #endregion

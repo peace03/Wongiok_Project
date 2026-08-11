@@ -13,7 +13,6 @@ public class PlayerJumpState : PlayerBaseState
 
     public override void EnterState()
     {
-        Debug.Log("Jump Enter");
 
         controller.Animation.PlayJump();
         controller.Movement.Jump();
@@ -50,7 +49,6 @@ public class PlayerJumpState : PlayerBaseState
 
     public override void ExitState()
     {
-        Debug.Log("Jump Exit");
     }
 
     #endregion

@@ -14,17 +14,29 @@ public abstract class MonsterBase : MonoBehaviour
     private MonsterFacing monsterFacing;
     private MonsterTargetSensor targetSensor;
     private MonsterGroundMotor groundMotor;
+    private MonsterFlyingMotor flyingMotor;
+
     private float lockedZ;
     private bool deadStateEntered;
 
     protected Transform Target
     {
-        get { return targetSensor != null ? targetSensor.Target : null; }
+        get
+        {
+            return targetSensor != null
+                ? targetSensor.Target
+                : null;
+        }
     }
 
     protected PlayerStatus TargetStatus
     {
-        get { return targetSensor != null ? targetSensor.TargetStatus : null; }
+        get
+        {
+            return targetSensor != null
+                ? targetSensor.TargetStatus
+                : null;
+        }
     }
 
     protected MonsterHealth SelfHealth
@@ -44,22 +56,40 @@ public abstract class MonsterBase : MonoBehaviour
 
     protected float DetectionRange
     {
-        get { return targetSensor != null ? targetSensor.DetectionRange : 0f; }
+        get
+        {
+            return targetSensor != null
+                ? targetSensor.DetectionRange
+                : 0f;
+        }
     }
 
     protected float VerticalTolerance
     {
-        get { return targetSensor != null ? targetSensor.VerticalTolerance : 0f; }
+        get
+        {
+            return targetSensor != null
+                ? targetSensor.VerticalTolerance
+                : 0f;
+        }
     }
 
     protected bool FacingRight
     {
-        get { return monsterFacing != null && monsterFacing.FacingRight; }
+        get
+        {
+            return monsterFacing != null &&
+                   monsterFacing.FacingRight;
+        }
     }
 
     protected bool IsDead
     {
-        get { return monsterHealth != null && monsterHealth.IsDead; }
+        get
+        {
+            return monsterHealth != null &&
+                   monsterHealth.IsDead;
+        }
     }
 
     protected virtual bool UsesCharacterMotor
@@ -72,18 +102,76 @@ public abstract class MonsterBase : MonoBehaviour
     {
         lockedZ = transform.position.z;
 
-        monsterHealth = GetComponent<MonsterHealth>();
-        monsterStats = GetComponent<MonsterStats>();
-        monsterFacing = GetComponent<MonsterFacing>();
-        targetSensor = GetComponent<MonsterTargetSensor>();
-        groundMotor = GetComponent<MonsterGroundMotor>();
+        monsterHealth =
+            GetComponent<MonsterHealth>();
+
+        monsterStats =
+            GetComponent<MonsterStats>();
+
+        monsterFacing =
+            GetComponent<MonsterFacing>();
+
+        targetSensor =
+            GetComponent<MonsterTargetSensor>();
+
+        groundMotor =
+            GetComponent<MonsterGroundMotor>();
+
+        flyingMotor =
+            GetComponent<MonsterFlyingMotor>();
+
+        deadStateEntered = false;
 
         if (groundMotor != null)
         {
             groundMotor.Initialize(lockedZ);
         }
 
+        if (flyingMotor != null)
+        {
+            flyingMotor.Initialize(lockedZ);
+        }
+
         FixDepthPosition();
+    }
+
+    // 김연호 : 풀에서 꺼낸 몬스터의 위치와 Fixed Z와 공통 런타임 상태를 새 Spawn 기준으로 초기화합니다
+    public void PrepareForSpawn(
+        Vector3 spawnPosition,
+        Quaternion spawnRotation)
+    {
+        deadStateEntered = false;
+
+        lockedZ = spawnPosition.z;
+
+        if (groundMotor != null)
+        {
+            groundMotor.SetCharacterControllerEnabled(
+                false
+            );
+        }
+
+        transform.SetPositionAndRotation(
+            spawnPosition,
+            spawnRotation
+        );
+
+        if (groundMotor != null)
+        {
+            groundMotor.Initialize(lockedZ);
+
+            groundMotor.SetCharacterControllerEnabled(
+                true
+            );
+        }
+
+        if (flyingMotor != null)
+        {
+            flyingMotor.Initialize(lockedZ);
+        }
+
+        FixDepthPosition();
+        OnSpawnPrepared();
     }
 
     // 몬스터의 공통 생명주기와 AI 틱을 실행합니다
@@ -100,7 +188,8 @@ public abstract class MonsterBase : MonoBehaviour
             targetSensor.RefreshTarget();
         }
 
-        if (UsesCharacterMotor && groundMotor != null)
+        if (UsesCharacterMotor &&
+            groundMotor != null)
         {
             groundMotor.ResetHorizontalVelocity();
         }
@@ -110,7 +199,8 @@ public abstract class MonsterBase : MonoBehaviour
             TickMonster();
         }
 
-        if (UsesCharacterMotor && groundMotor != null)
+        if (UsesCharacterMotor &&
+            groundMotor != null)
         {
             groundMotor.TickMovement();
         }
@@ -120,15 +210,19 @@ public abstract class MonsterBase : MonoBehaviour
         }
     }
 
-    // 프레임 마지막에 Z 이탈을 감지하고 최초 Z 위치로 복원합니다
+    // 프레임 마지막에 Z 이탈을 감지하고 최초 또는 Spawn 시 갱신된 Z 위치로 복원합니다
     private void LateUpdate()
     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        if (Mathf.Abs(transform.position.z - lockedZ) > 0.001f)
+        if (Mathf.Abs(
+                transform.position.z -
+                lockedZ) > 0.001f)
         {
             Debug.LogWarning(
-                $"[MonsterDepthLock] {name} Z drift detected. " +
-                $"Current: {transform.position.z:F4}, Locked: {lockedZ:F4}",
+                $"[MonsterDepthLock] {name} " +
+                "Z drift detected. " +
+                $"Current: {transform.position.z:F4}, " +
+                $"Locked: {lockedZ:F4}",
                 this
             );
         }
@@ -139,6 +233,11 @@ public abstract class MonsterBase : MonoBehaviour
 
     // 자식 클래스에서 몬스터별 행동을 구현합니다
     protected abstract void TickMonster();
+
+    // 김연호 : 풀에서 Spawn 준비가 끝난 뒤 자식 AI가 추가 상태를 초기화할 수 있도록 확장 지점을 제공합니다
+    protected virtual void OnSpawnPrepared()
+    {
+    }
 
     // 사망 상태에 한 번만 진입합니다
     private void EnterDeadStateIfNeeded()
@@ -166,18 +265,27 @@ public abstract class MonsterBase : MonoBehaviour
             return false;
         }
 
-        return targetSensor.IsTargetInDetectionRange(transform.position);
+        return targetSensor
+            .IsTargetInDetectionRange(
+                transform.position
+            );
     }
 
     // 대상이 지정한 수평 수직 범위 안에 있는지 확인합니다
-    protected bool IsTargetInRange(float horizontalRange, float allowedVerticalRange)
+    protected bool IsTargetInRange(
+        float horizontalRange,
+        float allowedVerticalRange)
     {
         if (targetSensor == null)
         {
             return false;
         }
 
-        return targetSensor.IsTargetInRange(transform.position, horizontalRange, allowedVerticalRange);
+        return targetSensor.IsTargetInRange(
+            transform.position,
+            horizontalRange,
+            allowedVerticalRange
+        );
     }
 
     // 대상 방향으로 바라보도록 방향 값을 갱신합니다
@@ -192,14 +300,17 @@ public abstract class MonsterBase : MonoBehaviour
     }
 
     // 몬스터의 바라보는 방향을 설정합니다
-    protected void SetFacingDirection(bool lookRight)
+    protected void SetFacingDirection(
+        bool lookRight)
     {
         if (monsterFacing == null)
         {
             return;
         }
 
-        monsterFacing.SetFacingDirection(lookRight);
+        monsterFacing.SetFacingDirection(
+            lookRight
+        );
     }
 
     // 대상 방향으로 수평 이동합니다
@@ -210,19 +321,29 @@ public abstract class MonsterBase : MonoBehaviour
             return;
         }
 
-        float direction = Target.position.x > transform.position.x ? 1f : -1f;
-        SetHorizontalVelocity(direction * GetMoveSpeed());
+        float direction =
+            Target.position.x >
+            transform.position.x
+                ? 1f
+                : -1f;
+
+        SetHorizontalVelocity(
+            direction * GetMoveSpeed()
+        );
     }
 
     // 수평 이동 속도를 설정합니다
-    protected void SetHorizontalVelocity(float velocity)
+    protected void SetHorizontalVelocity(
+        float velocity)
     {
         if (groundMotor == null)
         {
             return;
         }
 
-        groundMotor.SetHorizontalVelocity(velocity);
+        groundMotor.SetHorizontalVelocity(
+            velocity
+        );
     }
 
     // 수평 이동을 멈춥니다
@@ -244,62 +365,83 @@ public abstract class MonsterBase : MonoBehaviour
             return fallbackMoveSpeed;
         }
 
-        return monsterStats.GetMoveSpeedOrFallback(fallbackMoveSpeed);
+        return monsterStats
+            .GetMoveSpeedOrFallback(
+                fallbackMoveSpeed
+            );
     }
 
     // 몬스터 공격력을 가져옵니다
-    protected float GetAttackPower(float fallbackDamage)
+    protected float GetAttackPower(
+        float fallbackDamage)
     {
         if (monsterStats == null)
         {
             return fallbackDamage;
         }
 
-        return monsterStats.GetAttackPowerOrFallback(fallbackDamage);
+        return monsterStats
+            .GetAttackPowerOrFallback(
+                fallbackDamage
+            );
     }
 
     // 현재 바라보는 방향을 월드 방향으로 반환합니다
-    protected Vector3 GetFacingDirectionVector()
+    protected Vector3
+        GetFacingDirectionVector()
     {
         if (monsterFacing == null)
         {
             return Vector3.right;
         }
 
-        return monsterFacing.GetFacingDirectionVector();
+        return monsterFacing
+            .GetFacingDirectionVector();
     }
 
     // 현재 바라보는 방향에 맞춰 오프셋을 계산합니다
-    protected Vector3 GetFacingOffset(Vector3 offset)
+    protected Vector3 GetFacingOffset(
+        Vector3 offset)
     {
         if (monsterFacing == null)
         {
             return offset;
         }
 
-        return monsterFacing.GetFacingOffset(offset);
+        return monsterFacing
+            .GetFacingOffset(offset);
     }
 
     // 대상의 조준 위치를 반환합니다
     protected Vector3 GetTargetAimPosition()
     {
-        Vector3 fallbackPosition = transform.position + GetFacingDirectionVector();
+        Vector3 fallbackPosition =
+            transform.position +
+            GetFacingDirectionVector();
 
         if (targetSensor == null)
         {
             return fallbackPosition;
         }
 
-        return targetSensor.GetTargetAimPosition(fallbackPosition);
+        return targetSensor
+            .GetTargetAimPosition(
+                fallbackPosition
+            );
     }
 
     // 지정한 위치에서 대상 조준 위치로 향하는 방향을 계산합니다
-    protected Vector3 GetDirectionToTarget(Vector3 origin)
+    protected Vector3 GetDirectionToTarget(
+        Vector3 origin)
     {
-        Vector3 direction = GetTargetAimPosition() - origin;
+        Vector3 direction =
+            GetTargetAimPosition() -
+            origin;
+
         direction.z = 0f;
 
-        if (direction.sqrMagnitude <= Mathf.Epsilon)
+        if (direction.sqrMagnitude <=
+            Mathf.Epsilon)
         {
             return GetFacingDirectionVector();
         }
@@ -308,24 +450,33 @@ public abstract class MonsterBase : MonoBehaviour
     }
 
     // CharacterController 사용 여부를 변경합니다
-    protected void SetCharacterControllerEnabled(bool enabled)
+    protected void
+        SetCharacterControllerEnabled(
+            bool enabled)
     {
         if (groundMotor == null)
         {
             return;
         }
 
-        groundMotor.SetCharacterControllerEnabled(enabled);
+        groundMotor
+            .SetCharacterControllerEnabled(
+                enabled
+            );
     }
 
-    // 저장된 초기 Z값으로 현재 위치를 고정합니다
+    // 저장된 초기 또는 Spawn Z값으로 현재 위치를 고정합니다
     protected void FixDepthPosition()
     {
-        transform.position = FixDepthVector(transform.position);
+        transform.position =
+            FixDepthVector(
+                transform.position
+            );
     }
 
-    // 저장된 초기 Z값을 Vector3에 적용합니다
-    protected Vector3 FixDepthVector(Vector3 position)
+    // 저장된 초기 또는 Spawn Z값을 Vector3에 적용합니다
+    protected Vector3 FixDepthVector(
+        Vector3 position)
     {
         position.z = lockedZ;
         return position;
@@ -335,9 +486,14 @@ public abstract class MonsterBase : MonoBehaviour
     protected void DrawDetectionGizmo()
     {
         Gizmos.color = Color.yellow;
+
         Gizmos.DrawWireCube(
             transform.position,
-            new Vector3(DetectionRange * 2f, VerticalTolerance * 2f, 1f)
+            new Vector3(
+                DetectionRange * 2f,
+                VerticalTolerance * 2f,
+                1f
+            )
         );
     }
 }

@@ -72,7 +72,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5086391601370669333}
   m_Layer: 0
-  m_Name: RougeHoodBoss
+  m_Name: RougeHoodBoss_Legacy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

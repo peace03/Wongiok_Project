@@ -31,7 +31,6 @@ public class PlayerHealItemUseState : PlayerBaseState
 
     public override void EnterState()
     {
-        Debug.Log("Heal Item Use Enter");
 
         useTimer = controller.HealItemInventory.UseDuration;
         controller.Movement.ResetVerticalVelocity();
@@ -56,7 +55,6 @@ public class PlayerHealItemUseState : PlayerBaseState
 
     public override void ExitState()
     {
-        Debug.Log("Heal Item Use Exit");
     }
 
     #endregion
