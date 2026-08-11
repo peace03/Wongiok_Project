@@ -2,26 +2,23 @@ using UnityEngine;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerStatus))]
-[RequireComponent(typeof(PlayerLifeTracker))]
 [RequireComponent(typeof(PlayerHealItemInventory))]
 public class CheckpointHealSystem : MonoBehaviour
 {
     [Header("Player References")]
     [SerializeField] private PlayerStatus playerStatus;
-    [SerializeField] private PlayerLifeTracker lifeTracker;
     [SerializeField]
     private PlayerHealItemInventory healItemInventory;
 
-    // 같은 Player 오브젝트의 회복 관련 컴포넌트를 준비합니다
+    // 같은 Player 오브젝트의 체크포인트 회복 관련 컴포넌트를 준비합니다
     private void Awake()
     {
         playerStatus ??= GetComponent<PlayerStatus>();
-        lifeTracker ??= GetComponent<PlayerLifeTracker>();
         healItemInventory ??=
             GetComponent<PlayerHealItemInventory>();
     }
 
-    // Definition 설정에 따라 부족한 자원만 최대치까지 복구합니다
+    // 체크포인트 설정에 따라 체력과 회복 아이템만 복구합니다
     public bool RecoverMissingResources(
         CheckpointDefinition definition)
     {
@@ -35,11 +32,6 @@ public class CheckpointHealSystem : MonoBehaviour
         if (definition.RestoreHealth)
         {
             didRecover |= RestoreHealthToFull();
-        }
-
-        if (definition.RestoreLives)
-        {
-            didRecover |= RestoreLivesToFull();
         }
 
         if (definition.RestoreHealItems)
@@ -87,17 +79,6 @@ public class CheckpointHealSystem : MonoBehaviour
         return true;
     }
 
-    // 잔기가 부족할 때 시작 잔기 수까지 복구합니다
-    private bool RestoreLivesToFull()
-    {
-        if (lifeTracker == null)
-        {
-            return false;
-        }
-
-        return lifeTracker.RestoreToFull();
-    }
-
     // 회복 아이템이 부족할 때 최대 보유량까지 복구합니다
     private bool RestoreHealItemsToFull()
     {
@@ -110,6 +91,7 @@ public class CheckpointHealSystem : MonoBehaviour
 
         healItemInventory.RestoreCount(
             healItemInventory.MaxCount);
+
         return true;
     }
 }

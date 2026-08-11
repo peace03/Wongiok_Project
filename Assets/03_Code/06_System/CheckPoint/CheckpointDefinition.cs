@@ -23,7 +23,6 @@ public class CheckpointDefinition : ScriptableObject
 
     [Header("Recovery")]
     [SerializeField] private bool restoreHealth = true;
-    [SerializeField] private bool restoreLives = true;
     [SerializeField] private bool restoreHealItems;
 
     public string CheckpointId => checkpointId;
@@ -31,10 +30,11 @@ public class CheckpointDefinition : ScriptableObject
     public string ScenePath => scenePath;
     public Vector3 RespawnPosition => respawnPosition;
     public Vector3 RespawnEulerAngles => respawnEulerAngles;
+
     public Quaternion RespawnRotation =>
         Quaternion.Euler(respawnEulerAngles);
+
     public bool RestoreHealth => restoreHealth;
-    public bool RestoreLives => restoreLives;
     public bool RestoreHealItems => restoreHealItems;
 
     public bool IsValid =>
@@ -49,7 +49,8 @@ public class CheckpointDefinition : ScriptableObject
 
         if (sceneAsset != null)
         {
-            scenePath = AssetDatabase.GetAssetPath(sceneAsset);
+            scenePath =
+                AssetDatabase.GetAssetPath(sceneAsset);
         }
     }
 
@@ -59,7 +60,9 @@ public class CheckpointDefinition : ScriptableObject
         Vector3 bakedPosition,
         Vector3 bakedEulerAngles)
     {
-        Undo.RecordObject(this, "Bake Checkpoint Destination");
+        Undo.RecordObject(
+            this,
+            "Bake Checkpoint Destination");
 
         scenePath = bakedScenePath;
         respawnPosition = bakedPosition;
