@@ -78,7 +78,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MonsterFactory
   defaultContainer: {fileID: 5890234913495837966}
   monsterPools:
-  - monsterPrefab: {fileID: 3764868410852666932, guid: ef60423ffa18c11408f57121a7248a2f, type: 3}
+  - monsterPrefab: {fileID: 3764868410852666932, guid: 3c70d7d2ad8b23a44b3a43ece5b5a528, type: 3}
     maxCount: 12
     containerOverride: {fileID: 0}
   - monsterPrefab: {fileID: 161236733381727142, guid: 4d4b900a9dd1ff84999aa8da9d1e0a90, type: 3}
