@@ -43,6 +43,7 @@ Transform:
   - {fileID: 2267744183489098459}
   - {fileID: 1608060686159158496}
   - {fileID: 6717792724464430742}
+  - {fileID: 1367402200009716425}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &1178768876765957826
@@ -81,6 +82,7 @@ MonoBehaviour:
   maxHp: 25
   resetHpOnEnable: 1
   invulnerable: 0
+  hitEffectPlace: {fileID: 1367402200009716425}
 --- !u!114 &7416050180738467225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,8 +223,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterHitAnimationHandler
   animator: {fileID: 3570414411199172182}
-  monsterHealth: {fileID: 4325357426554323179}
-  meleeAI: {fileID: 0}
   hitTriggerName: Hit
 --- !u!136 &7856917874265365921
 CapsuleCollider:
@@ -353,6 +353,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3519508302361619876}
+  m_Father: {fileID: 2700554536499288600}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4838376395540054977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1367402200009716425}
+  m_Layer: 8
+  m_Name: "\uD0C0\uACA9/\uD53C\uACA9 \uC774\uD399\uD2B8 \uC2E4\uD589 \uC704\uCE58"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1367402200009716425
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4838376395540054977}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.536, y: 0.062, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 2700554536499288600}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6860398799303888835

@@ -12,8 +12,13 @@ public class TargetEffect : Effect, ITargetEffect
             // 종료
             return;
 
-        // 현재 위치를 타겟 위치로 설정
-        transform.position = target.position;
+        // 따라다닐 대상의 높이가 이펙트의 높이보다 낮다면
+        if(target.position.y < transform.position.y)
+            // 따라다닐 대상의 위치로 설정하되, 높이는 이펙트의 높이를 유지
+            transform.position = new(target.position.x, transform.position.y, target.position.z);
+        else
+            // 현재 위치를 타겟 위치로 설정
+            transform.position = target.position;
     }
 
     /// <summary>

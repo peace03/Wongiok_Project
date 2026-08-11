@@ -202,6 +202,7 @@ Transform:
   m_Children:
   - {fileID: 8032831983957406496}
   - {fileID: 5590358845352869087}
+  - {fileID: 6784229112189479518}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &9060762468629089592
@@ -242,6 +243,7 @@ MonoBehaviour:
   maxHp: 30
   resetHpOnEnable: 1
   invulnerable: 0
+  hitEffectPlace: {fileID: 6784229112189479518}
 --- !u!114 &3174039222302607023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -421,6 +423,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterExpReward
   expReward: 10
+--- !u!1 &4368670332618264600
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6784229112189479518}
+  m_Layer: 8
+  m_Name: "\uD0C0\uACA9/\uD53C\uACA9 \uC774\uD399\uD2B8 \uC2E4\uD589 \uC704\uCE58"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6784229112189479518
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4368670332618264600}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.278, y: 0.92, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8944076988817083243}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8097245854806106616
 GameObject:
   m_ObjectHideFlags: 0
