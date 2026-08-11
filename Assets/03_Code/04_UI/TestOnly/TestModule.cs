@@ -105,39 +105,39 @@ public class TestModule : MonoBehaviour
     // 2026.08.10_UI 정리: 프레임 단위 UI 상태와 입력을 갱신한다.
     private void Update()
     {
-        if (_input.TestF1Pressed)
-            CompleteCurrentChapter();
+        //if (_input.TestF1Pressed)
+        //    CompleteCurrentChapter();
 
-        if (_input.TestF2Pressed)
-            GainExp();
+        //if (_input.TestF2Pressed)
+        //    GainExp();
 
-        if (_input.TestF3Pressed)
-            ShowLevelUp();
+        //if (_input.TestF3Pressed)
+        //    ShowLevelUp();
 
-        if (_input.TestF4Pressed)
-            DamagePlayer();
+        //if (_input.TestF4Pressed)
+        //    DamagePlayer();
 
-        if (usePrototypeGameOverFlow && _input.TestF5Pressed)
-            ShowGameOver();
+        //if (usePrototypeGameOverFlow && _input.TestF5Pressed)
+        //    ShowGameOver();
 
-        if (_input.TestF6Pressed)
-            EventBus<UIBossEncounterRequestedEvent>.Publish(
-                new UIBossEncounterRequestedEvent());
+        //if (_input.TestF6Pressed)
+        //    EventBus<UIBossEncounterRequestedEvent>.Publish(
+        //        new UIBossEncounterRequestedEvent());
 
-        if (_input.TestF7Pressed)
-            DamageBoss();
+        //if (_input.TestF7Pressed)
+        //    DamageBoss();
 
-        if (_input.TestF8Pressed)
-            KillBossAndClearChapter();
+        //if (_input.TestF8Pressed)
+        //    KillBossAndClearChapter();
 
-        if (_input.TestF9Pressed)
-            ShowChapterSelect();
+        //if (_input.TestF9Pressed)
+        //    ShowChapterSelect();
 
-        if (_input.TestF10Pressed)
-            ResetTestState();
+        //if (_input.TestF10Pressed)
+        //    ResetTestState();
 
-        if (_input.TestF11Pressed)
-            SaveCheckpoint();
+        //if (_input.TestF11Pressed)
+        //    SaveCheckpoint();
     }
 
     // 2026.08.10_UI 정리: 현재 Prototype Snapshot 상태를 저장한다.

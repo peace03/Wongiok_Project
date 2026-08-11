@@ -37,7 +37,6 @@ public class PlayerDeathState : PlayerBaseState
 
     public override void EnterState()
     {
-        Debug.Log($"Death Enter: {deathInfo.Cause}");
 
         presentationFinished = false;
         controller.Movement.ResetVerticalVelocity();
@@ -66,7 +65,6 @@ public class PlayerDeathState : PlayerBaseState
 
     public override void ExitState()
     {
-        Debug.Log("Death Exit");
     }
 
     private void FinishDeathPresentation()

@@ -41,7 +41,6 @@ public class PlayerHitState : PlayerBaseState
 
     public override void EnterState()
     {
-        Debug.Log("Hit Enter");
 
         controller.Animation.PlayHit();
         controller.Movement.ResetVerticalVelocity();
@@ -71,7 +70,6 @@ public class PlayerHitState : PlayerBaseState
 
     public override void ExitState()
     {
-        Debug.Log("Hit Exit");
     }
 
     #endregion
