@@ -8,33 +8,46 @@ public class MonsterBurrowRangedAI : MonsterBase
 {
     [Header("Burrow")]
     [SerializeField] private float burrowDepth = 2.5f;
-    [SerializeField] private float burrowDownDuration = 0.35f;
-    [SerializeField] private float hiddenDuration = 0.6f;
-    [SerializeField] private float emergeDuration = 0.35f;
-    [SerializeField] private float reappearDistanceFromPlayer = 6f;
-    [SerializeField] private float reappearDistanceRandomRange = 2f;
-    [SerializeField] private bool alternateReappearSide = true;
-    [SerializeField] private bool useTargetYForReappear = false;
-    [SerializeField] private float reappearYOffset = 0f;
+    [SerializeField]
+    private float burrowDownDuration = 0.35f;
+    [SerializeField]
+    private float hiddenDuration = 0.6f;
+    [SerializeField]
+    private float emergeDuration = 0.35f;
+    [SerializeField]
+    private float reappearDistanceFromPlayer = 6f;
+    [SerializeField]
+    private float reappearDistanceRandomRange = 2f;
+    [SerializeField]
+    private bool alternateReappearSide = true;
+    [SerializeField]
+    private bool useTargetYForReappear = false;
+    [SerializeField]
+    private float reappearYOffset = 0f;
 
     [Header("Shoot")]
-    [SerializeField] private MonsterBulletLauncher bulletLauncher;
+    [SerializeField]
+    private MonsterBulletLauncher bulletLauncher;
     [SerializeField]
     private Vector3 firePointOffset =
         new Vector3(0.7f, 0.4f, 0f);
-    [SerializeField] private float fallbackProjectileDamage = 10f;
-    [SerializeField] private int projectilePenetrationCount = 0;
-    [SerializeField] private float shootWindup = 0.25f;
-    [SerializeField] private float patternCooldown = 1.5f;
+    [SerializeField]
+    private float fallbackProjectileDamage = 10f;
+    [SerializeField]
+    private int projectilePenetrationCount = 0;
+    [SerializeField]
+    private float shootWindup = 0.25f;
+    [SerializeField]
+    private float patternCooldown = 1.5f;
 
     private Renderer[] renderers;
+
     private float lastPatternEndTime = -999f;
     private bool isRunningPattern;
     private int reappearSideSign = 1;
     private float lastSurfaceY;
     private bool hasLoggedMissingLauncher;
 
-    // 땅파기 패턴 중에는 기본 이동 모터를 사용하지 않습니다
     protected override bool UsesCharacterMotor
     {
         get { return !isRunningPattern; }
@@ -46,7 +59,8 @@ public class MonsterBurrowRangedAI : MonsterBase
         base.Awake();
 
         renderers =
-            GetComponentsInChildren<Renderer>();
+            GetComponentsInChildren<
+                Renderer>();
 
         lastSurfaceY =
             transform.position.y;
@@ -54,11 +68,56 @@ public class MonsterBurrowRangedAI : MonsterBase
         CacheBulletLauncher();
     }
 
+    // 김연호 : 풀에서 다시 활성화될 때 굴파기 진행 상태와 Renderer와 Controller 상태를 초기화합니다
+    private void OnEnable()
+    {
+        lastPatternEndTime = -999f;
+        isRunningPattern = false;
+        reappearSideSign = 1;
+
+        SetVisible(true);
+
+        SetCharacterControllerEnabled(
+            true
+        );
+    }
+
+    // 김연호 : 풀 반환이나 비활성화 시 굴파기 Coroutine과 숨김 상태를 정리합니다
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+
+        isRunningPattern = false;
+
+        SetVisible(true);
+    }
+
     // 컴포넌트가 추가될 때 탄환 발사기 참조를 준비합니다
     private void Reset()
     {
         bulletLauncher =
-            GetComponent<MonsterBulletLauncher>();
+            GetComponent<
+                MonsterBulletLauncher>();
+    }
+
+    // 김연호 : 실제 Spawn 위치가 확정된 뒤 지면 기준 위치와 패턴 상태를 새 생명 기준으로 초기화합니다
+    protected override void
+        OnSpawnPrepared()
+    {
+        lastPatternEndTime = -999f;
+        isRunningPattern = false;
+        reappearSideSign = 1;
+
+        lastSurfaceY =
+            transform.position.y;
+
+        SetVisible(true);
+
+        SetCharacterControllerEnabled(
+            true
+        );
+
+        base.OnSpawnPrepared();
     }
 
     // 땅파기 원거리 몹의 패턴 시작 조건을 처리합니다
@@ -70,7 +129,8 @@ public class MonsterBurrowRangedAI : MonsterBase
         }
 
         if (Time.time <
-            lastPatternEndTime + patternCooldown)
+            lastPatternEndTime +
+            patternCooldown)
         {
             return;
         }
@@ -86,15 +146,18 @@ public class MonsterBurrowRangedAI : MonsterBase
     }
 
     // 땅속으로 숨고 다른 위치에서 나온 뒤 원거리 공격을 실행합니다
-    private IEnumerator BurrowPatternRoutine()
+    private IEnumerator
+        BurrowPatternRoutine()
     {
         isRunningPattern = true;
+
         lastSurfaceY =
             transform.position.y;
 
-        yield return StartCoroutine(
-            BurrowDownRoutine()
-        );
+        yield return
+            StartCoroutine(
+                BurrowDownRoutine()
+            );
 
         if (IsDead)
         {
@@ -108,16 +171,18 @@ public class MonsterBurrowRangedAI : MonsterBase
 
         Vector3 hiddenPosition =
             emergePosition +
-            Vector3.down * burrowDepth;
+            Vector3.down *
+            burrowDepth;
 
         transform.position =
             FixDepthVector(
                 hiddenPosition
             );
 
-        yield return new WaitForSeconds(
-            hiddenDuration
-        );
+        yield return
+            new WaitForSeconds(
+                hiddenDuration
+            );
 
         if (IsDead)
         {
@@ -126,11 +191,12 @@ public class MonsterBurrowRangedAI : MonsterBase
 
         SetVisible(true);
 
-        yield return StartCoroutine(
-            EmergeUpRoutine(
-                emergePosition
-            )
-        );
+        yield return
+            StartCoroutine(
+                EmergeUpRoutine(
+                    emergePosition
+                )
+            );
 
         if (IsDead)
         {
@@ -139,9 +205,10 @@ public class MonsterBurrowRangedAI : MonsterBase
 
         FaceTarget();
 
-        yield return new WaitForSeconds(
-            shootWindup
-        );
+        yield return
+            new WaitForSeconds(
+                shootWindup
+            );
 
         if (!IsDead)
         {
@@ -155,24 +222,29 @@ public class MonsterBurrowRangedAI : MonsterBase
     }
 
     // 현재 위치에서 아래로 내려가며 사라지는 연출을 처리합니다
-    private IEnumerator BurrowDownRoutine()
+    private IEnumerator
+        BurrowDownRoutine()
     {
-        SetCharacterControllerEnabled(false);
+        SetCharacterControllerEnabled(
+            false
+        );
 
         Vector3 startPosition =
             transform.position;
 
         Vector3 endPosition =
             startPosition +
-            Vector3.down * burrowDepth;
+            Vector3.down *
+            burrowDepth;
 
-        yield return StartCoroutine(
-            MoveTransformRoutine(
-                startPosition,
-                endPosition,
-                burrowDownDuration
-            )
-        );
+        yield return
+            StartCoroutine(
+                MoveTransformRoutine(
+                    startPosition,
+                    endPosition,
+                    burrowDownDuration
+                )
+            );
     }
 
     // 땅 아래 위치에서 위로 올라오는 연출을 처리합니다
@@ -185,15 +257,18 @@ public class MonsterBurrowRangedAI : MonsterBase
         Vector3 endPosition =
             emergePosition;
 
-        yield return StartCoroutine(
-            MoveTransformRoutine(
-                startPosition,
-                endPosition,
-                emergeDuration
-            )
-        );
+        yield return
+            StartCoroutine(
+                MoveTransformRoutine(
+                    startPosition,
+                    endPosition,
+                    emergeDuration
+                )
+            );
 
-        SetCharacterControllerEnabled(true);
+        SetCharacterControllerEnabled(
+            true
+        );
     }
 
     // 지정한 시작 위치에서 목표 위치까지 Transform을 이동합니다
@@ -216,11 +291,13 @@ public class MonsterBurrowRangedAI : MonsterBase
 
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
+            elapsed +=
+                Time.deltaTime;
 
             float ratio =
                 Mathf.Clamp01(
-                    elapsed / duration
+                    elapsed /
+                    duration
                 );
 
             transform.position =
@@ -242,7 +319,8 @@ public class MonsterBurrowRangedAI : MonsterBase
     }
 
     // 플레이어에게서 떨어진 재등장 위치를 계산합니다
-    private Vector3 FindReappearPosition()
+    private Vector3
+        FindReappearPosition()
     {
         Vector3 fallbackPosition =
             transform.position;
@@ -272,7 +350,8 @@ public class MonsterBurrowRangedAI : MonsterBase
 
         float candidateX =
             Target.position.x +
-            sideSign * finalDistance;
+            sideSign *
+            finalDistance;
 
         float candidateY =
             useTargetYForReappear
@@ -281,17 +360,19 @@ public class MonsterBurrowRangedAI : MonsterBase
                 : lastSurfaceY +
                   reappearYOffset;
 
-        Vector3 position = new Vector3(
-            candidateX,
-            candidateY,
-            FixedZ
-        );
+        Vector3 position =
+            new Vector3(
+                candidateX,
+                candidateY,
+                FixedZ
+            );
 
         return FixDepthVector(position);
     }
 
     // 다음 재등장 방향을 결정합니다
-    private int GetNextReappearSideSign()
+    private int
+        GetNextReappearSideSign()
     {
         if (!alternateReappearSide)
         {
@@ -301,6 +382,7 @@ public class MonsterBurrowRangedAI : MonsterBase
         }
 
         reappearSideSign *= -1;
+
         return reappearSideSign;
     }
 
@@ -308,7 +390,8 @@ public class MonsterBurrowRangedAI : MonsterBase
     private void ShootAtTarget()
     {
         if (!TryGetBulletLauncher(
-                out MonsterBulletLauncher launcher))
+                out MonsterBulletLauncher
+                    launcher))
         {
             return;
         }
@@ -328,9 +411,10 @@ public class MonsterBurrowRangedAI : MonsterBase
                 GetFacingDirectionVector();
         }
 
-        float damage = GetAttackPower(
-            fallbackProjectileDamage
-        );
+        float damage =
+            GetAttackPower(
+                fallbackProjectileDamage
+            );
 
         launcher.TryFire(
             firePosition,
@@ -349,11 +433,14 @@ public class MonsterBurrowRangedAI : MonsterBase
             CacheBulletLauncher();
         }
 
-        launcher = bulletLauncher;
+        launcher =
+            bulletLauncher;
 
         if (launcher != null)
         {
-            hasLoggedMissingLauncher = false;
+            hasLoggedMissingLauncher =
+                false;
+
             return true;
         }
 
@@ -364,7 +451,8 @@ public class MonsterBurrowRangedAI : MonsterBase
                 this
             );
 
-            hasLoggedMissingLauncher = true;
+            hasLoggedMissingLauncher =
+                true;
         }
 
         return false;
@@ -376,7 +464,8 @@ public class MonsterBurrowRangedAI : MonsterBase
         if (bulletLauncher == null)
         {
             bulletLauncher =
-                GetComponent<MonsterBulletLauncher>();
+                GetComponent<
+                    MonsterBulletLauncher>();
         }
     }
 
@@ -389,7 +478,8 @@ public class MonsterBurrowRangedAI : MonsterBase
             );
 
         return FixDepthVector(
-            transform.position + offset
+            transform.position +
+            offset
         );
     }
 
@@ -405,17 +495,31 @@ public class MonsterBurrowRangedAI : MonsterBase
              i < renderers.Length;
              i++)
         {
+            if (renderers[i] == null)
+            {
+                continue;
+            }
+
             renderers[i].enabled =
                 visible;
         }
     }
 
-    // 사망 상태에 들어갈 때 Renderer와 이동 상태를 정리합니다
-    protected override void OnDeadStateEntered()
+    // 김연호 : 사망 상태에 들어갈 때 굴파기 Coroutine과 Renderer와 이동 상태를 정리합니다
+    protected override void
+        OnDeadStateEntered()
     {
+        StopAllCoroutines();
+
         SetVisible(true);
-        SetCharacterControllerEnabled(false);
+
+        SetCharacterControllerEnabled(
+            false
+        );
+
         isRunningPattern = false;
+
+        base.OnDeadStateEntered();
     }
 
     // Scene 뷰에서 감지 범위와 발사 위치를 표시합니다
@@ -432,23 +536,28 @@ public class MonsterBurrowRangedAI : MonsterBase
     }
 
     // Gizmo 표시용 탄환 생성 위치를 계산합니다
-    private Vector3 GetFirePositionForGizmo()
+    private Vector3
+        GetFirePositionForGizmo()
     {
         float direction =
             transform.localScale.x >= 0f
                 ? 1f
                 : -1f;
 
-        Vector3 offset = new Vector3(
-            firePointOffset.x * direction,
-            firePointOffset.y,
-            firePointOffset.z
-        );
+        Vector3 offset =
+            new Vector3(
+                firePointOffset.x *
+                direction,
+                firePointOffset.y,
+                firePointOffset.z
+            );
 
         Vector3 firePosition =
-            transform.position + offset;
+            transform.position +
+            offset;
 
-        firePosition.z = FixedZ;
+        firePosition.z =
+            FixedZ;
 
         return firePosition;
     }

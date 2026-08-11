@@ -8,16 +8,22 @@ public class MonsterRangedAI : MonsterBase
 {
     [Header("Ranged")]
     [SerializeField] private float attackRange = 6f;
-    [SerializeField] private MonsterBulletLauncher bulletLauncher;
+    [SerializeField]
+    private MonsterBulletLauncher bulletLauncher;
     [SerializeField] private Transform firePoint;
     [SerializeField]
     private Vector3 firePointOffset =
         new Vector3(0.7f, 0.4f, 0f);
-    [SerializeField] private float fallbackProjectileDamage = 10f;
-    [SerializeField] private int projectilePenetrationCount = 0;
-    [SerializeField] private float attackCooldown = 1.5f;
-    [SerializeField] private float attackWindup = 0.25f;
-    [SerializeField] private bool aimAtTarget = false;
+    [SerializeField]
+    private float fallbackProjectileDamage = 10f;
+    [SerializeField]
+    private int projectilePenetrationCount = 0;
+    [SerializeField]
+    private float attackCooldown = 1.5f;
+    [SerializeField]
+    private float attackWindup = 0.25f;
+    [SerializeField]
+    private bool aimAtTarget = false;
 
     private float lastAttackTime = -999f;
     private bool isAttacking;
@@ -30,11 +36,26 @@ public class MonsterRangedAI : MonsterBase
         CacheBulletLauncher();
     }
 
+    // 김연호 : 풀에서 다시 활성화될 때 공격 쿨다운과 공격 진행 상태를 초기화합니다
+    private void OnEnable()
+    {
+        lastAttackTime = -999f;
+        isAttacking = false;
+    }
+
+    // 김연호 : 풀 반환이나 비활성화 시 진행 중인 원거리 공격 Coroutine을 정리합니다
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        isAttacking = false;
+    }
+
     // 컴포넌트가 추가될 때 탄환 발사기 참조를 준비합니다
     private void Reset()
     {
         bulletLauncher =
-            GetComponent<MonsterBulletLauncher>();
+            GetComponent<
+                MonsterBulletLauncher>();
     }
 
     // 원거리 일반몹의 추적과 발사 판단을 처리합니다
@@ -70,30 +91,37 @@ public class MonsterRangedAI : MonsterBase
         }
 
         if (Time.time <
-            lastAttackTime + attackCooldown)
+            lastAttackTime +
+            attackCooldown)
         {
             return;
         }
 
-        StartCoroutine(ShootRoutine());
+        StartCoroutine(
+            ShootRoutine()
+        );
     }
 
     // 공격 선딜 후 공용 Bullet을 발사합니다
     private IEnumerator ShootRoutine()
     {
         isAttacking = true;
+
         StopHorizontalMovement();
 
-        yield return new WaitForSeconds(
-            attackWindup
-        );
+        yield return
+            new WaitForSeconds(
+                attackWindup
+            );
 
         if (!IsDead)
         {
             ShootProjectile();
         }
 
-        lastAttackTime = Time.time;
+        lastAttackTime =
+            Time.time;
+
         isAttacking = false;
     }
 
@@ -101,7 +129,8 @@ public class MonsterRangedAI : MonsterBase
     private void ShootProjectile()
     {
         if (!TryGetBulletLauncher(
-                out MonsterBulletLauncher launcher))
+                out MonsterBulletLauncher
+                    launcher))
         {
             return;
         }
@@ -111,7 +140,9 @@ public class MonsterRangedAI : MonsterBase
 
         Vector3 shootDirection =
             aimAtTarget
-                ? GetDirectionToTarget(spawnPosition)
+                ? GetDirectionToTarget(
+                    spawnPosition
+                )
                 : GetFacingDirectionVector();
 
         if (shootDirection.sqrMagnitude <=
@@ -121,9 +152,10 @@ public class MonsterRangedAI : MonsterBase
                 GetFacingDirectionVector();
         }
 
-        float damage = GetAttackPower(
-            fallbackProjectileDamage
-        );
+        float damage =
+            GetAttackPower(
+                fallbackProjectileDamage
+            );
 
         launcher.TryFire(
             spawnPosition,
@@ -142,11 +174,14 @@ public class MonsterRangedAI : MonsterBase
             CacheBulletLauncher();
         }
 
-        launcher = bulletLauncher;
+        launcher =
+            bulletLauncher;
 
         if (launcher != null)
         {
-            hasLoggedMissingLauncher = false;
+            hasLoggedMissingLauncher =
+                false;
+
             return true;
         }
 
@@ -157,7 +192,8 @@ public class MonsterRangedAI : MonsterBase
                 this
             );
 
-            hasLoggedMissingLauncher = true;
+            hasLoggedMissingLauncher =
+                true;
         }
 
         return false;
@@ -169,7 +205,8 @@ public class MonsterRangedAI : MonsterBase
         if (bulletLauncher == null)
         {
             bulletLauncher =
-                GetComponent<MonsterBulletLauncher>();
+                GetComponent<
+                    MonsterBulletLauncher>();
         }
     }
 
@@ -189,8 +226,19 @@ public class MonsterRangedAI : MonsterBase
             );
 
         return FixDepthVector(
-            transform.position + offset
+            transform.position +
+            offset
         );
+    }
+
+    // 김연호 : 사망 상태에 들어갈 때 공격 Coroutine과 공격 진행 상태를 즉시 정리합니다
+    protected override void
+        OnDeadStateEntered()
+    {
+        StopAllCoroutines();
+        isAttacking = false;
+
+        base.OnDeadStateEntered();
     }
 
     // Scene 뷰에서 감지 범위와 공격 범위를 표시합니다
@@ -218,7 +266,8 @@ public class MonsterRangedAI : MonsterBase
     }
 
     // Gizmo 표시용 탄환 생성 위치를 계산합니다
-    private Vector3 GetFirePositionForGizmo()
+    private Vector3
+        GetFirePositionForGizmo()
     {
         if (firePoint != null)
         {
@@ -230,12 +279,15 @@ public class MonsterRangedAI : MonsterBase
                 ? 1f
                 : -1f;
 
-        Vector3 offset = new Vector3(
-            firePointOffset.x * direction,
-            firePointOffset.y,
-            firePointOffset.z
-        );
+        Vector3 offset =
+            new Vector3(
+                firePointOffset.x *
+                direction,
+                firePointOffset.y,
+                firePointOffset.z
+            );
 
-        return transform.position + offset;
+        return transform.position +
+               offset;
     }
 }

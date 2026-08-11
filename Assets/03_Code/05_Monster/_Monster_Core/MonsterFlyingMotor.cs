@@ -20,22 +20,44 @@ public class MonsterFlyingMotor : MonoBehaviour
     private bool isInitialized;
     private bool isShaking;
 
-    // 공중 이동 기준 위치와 고정 Z값을 준비합니다
+    // 김연호 : Spawn 위치를 새 순찰 중심으로 저장하고 이전 생의 순찰 및 떨림 상태를 초기화합니다
     public void Initialize(float newFixedZ)
     {
         fixedZ = newFixedZ;
-        homePosition = FixDepthVector(transform.position);
-        transform.position = homePosition;
+
+        homePosition =
+            FixDepthVector(
+                transform.position
+            );
+
+        patrolDirection = 1;
+        isShaking = false;
+
+        transform.position =
+            homePosition;
+
         isInitialized = true;
     }
 
     // 초기 위치를 기준으로 좌우 순찰 이동을 처리합니다
-    public void PatrolAroundHome(float speed)
+    public void PatrolAroundHome(
+        float speed)
     {
         EnsureInitialized();
 
-        Vector3 targetPosition = homePosition + Vector3.right * patrolDirection * patrolDistance;
-        bool reached = MoveTowardPosition(targetPosition, speed, patrolPointTolerance, true);
+        Vector3 targetPosition =
+            homePosition +
+            Vector3.right *
+            patrolDirection *
+            patrolDistance;
+
+        bool reached =
+            MoveTowardPosition(
+                targetPosition,
+                speed,
+                patrolPointTolerance,
+                true
+            );
 
         if (reached)
         {
@@ -44,42 +66,86 @@ public class MonsterFlyingMotor : MonoBehaviour
     }
 
     // 특정 대상 위의 공중 위치를 향해 이동합니다
-    public bool MoveTowardHoverPoint(Vector3 anchorPosition, float heightOffset, float speed, float stopDistance)
+    public bool MoveTowardHoverPoint(
+        Vector3 anchorPosition,
+        float heightOffset,
+        float speed,
+        float stopDistance)
     {
-        Vector3 targetPosition = new Vector3(anchorPosition.x, anchorPosition.y + heightOffset, fixedZ);
-        return MoveTowardPosition(targetPosition, speed, stopDistance, true);
+        Vector3 targetPosition =
+            new Vector3(
+                anchorPosition.x,
+                anchorPosition.y +
+                heightOffset,
+                fixedZ
+            );
+
+        return MoveTowardPosition(
+            targetPosition,
+            speed,
+            stopDistance,
+            true
+        );
     }
 
     // 특정 월드 위치를 향해 이동합니다
-    public bool MoveTowardPosition(Vector3 targetPosition, float speed, float stopDistance, bool useIdleMotion)
+    public bool MoveTowardPosition(
+        Vector3 targetPosition,
+        float speed,
+        float stopDistance,
+        bool useIdleMotion)
     {
         EnsureInitialized();
 
-        Vector3 fixedTargetPosition = FixDepthVector(targetPosition);
+        Vector3 fixedTargetPosition =
+            FixDepthVector(
+                targetPosition
+            );
 
         if (useIdleMotion)
         {
-            fixedTargetPosition += GetIdleMotionOffset();
+            fixedTargetPosition +=
+                GetIdleMotionOffset();
         }
 
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            fixedTargetPosition,
-            Mathf.Max(0f, speed) * Time.deltaTime
-        );
+        transform.position =
+            Vector3.MoveTowards(
+                transform.position,
+                fixedTargetPosition,
+                Mathf.Max(0f, speed) *
+                Time.deltaTime
+            );
 
-        transform.position = FixDepthVector(transform.position);
+        transform.position =
+            FixDepthVector(
+                transform.position
+            );
 
-        return Vector3.Distance(transform.position, fixedTargetPosition) <= Mathf.Max(0f, stopDistance);
+        return Vector3.Distance(
+                   transform.position,
+                   fixedTargetPosition) <=
+               Mathf.Max(
+                   0f,
+                   stopDistance
+               );
     }
 
     // 특정 위치에 머무르며 부유 연출을 적용합니다
-    public void HoldAt(Vector3 anchorPosition)
+    public void HoldAt(
+        Vector3 anchorPosition)
     {
         EnsureInitialized();
 
-        Vector3 holdPosition = FixDepthVector(anchorPosition) + GetIdleMotionOffset();
-        transform.position = FixDepthVector(holdPosition);
+        Vector3 holdPosition =
+            FixDepthVector(
+                anchorPosition
+            ) +
+            GetIdleMotionOffset();
+
+        transform.position =
+            FixDepthVector(
+                holdPosition
+            );
     }
 
     // 자폭 준비처럼 떨림이 필요한 상태를 시작합니다
@@ -98,14 +164,22 @@ public class MonsterFlyingMotor : MonoBehaviour
     public void ResetHomePosition()
     {
         EnsureInitialized();
-        homePosition = FixDepthVector(transform.position);
+
+        homePosition =
+            FixDepthVector(
+                transform.position
+            );
     }
 
     // 현재 위치의 Z값을 고정값으로 보정합니다
     public void SnapToFixedZ()
     {
         EnsureInitialized();
-        transform.position = FixDepthVector(transform.position);
+
+        transform.position =
+            FixDepthVector(
+                transform.position
+            );
     }
 
     // 초기화가 누락된 테스트 배치에서도 최소 동작을 보장합니다
@@ -116,29 +190,59 @@ public class MonsterFlyingMotor : MonoBehaviour
             return;
         }
 
-        Initialize(transform.position.z);
+        Initialize(
+            transform.position.z
+        );
     }
 
     // 부유와 떨림 연출에 사용할 오프셋을 계산합니다
     private Vector3 GetIdleMotionOffset()
     {
-        float hoverOffsetY = Mathf.Sin(Time.time * hoverFrequency) * hoverAmplitude;
-        Vector3 offset = Vector3.up * hoverOffsetY;
+        float hoverOffsetY =
+            Mathf.Sin(
+                Time.time *
+                hoverFrequency
+            ) *
+            hoverAmplitude;
+
+        Vector3 offset =
+            Vector3.up *
+            hoverOffsetY;
 
         if (isShaking)
         {
-            float shakeOffsetX = Mathf.Sin(Time.time * shakeFrequency) * shakeAmplitude;
-            float shakeOffsetY = Mathf.Cos(Time.time * shakeFrequency * 0.73f) * shakeAmplitude;
-            offset += new Vector3(shakeOffsetX, shakeOffsetY, 0f);
+            float shakeOffsetX =
+                Mathf.Sin(
+                    Time.time *
+                    shakeFrequency
+                ) *
+                shakeAmplitude;
+
+            float shakeOffsetY =
+                Mathf.Cos(
+                    Time.time *
+                    shakeFrequency *
+                    0.73f
+                ) *
+                shakeAmplitude;
+
+            offset +=
+                new Vector3(
+                    shakeOffsetX,
+                    shakeOffsetY,
+                    0f
+                );
         }
 
         return offset;
     }
 
     // 2.5D 횡스크롤 이동을 위해 Z 위치를 고정합니다
-    private Vector3 FixDepthVector(Vector3 position)
+    private Vector3 FixDepthVector(
+        Vector3 position)
     {
         position.z = fixedZ;
+
         return position;
     }
 }
