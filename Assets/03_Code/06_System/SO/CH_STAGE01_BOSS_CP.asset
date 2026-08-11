@@ -16,8 +16,7 @@ MonoBehaviour:
   displayNumber: 3
   sceneAsset: {fileID: 102900000, guid: 886c57300ec1de64c97c5b95f00d97f9, type: 3}
   scenePath: Assets/04_Level/Scenes/Real/Chapter1Scene.unity
-  respawnPosition: {x: 199.29001, y: 7, z: 1}
+  respawnPosition: {x: 275.6, y: 7, z: 1}
   respawnEulerAngles: {x: -0, y: 0, z: 0}
   restoreHealth: 1
-  restoreLives: 1
   restoreHealItems: 1
