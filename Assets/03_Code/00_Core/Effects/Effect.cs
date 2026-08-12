@@ -13,7 +13,6 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
     private float maxEffectTime = 0f;               // 최대 이펙트 시간
 
     public Transform Container => container;
-    public ParticleSystem Particle => particle;
     public float MaxEffectTime => maxEffectTime;
 
     private void Awake()
