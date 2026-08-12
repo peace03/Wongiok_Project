@@ -375,14 +375,6 @@ public class CheckpointRespawnCoordinator : MonoBehaviour
             new UIChangeScreenEvent(
                 UIScreenState.InGame));
 
-        if (logProcessing)
-        {
-            Debug.Log(
-                $"Checkpoint respawn complete: " +
-                $"{data.CheckpointId}",
-                this);
-        }
-
         isRespawning = false;
     }
 
