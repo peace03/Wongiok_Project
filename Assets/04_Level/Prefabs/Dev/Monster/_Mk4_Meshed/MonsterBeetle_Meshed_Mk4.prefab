@@ -196,7 +196,7 @@ MonoBehaviour:
   playerHitMask:
     serializedVersion: 2
     m_Bits: 64
-  explosionRadius: 10
+  explosionRadius: 2
   fallbackExplosionDamage: 25
   explosionEffectPrefab: {fileID: 6624936854607232037, guid: d1e4f7fa443dd82459ba0d362af39297, type: 3}
   killSelfOnExplosion: 1

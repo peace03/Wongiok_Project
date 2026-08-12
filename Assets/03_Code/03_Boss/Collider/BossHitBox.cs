@@ -69,7 +69,7 @@ public class BossHitBox : MonoBehaviour, IInitializable
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        Debug.Log("[Boss] 플레이어 콜라이더 인");
+        //플레이어 콜라이더 인
 
         // RangeCheck와 Damage가 같은 콜라이더를 쓰므로, 먼저 플레이어 정보를 저장한다.
         currentPlayerCollider = other;
@@ -86,7 +86,7 @@ public class BossHitBox : MonoBehaviour, IInitializable
     private void OnTriggerExit(Collider other)
     {
         if (other != currentPlayerCollider) return;
-        Debug.Log("[Boss] 플레이어 콜라이더 아웃");
+        //플레이어 콜라이더 아웃
 
         ClearTrackedPlayer();
     }

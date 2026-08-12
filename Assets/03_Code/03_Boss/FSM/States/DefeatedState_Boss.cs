@@ -9,15 +9,14 @@ public class DefeatedState_Boss : BossState
 
     public override void Enter()
     {
-        Debug.Log("Defeated 상태 진입");
+        
     }
     public override void Update()
     {
-        if (!chance) { Debug.Log("Defeated Update 실행"); chance = true; }
+        if (!chance) { chance = true; }
     }
     public override void Exit()
     {
         chance = false;
-        Debug.Log("Defeated 상태 이탈");
     }
 }

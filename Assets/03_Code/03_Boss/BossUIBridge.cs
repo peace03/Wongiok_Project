@@ -22,9 +22,6 @@ public class BossUIBridge : MonoBehaviour, IInitializable
         uiManager.ChangeScreen(UIScreenState.InGame);
         uiManager.SetBossHudVisible(true);
         PublishBossHudData(bossStatus.GetBossCurHP());
-
-        Debug.Log($"[BossUIBridge] HUD 표시 요청 완료: {bossName}, " +
-                  $"{bossStatus.GetBossCurHP()} / {bossMaxHP}");
     }
 
     private void OnEnable()

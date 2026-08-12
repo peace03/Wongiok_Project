@@ -519,7 +519,7 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
             return;
         }
 
-        SelfHealth.Kill();
+        SelfHealth.Kill(MonsterDeathCause.SelfDestruct);
     }
 
     // 애니메이터 트리거를 안전하게 실행합니다

@@ -734,7 +734,7 @@ public class BuildingGenerator : MonoBehaviour
         BuildingMaterialApplier.Apply(instance, style.materialStyle, moduleId, instanceSeed, tilingScale,
                                        overrideColor, dirtSeedOverride, noiseSeedOverride);
 
-        Debug.Log($"[체크] {instance.name} seed={CombineSeed(randomSeed, instance.name)}");
+        //Debug.Log($"[체크] {instance.name} seed={CombineSeed(randomSeed, instance.name)}");
     }
 
     /// <summary>

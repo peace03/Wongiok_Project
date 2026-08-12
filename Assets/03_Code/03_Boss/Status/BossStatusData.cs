@@ -54,14 +54,12 @@ public class BossStatusData
         if (IsDead)
             return;
 
-        if (isGroggyState)
+        if (isGroggyState) //그로기 상태일 경우 피격 배수 증가
         {
             amount *= groggyDamageMultiplier;
-            Debug.Log("오 실행된다");
         }
         currentHP = Mathf.Clamp(currentHP - amount, 0f, maxHP.FinalValue);
         EventBus<BossHPChangedEvent>.Publish(new BossHPChangedEvent(currentHP)); //UI bridge
-        Debug.Log("보스 체력: "+currentHP);
 
         if (IsDead)
         {

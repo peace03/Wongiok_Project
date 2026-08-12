@@ -7,7 +7,6 @@ public class IdleState_Boss : BossState
 
     public override void Enter()
     {
-        Debug.Log("Idle 상태 진입");
         logics.SetStateDone(false);
         logics.InitCurTime_Idle();
         logics.SetRandomPos();      //Idle 이동좌표 지정
@@ -25,6 +24,6 @@ public class IdleState_Boss : BossState
     }
     public override void Exit()
     {
-        //Debug.Log("Idle 상태 이탈");
+        
     }
 }
