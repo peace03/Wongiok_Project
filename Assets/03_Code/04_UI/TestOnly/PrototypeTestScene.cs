@@ -392,8 +392,6 @@ public class PrototypeTestScene : MonoBehaviour, IInitializable
 
         if (skill.SkillId < 0) return;
 
-        if (skillCooldownRemaining[eventData.SlotIndex] > 0f) return;
-
         float cooldownDuration = GetSkillCooldownDuration(eventData.SlotIndex);
 
         skillCooldownDuration[eventData.SlotIndex] = cooldownDuration;
