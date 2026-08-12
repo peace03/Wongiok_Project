@@ -21,6 +21,8 @@ public class GroggyState_Boss : BossState
     }
     public override void Exit()
     {
+        // 궁극기나 사망 등으로 그로기가 중간에 끝나도 상태가 소유한 반복음을 반드시 종료합니다.
+        logics.StopGroggySfx();
         bossStatus.SetGroggyDamageMultiplierActive(false); //그로기 피격 배율 증가
     }
 }

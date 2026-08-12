@@ -145,6 +145,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
     {
         EventBus<ParryKeyDown>.action -= ParryKeyDown;
         telegraphDrawer?.StopSignal(); // 비활성화 뒤에도 남을 수 있는 사전신호와 연출 코루틴을 정리
+        StopGroggySfx(); // 상태 Exit 없이 보스가 비활성화되어도 그로기 반복음이 남지 않게 정리
         // 비활성화되는 보스가 열어 둔 패링 창만 닫도록 현재 attackId를 함께 보낸다.
         EventBus<CanParryEvent>.Publish(
             new CanParryEvent(attackId, false)); // PlayerParry의 보스 패링 창을 강제로 닫음
@@ -529,7 +530,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
         comboStep = 0;
         ultimateAttack?.Reset();
         isGroggyAnimDone = false;
-        isGroggySfxPlaying = false;
+        StopGroggySfx(); // 실제 정지 요청 없이 플래그만 초기화해 재생 채널을 잃어버리지 않게 정리
         ResetPatternState();
     }
 
@@ -538,6 +539,23 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
 
     // 그로기 발동 조건 검사 (기본적으로 누적 패링 3회 시 발동되나 자식 클래스에서 오버라이드 가능)
     public virtual bool CanTransitionToGroggy() { return parryCount >= 3; }
+
+    /// <summary>
+    /// 그로기 상태가 정상 완료되거나 다른 상태로 강제 전환될 때,
+    /// 그로기 상태가 소유한 반복 SFX를 동일한 ID로 종료합니다.
+    /// </summary>
+    public void StopGroggySfx()
+    {
+        if (!isGroggySfxPlaying)
+            return;
+
+        EventBus<StopControlledSfxEvent>.Publish(
+            new StopControlledSfxEvent(
+                $"{GetInstanceID()}_Groggy",
+                groggySfxFadeOutDuration));
+
+        isGroggySfxPlaying = false;
+    }
 
     /// <summary>
     /// 보스가 그로기(무력화) 상태에 빠졌을 때 애니메이션과 그로기 추가 데미지(Multiplier)를 통제합니다.
@@ -569,13 +587,7 @@ public abstract class BossPatternBase : MonoBehaviour, IInitializable, IBossLogi
                 isGroggyAnimDone = true;
 
                 // Groggy 모션이 끝나고 Idle 기상 모션으로 넘어가기 직전에 루프 SFX를 종료합니다.
-                if (isGroggySfxPlaying)
-                {
-                    EventBus<StopControlledSfxEvent>.Publish(
-                        new StopControlledSfxEvent($"{GetInstanceID()}_Groggy",groggySfxFadeOutDuration));
-
-                    isGroggySfxPlaying = false;
-                }
+                StopGroggySfx();
 
                 bossStatus?.SetGroggyDamageMultiplierActive(false); // 무력화 해제 직전 피격 추가 배율 보너스 종료
                 return NodeState.Running;
