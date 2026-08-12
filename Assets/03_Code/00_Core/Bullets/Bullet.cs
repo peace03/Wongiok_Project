@@ -189,14 +189,17 @@ public class Bullet : MonoBehaviour, IPoolable
                 // 최대 이펙트 시간 받아오기
                 maxEffectTime = effect.MaxEffectTime;
 
+            // 실행한 이펙트를 저장할 변수
             Effect executeEffect;
 
+            // 부딪힌 대상에게 타격/피격 이펙트 실행할 위치가 있다면
             if (target.HitEffectPlace != null)
-                // 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
+                // 해당 위치에서 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
                 executeEffect = EffectManager.Instance.PlayEffect(hitEffect, target.HitEffectPlace.position,
                                                 Quaternion.LookRotation(-transform.forward), maxEffectTime);
+            // 부딪힌 대상에게 타격/피격 이펙트 실행할 위치가 없다면
             else
-                // 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
+                // 부딪힌 위치에서 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
                 executeEffect = EffectManager.Instance.PlayEffect(hitEffect, pos,
                                                 Quaternion.LookRotation(-transform.forward), maxEffectTime);
 
