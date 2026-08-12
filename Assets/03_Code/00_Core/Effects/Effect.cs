@@ -86,16 +86,15 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
     /// <param name="time">타이머 시간</param>
     private IEnumerator TimerRoutine(float time)
     {
+        // 타이머 시간이 음수라면
+        if (time < 0f)
+            yield break;
+
         // 파티클이 있다면
         if (particle != null)
         {
-            if (time == 0f)
-            {
-                yield return null;
-                particle.Stop();
-            }
             // 타이머 시간이 최대 이펙트 시간보다 크다면
-            else if (time - maxEffectTime > 0f)
+            if (time - maxEffectTime > 0f)
             {
                 // 타이머 시간 중 최대 이펙트 시간을 제외한 나머지 시간 대기하기
                 yield return new WaitForSeconds(time - maxEffectTime);
@@ -122,14 +121,13 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
             // 타이머 시간만큼 대기하기
             yield return new WaitForSeconds(time);
 
-        // 타이머 코루틴 초기화
-        timerCoroutine = null;
-
         // 따라다니고 있는 대상이 있다면
         if (transform.parent != container)
             // 컨테이너로 돌려보내기
             transform.SetParent(container, true);
 
+        // 타이머 코루틴 초기화
+        timerCoroutine = null;
         // 오브젝트 비활성화
         gameObject.SetActive(false);
     }
@@ -164,8 +162,7 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
     /// 이펙트 종료 함수
     /// </summary>
     /// <param name="immediately">즉시 종료 여부(생략 가능, 기본값 : 즉시 종료 안함)</param>
-    /// <param name="waitTime">이펙트 종료 대기 시간(생략 가능, 기본값 : 0초)</param>
-    public void StopEffect(bool immediately = false, float waitTime = 0f)
+    public void StopEffect(bool immediately = false)
     {
         // 타이머 코루틴이 비어있지 않다면
         if (timerCoroutine != null)
@@ -181,37 +178,16 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
             // 컨테이너로 돌려보내기
             transform.SetParent(container, true);
 
-        // 파티클이 있다면
-        if (particle != null)
-        {
-            // 즉시 종료가 아니라면
-            if (!immediately)
-            {
-                // 종료 대기 시간이 있다면
-                if (waitTime > 0f)
-                    // 종료 대기 시간으로 타이머 실행
-                    timerCoroutine = StartCoroutine(TimerRoutine(waitTime));
-                // 종료 대기 시간이 음수라면
-                else if (waitTime < 0f)
-                    // 0f로 타이머 실행
-                    timerCoroutine = StartCoroutine(TimerRoutine(0f));
-                else
-                    // 최대 이펙트 시간으로 타이머 실행
-                    timerCoroutine = StartCoroutine(TimerRoutine(maxEffectTime));
-            }
-            // 즉시 종료라면
-            else
-            {
-                // 이펙트 초기화
-                ResetEffect();
-                // 오브젝트 비활성화
-                gameObject.SetActive(false);
-            }
-        }
         // 파티클이 없다면
-        else
+        if (particle == null || immediately)
+        {
             // 오브젝트 비활성화
             gameObject.SetActive(false);
+            return;
+        }
+
+        // 최대 이펙트 시간으로 타이머 실행
+        timerCoroutine = StartCoroutine(TimerRoutine(maxEffectTime));
     }
 
     /// <summary>

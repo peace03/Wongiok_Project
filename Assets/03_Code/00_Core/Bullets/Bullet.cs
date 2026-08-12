@@ -131,18 +131,14 @@ public class Bullet : MonoBehaviour, IPoolable
         if (transform.childCount > 0)
         {
             // 하위 오브젝트들의 이펙트 실행기 인터페이스들 받아오기
-            var effects = transform.GetComponentsInChildren<Effect>();
+            var executers = transform.GetComponentsInChildren<IEffectExecuter>();
 
             // 하위 오브젝트에 이펙트가 있다면
-            if (effects.Length > 0)
-            {
+            if (executers.Length > 0)
                 // 이펙트 실행기들의 수만큼
-                foreach (var effect in effects)
-                    // 이펙트 종료 및 반납(즉시 종료 여부, 즉시 종료라면 대기 시간 0f, 아니라면 -1f)
-                    effect.Particle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-
-                StartCoroutine(Test(effects));
-            }
+                foreach (var executer in executers)
+                    // 이펙트 종료 및 반납
+                    executer.StopEffect(true);
         }
 
         // 충돌 처리한 콜라이더들이 있다면
@@ -161,14 +157,6 @@ public class Bullet : MonoBehaviour, IPoolable
 
         // 콜라이더 크기 설정
         SetColliderSize();
-    }
-
-    private IEnumerator Test(Effect[] effects)
-    {
-        yield return new WaitForEndOfFrame();
-
-        foreach (var effect in effects)
-            effect.Particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     /// <summary>
@@ -227,7 +215,7 @@ public class Bullet : MonoBehaviour, IPoolable
                                                 Quaternion.LookRotation(-transform.forward));
 
             // 최대 이펙트 시간만큼 대기 후 종료
-            executeEffect.StopEffect(waitTime : executeEffect.MaxEffectTime);
+            executeEffect.StopEffect();
 
             // 실행한 이펙트가 타겟 이펙트 인터페이스를 가지고 있다면
             if (executeEffect.TryGetComponent<ITargetEffect>(out var targetEffect))
@@ -341,7 +329,6 @@ public class Bullet : MonoBehaviour, IPoolable
         isReturnedToPool = false;
         // 활성화 된 시간 저장
         onEnabledTime = Time.time;
-        Debug.Log(onEnabledTime);
         // 사격 시작
         startFire = true;
         // 타이머 시작

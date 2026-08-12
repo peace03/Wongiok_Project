@@ -200,7 +200,7 @@ public class EffectManager : MonoBehaviour, IInitializable
             return;
 
         // 실행기 인터페이스가 없다면
-        if(!effect.TryGetComponent<IEffectExecuter>(out var executer))
+        if (!effect.TryGetComponent<IEffectExecuter>(out var executer))
             return;
 
         // 최대 이펙트 시간 후 자동으로 꺼지는 이펙트 실행으로 변경
@@ -232,22 +232,21 @@ public class EffectManager : MonoBehaviour, IInitializable
     /// </summary>
     /// <param name="effect">종료할 이펙트</param>
     /// <param name="immediately">즉시 종료 여부(생략 가능, 기본값 : 즉시 종료 안함)</param>
-    /// <param name="waitTime">이펙트 종료 대기 시간(생략 가능, 기본값 : 0초)</param>
-    public void StopEffect(Effect effect, bool immediately = false, float waitTime = 0f)
+    public void StopEffect(Effect effect, bool immediately = false)
     {
         // 종료할 이펙트가 없다면
         if (effect == null)
             return;
 
         // 이펙트 종료
-        effect.StopEffect(immediately, waitTime);
+        effect.StopEffect(immediately);
     }
 
     /// <summary>
     /// [구조체] 이펙트 종료 함수
     /// </summary>
     /// <param name="data">종료할 이펙트 정보 구조체</param>
-    public void StopEffect(EffectStopData data) => StopEffect(data.effect, data.immediately, data.waitTime);
+    public void StopEffect(EffectStopData data) => StopEffect(data.effect, data.immediately);
 
     /// <summary>
     /// [구조체] 이펙트들 종료 함수

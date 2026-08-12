@@ -212,19 +212,16 @@ public readonly struct EffectStopData
 {
     public readonly Effect effect;                                  // 종료할 이펙트
     public readonly bool immediately;                               // 즉시 종료 여부
-    public readonly float waitTime;                                 // 종료 대기 시간
 
     /// <summary>
     /// 종료할 이펙트 정보 생성자
     /// </summary>
     /// <param name="effect">종료할 이펙트</param>
     /// <param name="immediately">즉시 종료 여부(생략 가능, 기본값 : 즉시 종료 안함)</param>
-    /// <param name="waitTime">이펙트 종료 대기 시간(생략 가능, 기본값 : 0초)</param>
-    public EffectStopData(Effect effect, bool immediately = false, float waitTime = 0f)
+    public EffectStopData(Effect effect, bool immediately = false)
     {
         this.effect = effect;
         this.immediately = immediately;
-        this.waitTime = waitTime;
     }
 }
 
