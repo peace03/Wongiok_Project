@@ -568,14 +568,6 @@ public class TestModule : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene(titleSceneName);
     }
 
-    // 2026.08.10_UI 정리: 챕터 클리어 종료 게임 Requested 관련 입력 또는 EventBus 요청을 처리한다.
-    private void HandleChapterClearQuitGameRequested(UIChapterClearQuitGameRequestedEvent eventData)
-    {
-        Time.timeScale = 0f;
-
-        Debug.Log("게임 종료됨");
-    }
-
     // 2026.08.07_psb수정
     // 챕터 클리어 화면의 종료 요청을 현재 인게임 흐름에서 실제 게임 종료로 처리한다.
     private void HandleChapterClearQuitRequested(
