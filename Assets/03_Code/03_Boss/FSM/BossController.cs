@@ -120,7 +120,6 @@ public class BossController : MonoBehaviour, IInitializable
     //보스가 죽을 때 상태 전환
     private void SetDefeatedState(BossDeadEvent data)
     {
-        Debug.Log("죽음!!!!!!!!!!!!!!");
         if (isDefeated)
             return;
 

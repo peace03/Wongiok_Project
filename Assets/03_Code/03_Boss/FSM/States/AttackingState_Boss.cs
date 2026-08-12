@@ -10,7 +10,6 @@ public class AttackingState_Boss : BossState
 
     public override void Enter()
     {
-        Debug.Log("Attack 상태 진입");
         curBT = logics.GetAttackBT();
         logics.SetStateDone(false);
         logics.LogicInit();
@@ -24,7 +23,6 @@ public class AttackingState_Boss : BossState
     {
         curBT.Evaluate();
         if (logics.IsEnranged == true) logics.EnrangedTimer(); //격노 타이머
-        //Debug.Log("Attack State Update 실행");
         if (logics.GetStateDone())
         {
             if (logics.IsEnranged == true && enrangedCount < 2)
@@ -37,6 +35,5 @@ public class AttackingState_Boss : BossState
     {
         EventBus<AttackFinishEvent>.Publish(default);
         if(!logics.IsEnranged) enrangedCount = 0;
-        //Debug.Log("Attack 상태 이탈");
     }
 }
