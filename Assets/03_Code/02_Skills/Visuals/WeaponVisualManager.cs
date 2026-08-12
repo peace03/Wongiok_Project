@@ -49,11 +49,8 @@ public class WeaponVisualManager : MonoBehaviour, IInitializable
     /// </summary>
     private void AddWeapon(WeaponVisualAddData skill)
     {
-        // ID에 해당하는 무기가 있다면
-        if (weapons.ContainsKey(skill.id))
-            return;
-        // 무기 프리팹이 없다면
-        else if (skill.weapon == null)
+        // ID에 해당하는 무기가 있거나, 무기 프리팹이 없다면
+        if (weapons.ContainsKey(skill.id) || skill.weapon == null)
             return;
 
         // 무기 오브젝트 생성 후 딕셔너리에 저장
@@ -70,8 +67,11 @@ public class WeaponVisualManager : MonoBehaviour, IInitializable
         // 변경할 무기가 없다면
         if (!weapons.TryGetValue(change.id, out var weaponVisual))
             return;
+        // 무기 외형 관리자의 로컬 각도가 초기화되어 있지 않다면
+        else if(transform.localRotation != Quaternion.identity)
+            // 로컬 각도 초기화
+            transform.localRotation = Quaternion.identity;
 
-        transform.localRotation = Quaternion.identity;
         // 무기 외형 상태 변경
         weaponVisual.SetActive(change.isActiveWeapon);
 
