@@ -13,6 +13,7 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
     private float maxEffectTime = 0f;               // 최대 이펙트 시간
 
     public Transform Container => container;
+    public ParticleSystem Particle => particle;
     public float MaxEffectTime => maxEffectTime;
 
     private void Awake()
@@ -88,8 +89,13 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
         // 파티클이 있다면
         if (particle != null)
         {
+            if (time == 0f)
+            {
+                yield return null;
+                particle.Stop();
+            }
             // 타이머 시간이 최대 이펙트 시간보다 크다면
-            if (time - maxEffectTime > 0f)
+            else if (time - maxEffectTime > 0f)
             {
                 // 타이머 시간 중 최대 이펙트 시간을 제외한 나머지 시간 대기하기
                 yield return new WaitForSeconds(time - maxEffectTime);
@@ -187,16 +193,20 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
                     timerCoroutine = StartCoroutine(TimerRoutine(waitTime));
                 // 종료 대기 시간이 음수라면
                 else if (waitTime < 0f)
-                    // 최대 이펙트 시간의 절반으로 타이머 실행
-                    timerCoroutine = StartCoroutine(TimerRoutine(maxEffectTime * 0.5f));
+                    // 0f로 타이머 실행
+                    timerCoroutine = StartCoroutine(TimerRoutine(0f));
                 else
                     // 최대 이펙트 시간으로 타이머 실행
                     timerCoroutine = StartCoroutine(TimerRoutine(maxEffectTime));
             }
             // 즉시 종료라면
             else
+            {
+                // 이펙트 초기화
+                ResetEffect();
                 // 오브젝트 비활성화
                 gameObject.SetActive(false);
+            }
         }
         // 파티클이 없다면
         else

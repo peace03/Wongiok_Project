@@ -56,7 +56,7 @@ public class Bullet : MonoBehaviour, IPoolable
     private float bulletSpeed;                                      // 총알 속도
     private float damage;                                           // 데미지
     private float cameraShakeValue;                                 // 카메라 흔들림 값
-    private float onEnabledTime;                                    // 활성화 된 시간
+    private float onEnabledTime = 0f;                               // 활성화 된 시간
     
     private int penetrationCount;                                   // 관통 횟수
     #endregion
@@ -102,18 +102,12 @@ public class Bullet : MonoBehaviour, IPoolable
             // 콜라이더 충돌 처리 시작
             EnterColliderProcess(hit.collider, hit.point);
 
-        // 전방으로 총알 발사
-        transform.position += bulletSpeed * Time.deltaTime * transform.forward;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        // 사격이 시작되지 않았거나, 풀에 반환되었다면
-        if (!startFire || isReturnedToPool)
+        // 풀에 반납되었다면
+        if (isReturnedToPool)
             return;
 
-        // 콜라이더 충돌 처리 시작
-        EnterColliderProcess(other, other.ClosestPoint(transform.position));
+        // 전방으로 총알 발사
+        transform.position += bulletSpeed * Time.deltaTime * transform.forward;
     }
 
     // 총알 초기화
@@ -137,20 +131,18 @@ public class Bullet : MonoBehaviour, IPoolable
         if (transform.childCount > 0)
         {
             // 하위 오브젝트들의 이펙트 실행기 인터페이스들 받아오기
-            var executers = transform.GetComponentsInChildren<IEffectExecuter>();
+            var effects = transform.GetComponentsInChildren<Effect>();
 
-            // 즉시 종료 여부
-            bool immediatelyStop = false;
+            // 하위 오브젝트에 이펙트가 있다면
+            if (effects.Length > 0)
+            {
+                // 이펙트 실행기들의 수만큼
+                foreach (var effect in effects)
+                    // 이펙트 종료 및 반납(즉시 종료 여부, 즉시 종료라면 대기 시간 0f, 아니라면 -1f)
+                    effect.Particle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
-            // 현재 시간이 활성화한 시간에 최대 유지 시간의 절반 이상이라면
-            if (Time.time >= onEnabledTime + (maxLifeTime * 0.5f))
-                // 즉시 종료
-                immediatelyStop = true;
-
-            // 이펙트 실행기들의 수만큼
-            foreach (var executer in executers)
-                // 이펙트 종료 및 반납(즉시 종료 여부, 즉시 종료라면 대기 시간 0f, 아니라면 -1f)
-                executer.StopEffect(immediatelyStop, immediatelyStop ? 0f : -1f);
+                StartCoroutine(Test(effects));
+            }
         }
 
         // 충돌 처리한 콜라이더들이 있다면
@@ -169,6 +161,14 @@ public class Bullet : MonoBehaviour, IPoolable
 
         // 콜라이더 크기 설정
         SetColliderSize();
+    }
+
+    private IEnumerator Test(Effect[] effects)
+    {
+        yield return new WaitForEndOfFrame();
+
+        foreach (var effect in effects)
+            effect.Particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     /// <summary>
@@ -337,12 +337,13 @@ public class Bullet : MonoBehaviour, IPoolable
         transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
         // 총알 정보 설정
         SetInfo(ownerLayer, damage, penetrationCount, speed, cameraShakeValue, effectPrefabs);
-        // 사격 시작
-        startFire = true;
         // 풀 반환 완료 여부 초기화
         isReturnedToPool = false;
         // 활성화 된 시간 저장
         onEnabledTime = Time.time;
+        Debug.Log(onEnabledTime);
+        // 사격 시작
+        startFire = true;
         // 타이머 시작
         timerCoroutine = StartCoroutine(ReturnRoutine());
     }
