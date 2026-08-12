@@ -350,11 +350,6 @@ public class MonsterFlyingSelfDestructAI : MonsterBase
     // 폭발 애니메이션의 타격 프레임에서 실제 폭발 판정을 실행합니다
     public void ExecuteExplosionImpact()
     {
-        Debug.Log(
-            $"{name}: 실제 폭발 처리 진입",
-            this
-        );
-
         if (currentState != SelfDestructState.Exploded || IsDead)
         {
             Debug.LogWarning(
