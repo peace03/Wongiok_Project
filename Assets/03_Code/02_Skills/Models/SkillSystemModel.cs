@@ -388,6 +388,8 @@ public class SkillSystemModel
         var skillData = equippedActives[slotIndex].BaseData;
         // 무기 외형 착용 해제 이벤트 발행
         EventBus<ChangeWeaponState>.Publish(new(skillData.Id, false));
+        // 플레이어에게 스킬 실행 중 여부 이벤트 발행
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(new(false));
 
         // 소유자 애니메이터 시스템이 없다면
         if (ownerAnimatorDriver == null)

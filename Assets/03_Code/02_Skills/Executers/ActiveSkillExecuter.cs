@@ -325,10 +325,10 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         EventBus<StopControlledSfxEvent>.Publish(new($"{executingSkillId}_Sound"));
         // 총구 이펙트 즉시 종료
         StopEffects(ACTIVE_SKILL_EFFECT_TYPE.Muzzle, true);
-        // 총알 이펙트 리스트 초기화
-        activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
-        // 무기 외형 착용 해제 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new(executingSkillId, false));
+
+        if(activeEffects.ContainsKey(ACTIVE_SKILL_EFFECT_TYPE.Main))
+            // 총알 이펙트 리스트 초기화
+            activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
 
         // 소유자 애니메이터 시스템이 없다면
         if (ownerAnimatorDriver == null)
