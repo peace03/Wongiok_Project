@@ -4,6 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
+/// <summary>
+/// 데미지 받음 여부 인터페이스
+/// </summary>
+public interface IDamageable
+{
+    /// <summary>
+    /// 데미지를 입을 수 있는 상태 여부
+    /// </summary>
+    public bool CanTakeDamage => true;
+
+    /// <summary>
+    /// 타격/피격 이펙트를 실행할 위치
+    /// </summary>
+    public Transform HitEffectPlace => null;
+
+    /// <summary>
+    /// 데미지 전달 함수
+    /// </summary>
+    /// <param name="amount">데미지 량</param>
+    public void TakeDamage(float amount);
+}
+
 public class Bullet : MonoBehaviour, IPoolable
 {
     #region 변수
