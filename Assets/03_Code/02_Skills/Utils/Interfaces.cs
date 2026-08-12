@@ -68,19 +68,15 @@ public interface IEffectExecuter
     /// <summary>
     /// 이펙트 실행 함수
     /// </summary>
-    public void ExecuteEffect();
-
-    /// <summary>
-    /// 이펙트 실행 함수
-    /// </summary>
     /// <param name="time">이펙트 종료 시간</param>
-    public void ExecuteEffect(float time);
+    public void ExecuteEffect(float time = 0f);
 
     /// <summary>
     /// 이펙트 종료 함수
     /// </summary>
-    /// <param name="immediately">즉시 종료 여부(기본값 : 즉시 종료 안함)</param>
-    public void StopEffect(bool immediately = false);
+    /// <param name="immediately">즉시 종료 여부(생략 가능, 기본값 : 즉시 종료 안함)</param>
+    /// <param name="waitTime">이펙트 종료 대기 시간(생략 가능, 기본값 : 0초)</param>
+    public void StopEffect(bool immediately = false, float waitTime = 0f);
 
     /// <summary>
     /// 이펙트 초기화 함수

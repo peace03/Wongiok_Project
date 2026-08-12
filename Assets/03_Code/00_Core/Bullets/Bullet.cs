@@ -56,6 +56,7 @@ public class Bullet : MonoBehaviour, IPoolable
     private float bulletSpeed;                                      // 총알 속도
     private float damage;                                           // 데미지
     private float cameraShakeValue;                                 // 카메라 흔들림 값
+    private float onEnabledTime;                                    // 활성화 된 시간
     
     private int penetrationCount;                                   // 관통 횟수
     #endregion
@@ -138,10 +139,18 @@ public class Bullet : MonoBehaviour, IPoolable
             // 하위 오브젝트들의 이펙트 실행기 인터페이스들 받아오기
             var executers = transform.GetComponentsInChildren<IEffectExecuter>();
 
+            // 즉시 종료 여부
+            bool immediatelyStop = false;
+
+            // 현재 시간이 활성화한 시간에 최대 유지 시간의 절반 이상이라면
+            if (Time.time >= onEnabledTime + (maxLifeTime * 0.5f))
+                // 즉시 종료
+                immediatelyStop = true;
+
             // 이펙트 실행기들의 수만큼
             foreach (var executer in executers)
-                // 이펙트 종료 및 반납
-                executer.StopEffect();
+                // 이펙트 종료 및 반납(즉시 종료 여부, 즉시 종료라면 대기 시간 0f, 아니라면 -1f)
+                executer.StopEffect(immediatelyStop, immediatelyStop ? 0f : -1f);
         }
 
         // 충돌 처리한 콜라이더들이 있다면
@@ -203,14 +212,6 @@ public class Bullet : MonoBehaviour, IPoolable
         // 실행할 타격/피격 이펙트의 수만큼
         foreach(var hitEffect in executeHitEffects)
         {
-            // 최대 이펙트 시간 저장할 변수
-            float maxEffectTime = 0f;
-
-            // 타격/피격 이펙트가 이펙트 스크립트를 가지고 있다면
-            if(hitEffect.TryGetComponent<Effect>(out var effect))
-                // 최대 이펙트 시간 받아오기
-                maxEffectTime = effect.MaxEffectTime;
-
             // 실행한 이펙트를 저장할 변수
             Effect executeEffect;
 
@@ -218,12 +219,15 @@ public class Bullet : MonoBehaviour, IPoolable
             if (target.HitEffectPlace != null)
                 // 해당 위치에서 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
                 executeEffect = EffectManager.Instance.PlayEffect(hitEffect, target.HitEffectPlace.position,
-                                                Quaternion.LookRotation(-transform.forward), maxEffectTime);
+                                                Quaternion.LookRotation(-transform.forward));
             // 부딪힌 대상에게 타격/피격 이펙트 실행할 위치가 없다면
             else
                 // 부딪힌 위치에서 타격/피격 이펙트 실행 후, 실행한 이펙트 받아오기
                 executeEffect = EffectManager.Instance.PlayEffect(hitEffect, pos,
-                                                Quaternion.LookRotation(-transform.forward), maxEffectTime);
+                                                Quaternion.LookRotation(-transform.forward));
+
+            // 최대 이펙트 시간만큼 대기 후 종료
+            executeEffect.StopEffect(waitTime : executeEffect.MaxEffectTime);
 
             // 실행한 이펙트가 타겟 이펙트 인터페이스를 가지고 있다면
             if (executeEffect.TryGetComponent<ITargetEffect>(out var targetEffect))
@@ -337,6 +341,8 @@ public class Bullet : MonoBehaviour, IPoolable
         startFire = true;
         // 풀 반환 완료 여부 초기화
         isReturnedToPool = false;
+        // 활성화 된 시간 저장
+        onEnabledTime = Time.time;
         // 타이머 시작
         timerCoroutine = StartCoroutine(ReturnRoutine());
     }

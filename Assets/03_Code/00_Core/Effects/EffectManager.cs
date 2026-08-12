@@ -232,21 +232,22 @@ public class EffectManager : MonoBehaviour, IInitializable
     /// </summary>
     /// <param name="effect">종료할 이펙트</param>
     /// <param name="immediately">즉시 종료 여부(생략 가능, 기본값 : 즉시 종료 안함)</param>
-    public void StopEffect(Effect effect, bool immediately = false)
+    /// <param name="waitTime">이펙트 종료 대기 시간(생략 가능, 기본값 : 0초)</param>
+    public void StopEffect(Effect effect, bool immediately = false, float waitTime = 0f)
     {
         // 종료할 이펙트가 없다면
         if (effect == null)
             return;
 
         // 이펙트 종료
-        effect.StopEffect(immediately);
+        effect.StopEffect(immediately, waitTime);
     }
 
     /// <summary>
     /// [구조체] 이펙트 종료 함수
     /// </summary>
     /// <param name="data">종료할 이펙트 정보 구조체</param>
-    public void StopEffect(EffectStopData data) => StopEffect(data.effect, data.immediately);
+    public void StopEffect(EffectStopData data) => StopEffect(data.effect, data.immediately, data.waitTime);
 
     /// <summary>
     /// [구조체] 이펙트들 종료 함수

@@ -9,8 +9,11 @@ public class TargetEffect : Effect, ITargetEffect
     {
         // 따라다닐 대상이 없다면
         if (target == null)
-            // 종료
+        {
+            // 이펙트 즉시 종료
+            StopEffect(true);
             return;
+        }
 
         // 따라다닐 대상의 높이가 이펙트의 높이보다 낮다면
         if(target.position.y < transform.position.y)

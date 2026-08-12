@@ -45,10 +45,27 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
     /// <summary>
     /// 이펙트 실행 함수
     /// </summary>
-    public void ExecuteEffect()
+    /// <param name="time">이펙트 종료 시간</param>
+    public void ExecuteEffect(float time = 0f)
+    {
+        // 이펙트 실행
+        PlayEffect();
+
+        // 이펙트 종료 시간이 없다면
+        if (time <= 0f)
+            return;
+
+        // 이펙트 종료 시간으로 타이머 실행
+        timerCoroutine = StartCoroutine(TimerRoutine(time));
+    }
+
+    /// <summary>
+    /// 이펙트 실행 함수
+    /// </summary>
+    private void PlayEffect()
     {
         // 타이머 코루틴이 비어있지 않다면
-        if(timerCoroutine != null)
+        if (timerCoroutine != null)
         {
             // 타이머 코루틴 중지
             StopCoroutine(timerCoroutine);
@@ -57,21 +74,9 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
         }
 
         // 파티클이 있다면
-        if(particle != null)
+        if (particle != null)
             // 파티클 실행
             particle.Play();
-    }
-
-    /// <summary>
-    /// 이펙트 실행 함수
-    /// </summary>
-    /// <param name="time">이펙트 종료 시간</param>
-    public void ExecuteEffect(float time)
-    {
-        // 이펙트 실행
-        ExecuteEffect();
-        // 이펙트 종료 시간으로 타이머 실행
-        timerCoroutine = StartCoroutine(TimerRoutine(time));
     }
 
     /// <summary>
@@ -84,7 +89,7 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
         if (particle != null)
         {
             // 타이머 시간이 최대 이펙트 시간보다 크다면
-            if(time - maxEffectTime > 0f)
+            if (time - maxEffectTime > 0f)
             {
                 // 타이머 시간 중 최대 이펙트 시간을 제외한 나머지 시간 대기하기
                 yield return new WaitForSeconds(time - maxEffectTime);
@@ -152,8 +157,9 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
     /// <summary>
     /// 이펙트 종료 함수
     /// </summary>
-    /// <param name="immediately">즉시 종료 여부(기본값 : 즉시 종료 안함)</param>
-    public void StopEffect(bool immediately = false)
+    /// <param name="immediately">즉시 종료 여부(생략 가능, 기본값 : 즉시 종료 안함)</param>
+    /// <param name="waitTime">이펙트 종료 대기 시간(생략 가능, 기본값 : 0초)</param>
+    public void StopEffect(bool immediately = false, float waitTime = 0f)
     {
         // 타이머 코루틴이 비어있지 않다면
         if (timerCoroutine != null)
@@ -174,8 +180,19 @@ public class Effect : MonoBehaviour, IPoolable, IEffectExecuter
         {
             // 즉시 종료가 아니라면
             if (!immediately)
-                // 최대 이펙트 시간으로 타이머 실행
-                timerCoroutine = StartCoroutine(TimerRoutine(maxEffectTime));
+            {
+                // 종료 대기 시간이 있다면
+                if (waitTime > 0f)
+                    // 종료 대기 시간으로 타이머 실행
+                    timerCoroutine = StartCoroutine(TimerRoutine(waitTime));
+                // 종료 대기 시간이 음수라면
+                else if (waitTime < 0f)
+                    // 최대 이펙트 시간의 절반으로 타이머 실행
+                    timerCoroutine = StartCoroutine(TimerRoutine(maxEffectTime * 0.5f));
+                else
+                    // 최대 이펙트 시간으로 타이머 실행
+                    timerCoroutine = StartCoroutine(TimerRoutine(maxEffectTime));
+            }
             // 즉시 종료라면
             else
                 // 오브젝트 비활성화
