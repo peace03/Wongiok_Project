@@ -13,53 +13,49 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     private GameInputReader ownerInput;                             // 소유자 입력 시스템
 
     private bool ownerIsGrounded = true;                            // 소유자 땅에 있음 여부
+    private bool canExecutingSkill = true;                          // 스킬 실행 가능 여부
 
     public ISkillSystemProvider Presenter => presenter ?? null;
     public int Priority => (int)InitOrder.Skill + 1;                // 중요도
 
-    private void OnEnable()
-    {
-        // 액티브 스킬 슬롯 키 누름 이벤트 구독
-        EventBus<StartedPressSkillSlot>.action += ExecuteSkill;
-        // 스킬 사용 가능 여부 이벤트 구독
-        EventBus<CanExecutingActiveSkill>.action += SetOwnerIsGrounded;
-    }
+    // 스킬 사용 가능 여부 이벤트 구독
+    private void OnEnable() => EventBus<CanExecutingActiveSkill>.action += SetOwnerIsGrounded;
 
     private void Update()
     {
-        // 시간이 멈춰있거나, 소유자가 땅에 있는 상태가 아니라면
-        if (Time.timeScale <= 0f || !ownerIsGrounded)
-            return;
-
-        // A키를 눌렀다면
-        if (ownerInput.SkillAPressed)
-            // A키 누름 이벤트 발행
-            EventBus<StartedPressSkillSlot>.Publish(new(ACTIVE_SKILL_SLOT_TYPE.A));
-
-        // S키를 눌렀다면
-        if (ownerInput.SkillSPressed)
-            // S키 누름 이벤트 발행
-            EventBus<StartedPressSkillSlot>.Publish(new(ACTIVE_SKILL_SLOT_TYPE.S));
-
-        // D키를 눌렀다면
-        if (ownerInput.SkillDPressed)
-            // D키 누름 이벤트 발행
-            EventBus<StartedPressSkillSlot>.Publish(new(ACTIVE_SKILL_SLOT_TYPE.D));
-
-        // 프레젠터가 없다면
-        if (presenter == null)
+        // 시간이 멈춰있거나, 프레젠터가 없거나, 실행기가 없다면
+        if (Time.timeScale <= 0f || presenter == null || executer == null)
             return;
 
         // 장착한 액티브 스킬들 시간 진행
         presenter.TickActiveSkills(Time.deltaTime);
+        // 스킬 실행 가능 여부 받아오기
+        canExecutingSkill = presenter.GetCanExecutingSkill() && !executer.ExecutingSkill;
+
+        // 소유자가 공중에 있거나, 스킬 실행이 불가능하다면
+        if (!ownerIsGrounded || !canExecutingSkill)
+            return;
+
+        // A키를 눌렀다면
+        if (ownerInput.SkillAPressed)
+            // A 슬롯 액티브 스킬 실행
+            ExecuteSkill(ACTIVE_SKILL_SLOT_TYPE.A);
+
+        // S키를 눌렀다면
+        if (ownerInput.SkillSPressed)
+            // S 슬롯 액티브 스킬 실행
+            ExecuteSkill(ACTIVE_SKILL_SLOT_TYPE.S);
+
+        // D키를 눌렀다면
+        if (ownerInput.SkillDPressed)
+            // D 슬롯 액티브 스킬 실행
+            ExecuteSkill(ACTIVE_SKILL_SLOT_TYPE.D);
     }
 
     private void OnDisable()
     {
         // 프레젠터 비활성화 함수 호출
         presenter.DisablePresenter();
-        // 액티브 스킬 슬롯 누름 이벤트 구독 해제
-        EventBus<StartedPressSkillSlot>.action -= ExecuteSkill;
         // 스킬 사용 가능 여부 이벤트 구독 해제
         EventBus<CanExecutingActiveSkill>.action -= SetOwnerIsGrounded;
     }
@@ -92,36 +88,15 @@ public class SkillSystemController : MonoBehaviour, IInitializable
     /// <summary>
     /// 스킬 실행 함수
     /// </summary>
-    private void ExecuteSkill(StartedPressSkillSlot type)
+    /// <param name="slot">실행할 스킬 위치</param>
+    private void ExecuteSkill(ACTIVE_SKILL_SLOT_TYPE slot)
     {
-        // 프레젠터가 없다면
-        if (presenter == null)
+        // 프레젠터가 없거나, 스킬 실행이 불가능하다면
+        if (presenter == null || !canExecutingSkill)
             return;
 
-        // 슬롯 종류에 따라
-        switch (type.type)
-        {
-            // A키라면
-            case ACTIVE_SKILL_SLOT_TYPE.A:
-                // A키 액티브 스킬 실행
-                presenter.ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE.A);
-                break;
-            // S키라면
-            case ACTIVE_SKILL_SLOT_TYPE.S:
-                // S키 액티브 스킬 실행
-                presenter.ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE.S);
-                break;
-            // D키라면
-            case ACTIVE_SKILL_SLOT_TYPE.D:
-                // D키 액티브 스킬 실행
-                presenter.ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE.D);
-                break;
-            // 그 외라면
-            default:
-                //Debug.Log($"[Skill] 스킬 실행 실패 => " +
-                //            $"입력 - 슬롯 : {type.type.ToKoreanString()}", this);
-                break;
-        }
+        // 해당 슬롯의 액티브 스킬 실행
+        presenter.ExecuteActiveSkill(slot);
     }
 
     /// <summary>

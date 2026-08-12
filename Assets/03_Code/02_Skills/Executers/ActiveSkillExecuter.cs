@@ -32,6 +32,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private readonly List<Transform> executePlaces = new();                 // 실행 위치들
 
     public IReadOnlyList<Transform> ExecutePlaces => executePlaces;
+    public bool ExecutingSkill => executingSkill;
 
     // 액티브 스킬 실행 위치들 변경 이벤트 구독
     private void OnEnable() => EventBus<ChangeActiveSkillExecutePositions>.action += SetExecutePositions;
@@ -39,21 +40,15 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
     private void Awake()
     {
         // 현재 프레임 구하기
-        curFps = Mathf.RoundToInt(1f / Time.deltaTime);
+        curFps = Application.targetFrameRate;
         // 스킬 레이어 초기화(실행 위치의 레이어로 설정)
         skillLayer = 1 << defaultExecutePos.gameObject.layer;
         // 실행 위치들 초기화
         ResetExecutePositions();
     }
 
-    private void OnDisable()
-    {
-        // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
-        EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
-        #region 플레이어 쪽에서 추가한 로직
-        SetExecutingSkill(false);
-        #endregion
-    }
+    // 액티브 스킬 실행 위치들 변경 이벤트 구독 해제
+    private void OnDisable() => EventBus<ChangeActiveSkillExecutePositions>.action -= SetExecutePositions;
 
     /// <summary>
     /// 초기화 함수
@@ -124,7 +119,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             activeEffects[ACTIVE_SKILL_EFFECT_TYPE.Main].Clear();
 
         // 스킬 실행 중
-        SetExecutingSkill(true);
+        executingSkill = true;
         // 발사체 스킬 실행
         StartCoroutine(ProjectileRoutine(levelData.ProjectileCount, levelData.GetDamage(),
                                                 levelData.MaxDuration > 0f ? levelData.MaxDuration : null,
@@ -149,7 +144,11 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         {
             // 스킬 실행 중이 아니라면
             if (!executingSkill)
+            {
+                // 스킬 취소
+                CancelSkill();
                 yield break;
+            }
 
             // 대기 시간 감소
             waitTimer -= Time.deltaTime;
@@ -162,9 +161,8 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 정보가 비어있거나, 액티브 스킬이 아니라면
         if (data == null || data.AsActiveData == null)
         {
-            #region 플레이어 쪽에서 추가한 로직
-            SetExecutingSkill(false);
-            #endregion
+            // 스킬 취소
+            CancelSkill();
             yield break;
         }
 
@@ -236,7 +234,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 실행 위치들 초기화
         ResetExecutePositions();
         // 스킬 실행 끝남
-        SetExecutingSkill(false);
+        executingSkill = false;
     }
 
     /// <summary>
@@ -322,7 +320,7 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
             return;
 
         // 스킬 실행 중지
-        SetExecutingSkill(false);
+        executingSkill = false;
         // 스킬 사용 사운드 정지
         EventBus<StopControlledSfxEvent>.Publish(new($"{executingSkillId}_Sound"));
         // 총구 이펙트 즉시 종료
@@ -344,18 +342,6 @@ public class ActiveSkillExecuter : MonoBehaviour, IProjectileSkill, IAreaSkill
         // 실행 중인 스킬 ID 초기화
         executingSkillId = -1;
     }
-
-    #region 플레이어 쪽에서 추가한 함수
-    private void SetExecutingSkill(bool isExecuting)
-    {
-        if (executingSkill == isExecuting)
-            return;
-
-        executingSkill = isExecuting;
-        EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(
-            new PlayerSkillEffectExecutionChangedEvent(isExecuting));
-    }
-    #endregion
 
     #region 기획 축소로 인한 사용하지 않는 함수들
     /// <summary>

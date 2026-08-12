@@ -358,7 +358,9 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
         }
 
         // 무기 외형 착용 해제 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState((int)skillId, false));
+        EventBus<ChangeWeaponState>.Publish(new((int)skillId, false));
+        // 플레이어에게 스킬 실행 중 여부 이벤트 발행
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(new(false));
     }
 
     /// <summary>
@@ -547,6 +549,8 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
 
     private IEnumerator SkillRoutine(ACTIVE_SKILL_ID skillId, float duration)
     {
+        // 플레이어에게 스킬 실행 중 여부 이벤트 발행
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(new(true));
         animator.SetBool(IsExecutingSkill, true);
         yield return new WaitForSeconds(duration);
         
@@ -558,8 +562,10 @@ public sealed class PlayerAnimatorDriver : MonoBehaviour
 
         skillCoroutine = null;
         animator.SetBool(IsExecutingSkill, false);
-        // 무기 외형 착용 해제 이벤트 발행
-        EventBus<ChangeWeaponState>.Publish(new ChangeWeaponState((int)skillId, false));
+        // 스킬 취소 이벤트 발행
+        EventBus<CancelSkill>.Publish(default);
+        // 플레이어에게 스킬 실행 중 여부 이벤트 발행
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(new(false));
 
         if (!Mathf.Approximately(inputReader.MoveInput.x, 0f))
             animator.SetBool(IsMoving, true);

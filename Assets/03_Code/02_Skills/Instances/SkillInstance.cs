@@ -363,12 +363,12 @@ public class SkillInstance
     /// </summary>
     public void CancelSkill()
     {
-        // 차징 상태가 아니라면
-        if (!IsCharging)
+        // 사용 가능 상태이거나, 쿨타임 중 상태라면
+        if (IsReady || IsOnCoolTime)
             return;
 
-        // 차징이 끝났다면
-        if (curChargingTime >= Math.Max(0f, data.GetMaxChargingTime(curLevel)))
+        // 차징 상태이고 차징이 끝났다면
+        if (IsCharging && curChargingTime >= Math.Max(0f, data.GetMaxChargingTime(curLevel)))
         {
             // 실행 상태로 변경(이펙트 초기화 X)
             SwitchState(SKILL_STATE.Executing, false);

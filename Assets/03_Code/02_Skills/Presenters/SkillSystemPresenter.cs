@@ -244,6 +244,37 @@ public class SkillSystemPresenter : ISkillSystemProvider
     }
 
     /// <summary>
+    /// 스킬 실행 가능 여부 반환 함수
+    /// </summary>
+    public bool GetCanExecutingSkill() => model.GetCanExecutingSkill();
+
+    /// <summary>
+    /// 액티브 스킬 실행 함수
+    /// </summary>
+    public void ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
+    {
+        // 모델이 없다면
+        if (model == null)
+            return;
+
+        // 액티브 스킬 실행
+        model.ExecuteActiveSkill(slot);
+    }
+
+    /// <summary>
+    /// 액티브 스킬 시간 진행 함수
+    /// </summary>
+    public void TickActiveSkills(float time)
+    {
+        // 모델이 없다면
+        if (model == null)
+            return;
+
+        // 액티브 스킬 시간 진행
+        model.TickActiveSkills(time);
+    }
+
+    /// <summary>
     /// 특정 스킬 새로고침 함수
     /// </summary>
     /// <param name="skillUIData">선택한 스킬 UI 데이터</param>
@@ -306,32 +337,6 @@ public class SkillSystemPresenter : ISkillSystemProvider
         // 스킬 스왑에 실패했다면
         if (!model.SwapSkill(slot, skillId))
             return;
-    }
-
-    /// <summary>
-    /// 액티브 스킬 실행 함수
-    /// </summary>
-    public void ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
-    {
-        // 모델이 없다면
-        if (model == null)
-            return;
-
-        // 액티브 스킬 실행
-        model.ExecuteActiveSkill(slot);
-    }
-
-    /// <summary>
-    /// 액티브 스킬 시간 진행 함수
-    /// </summary>
-    public void TickActiveSkills(float time)
-    {
-        // 모델이 없다면
-        if (model == null)
-            return;
-
-        // 액티브 스킬 시간 진행
-        model.TickActiveSkills(time);
     }
 
     #region 플레이어 쪽에서 추가한 함수

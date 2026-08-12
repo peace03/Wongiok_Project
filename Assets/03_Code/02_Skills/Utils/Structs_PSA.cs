@@ -135,19 +135,6 @@ public readonly struct CanExecutingActiveSkill
 }
 
 /// <summary>
-/// 누른 스킬 슬롯 정보
-/// </summary>
-public readonly struct StartedPressSkillSlot
-{
-    public readonly ACTIVE_SKILL_SLOT_TYPE type;                    // 슬롯 종류
-
-    /// <summary>
-    /// 누른 스킬 슬롯 정보 생성자
-    /// </summary>
-    public StartedPressSkillSlot(ACTIVE_SKILL_SLOT_TYPE type) => this.type = type;
-}
-
-/// <summary>
 /// 취소할 스킬 정보
 /// </summary>
 public readonly struct CancelSkill { }

@@ -65,7 +65,7 @@ public class SkillSystemModel
 
             // 스킬 객체 생성 및 저장
             allSkillDictionary[data.Id] = data.CreateInstance(owner, executer, chapter,
-                                                                Mathf.RoundToInt(1f / Time.deltaTime));
+                                                                            Application.targetFrameRate);
             allSkillList.Add(allSkillDictionary[data.Id]);
             // 장착한 액티브 스킬들과 패시브 스킬들 리스트 연결
             allSkillDictionary[data.Id].SetEquippedSkills(equippedActives, equippedPassives);
@@ -276,6 +276,26 @@ public class SkillSystemModel
     }
 
     /// <summary>
+    /// 스킬 실행 가능 여부 반환 함수
+    /// </summary>
+    public bool GetCanExecutingSkill()
+    {
+        // 장착한 액티브 스킬들의 수만큼
+        foreach(var skill in equippedActives)
+        {
+            // 사용 가능 상태이거나, 쿨타임 중 상태라면
+            if (skill.IsReady || skill.IsOnCoolTime)
+                continue;
+
+            // 차징 중이거나 실행 중이라면, 스킬 실행 불가능
+            return false;
+        }
+
+        // 스킬 실행 가능
+        return true;
+    }
+
+    /// <summary>
     /// 액티브 스킬 실행 함수
     /// </summary>
     public void ExecuteActiveSkill(ACTIVE_SKILL_SLOT_TYPE slot)
@@ -284,8 +304,9 @@ public class SkillSystemModel
         if (equippedActives[(int)slot] == null || equippedActives[(int)slot].BaseData == null)
             return;
 
-        // 스킬이 쿨타임 중이거나, 실행 중이라면
-        if (equippedActives[(int)slot].IsOnCoolTime || equippedActives[(int)slot].IsExecuting)
+        // 스킬이 쿨타임 중이거나, 실행 중이거나, 차징 중이라면
+        if (equippedActives[(int)slot].IsOnCoolTime
+                || equippedActives[(int)slot].IsExecuting || equippedActives[(int)slot].IsCharging)
             return;
 
         // 스킬 정보 받아오기
@@ -311,6 +332,8 @@ public class SkillSystemModel
         EventBus<ChangeWeaponState>.Publish(new(skillData.Id));
         // UI의 스킬 쿨타임 설정 이벤트 발행
         EventBus<TestPlayerSkillUsedEvent>.Publish(new((int)slot));
+        // 플레이어에게 스킬 실행 중 여부 이벤트 발행
+        EventBus<PlayerSkillEffectExecutionChangedEvent>.Publish(new(true));
         // 스킬 실행
         equippedActives[(int)slot].UseSkill();
     }

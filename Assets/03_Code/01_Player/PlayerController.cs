@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour
     private bool isSkillExecuting;
 
     // 스킬 데이터의 실행 시간이 끝난 뒤에도 실제 발사가 남아 있는지 확인합니다.
-    private bool isSkillEffectExecuting;
+    private bool isSkillEffectExecuting = false;
 
     // 플레이어가 마지막으로 바라본 방향입니다. true면 오른쪽, false면 왼쪽으로 취급합니다.
     private bool _isFacingRight = true;
